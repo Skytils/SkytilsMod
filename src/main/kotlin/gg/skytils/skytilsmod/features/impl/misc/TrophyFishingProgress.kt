@@ -60,7 +60,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object TrophyFishingProgress {
 
     private val trophyFishingProgressDisplay = TrophyFishingProgressDisplay() //do not delete this otherwise the HUD WONT SHOW
-    private val TROPHY_FISH_MESSAGE_REGEX = Regex("(?:[^:\\n]*)(?:§.)+TROPHY FISH! (?:§.)+You caught an? (?:§.)+(?<trophyFishType>[\\w ]+)(?:§.)+ (?:§.)+(?<trophyFishTier>[A-Z]+)(?:§.)+\\.(?:[^:\\n]*)").toPattern()
+    private val TROPHY_FISH_MESSAGE_REGEX = Regex("(?:[^:\\n]*)(?:§.)+TROPHY FISH! (?:§.)+You caught an? (?:§.)+(?<trophyFishType>[\\S ]+)(?:§.)+ (?:§.)+(?<trophyFishTier>[A-Z]+)(?:§.)+\\.(?:[^:\\n]*)").toPattern()
     private var trophyFishMissing = mutableListOf(
         "§c§lTrophy Fishes Missing:",
         "§c§lVisit Odger!",
