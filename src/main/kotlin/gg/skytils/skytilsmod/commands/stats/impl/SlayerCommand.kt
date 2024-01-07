@@ -19,8 +19,7 @@
 package gg.skytils.skytilsmod.commands.stats.impl
 
 import gg.essential.universal.wrappers.message.UMessage
-import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.client
+import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.commands.stats.StatCommand
@@ -31,19 +30,9 @@ import skytils.hylin.extension.nonDashedString
 import java.util.*
 
 
-object SlayerCommand : StatCommand("skytilsslayer", needProfile = false) {
-    override suspend fun displayStats(username: String, uuid: UUID) {
-        val latestProfile: String = Skytils.hylinAPI.getLatestSkyblockProfileSync(uuid)?.id ?: return
-
-        val profileResponse =
-            client.get("${Skytils.hylinAPI.endpoint}/skyblock/profile?profile=$latestProfile")
-                .body<ProfileResponse>()
-        if (!profileResponse.success) {
-            printMessage("$failPrefix §cUnable to retrieve profile information: ${profileResponse.cause}")
-            return
-        }
-
-        val slayersObject = profileResponse.profile.members[uuid.nonDashedString()]?.slayer?.slayerBosses?.ifNull {
+object SlayerCommand : StatCommand("skytilsslayer") {
+    override fun displayStats(username: String, uuid: UUID, profileData: Member) {
+        val slayersObject = profileData.slayer.slayer_bosses.ifNull {
             printMessage("$failPrefix §cUnable to retrieve slayer information")
             return@ifNull
         }

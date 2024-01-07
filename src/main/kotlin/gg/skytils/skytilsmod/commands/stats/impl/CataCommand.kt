@@ -22,9 +22,9 @@ import gg.essential.universal.utils.MCHoverEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.hypixel.types.skyblock.Member
-import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.commands.stats.StatCommand
+import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.utils.NumberUtil.nf
 import gg.skytils.skytilsmod.utils.SkillUtils
 import gg.skytils.skytilsmod.utils.append
@@ -41,7 +41,7 @@ object CataCommand : StatCommand("skytilscata") {
 
     override fun displayStats(username: String, uuid: UUID, profileData: Member) {
         val playerResponse = try {
-            Skytils.hylinAPI.getPlayerSync(uuid)
+            API.getPlayerSync(uuid)
         } catch (e: HypixelAPIException) {
             printMessage(
                 "$failPrefix §cFailed to get dungeon stats: ${
@@ -100,7 +100,7 @@ object CataCommand : StatCommand("skytilscata") {
                     SkillUtils.dungeoneeringXp.values
                 )
 
-            val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
+            val secrets = playerResponse?.achievements?.getOrDefault("skyblock_treasure_hunter", 0) ?: 0
 
             val classAvgOverflow = (archLevel + bersLevel + healerLevel + mageLevel + tankLevel) / 5.0
             val classAvgCapped =
@@ -110,7 +110,7 @@ object CataCommand : StatCommand("skytilscata") {
 
             val component = UMessage("§a➜ Catacombs Statistics Viewer\n")
                 .append(
-                    "§2§l ❣ §7§oYou are looking at data for ${playerResponse.formattedName}§7§o.\n\n"
+                    "§2§l ❣ §7§oYou are looking at data for ${playerResponse?.formattedName}§7§o.\n\n"
                 )
                 .append("§a§l➜ Catacombs Levels:\n")
                 .append(

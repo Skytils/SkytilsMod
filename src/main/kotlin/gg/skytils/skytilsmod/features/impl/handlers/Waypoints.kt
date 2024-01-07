@@ -21,6 +21,7 @@ import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.commands.impl.OrderedWaypointCommand
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
@@ -31,6 +32,8 @@ import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.binary.Base64InputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
@@ -38,6 +41,7 @@ import java.awt.Color
 import java.io.File
 import java.io.Reader
 import java.io.Writer
+import java.util.TreeSet
 
 object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     val categories = HashSet<WaypointCategory>()
@@ -143,8 +147,24 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     }
 
     @SubscribeEvent
+    fun onPlayerMove(event: ClientTickEvent) {
+        if (event.phase == TickEvent.Phase.END || mc.thePlayer?.hasMoved != true) return
+        if (SBInfo.mode != null && OrderedWaypointCommand.trackedIsland?.mode == SBInfo.mode) {
+            val tracked = OrderedWaypointCommand.trackedSet?.firstOrNull()
+            if (tracked == null) {
+                OrderedWaypointCommand.doneTracking()
+            } else if (tracked.pos.distanceSq(mc.thePlayer.position) < 2 * 2) {
+                OrderedWaypointCommand.trackedSet?.removeFirstOrNull()
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         val matrixStack = UMatrixStack()
+        if (OrderedWaypointCommand.trackedIsland?.mode == SBInfo.mode) {
+            OrderedWaypointCommand.trackedSet?.firstOrNull()?.draw(event.partialTicks, matrixStack)
+        }
         visibleWaypoints.forEach {
             it.draw(event.partialTicks, matrixStack)
         }
@@ -205,7 +225,6 @@ data class WaypointCategory(
     @Serializable(with = SkyblockIsland.ModeSerializer::class)
     var island: SkyblockIsland
 )
-
 @Serializable
 data class Waypoint @OptIn(ExperimentalSerializationApi::class) constructor(
     var name: String,

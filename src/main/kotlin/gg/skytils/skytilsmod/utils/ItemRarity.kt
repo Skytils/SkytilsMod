@@ -26,32 +26,33 @@ import java.awt.Color
  * https://github.com/SteveKunG/SkyBlockcatia/blob/1.8.9/LICENSE.md
  * @author SteveKunG
  */
-enum class ItemRarity(val rarityName: String, val baseColor: ChatColor, val color: Color = baseColor.color!!) {
-    NONE("NONE", ChatColor.GRAY),
-    COMMON("COMMON", ChatColor.WHITE, Color(255, 255, 255)),
-    UNCOMMON("UNCOMMON", ChatColor.GREEN, Color(77, 231, 77)),
-    RARE("RARE", ChatColor.BLUE, Color(85, 85, 255)),
-    EPIC("EPIC", ChatColor.DARK_PURPLE, Color(151, 0, 151)),
-    LEGENDARY("LEGENDARY", ChatColor.GOLD, Color(255, 170, 0)),
-    MYTHIC("MYTHIC", ChatColor.LIGHT_PURPLE, Color(255, 85, 255)),
-    DIVINE("DIVINE", ChatColor.AQUA, Color(85, 255, 255)),
-    SUPREME("SUPREME", ChatColor.DARK_RED, Color(170, 0, 0)),
-    SPECIAL("SPECIAL", ChatColor.RED, Color(255, 85, 85)),
-    VERY_SPECIAL("VERY SPECIAL", ChatColor.RED, Color(170, 0, 0));
+enum class ItemRarity(val baseColor: ChatColor, val color: Color = baseColor.color!!) {
+    NONE(ChatColor.GRAY),
+    COMMON(ChatColor.WHITE, Color(255, 255, 255)),
+    UNCOMMON(ChatColor.GREEN, Color(77, 231, 77)),
+    RARE(ChatColor.BLUE, Color(85, 85, 255)),
+    EPIC(ChatColor.DARK_PURPLE, Color(151, 0, 151)),
+    LEGENDARY(ChatColor.GOLD, Color(255, 170, 0)),
+    MYTHIC(ChatColor.LIGHT_PURPLE, Color(255, 85, 255)),
+    DIVINE(ChatColor.AQUA, Color(85, 255, 255)),
+    SUPREME(ChatColor.DARK_RED, Color(170, 0, 0)),
+    ULTIMATE(ChatColor.DARK_RED, Color(170, 0, 0)),
+    SPECIAL(ChatColor.RED, Color(255, 85, 85)),
+    VERY_SPECIAL(ChatColor.RED, Color(170, 0, 0));
+
+    val rarityName by lazy {
+        name.replace("_", " ").uppercase()
+    }
 
     companion object {
-        private val VALUES = entries.sortedBy { obj: ItemRarity -> obj.ordinal }.toMutableList()
-        val RARITY_PATTERN: Regex
+        val RARITY_PATTERN by lazy {
+            Regex("(?:§[\\da-f]§l§ka§r )?(?<rarity>${entries.joinToString("|") { "(?:${it.baseColor}§l)+(?:SHINY )?${it.rarityName}" }})")
+        }
 
         fun byBaseColor(color: String) = entries.find { rarity -> rarity.baseColor.toString() == color }
 
-        init {
-            entries.forEach { rarity -> VALUES[rarity.ordinal] = rarity }
-            RARITY_PATTERN =
-                Regex("(?:§[\\da-f]§l§ka§r )?(?<rarity>${VALUES.joinToString("|") { "(?:${it.baseColor}§l)+(?:SHINY )?${it.rarityName}" }})")
-        }
     }
 
     val nextRarity: ItemRarity
-        get() = VALUES[(ordinal + 1) % VALUES.size]
+        get() = entries[(ordinal + 1) % entries.size]
 }

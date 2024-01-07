@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.core
 
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.utils.PlayerResponse
 import gg.skytils.skytilsmod.utils.TypesProfileResponse
 import io.ktor.client.call.*
 import io.ktor.client.request.*
@@ -41,10 +42,25 @@ object API {
         }.body<TypesProfileResponse>().profiles
 
     suspend fun getSelectedSkyblockProfile(uuid: UUID) =
-        getSkyblockProfiles(uuid).find { it.selected }
+        getSkyblockProfiles(uuid)?.find { it.selected }
 
     fun getSelectedSkyblockProfileSync(uuid: UUID) =
         runBlocking {
             getSelectedSkyblockProfile(uuid)
+        }
+
+    suspend fun getPlayer(uuid: UUID) =
+        client.get {
+            url {
+                protocol = URLProtocol.HTTPS
+                host = baseUrl
+                path("v2", "player")
+                parameter("uuid", uuid.toString())
+            }
+        }.body<PlayerResponse>().player
+
+    fun getPlayerSync(uuid: UUID) =
+        runBlocking {
+            getPlayer(uuid)
         }
 }
