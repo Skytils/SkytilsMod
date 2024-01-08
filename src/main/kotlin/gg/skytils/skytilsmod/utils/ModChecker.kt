@@ -18,6 +18,8 @@
 
 package gg.skytils.skytilsmod.utils
 
+import gg.essential.api.EssentialAPI
+import gg.essential.api.config.EssentialConfig
 import gg.skytils.skytilsmod.Skytils
 import kotlinx.coroutines.launch
 import net.minecraft.client.ClientBrandRetriever
@@ -40,6 +42,10 @@ object ModChecker {
                 Loader.isModLoaded("feather") ||
                 Loader.isModLoaded("labymod") ||
                 ForgeVersion.getStatus().ordinal > 3
+    }
+
+    val canShowNotifications by lazy {
+        !EssentialAPI.getConfig().disableAllNotifications && !EssentialAPI.getOnboardingData().hasDeniedEssentialTOS()
     }
 
     fun checkModdedForge() {

@@ -19,6 +19,7 @@ package gg.skytils.skytilsmod.core
 
 import gg.essential.api.EssentialAPI
 import gg.essential.elementa.utils.withAlpha
+import gg.essential.universal.UChat
 import gg.essential.universal.UDesktop
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.Category
@@ -32,6 +33,7 @@ import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.PotionNotificationsGui
 import gg.skytils.skytilsmod.gui.SpiritLeapNamesGui
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
+import gg.skytils.skytilsmod.utils.ModChecker
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ClientCommandHandler
@@ -238,10 +240,15 @@ object Config : Vigilant(
         searchTags = ["predev", "pre-dev", "arrow", "tic tac toe", "solver"]
     )
     fun openDungeonSweat() {
-        EssentialAPI.getNotifications().push("azoopuzzoo", "hmmmmm... nice pb + ratio + sub 3 + FAST S+ + no bers + no healer + no tank + 4m 1a + no hype = kick", 3f) {
-            onClose = {
-                UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
+        if (ModChecker.canShowNotifications) {
+            EssentialAPI.getNotifications().push("azoopuzzoo", "hmmmmm... nice pb + ratio + sub 3 + FAST S+ + no bers + no healer + no tank + 4m 1a + no hype = kick", 3f) {
+                onClose = {
+                    UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
+                }
             }
+        } else {
+            UChat.chat("${Skytils.prefix} §bazoopuzzoo")
+            UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
         }
     }
 
@@ -2062,6 +2069,18 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var pressEnterToConfirmSignQuestion = false
+
+    @Property(
+        type = PropertyType.BUTTON, name = "Protect Items",
+        description = "Prevents you from dropping, salvaging, or selling items that you have selected.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        searchTags = ["Lock", "Slot"]
+    )
+    fun protectItems() {
+        if (ModChecker.canShowNotifications) {
+            EssentialAPI.getNotifications().push("Protect Items Help", "Hold the item you'd like to protect, and then run /protectitem.", 5f)
+        } else UChat.chat("${Skytils.prefix} §bHold the item you'd like to protect, and then run /protectitem.")
+    }
 
     @Property(
         type = PropertyType.TEXT, name = "Protect Items Above Value",
