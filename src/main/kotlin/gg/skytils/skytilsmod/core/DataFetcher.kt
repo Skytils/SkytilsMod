@@ -40,8 +40,8 @@ import gg.skytils.skytilsmod.utils.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
@@ -49,8 +49,8 @@ import net.minecraft.util.BlockPos
 import kotlin.concurrent.fixedRateTimer
 
 object DataFetcher {
-    private fun loadData(): Job {
-        return Skytils.IO.launch {
+    private fun loadData(): Deferred<*> {
+        return Skytils.IO.async {
             try {
                 client.get("${dataUrl}constants/domain.txt").bodyAsText().apply {
                     if (isNotBlank()) {
@@ -178,8 +178,9 @@ object DataFetcher {
     }
 
     @JvmStatic
-    fun reloadData() =
-        loadData()
+    fun reloadData(): Deferred<*> {
+        return loadData()
+    }
 
     internal fun preload() {}
 
