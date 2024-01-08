@@ -17,6 +17,8 @@
 </p>
 A Hypixel Skyblock Utilities mod.
 
+![Use code Skytils in the Essential.GG Store](https://data.skytils.gg/codeskytils.png)
+
 <p style="font-size: larger">
 09/15/2023:
 If you have a GitHub account, <b>PLEASE CONSIDER STARRING</b> and forking the repository! A new influx of fake respoitories are using botted star and fork counts in order to outrank the search algorithm.
