@@ -60,7 +60,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object TrophyFishingProgress {
 
     private val trophyFishingProgressDisplay = TrophyFishingProgressDisplay() //do not delete this otherwise the HUD WONT SHOW
-    private val TROPHY_FISH_MESSAGE_REGEX = Regex("(?:[^:\\n]*)(?:§.)+TROPHY FISH! (?:§.)+You caught an? (?:§.)+(?<trophyFishType>[\\S ]+)(?:§.)+ (?:§.)+(?<trophyFishTier>[A-Z]+)(?:§.)+\\.(?:[^:\\n]*)").toPattern()
+    private val TROPHY_FISH_MESSAGE_REGEX = Regex("(?:[^>:\\n]*)(?:§.)+TROPHY FISH! (?:§.)+You caught an? (?:§.)+(?<trophyFishType>[\\S &&[^§]]+)(?:§.)* +(?:§.)+(?<trophyFishTier>[A-Z]+)(?:§.)+\\.(?:[^>:\\n]*)").toPattern() // https://regex101.com/r/smhNg2/1 -ery
     private var trophyFishMissing = mutableListOf(
         "§c§lTrophy Fishes Missing:",
         "§c§lVisit Odger!",
@@ -214,6 +214,8 @@ object TrophyFishingProgress {
         //Vanille BRONZE
         //§6§lTROPHY FISH! §r§bYou caught a §r§aSlugfish§r§r§r §r§l§r§8§lBRONZE§r§b.
         //§6§lTROPHY FISH! §r§bYou caught a §r§fBlobfish§r§r§r §r§l§r§8§lBRONZE§r§b.
+        //§6§lTROPHY FISH! §r§bYou caught a §r§fBlo-fi sh §r§8§lBRONZE§r§b.
+        //Blo-fi sh BRONZE
 
         //why it requires .contains i have no clue
         val trophyFishMatcherOnFormatted = TROPHY_FISH_MESSAGE_REGEX.matcher(formatted)
