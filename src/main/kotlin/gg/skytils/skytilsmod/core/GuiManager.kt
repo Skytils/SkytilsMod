@@ -242,7 +242,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
             val pos = x to y
             GUIPOSITIONS[name] = pos
             GUISCALES[name] = scale
-            GUITEXTSHADOWS[name] = textShadow // TODO: Fix/Work around NullPointerException with old guipositions file
+            GUITEXTSHADOWS[name] = textShadow
             getByName(name)?.let { element ->
                 element.setPos(x, y)
                 element.scale = scale
@@ -274,5 +274,5 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     // this class sucks lol (why is there a thing called floatpair)
     // was going to make guielement serializable but it's too much effort
     @Serializable
-    private data class GuiElementLocation(val x: Float, val y: Float, val scale: Float, val textShadow: SmartFontRenderer.TextShadow)
+    private data class GuiElementLocation(val x: Float, val y: Float, val scale: Float = 1f, val textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL)
 }

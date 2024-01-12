@@ -22,8 +22,8 @@ import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 
-abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float, var y: Float, var textShadow: SmartFontRenderer.TextShadow) {
-    constructor(name: String, scale: Float = 1f, x: Int, y: Int, textShadow: SmartFontRenderer.TextShadow) : this(
+abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float, var y: Float, var textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    constructor(name: String, scale: Float = 1f, x: Int, y: Int, textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL) : this(
         name,
         scale,
         (x / UResolution.scaledWidth).toFloat(),
