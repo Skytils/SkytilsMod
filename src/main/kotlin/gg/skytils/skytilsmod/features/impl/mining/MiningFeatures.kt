@@ -31,8 +31,8 @@ import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
 import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.BossBarEvent
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
@@ -176,7 +176,7 @@ object MiningFeatures {
                     s
                 )
             }, null)
-            TickTask(50) {
+            tickTimer(50) {
                 if (solution != null) {
                     UChat.chat("$successPrefix §aFetchur needs: §2${solution}§a!")
                 } else {
@@ -210,7 +210,7 @@ object MiningFeatures {
                 val x = cleaned.groups["x"]!!.value
                 val y = cleaned.groups["y"]!!.value
                 val z = cleaned.groups["z"]!!.value
-                CrystalHollowsMap.Locations.values().find { it.cleanName == stringLocation }
+                CrystalHollowsMap.Locations.entries.find { it.cleanName == stringLocation }
                     ?.takeIf { !it.loc.exists() }?.let { loc ->
                         /**
                          * Sends the waypoints message except it suggests which one should be used based on
@@ -261,7 +261,7 @@ object MiningFeatures {
         val message = UMessage(
             "$prefix §eFound coordinates in a chat message, click a button to set a waypoint.\n"
         )
-        for (loc in CrystalHollowsMap.Locations.values()) {
+        for (loc in CrystalHollowsMap.Locations.entries) {
             if (loc.loc.exists()) continue
             message.append(
                 UTextComponent("${loc.displayName.substring(0, 2)}[${loc.displayName}] ")
@@ -343,7 +343,7 @@ object MiningFeatures {
         }
         if (Skytils.config.crystalHollowWaypoints && SBInfo.mode == SkyblockIsland.CrystalHollows.mode) {
             GlStateManager.disableDepth()
-            for (loc in CrystalHollowsMap.Locations.values()) {
+            for (loc in CrystalHollowsMap.Locations.entries) {
                 loc.loc.drawWaypoint(loc.cleanName, event.partialTicks, matrixStack)
             }
             RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks, matrixStack)
@@ -403,7 +403,7 @@ object MiningFeatures {
         lastJukebox = null
         raffleBox = null
         inRaffle = false
-        CrystalHollowsMap.Locations.values().forEach { it.loc.reset() }
+        CrystalHollowsMap.Locations.entries.forEach { it.loc.reset() }
         waypoints.clear()
     }
 
@@ -424,7 +424,7 @@ object MiningFeatures {
             val cleanName = displayName.stripControlCodes()
 
             companion object {
-                val cleanNameToLocation = values().associateBy { it.cleanName }
+                val cleanNameToLocation = entries.associateBy { it.cleanName }
             }
         }
 
@@ -437,7 +437,7 @@ object MiningFeatures {
                 stack.runWithGlobalState {
                     RenderUtil.renderTexture(mapLocation, 0, 0, 624, 624, false)
                     if (Skytils.config.crystalHollowMapPlaces) {
-                        Locations.values().forEach {
+                        Locations.entries.forEach {
                             it.loc.drawOnMap(it.size, it.color)
                         }
                     }

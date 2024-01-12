@@ -41,8 +41,9 @@ object Events {
     suspend inline fun <reified T : Event> await() =
         events.filterIsInstance<T>().first()
 
-    suspend inline fun <reified T : Event> await(repetitions: Int) =
-        repeat(repetitions) {
-            await<T>()
-        }
+    suspend inline fun <reified T : Event> await(repetitions: Int) = run {
+        assert(repetitions >= 1) { "Expected repetitions to be at least 1 but received $repetitions" }
+        var counter = 0
+        events.filterIsInstance<T>().first { counter++ == repetitions }
+    }
 }

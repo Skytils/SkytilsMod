@@ -50,7 +50,7 @@ object SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
     private const val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
     private var doorOpener: String? = null
     val names = HashMap<String, Boolean>()
-    val classes = DungeonClass.values()
+    val classes = DungeonClass.entries
         .associateWithTo(EnumMap(DungeonClass::class.java)) { false }
     private val shortenedNameCache = WeakHashMap<String, String>()
     private val nameSlotCache = HashMap<Int, String>()

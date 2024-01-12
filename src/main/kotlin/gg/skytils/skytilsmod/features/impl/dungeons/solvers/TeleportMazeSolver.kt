@@ -40,6 +40,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.math.PI
 import kotlin.math.abs
 
 object TeleportMazeSolver {
@@ -72,19 +73,16 @@ object TeleportMazeSolver {
                     ) {
                         val currPos = mc.thePlayer.position
                         val pos = BlockPos(x, y, z)
-                        val oldTpPad = Utils.getBlocksWithinRangeAtSameY(currPos, 1, 69).find {
-                            mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
-                        } ?: return
-                        val tpPad = Utils.getBlocksWithinRangeAtSameY(pos, 1, 69).find {
-                            mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
-                        } ?: return
+                        val oldTpPad = findEndPortalFrame(currPos) ?: return
+                        val tpPad = findEndPortalFrame(pos) ?: return
                         steppedPads.add(oldTpPad)
                         if (tpPad !in steppedPads) {
                             steppedPads.add(tpPad)
-                            val magicYaw = -yaw * 0.017453292f - 3.1415927f
+                            val deg2Rad = PI/180
+                            val magicYaw = (-yaw * deg2Rad - PI).toFloat()
                             val yawX = MathHelper.sin(magicYaw)
                             val yawZ = MathHelper.cos(magicYaw)
-                            val pitchVal = -MathHelper.cos(-pitch * 0.017453292f)
+                            val pitchVal = -MathHelper.cos(-pitch * deg2Rad.toFloat())
                             val vec = Vec3((yawX * pitchVal).toDouble(), 69.0, (yawZ * pitchVal).toDouble())
                             valid.clear()
                             for (i in 4..23) {
@@ -115,6 +113,12 @@ object TeleportMazeSolver {
                     }
                 }
             }
+        }
+    }
+
+    private fun findEndPortalFrame(pos: BlockPos): BlockPos? {
+        return Utils.getBlocksWithinRangeAtSameY(pos, 1, 69).find {
+            mc.theWorld.getBlockState(it).block === Blocks.end_portal_frame
         }
     }
 

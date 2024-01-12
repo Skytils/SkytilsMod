@@ -34,6 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.Objects;
 
 import static gg.skytils.skytilsmod.tweaker.TweakerUtil.*;
 
@@ -64,7 +65,7 @@ public class EssentialPlatformSetup {
                     System.out.println("Skytils is attempting to run keytool.");
                     Files.createDirectories(keyStoreLoc.getParent());
                     try (InputStream in = EssentialPlatformSetup.class.getResourceAsStream("/skytilscacerts.jks"); OutputStream os = Files.newOutputStream(keyStoreLoc)) {
-                        IOUtils.copy(in, os);
+                        IOUtils.copy(Objects.requireNonNull(in), os);
                     }
                     String os = System.getProperty("os.name", "unknown");
 

@@ -95,7 +95,7 @@ object UpdateChecker {
                     }
                 }
                 println("Using runtime $runtime")
-                Runtime.getRuntime().exec("\"$runtime\" -jar \"${taskFile.absolutePath}\" \"${oldJar.absolutePath}\"")
+                Runtime.getRuntime().exec("\"$runtime\" -jar \"${taskFile.absolutePath}\" delete \"${oldJar.absolutePath}\"")
                 println("Successfully applied Skytils update.")
             } catch (ex: Throwable) {
                 println("Failed to apply Skytils Update.")
@@ -110,7 +110,7 @@ object UpdateChecker {
             val taskDir = File(File(Skytils.modDir, "updates"), "tasks")
             // TODO Make this dynamic and fetch latest one or something
             val url =
-                "https://github.com/Skytils/SkytilsMod-Data/releases/download/files/SkytilsInstaller-1.1.1.jar"
+                "https://github.com/Skytils/SkytilsMod-Data/releases/download/files/SkytilsInstaller-1.2.0.jar"
             val taskFile = File(taskDir, getJarNameFromUrl(url))
             if (taskDir.mkdirs() || withContext(Dispatchers.IO) {
                     taskFile.createNewFile()
@@ -188,7 +188,7 @@ object UpdateChecker {
         val specialVersionType by lazy {
             val typeString = matched!!.groups["type"]?.value ?: return@lazy UpdateType.RELEASE
 
-            return@lazy UpdateType.values().find { typeString == it.prefix } ?: UpdateType.UNKNOWN
+            return@lazy UpdateType.entries.find { typeString == it.prefix } ?: UpdateType.UNKNOWN
         }
         val specialVersion by lazy {
             if (specialVersionType == UpdateType.RELEASE) return@lazy null

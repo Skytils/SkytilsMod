@@ -16,13 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod;
+package gg.skytils.skytilsmod.utils.elementa
 
-public class Reference {
-    public static String dataUrl = "https://data.skytils.gg/";
-    public static final String MOD_ID = "skytils";
-    public static final String MOD_NAME = "Skytils";
-    public static final String VERSION = "1.7.9";
+import gg.essential.elementa.constraints.CenterConstraint
+import gg.essential.elementa.dsl.pixels
 
-    public static final int apiVersion = 4;
-}
+fun Constraints.x(pixels: Number, alignOpposite: Boolean = false, alignOutside: Boolean = false) =
+    xConstraint(pixels.pixels(alignOpposite, alignOutside))
+
+fun Constraints.y(pixels: Number, alignOpposite: Boolean = false, alignOutside: Boolean = false) =
+    yConstraint(pixels.pixels(alignOpposite, alignOutside))
+
+fun Constraints.centerHorizontally() = xConstraint(CenterConstraint())
+
+fun Constraints.centerVertically() = yConstraint(CenterConstraint())
+
+fun Constraints.center() = centerHorizontally().centerVertically()

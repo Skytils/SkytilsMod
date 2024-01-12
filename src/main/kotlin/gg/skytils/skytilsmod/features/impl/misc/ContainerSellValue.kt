@@ -23,8 +23,8 @@ import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.mixins.hooks.item.masterStarPattern
@@ -261,14 +261,14 @@ object ContainerSellValue {
      * Update the list of items in the GUI to be displayed after the container background is drawn.
      */
     init {
-        TickTask(4, repeats = true) {
-            if (!Skytils.config.containerSellValue) return@TickTask
+        tickTimer(4, repeats = true) {
+            if (!Skytils.config.containerSellValue) return@tickTimer
 
 
-            val container = (mc.currentScreen as? GuiChest)?.inventorySlots as? ContainerChest ?: return@TickTask
+            val container = (mc.currentScreen as? GuiChest)?.inventorySlots as? ContainerChest ?: return@tickTimer
             val chestName = container.lowerChestInventory.name
 
-            if (!isChestNameValid(chestName)) return@TickTask
+            if (!isChestNameValid(chestName)) return@tickTimer
 
             val isMinion = chestName.contains(" Minion ")
 
@@ -292,7 +292,7 @@ object ContainerSellValue {
 
             // Sort the items from most to least valuable and convert them into a readable format
             textLines.clear()
-            if (distinctItems.isEmpty() || totalContainerValue == 0.0) return@TickTask
+            if (distinctItems.isEmpty() || totalContainerValue == 0.0) return@tickTimer
             textLines.addAll(
                 distinctItems.entries.asSequence()
                     .sortedByDescending { (_, displayItem) -> displayItem.lowestBIN }

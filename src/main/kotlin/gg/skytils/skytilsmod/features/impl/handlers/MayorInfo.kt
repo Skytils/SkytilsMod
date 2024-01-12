@@ -23,7 +23,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.SoundQueue
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.utils.*
 import io.ktor.client.call.*
@@ -61,10 +61,10 @@ object MayorInfo {
     private val jerryNextPerkRegex = Regex("§7Next set of perks in §e(?<h>\\d+?)h (?<m>\\d+?)m")
 
     init {
-        TickTask(60 * 20, repeats = true) {
+        tickTimer(60 * 20, repeats = true) {
             if (!Utils.inSkyblock || mc.currentServerData?.serverIP?.lowercase()
                     ?.contains("alpha") == true
-            ) return@TickTask
+            ) return@tickTimer
             if (currentMayor == "Jerry" && System.currentTimeMillis() > newJerryPerks) {
                 if (jerryMayor != null && Skytils.config.displayJerryPerks) {
                     SoundQueue.addToQueue("random.orb", 0.8f, 1f, 1, true)
@@ -134,7 +134,7 @@ object MayorInfo {
 
     fun fetchMayorData() = Skytils.IO.launch {
         val res = json.decodeFromJsonElement<Mayor>(client.get("https://api.hypixel.net/resources/skyblock/election").body<JsonObject>()["mayor"]!!)
-        TickTask(1) {
+        tickTimer(1) {
             currentMayor = res.name
             lastFetchedMayorData = System.currentTimeMillis()
             if (currentMayor != "Jerry") jerryMayor = null
@@ -145,7 +145,7 @@ object MayorInfo {
 
     fun fetchJerryData() = Skytils.IO.launch {
         val res = client.get("https://${Skytils.domain}/api/mayor").body<JerrySession>()
-        TickTask(1) {
+        tickTimer(1) {
             newJerryPerks = res.nextSwitch
             jerryMayor = res.mayor
         }

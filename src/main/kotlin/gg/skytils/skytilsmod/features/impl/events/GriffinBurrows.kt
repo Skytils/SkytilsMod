@@ -242,7 +242,7 @@ object GriffinBurrows {
         companion object {
             fun getParticleType(packet: S2APacketParticles): ParticleType? {
                 if (!packet.isLongDistance) return null
-                for (type in values()) {
+                for (type in entries) {
                     if (type.check(packet)) {
                         return type
                     }

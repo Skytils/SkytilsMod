@@ -61,9 +61,9 @@ object LockOrb {
         PLASMAFLUX("§d§lPlasmaflux", 20.0, "PLASMAFLUX_POWER_ORB");
 
         companion object {
-            fun getPowerOrbMatchingName(name: String): PowerOrbs? = values().find { name.startsWith(it.orbName) }
+            fun getPowerOrbMatchingName(name: String): PowerOrbs? = entries.find { name.startsWith(it.orbName) }
 
-            fun getPowerOrbMatchingItemId(itemId: String): PowerOrbs? = values().find { it.itemId == itemId }
+            fun getPowerOrbMatchingItemId(itemId: String): PowerOrbs? = entries.find { it.itemId == itemId }
         }
     }
 }

@@ -18,6 +18,8 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.entity;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import gg.skytils.skytilsmod.Skytils;
 import gg.skytils.skytilsmod.utils.Utils;
 import net.minecraft.block.material.Material;
@@ -36,9 +38,10 @@ public abstract class MixinEntityFishHook extends Entity {
         super(worldIn);
     }
 
-    @ModifyArg(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;isAABBInMaterial(Lnet/minecraft/util/AxisAlignedBB;Lnet/minecraft/block/material/Material;)Z"))
-    private Material modifyLiquid(AxisAlignedBB aabb, Material materialIn) {
-        if (!Utils.INSTANCE.getInSkyblock() || !Skytils.Companion.getConfig().getLavaBobber()) return materialIn;
-        return this.worldObj.isAABBInMaterial(aabb, Material.lava) ? Material.lava : materialIn;
+    @WrapOperation(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;isAABBInMaterial(Lnet/minecraft/util/AxisAlignedBB;Lnet/minecraft/block/material/Material;)Z"))
+    private boolean allowLavaBobber(World world, AxisAlignedBB aabb, Material materialIn, Operation<Boolean> original) {
+        boolean orig = original.call(world, aabb, materialIn);
+        if (!Utils.INSTANCE.getInSkyblock() || !Skytils.Companion.getConfig().getLavaBobber()) return orig;
+        return this.worldObj.isAABBInMaterial(aabb, Material.lava) || orig;
     }
 }

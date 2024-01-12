@@ -41,7 +41,7 @@ object SelectAllColorSolver {
                 "Select all the"
             )
         ) {
-            val promptColor = EnumDyeColor.values().find {
+            val promptColor = EnumDyeColor.entries.find {
                 event.chestName.contains(it.getName().replace("_", " ").uppercase())
             }?.unlocalizedName
             if (promptColor != colorNeeded) {
@@ -88,13 +88,10 @@ object SelectAllColorSolver {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!Utils.inDungeons) return
-        if (!Skytils.config.selectAllColorTerminalSolver) return
-        if (event.toolTip == null) return
+        if (event.toolTip == null || !Utils.inDungeons || !Skytils.config.selectAllColorTerminalSolver) return
         val chest = mc.thePlayer.openContainer
         if (chest is ContainerChest) {
-            val inv = chest.lowerChestInventory
-            val chestName = inv.displayName.unformattedText
+            val chestName = chest.lowerChestInventory.displayName.unformattedText
             if (chestName.startsWith("Select all the")) {
                 event.toolTip.clear()
             }

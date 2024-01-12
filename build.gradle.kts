@@ -21,17 +21,20 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm") version "1.8.22"
-    kotlin("plugin.serialization") version "1.8.22"
+    kotlin("jvm") version "1.9.20"
+    kotlin("plugin.serialization") version "1.9.20"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("net.kyori.blossom") version "2.0.0"
     id("io.github.juuxel.loom-quiltflower") version "1.10.0"
     id("gg.essential.loom") version "1.3.12"
     id("gg.essential.defaults") version "0.3.0"
     idea
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
+
     signing
 }
 
-version = "1.7.9"
+version = "1.8.0-pre7"
 group = "gg.skytils"
 
 repositories {
@@ -85,9 +88,8 @@ val shadowMeMod: Configuration by configurations.creating {
 }
 
 dependencies {
-
     shadowMe("gg.essential:loader-launchwrapper:1.2.1")
-    implementation("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5") {
+    implementation("gg.essential:essential-1.8.9-forge:14616+g169bd9af6a") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
@@ -110,7 +112,7 @@ dependencies {
     }
 
     shadowMe(platform(kotlin("bom")))
-    shadowMe(platform(ktor("bom", "2.2.4", addSuffix = false)))
+    shadowMe(platform(ktor("bom", "2.3.7", addSuffix = false)))
 
     shadowMe(ktor("serialization-kotlinx-json"))
     shadowMe(ktor("serialization-gson"))
@@ -132,12 +134,10 @@ dependencies {
     shadowMe(ktorServer("auth"))
 
     shadowMe(project(":events"))
+    shadowMe(project(":hypixel-api:types"))
 
 
-
-
-    shadowMe("com.github.LlamaLad7:MixinExtras:0.1.1")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
+    shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.2")!!)
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
 }
@@ -145,17 +145,20 @@ dependencies {
 sourceSets {
     main {
         output.setResourcesDir(file("${buildDir}/classes/kotlin/main"))
+        blossom {
+            javaSources {
+                property("version", project.version.toString())
+            }
+            resources {
+                property("version", project.version.toString())
+                property("mcversion", "1.8.9")
+            }
+        }
     }
 }
 
 tasks {
     processResources {
-        inputs.property("version", project.version)
-        inputs.property("mcversion", "1.8.9")
-
-        filesMatching("mcmod.info") {
-            expand(mapOf("version" to project.version, "mcversion" to "1.8.9"))
-        }
         dependsOn(compileJava)
     }
     named<Jar>("jar") {
@@ -217,6 +220,10 @@ tasks {
         )
         mergeServiceFiles()
     }
+    withType<AbstractArchiveTask> {
+        isPreserveFileTimestamps = false
+        isReproducibleFileOrder = true
+    }
     withType<JavaCompile> {
         options.encoding = "UTF-8"
     }
@@ -231,7 +238,7 @@ tasks {
                     "-Xbackend-threads=0",
                     /*"-Xuse-k2"*/
                 )
-            languageVersion = "1.7"
+            languageVersion = "1.9"
         }
         kotlinDaemonJvmArguments.set(
             listOf(

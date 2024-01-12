@@ -34,8 +34,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
 object ChangeAllToSameColorSolver {
-    val ordering =
-        setOf(EnumDyeColor.RED, EnumDyeColor.ORANGE, EnumDyeColor.YELLOW, EnumDyeColor.GREEN, EnumDyeColor.BLUE)
+    private val ordering =
+        setOf(EnumDyeColor.RED,
+            EnumDyeColor.ORANGE,
+            EnumDyeColor.YELLOW,
+            EnumDyeColor.GREEN,
+            EnumDyeColor.BLUE
+        ).withIndex().associate { (i, c) ->
+            c.metadata to i
+        }
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -43,12 +50,14 @@ object ChangeAllToSameColorSolver {
         val grid = event.container.inventorySlots.filter {
             it.inventory == event.container.lowerChestInventory && it.stack?.displayName?.startsWith("§a") == true
         }
-        val mostFans = ordering.maxByOrNull { c -> grid.count { it.stack?.metadata == c.metadata } } ?: EnumDyeColor.RED
-        val targetIndex = ordering.indexOfFirst { it.metadata == mostFans.metadata }
-        val mapping = grid.filter { it.stack.metadata != mostFans.metadata }.associateWith { slot ->
+        val mostCommon = ordering.keys.maxByOrNull { c -> grid.count { it.stack?.metadata == c } } ?: EnumDyeColor.RED.metadata
+        val targetIndex = ordering[mostCommon]!!
+        val mapping = grid.filter { it.stack.metadata != mostCommon }.associateWith { slot ->
             val stack = slot.stack
-            val myIndex = ordering.indexOfFirst { it.metadata == stack.metadata }
-            ((targetIndex - myIndex) % ordering.size + ordering.size) % ordering.size to -(((myIndex - targetIndex) % ordering.size + ordering.size) % ordering.size)
+            val myIndex = ordering[stack.metadata]!!
+            val normalCycle = ((targetIndex - myIndex) % ordering.size + ordering.size) % ordering.size
+            val otherCycle = -((myIndex - targetIndex) % ordering.size + ordering.size) % ordering.size
+            normalCycle to otherCycle
         }
         GlStateManager.translate(0f, 0f, 299f)
         for ((slot, clicks) in mapping) {

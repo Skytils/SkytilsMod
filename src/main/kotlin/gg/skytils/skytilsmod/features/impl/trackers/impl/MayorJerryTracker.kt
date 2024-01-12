@@ -46,11 +46,11 @@ object MayorJerryTracker : Tracker("mayorjerry") {
 
         companion object {
             fun getFromString(str: String): HiddenJerry? {
-                return values().find { str == "§${it.colorCode}${it.type}" }
+                return entries.find { str == "§${it.colorCode}${it.type}" }
             }
 
             fun getFromType(str: String): HiddenJerry? {
-                return values().find { str == it.type }
+                return entries.find { str == it.type }
             }
         }
     }
@@ -70,7 +70,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
 
         companion object {
             fun getFromName(str: String): JerryBoxDrops? {
-                return values().find { it.dropName == str }
+                return entries.find { it.dropName == str }
             }
         }
     }
@@ -105,7 +105,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
                     markDirty<MayorJerryTracker>()
                 }
             } else {
-                (JerryBoxDrops.values().find {
+                (JerryBoxDrops.entries.find {
                     formatted.contains(it.dropName)
                 } ?: return).droppedAmount++
                 markDirty<MayorJerryTracker>()
@@ -113,7 +113,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
             return
         }
         if (formatted.endsWith("§r§ein a Jerry Box!§r") && formatted.contains(mc.thePlayer.name)) {
-            (JerryBoxDrops.values().find {
+            (JerryBoxDrops.entries.find {
                 formatted.contains(it.dropName)
             } ?: return).droppedAmount++
             markDirty<MayorJerryTracker>()
@@ -121,8 +121,8 @@ object MayorJerryTracker : Tracker("mayorjerry") {
     }
 
     override fun resetLoot() {
-        HiddenJerry.values().onEach { it.discoveredTimes = 0L }
-        JerryBoxDrops.values().onEach { it.droppedAmount = 0L }
+        HiddenJerry.entries.onEach { it.discoveredTimes = 0L }
+        JerryBoxDrops.entries.onEach { it.droppedAmount = 0L }
     }
 
     // TODO: 5/3/2022  Redo this entire thing
@@ -134,10 +134,10 @@ object MayorJerryTracker : Tracker("mayorjerry") {
 
     override fun read(reader: Reader) {
         val save = json.decodeFromString<TrackerSave>(reader.readText())
-        HiddenJerry.values().forEach {
+        HiddenJerry.entries.forEach {
             it.discoveredTimes = save.jerry[it] ?: 0L
         }
-        JerryBoxDrops.values().forEach {
+        JerryBoxDrops.entries.forEach {
             it.droppedAmount = save.drops[it] ?: 0L
         }
     }
@@ -146,8 +146,8 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         writer.write(
             json.encodeToString(
                 TrackerSave(
-                    HiddenJerry.values().associateWith(HiddenJerry::discoveredTimes),
-                    JerryBoxDrops.values().associateWith(JerryBoxDrops::droppedAmount)
+                    HiddenJerry.entries.associateWith(HiddenJerry::discoveredTimes),
+                    JerryBoxDrops.entries.associateWith(JerryBoxDrops::droppedAmount)
                 )
             )
         )
@@ -169,7 +169,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
                 val alignment =
                     if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
                 var drawnLines = 0
-                for (jerry in HiddenJerry.values()) {
+                for (jerry in HiddenJerry.entries) {
                     if (jerry.discoveredTimes == 0L) continue
                     ScreenRenderer.fontRenderer.drawString(
                         "§${jerry.colorCode}${jerry.type}§f: ${jerry.discoveredTimes}",
@@ -181,7 +181,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
                     )
                     drawnLines++
                 }
-                for (drop in JerryBoxDrops.values()) {
+                for (drop in JerryBoxDrops.entries) {
                     if (drop.droppedAmount == 0L) continue
                     ScreenRenderer.fontRenderer.drawString(
                         "§${drop.colorCode}${drop.dropName}§f: ${drop.droppedAmount}",

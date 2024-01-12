@@ -29,15 +29,13 @@ object SkillUtils {
     val hotmXp = LinkedHashMap<Int, Long>()
     val dungeoneeringXp = LinkedHashMap<Int, Long>()
     val slayerXp = LinkedHashMap<String, LinkedHashMap<Int, Long>>()
-    val petRarityOffset: Map<Tier, Int> = EnumMap(
-        mapOf(
-            Tier.COMMON to 0,
-            Tier.UNCOMMON to 6,
-            Tier.RARE to 11,
-            Tier.EPIC to 16,
-            Tier.LEGENDARY to 20,
-            Tier.MYTHIC to 20,
-        )
+    val petRarityOffset: Map<String, Int> = mapOf(
+        "COMMON" to 0,
+        "UNCOMMON" to 6,
+        "RARE" to 11,
+        "EPIC" to 16,
+        "LEGENDARY" to 20,
+        "MYTHIC" to 20,
     )
 
     val petLevels = arrayOf(
@@ -300,14 +298,28 @@ object SkillUtils {
 
     val Pet.level: Int
         get() {
-            val offset = petRarityOffset[tier]!!
+            val offset = petRarityOffset[tier.toString()]!!
             val maxLevel = if (type == "GOLDEN_DRAGON") 200 else 100
-            val levels = petLevels.sliceArray(offset until offset + maxLevel - 1)
+            val levels = petLevels.sliceArray(offset..<offset + maxLevel - 1)
 
             var xpRemaining = xp
             for ((i, xp) in levels.withIndex()) {
                 if (xp > xpRemaining) return i - 1
                 xpRemaining -= xp
+            }
+            return maxLevel
+        }
+
+    val gg.skytils.hypixel.types.skyblock.Pet.level: Int
+        get () {
+            val offset = petRarityOffset[tier] ?: 0
+            val maxLevel = if (type == "GOLDEN_DRAGON") 200 else 100
+            val levels = petLevels.sliceArray(offset..< offset + maxLevel - 1)
+
+            levels.reduceIndexed { index, acc, i ->
+                if (exp < acc) return index - 1
+                println(acc + i)
+                acc + i
             }
             return maxLevel
         }

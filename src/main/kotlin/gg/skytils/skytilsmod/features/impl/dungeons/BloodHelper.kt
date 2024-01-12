@@ -21,7 +21,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UMinecraft
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -113,11 +113,11 @@ object BloodHelper {
     fun onJoin(event: EntityJoinWorldEvent) {
         if (event.entity !is EntityZombie) return
         (event.entity as EntityZombie).apply {
-            TickTask(1) {
+            tickTimer(1) {
                 val helmet = getEquipmentInSlot(4)
-                if (helmet == null || helmet.item != Items.skull) return@TickTask
+                if (helmet == null || helmet.item != Items.skull) return@tickTimer
                 val texture = ItemUtil.getSkullTexture(helmet)
-                if (texture == null || (watcherSkins.contains(texture))) return@TickTask
+                if (texture == null || (watcherSkins.contains(texture))) return@tickTimer
                 printDevMessage("found watcher", "blood")
                 watchers.add(this)
             }
