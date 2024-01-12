@@ -110,11 +110,7 @@ open class LocationEditGui : GuiScreen(), ReopenableGUI {
                 it.element.scale = 1f
             }
             2 -> buttonList.filterIsInstance<LocationButton>().filter { it.mousePressed(mc, mouseX, mouseY) }.forEach {
-                it.element.textShadow = when (it.element.textShadow) {
-                    SmartFontRenderer.TextShadow.NONE -> SmartFontRenderer.TextShadow.NORMAL
-                    SmartFontRenderer.TextShadow.NORMAL -> SmartFontRenderer.TextShadow.OUTLINE
-                    SmartFontRenderer.TextShadow.OUTLINE -> SmartFontRenderer.TextShadow.NONE
-                }
+                it.element.textShadow = SmartFontRenderer.TextShadow.entries[it.element.textShadow.ordinal + 1 % SmartFontRenderer.TextShadow.entries.size]
             }
         }
         super.mouseClicked(mouseX, mouseY, mouseButton)
