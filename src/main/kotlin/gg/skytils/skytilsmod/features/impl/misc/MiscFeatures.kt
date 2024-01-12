@@ -41,8 +41,8 @@ import gg.skytils.skytilsmod.utils.RenderUtil.renderItem
 import gg.skytils.skytilsmod.utils.RenderUtil.renderTexture
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.block.BlockEndPortalFrame
 import net.minecraft.client.Minecraft
@@ -522,7 +522,7 @@ object MiscFeatures {
                     0f,
                     CommonColors.WHITE,
                     alignment,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -534,7 +534,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.WHITE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -561,7 +561,7 @@ object MiscFeatures {
                     5f,
                     CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -574,7 +574,7 @@ object MiscFeatures {
                 5f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -603,7 +603,7 @@ object MiscFeatures {
                     5f,
                     CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -616,7 +616,7 @@ object MiscFeatures {
                 5f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -660,7 +660,7 @@ object MiscFeatures {
                         0f,
                         CommonColors.RED,
                         TextAlignment.LEFT_RIGHT,
-                        TextShadow.NORMAL
+                        textShadow
                     )
                     return
                 }
@@ -672,7 +672,7 @@ object MiscFeatures {
                     0f,
                     CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -687,7 +687,7 @@ object MiscFeatures {
                     0f,
                     CommonColors.RED,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
                 return
             }
@@ -697,7 +697,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -726,7 +726,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.WHITE,
                 TextAlignment.MIDDLE,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -755,7 +755,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.WHITE,
                 TextAlignment.MIDDLE,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 

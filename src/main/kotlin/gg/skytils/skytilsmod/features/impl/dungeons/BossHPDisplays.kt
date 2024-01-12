@@ -165,7 +165,7 @@ object BossHPDisplays {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 

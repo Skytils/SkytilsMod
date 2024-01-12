@@ -42,7 +42,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.block.BlockStainedGlass
-import net.minecraft.block.material.Material
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
@@ -756,7 +755,7 @@ object DungeonFeatures {
                     0f,
                     CommonColors.PURPLE,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -771,7 +770,7 @@ object DungeonFeatures {
                 0f,
                 CommonColors.PURPLE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -803,7 +802,7 @@ object DungeonFeatures {
                     0f,
                     CommonColors.WHITE,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -819,7 +818,7 @@ object DungeonFeatures {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 

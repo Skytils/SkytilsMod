@@ -30,6 +30,7 @@ import gg.skytils.skytilsmod.gui.elements.GIFResource
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.getSkytilsResource
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.MathHelper
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -96,7 +97,7 @@ object Funny {
         GuiManager.registerElement(JamCatElement)
     }
 
-    object JamCatElement : GuiElement("Jamcat", x = 0, y = 0) {
+    object JamCatElement : GuiElement("Jamcat", x = 0, y = 0) { // textShadow is a bit useless here... Too bad!
         val gif by lazy {
             GIFResource(getSkytilsResource("splashes/jamcat.gif"), frameDelay = 5)
         }

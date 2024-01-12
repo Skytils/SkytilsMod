@@ -177,7 +177,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.WHITE,
                         alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                     drawnLines++
                 }
@@ -189,7 +189,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.WHITE,
                         alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                     drawnLines++
                 }
@@ -207,7 +207,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
                 0f,
                 CommonColors.YELLOW,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 

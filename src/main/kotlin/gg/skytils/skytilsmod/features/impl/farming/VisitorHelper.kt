@@ -147,6 +147,7 @@ object VisitorHelper {
 
         override fun render() {
             // Rendering is handled in the BackgroundDrawnEvent to give the text proper lighting
+            textShadow_ = textShadow
         }
 
         override fun demoRender() {
@@ -157,7 +158,7 @@ object VisitorHelper {
             ).forEachIndexed { i, str ->
                 fr.drawString(
                     str, textPosX, (i * fr.FONT_HEIGHT).toFloat(),
-                    CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL
+                    CommonColors.WHITE, alignment, textShadow
                 )
             }
         }
@@ -174,6 +175,7 @@ object VisitorHelper {
         }
     }
 
+    private var textShadow_ = SmartFontRenderer.TextShadow.NORMAL
     private fun drawLine(index: Int, str: String) {
         ScreenRenderer.fontRenderer.drawString(
             str,
@@ -181,7 +183,7 @@ object VisitorHelper {
             (index * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
             CommonColors.WHITE,
             VisitorHelperDisplay.alignment,
-            SmartFontRenderer.TextShadow.NORMAL
+            textShadow_
         )
     }
 

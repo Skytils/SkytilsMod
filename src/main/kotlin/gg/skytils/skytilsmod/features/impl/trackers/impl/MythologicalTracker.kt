@@ -262,7 +262,7 @@ object MythologicalTracker : Tracker("mythological") {
                     0f,
                     CommonColors.YELLOW,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
                 var drawnLines = 1
                 for (mob in BurrowMob.entries) {
@@ -273,7 +273,7 @@ object MythologicalTracker : Tracker("mythological") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
                         alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                     drawnLines++
                 }
@@ -285,7 +285,7 @@ object MythologicalTracker : Tracker("mythological") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
                         alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                     drawnLines++
                 }
@@ -303,7 +303,7 @@ object MythologicalTracker : Tracker("mythological") {
                 0f,
                 CommonColors.YELLOW,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
             var drawnLines = 1
             for (mob in BurrowMob.entries) {
@@ -313,7 +313,7 @@ object MythologicalTracker : Tracker("mythological") {
                     (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                     CommonColors.CYAN,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
                 drawnLines++
             }
@@ -324,7 +324,7 @@ object MythologicalTracker : Tracker("mythological") {
                     (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                     CommonColors.CYAN,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
                 drawnLines++
             }

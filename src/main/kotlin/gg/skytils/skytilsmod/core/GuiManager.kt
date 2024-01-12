@@ -29,6 +29,7 @@ import gg.skytils.skytilsmod.events.impl.RenderHUDEvent
 import gg.skytils.skytilsmod.gui.LocationEditGui
 import gg.skytils.skytilsmod.utils.GlState
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.toast.Toast
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
@@ -52,6 +53,7 @@ import java.util.Queue
 object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     val GUIPOSITIONS = hashMapOf<String, Pair<Float, Float>>()
     val GUISCALES = hashMapOf<String, Float>()
+    val GUITEXTSHADOWS = hashMapOf<String, SmartFontRenderer.TextShadow>()
     val elements = hashMapOf<Int, GuiElement>()
     private val names = hashMapOf<String, GuiElement>()
 
@@ -236,13 +238,15 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     }
 
     override fun read(reader: Reader) {
-        json.decodeFromString<Map<String, GuiElementLocation>>(reader.readText()).forEach { name, (x, y, scale) ->
+        json.decodeFromString<Map<String, GuiElementLocation>>(reader.readText()).forEach { name, (x, y, scale, textShadow) ->
             val pos = x to y
             GUIPOSITIONS[name] = pos
             GUISCALES[name] = scale
+            GUITEXTSHADOWS[name] = textShadow
             getByName(name)?.let { element ->
                 element.setPos(x, y)
                 element.scale = scale
+                element.textShadow = textShadow
             }
         }
     }
@@ -251,12 +255,14 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
         names.entries.forEach { (n, e) ->
             GUIPOSITIONS[n] = e.x to e.y
             GUISCALES[n] = e.scale
+            GUITEXTSHADOWS[n] = e.textShadow
         }
         writer.write(json.encodeToString(GUIPOSITIONS.entries.associate {
             it.key to GuiElementLocation(
                 it.value.first,
                 it.value.second,
-                GUISCALES[it.key] ?: 1f
+                GUISCALES[it.key] ?: 1f,
+                GUITEXTSHADOWS[it.key] ?: SmartFontRenderer.TextShadow.NORMAL
             )
         }))
     }
@@ -268,5 +274,5 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     // this class sucks lol (why is there a thing called floatpair)
     // was going to make guielement serializable but it's too much effort
     @Serializable
-    private data class GuiElementLocation(val x: Float, val y: Float, val scale: Float)
+    private data class GuiElementLocation(val x: Float, val y: Float, val scale: Float = 1f, val textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL)
 }

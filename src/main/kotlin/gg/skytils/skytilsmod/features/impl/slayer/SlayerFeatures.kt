@@ -617,7 +617,7 @@ object SlayerFeatures : CoroutineScope {
                                 0f,
                                 CommonColors.WHITE,
                                 alignment,
-                                SmartFontRenderer.TextShadow.NORMAL
+                                textShadow
                             )
                         }
                     }
@@ -632,7 +632,7 @@ object SlayerFeatures : CoroutineScope {
                                 10f,
                                 CommonColors.WHITE,
                                 alignment,
-                                SmartFontRenderer.TextShadow.NORMAL
+                                textShadow
                             )
                         }
                     }
@@ -654,7 +654,7 @@ object SlayerFeatures : CoroutineScope {
                 0f,
                 CommonColors.WHITE,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
             ScreenRenderer.fontRenderer.drawString(
                 "§c☠ §bRevenant Horror §a500§c❤§r",
@@ -662,7 +662,7 @@ object SlayerFeatures : CoroutineScope {
                 10f,
                 CommonColors.WHITE,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -696,7 +696,7 @@ object SlayerFeatures : CoroutineScope {
                             0f,
                             CommonColors.WHITE,
                             alignment,
-                            SmartFontRenderer.TextShadow.NORMAL
+                            textShadow
                         )
                     }
                     entity.heldBlockState?.takeIf { it.block is BlockBeacon }?.run {
@@ -706,7 +706,7 @@ object SlayerFeatures : CoroutineScope {
                             10f,
                             CommonColors.WHITE,
                             alignment,
-                            SmartFontRenderer.TextShadow.NORMAL
+                            textShadow
                         )
                     } ?: if (lastYangGlyphSwitchTicks != -1) {
                         ScreenRenderer.fontRenderer.drawString(
@@ -715,7 +715,7 @@ object SlayerFeatures : CoroutineScope {
                             10f,
                             CommonColors.WHITE,
                             alignment,
-                            SmartFontRenderer.TextShadow.NORMAL
+                            textShadow
                         )
                     } else {
                         ScreenRenderer.fontRenderer.drawString(
@@ -724,7 +724,7 @@ object SlayerFeatures : CoroutineScope {
                             10f,
                             CommonColors.WHITE,
                             alignment,
-                            SmartFontRenderer.TextShadow.NORMAL
+                            textShadow
                         )
                     }
                     ScreenRenderer.fontRenderer.drawString(
@@ -736,7 +736,7 @@ object SlayerFeatures : CoroutineScope {
                         20f,
                         CommonColors.WHITE,
                         alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                     ScreenRenderer.fontRenderer.drawString(
                         if (nukekebiSkulls.size > 0)
@@ -747,7 +747,7 @@ object SlayerFeatures : CoroutineScope {
                         30f,
                         CommonColors.WHITE,
                         alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                 }
             }
@@ -763,7 +763,7 @@ object SlayerFeatures : CoroutineScope {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
             ScreenRenderer.fontRenderer.drawString(
                 "§bHolding beacon!",
@@ -771,7 +771,7 @@ object SlayerFeatures : CoroutineScope {
                 10f,
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
             ScreenRenderer.fontRenderer.drawString(
                 "§cNo yang glyph",
@@ -779,7 +779,7 @@ object SlayerFeatures : CoroutineScope {
                 20f,
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -808,7 +808,7 @@ object SlayerFeatures : CoroutineScope {
                     0f,
                     CommonColors.WHITE,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -823,7 +823,7 @@ object SlayerFeatures : CoroutineScope {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 

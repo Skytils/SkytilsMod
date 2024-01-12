@@ -91,7 +91,7 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
                         (ScreenRenderer.fontRenderer.FONT_HEIGHT * i).toFloat(),
                         CommonColors.ORANGE,
                         SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                 }
             }
@@ -104,7 +104,7 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
                 0f,
                 CommonColors.ORANGE,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 

@@ -97,7 +97,7 @@ object ContainerSellValue {
             ).forEachIndexed { i, str ->
                 fr.drawString(
                     str, textPosX, (i * fr.FONT_HEIGHT).toFloat(),
-                    CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL
+                    CommonColors.WHITE, alignment, textShadow
                 )
             }
         }

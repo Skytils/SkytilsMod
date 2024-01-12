@@ -47,7 +47,7 @@ object RainTimer {
                         0f,
                         CommonColors.BLUE,
                         SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                        SmartFontRenderer.TextShadow.NONE
+                        textShadow
                     )
                 } else {
                     val secondsToNext = (nextRain - System.currentTimeMillis()) / 1000L
@@ -57,7 +57,7 @@ object RainTimer {
                         0f,
                         CommonColors.ORANGE,
                         SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                        SmartFontRenderer.TextShadow.NONE
+                        textShadow
                     )
                 }
             }
@@ -70,7 +70,7 @@ object RainTimer {
                 0f,
                 CommonColors.ORANGE,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                SmartFontRenderer.TextShadow.NONE
+                textShadow
             )
         }
 
