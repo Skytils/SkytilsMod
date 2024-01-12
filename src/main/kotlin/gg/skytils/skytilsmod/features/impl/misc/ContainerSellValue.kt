@@ -74,7 +74,7 @@ object ContainerSellValue {
      * of this class so that the user can move the element around normally.
      * @see renderGuiComponent
      */
-    class SellValueDisplay : GuiElement("Container Sell Value", x = 0.258f, y = 0.283f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class SellValueDisplay : GuiElement("Container Sell Value", x = 0.258f, y = 0.283f) {
 
         internal val rightAlign: Boolean
             get() = scaleX > (UResolution.scaledWidth * 0.75f) ||

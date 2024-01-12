@@ -738,7 +738,7 @@ object DungeonFeatures {
         terracottaSpawns.clear()
     }
 
-    class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", x = 0.05f, y = 0.4f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", x = 0.05f, y = 0.4f) {
         override fun render() {
             if (toggled && lastLitUpTime != -1L) {
                 val time = lastLitUpTime + 3400
@@ -787,7 +787,7 @@ object DungeonFeatures {
         }
     }
 
-    internal class LividGuiElement : GuiElement("Livid HP", x = 0.05f, y = 0.4f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    internal class LividGuiElement : GuiElement("Livid HP", x = 0.05f, y = 0.4f) {
         override fun render() {
             val player = mc.thePlayer
             val world: World? = mc.theWorld

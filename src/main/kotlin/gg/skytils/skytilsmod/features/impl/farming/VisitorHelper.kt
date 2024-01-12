@@ -135,7 +135,7 @@ object VisitorHelper {
      * of this class so that the user can move the element around normally.
      * @see ContainerSellValue
      */
-    object VisitorHelperDisplay : GuiElement("Visitor Offer Helper", x = 0.258f, y = 0.283f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    object VisitorHelperDisplay : GuiElement("Visitor Offer Helper", x = 0.258f, y = 0.283f) {
         internal val rightAlign: Boolean
             get() = scaleX > (UResolution.scaledWidth * 0.75f) ||
                     (scaleX < UResolution.scaledWidth / 2f && scaleX > UResolution.scaledWidth / 4f)

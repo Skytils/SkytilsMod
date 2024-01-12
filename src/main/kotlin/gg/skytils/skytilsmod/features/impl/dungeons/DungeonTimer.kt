@@ -234,7 +234,7 @@ object DungeonTimer {
         scoreShownAt = -1
     }
 
-    class DungeonTimerElement : GuiElement("Dungeon Timer", x = 200, y = 80, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class DungeonTimerElement : GuiElement("Dungeon Timer", x = 200, y = 80) {
         override fun render() {
             if (toggled && Utils.inDungeons && dungeonStartTime != -1L) {
                 val time =
@@ -295,7 +295,7 @@ object DungeonTimer {
         }
     }
 
-    class NecronPhaseTimerElement : GuiElement("Necron Phase Timer", x = 200, y = 120, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class NecronPhaseTimerElement : GuiElement("Necron Phase Timer", x = 200, y = 120) {
         override fun render() {
             if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,
@@ -347,7 +347,7 @@ object DungeonTimer {
         }
     }
 
-    class SadanPhaseTimerElement : GuiElement("Sadan Phase Timer", x = 200, y = 120, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class SadanPhaseTimerElement : GuiElement("Sadan Phase Timer", x = 200, y = 120) {
         override fun render() {
             if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
                     DungeonFeatures.dungeonFloor,

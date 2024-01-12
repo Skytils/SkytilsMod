@@ -41,7 +41,7 @@ object DungeonMap {
         mapData = null
     }
 
-    class TrashDungeonMap : GuiElement(name = "Dungeon Map", x = 0, y = 0, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class TrashDungeonMap : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
         override fun render() {
             if (!toggled || SBInfo.mode != SkyblockIsland.Dungeon.mode || mc.thePlayer == null || mc.theWorld == null) return

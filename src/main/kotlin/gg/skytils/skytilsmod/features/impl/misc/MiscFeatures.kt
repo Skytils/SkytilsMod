@@ -507,7 +507,7 @@ object MiscFeatures {
         }
     }
 
-    class GolemSpawnTimerElement : GuiElement("Endstone Protector Spawn Timer", x = 150, y = 20, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class GolemSpawnTimerElement : GuiElement("Endstone Protector Spawn Timer", x = 150, y = 20) {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && golemSpawnTime - System.currentTimeMillis() > 0) {
@@ -551,7 +551,7 @@ object MiscFeatures {
         }
     }
 
-    class PlayersInRangeDisplay : GuiElement("Players In Range Display", x = 50, y = 50, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class PlayersInRangeDisplay : GuiElement("Players In Range Display", x = 50, y = 50) {
         override fun render() {
             if (toggled && Utils.inSkyblock && mc.thePlayer != null && mc.theWorld != null) {
                 renderItem(ItemStack(Items.enchanted_book), 0, 0)
@@ -591,7 +591,7 @@ object MiscFeatures {
         }
     }
 
-    class PlacedSummoningEyeDisplay : GuiElement("Placed Summoning Eye Display", x = 50, y = 60, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class PlacedSummoningEyeDisplay : GuiElement("Placed Summoning Eye Display", x = 50, y = 60) {
         override fun render() {
             val player = mc.thePlayer
             if (toggled && Utils.inSkyblock && player != null && mc.theWorld != null) {
@@ -647,7 +647,7 @@ object MiscFeatures {
         }
     }
 
-    class WorldAgeDisplay : GuiElement("World Age Display", x = 50, y = 60, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class WorldAgeDisplay : GuiElement("World Age Display", x = 50, y = 60) {
 
         var usesBaldTimeChanger = false
 
@@ -714,7 +714,7 @@ object MiscFeatures {
         }
     }
 
-    object ItemNameHighlightDummy : GuiElement("Item Name Highlight", x = 50, y = 60, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    object ItemNameHighlightDummy : GuiElement("Item Name Highlight", x = 50, y = 60) {
         override fun render() {
             //This is a placeholder
         }
@@ -743,7 +743,7 @@ object MiscFeatures {
         }
     }
 
-    object ActionBarDummy : GuiElement("Action Bar", x = 50, y = 70, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    object ActionBarDummy : GuiElement("Action Bar", x = 50, y = 70) {
         override fun render() {
             //This is a placeholder
         }

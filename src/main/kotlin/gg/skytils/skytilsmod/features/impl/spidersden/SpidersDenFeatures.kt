@@ -89,7 +89,7 @@ object SpidersDenFeatures {
         arachneName = null
     }
 
-    class ArachneHPElement : GuiElement("Show Arachne HP", x = 200, y = 30, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class ArachneHPElement : GuiElement("Show Arachne HP", x = 200, y = 30) {
         override fun render() {
             if (arachneName != null) {
                 val leftAlign = scaleX < UResolution.scaledWidth / 2f

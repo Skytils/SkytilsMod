@@ -726,7 +726,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     }
 
     data class SpamMessage(var message: String, var time: Long, var height: Double)
-    class SpamGuiElement : GuiElement("Spam Gui", scale = 1.0f, x = 0.65f, y = 0.925f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class SpamGuiElement : GuiElement("Spam Gui", scale = 1.0f, x = 0.65f, y = 0.925f) {
         /**
          * Based off of Soopyboo32's SoopyApis module
          * https://github.com/Soopyboo32

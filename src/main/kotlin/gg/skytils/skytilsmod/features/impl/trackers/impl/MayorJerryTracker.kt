@@ -161,7 +161,7 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         JerryTrackerElement()
     }
 
-    class JerryTrackerElement : GuiElement("Mayor Jerry Tracker", x = 150, y = 120, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class JerryTrackerElement : GuiElement("Mayor Jerry Tracker", x = 150, y = 120) {
         override fun render() {
             if (toggled && Utils.inSkyblock) {
 

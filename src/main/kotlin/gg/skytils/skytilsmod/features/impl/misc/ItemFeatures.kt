@@ -767,7 +767,7 @@ object ItemFeatures {
         }
     }
 
-    class SelectedArrowDisplay : GuiElement("Arrow Swapper Display", x = 0.65f, y = 0.85f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class SelectedArrowDisplay : GuiElement("Arrow Swapper Display", x = 0.65f, y = 0.85f) {
         override fun render() {
             if (toggled && Utils.inSkyblock) {
                 val alignment =
@@ -808,7 +808,7 @@ object ItemFeatures {
         }
     }
 
-    class StackingEnchantDisplay : GuiElement("Stacking Enchant Display", x = 0.65f, y = 0.85f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class StackingEnchantDisplay : GuiElement("Stacking Enchant Display", x = 0.65f, y = 0.85f) {
         override fun render() {
             if (toggled && Utils.inSkyblock && stackingEnchantDisplayText.isNotBlank()) {
                 val alignment =
@@ -849,7 +849,7 @@ object ItemFeatures {
         }
     }
 
-    class SoulflowGuiElement : GuiElement("Soulflow Display", x = 0.65f, y = 0.85f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class SoulflowGuiElement : GuiElement("Soulflow Display", x = 0.65f, y = 0.85f) {
         override fun render() {
             if (Utils.inSkyblock && toggled) {
                 val alignment =
@@ -891,7 +891,7 @@ object ItemFeatures {
     }
 
 
-    class WitherShieldDisplay : GuiElement("Wither Shield Display", x = 0.65f, y = 0.85f, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class WitherShieldDisplay : GuiElement("Wither Shield Display", x = 0.65f, y = 0.85f) {
         override fun render() {
             if (toggled && Utils.inSkyblock) {
                 val alignment =

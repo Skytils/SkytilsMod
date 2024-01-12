@@ -508,7 +508,7 @@ object ScoreCalculation {
         HugeCryptsCounter()
     }
 
-    class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", scale = 2f, x = 200, y = 200, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class HugeCryptsCounter : GuiElement("Dungeon Crypts Counter", scale = 2f, x = 200, y = 200) {
         override fun render() {
             if (toggled && Utils.inDungeons && DungeonTimer.dungeonStartTime != -1L) {
 
@@ -547,7 +547,7 @@ object ScoreCalculation {
         }
     }
 
-    class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", x = 200, y = 100, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class ScoreCalculationElement : GuiElement("Dungeon Score Estimate", x = 200, y = 100) {
         override fun render() {
             if (toggled && Utils.inDungeons) {
                 RenderUtil.drawAllInList(this, text)

@@ -96,7 +96,7 @@ object Ping {
         }
     }
 
-    class PingDisplayElement : GuiElement(name = "Ping Display", x = 10, y = 10, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class PingDisplayElement : GuiElement(name = "Ping Display", x = 10, y = 10) {
         override fun render() {
             if (Utils.isOnHypixel && toggled && mc.thePlayer != null) {
                 when (Skytils.config.pingDisplay) {

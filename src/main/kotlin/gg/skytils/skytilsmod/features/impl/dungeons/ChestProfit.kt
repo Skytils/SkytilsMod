@@ -256,7 +256,7 @@ object ChestProfit {
 
     private var textShadow_ = SmartFontRenderer.TextShadow.NORMAL
     private class DungeonChestLootItem(var item: ItemStack, var value: Double)
-    class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", x = 200, y = 120, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", x = 200, y = 120) {
         override fun render() {
             if (toggled && (Utils.inDungeons || SBInfo.mode == SkyblockIsland.DungeonHub.mode)) {
                 val leftAlign = scaleX < sr.scaledWidth / 2f

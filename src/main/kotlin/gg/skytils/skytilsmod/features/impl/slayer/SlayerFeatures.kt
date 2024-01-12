@@ -599,7 +599,7 @@ object SlayerFeatures : CoroutineScope {
 
     }
 
-    class SlayerDisplayElement : GuiElement("Slayer Display", x = 150, y = 20, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class SlayerDisplayElement : GuiElement("Slayer Display", x = 150, y = 20) {
         override fun render() {
             if (Utils.inSkyblock) {
                 val leftAlign = scaleX < UResolution.scaledWidth / 2f
@@ -679,7 +679,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    class SeraphDisplayElement : GuiElement("Seraph Display", x = 20, y = 20, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class SeraphDisplayElement : GuiElement("Seraph Display", x = 20, y = 20) {
         override fun render() {
             if (toggled && Utils.inSkyblock && slayerEntity != null && slayerEntity is EntityEnderman) {
                 val leftAlign = scaleX < UResolution.scaledWidth / 2f
@@ -796,7 +796,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    object TotemDisplayElement : GuiElement("Totem Display", x = 20, y = 50, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    object TotemDisplayElement : GuiElement("Totem Display", x = 20, y = 50) {
         override fun render() {
             (slayer as? DemonlordSlayer)?.totemEntity?.run {
                 val leftAlign = scaleX < UResolution.scaledWidth / 2f
@@ -840,7 +840,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", x = 150, y = 20, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class SlayerArmorDisplayElement : GuiElement("Slayer Armor Display", x = 150, y = 20) {
         private val upgradeBonusRegex =
             Regex("§7Next Upgrade: §a\\+(?<nextDefense>[\\d,]+?)❈ §8\\(§a(?<kills>[\\d,]+)§7/§c(?<nextKills>[\\d,]+)§8\\)")
 

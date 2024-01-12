@@ -407,7 +407,7 @@ object MiningFeatures {
         waypoints.clear()
     }
 
-    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", x = 0, y = 0, textShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", x = 0, y = 0) {
         val mapLocation = ResourceLocation("skytils", "crystalhollowsmap.png")
 
         enum class Locations(val displayName: String, val id: String, val color: Int, val size: Int = 50) {
