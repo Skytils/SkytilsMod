@@ -46,6 +46,14 @@ abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float,
         this.y = y
     }
 
+    fun applyMetadata(metadata: GuiManager.GuiElementMetadata) {
+        setPos(metadata.x, metadata.y)
+        scale = metadata.scale
+        textShadow = metadata.textShadow
+    }
+
+    fun asMetadata() = GuiManager.GuiElementMetadata(x, y, scale, textShadow)
+
     val scaleX: Float
         get() {
             val maxX = UResolution.scaledWidth
@@ -71,10 +79,6 @@ abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float,
     }
 
     init {
-        val pos = GuiManager.GUIPOSITIONS.getOrDefault(name, x to y)
-        x = pos.first
-        y = pos.second
-        scale = GuiManager.GUISCALES.getOrDefault(name, scale)
-        textShadow = GuiManager.GUITEXTSHADOWS.getOrDefault(name, textShadow)
+        applyMetadata(GuiManager.elementMetadata.getOrDefault(name, GuiManager.GuiElementMetadata.DEFAULT))
     }
 }

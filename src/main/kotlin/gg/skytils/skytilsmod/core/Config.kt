@@ -3061,8 +3061,10 @@ object Config : Vigilant(
             val ver = UpdateChecker.SkytilsVersion(Skytils.config.lastLaunchedVersion)
             when {
                 !ver.isSafe || ver < UpdateChecker.SkytilsVersion("1.2-pre3") || Skytils.config.lastLaunchedVersion == "0" -> {
-                    if (GuiManager.GUISCALES["Crystal Hollows Map"] == 0.1f) {
-                        GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
+                    if (GuiManager.elementMetadata["Crystal Hollows Map"]?.scale == 0.1f) {
+                        GuiManager.elementMetadata["Crystal Hollows Map"] = GuiManager.elementMetadata["Crystal Hollows Map"]!!.copy(
+                            scale = 1f
+                        )
                         PersistentSave.markDirty<GuiManager>()
                     }
                 }
