@@ -2190,6 +2190,13 @@ object Config : Vigilant(
     var lavaBobber = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Fishing Hook Age",
+        description = "Shows how long your fishing hook has been cast",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var fishingHookAge = false
+
+    @Property(
         type = PropertyType.SELECTOR, name = "Autopet Message Hider",
         description = "Removes autopet messages from your chat.",
         category = "Pets", subcategory = "Quality of Life",
