@@ -22,6 +22,7 @@ import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.hypixel.types.skyblock.Member
+import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
@@ -124,7 +125,7 @@ object PartyFinderStats {
                         )
                     }?: component.append("§cNo Pet Equipped!")
 
-                    profileData.pets_data.pets.find{ it.type == "SPIRIT" }?.run {
+                    profileData.pets_data.pets.find(Pet::isSpirit)?.run {
                         component.append(" §7(§6Spirit§7)\n\n")
                     } ?: component.append(" §7(No Spirit)\n\n")
 
