@@ -79,15 +79,15 @@ object PartyFinderStats {
         }
     }
 
-    private fun playerStats(username: String, uuid: UUID, profileData: Member) {
-        Skytils.hylinAPI.getPlayer(uuid).whenComplete { playerResponse ->
+    private suspend fun playerStats(username: String, uuid: UUID, profileData: Member) {
+        API.getPlayer(uuid)?.let {playerResponse ->
             try {
                 profileData.dungeons?.dungeon_types?.get("catacombs")?.also { catacombsObj ->
                     val cataData = catacombsObj.normal
                     val masterCataData = catacombsObj.master
 
                     val cataLevel =
-                        SkillUtils.calcXpWithProgress(catacombsObj.experience ?: 0.0, SkillUtils.dungeoneeringXp.values)
+                        SkillUtils.calcXpWithProgress(catacombsObj.experience, SkillUtils.dungeoneeringXp.values)
 
                     val name = playerResponse.formattedName
 
@@ -224,14 +224,7 @@ object PartyFinderStats {
                 UChat.chat("$failPrefix §cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
                 e.printStackTrace()
             }
-        }.catch { e ->
-            e.printStackTrace()
-            UChat.chat(
-                "$failPrefix §cFailed to get dungeon stats: ${
-                    e.message
-                }"
-            )
-        }
+        } ?: UChat.chat("$failPrefix §cFailed to get dungeon stats for $username")
     }
 
     private fun Duration.timeFormat() = toComponents { minutes, seconds, _ ->
