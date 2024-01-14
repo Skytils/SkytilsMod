@@ -22,10 +22,12 @@ import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.lib.caffeine.cache.Caffeine
 import gg.essential.lib.caffeine.cache.Expiry
 import gg.essential.universal.UChat
+import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
+import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
@@ -39,7 +41,7 @@ import kotlinx.coroutines.launch
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import skytils.hylin.skyblock.Pet
+import skytils.hylin.extension.nonDashedString
 import skytils.hylin.skyblock.dungeons.DungeonClass
 
 object DungeonListener {
@@ -284,22 +286,19 @@ object DungeonListener {
     }
 
     fun checkSpiritPet() {
-        if (Skytils.hylinAPI.key.isNotEmpty()) {
-            Skytils.IO.launch {
-                runCatching {
-                    for (teammate in team.values) {
-                        val name = teammate.playerName
-                        if (hutaoFans.getIfPresent(name) != null) continue
-                        val uuid = teammate.player?.uniqueID ?: MojangUtil.getUUIDFromUsername(name) ?: continue
-                        val profile = Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(
-                            uuid
-                        ) ?: continue
-                        hutaoFans[name] = profile.pets.any(Pet::isSpirit)
+        Skytils.IO.launch {
+            runCatching {
+                for (teammate in team.values) {
+                    val name = teammate.playerName
+                    if (hutaoFans.getIfPresent(name) != null) continue
+                    val uuid = teammate.player?.uniqueID ?: MojangUtil.getUUIDFromUsername(name) ?: continue
+                    API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString())?.pets_data?.pets?.any(Pet::isSpirit)?.let {
+                        hutaoFans[name] = it
                     }
-                    printDevMessage(hutaoFans.asMap().toString(), "spiritpet")
-                }.onFailure {
-                    it.printStackTrace()
                 }
+                printDevMessage(hutaoFans.asMap().toString(), "spiritpet")
+            }.onFailure {
+                it.printStackTrace()
             }
         }
     }

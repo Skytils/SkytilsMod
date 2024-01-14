@@ -26,6 +26,7 @@ import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.gui.settings.CheckboxComponent
+import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.asm.SkytilsTransformer
@@ -57,8 +58,6 @@ import org.objectweb.asm.tree.MethodInsnNode
 import skytils.hylin.extension.getString
 import skytils.hylin.player.Player
 import skytils.hylin.player.rank.PackageRank
-import skytils.hylin.skyblock.Pet
-import skytils.hylin.skyblock.item.Tier
 import java.awt.Color
 import java.io.File
 import java.io.IOException
@@ -382,7 +381,7 @@ val gg.skytils.hypixel.types.player.Player.formattedName
     get() = "${rank_prefix}${" ".toStringIfTrue(rank != "NONE")}$display_name"
 
 val Pet.isSpirit
-    get() = type == "SPIRIT" && (tier == Tier.LEGENDARY || (heldItem == "PET_ITEM_TIER_BOOST" && tier == Tier.EPIC))
+    get() = type == "SPIRIT" && (tier == "LEGENDARY" || (heldItem == "PET_ITEM_TIER_BOOST" && tier == "EPIC"))
 
 val <E> MutableMap<E, Boolean>.asSet: MutableSet<E>
     get() = Collections.newSetFromMap(this)
