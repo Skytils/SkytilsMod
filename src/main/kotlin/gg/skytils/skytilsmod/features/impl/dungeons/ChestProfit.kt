@@ -176,7 +176,7 @@ object ChestProfit {
                 element.scaleY,
                 chest.displayColor,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow_
             )
 
             for (item in chest.items) {
@@ -187,7 +187,7 @@ object ChestProfit {
                     element.scaleY + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT,
                     CommonColors.WHITE,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow_
                 )
                 drawnLines++
             }
@@ -254,11 +254,13 @@ object ChestProfit {
         }
     }
 
+    private var textShadow_ = SmartFontRenderer.TextShadow.NORMAL
     private class DungeonChestLootItem(var item: ItemStack, var value: Double)
     class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", x = 200, y = 120) {
         override fun render() {
             if (toggled && (Utils.inDungeons || SBInfo.mode == SkyblockIsland.DungeonHub.mode)) {
                 val leftAlign = scaleX < sr.scaledWidth / 2f
+                textShadow_ = textShadow
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()
                 DungeonChest.entries.filter { it.items.isNotEmpty() }.forEachIndexed { i, chest ->
@@ -269,7 +271,7 @@ object ChestProfit {
                         (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         chest.displayColor,
                         if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                 }
             }

@@ -102,7 +102,7 @@ object SpidersDenFeatures {
                     0f,
                     CommonColors.WHITE,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -118,7 +118,7 @@ object SpidersDenFeatures {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 

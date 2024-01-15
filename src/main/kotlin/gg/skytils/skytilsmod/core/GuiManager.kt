@@ -29,9 +29,9 @@ import gg.skytils.skytilsmod.events.impl.RenderHUDEvent
 import gg.skytils.skytilsmod.gui.LocationEditGui
 import gg.skytils.skytilsmod.utils.GlState
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.toast.Toast
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -46,14 +46,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
-import java.util.LinkedList
-import java.util.Queue
+import java.util.*
 
 object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
-    val GUIPOSITIONS = hashMapOf<String, Pair<Float, Float>>()
-    val GUISCALES = hashMapOf<String, Float>()
     val elements = hashMapOf<Int, GuiElement>()
     private val names = hashMapOf<String, GuiElement>()
+    val elementMetadata = hashMapOf<String, GuiElementMetadata>()
 
     @JvmField
     var title: String? = null
@@ -186,7 +184,6 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
      * @author BiscuitDevelopment
      */
     private fun renderTitles(scaledResolution: ScaledResolution) {
-        val mc = Minecraft.getMinecraft()
         if (mc.theWorld == null || mc.thePlayer == null || !Utils.inSkyblock) {
             return
         }
@@ -236,37 +233,27 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     }
 
     override fun read(reader: Reader) {
-        json.decodeFromString<Map<String, GuiElementLocation>>(reader.readText()).forEach { name, (x, y, scale) ->
-            val pos = x to y
-            GUIPOSITIONS[name] = pos
-            GUISCALES[name] = scale
-            getByName(name)?.let { element ->
-                element.setPos(x, y)
-                element.scale = scale
-            }
+        json.decodeFromString<Map<String, GuiElementMetadata>>(reader.readText()).forEach { (name, metadata) ->
+            elementMetadata[name] = metadata
+            getByName(name)?.applyMetadata(metadata)
         }
     }
 
     override fun write(writer: Writer) {
         names.entries.forEach { (n, e) ->
-            GUIPOSITIONS[n] = e.x to e.y
-            GUISCALES[n] = e.scale
+            elementMetadata[n] = e.asMetadata()
         }
-        writer.write(json.encodeToString(GUIPOSITIONS.entries.associate {
-            it.key to GuiElementLocation(
-                it.value.first,
-                it.value.second,
-                GUISCALES[it.key] ?: 1f
-            )
-        }))
+        writer.write(json.encodeToString(elementMetadata))
     }
 
     override fun setDefault(writer: Writer) {
         writer.write("{}")
     }
 
-    // this class sucks lol (why is there a thing called floatpair)
-    // was going to make guielement serializable but it's too much effort
     @Serializable
-    private data class GuiElementLocation(val x: Float, val y: Float, val scale: Float)
+    data class GuiElementMetadata(val x: Float, val y: Float, val scale: Float = 1f, val textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL) {
+        companion object {
+            val DEFAULT = GuiElementMetadata(0f, 0f, 1f, SmartFontRenderer.TextShadow.NORMAL)
+        }
+    }
 }

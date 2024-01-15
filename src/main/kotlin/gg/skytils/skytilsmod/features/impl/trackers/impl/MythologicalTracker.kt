@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.features.impl.trackers.impl
 
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.PacketEvent
@@ -33,33 +32,21 @@ import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.Reader
 import java.io.Writer
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.pow
+import kotlinx.serialization.Serializable
 
 object MythologicalTracker : Tracker("mythological") {
 
     private val rareDugDrop = Regex("^RARE DROP! You dug out a (.+)!$")
     private val mythCreatureDug = Regex("^(?:Oi|Uh oh|Yikes|Woah|Oh|Danger|Good Grief)! You dug out (?:a )?(.+)!$")
-
-    private var lastMinosChamp = 0L
-
-    private val timestampFormat = DateTimeFormatter
-        .ofPattern("M/d/yy h:mm a")
-        .withZone(ZoneId.of("America/New_York"))
-        .withLocale(Locale.US)
 
     private val seenUUIDs = WeakHashMap<String, Boolean>().asSet
 
@@ -177,10 +164,8 @@ object MythologicalTracker : Tracker("mythological") {
                 val extraAttr = ItemUtil.getExtraAttributes(item) ?: return
                 if (!extraAttr.hasKey("timestamp")) return
                 if (!seenUUIDs.add(extraAttr.getString("uuid"))) return
-                val time = ZonedDateTime.from(
-                    timestampFormat.parse(extraAttr.getString("timestamp"))
-                )
-                if (ZonedDateTime.now().withSecond(0).withNano(0).toEpochSecond() - time.toEpochSecond() > 120) return
+                val time = extraAttr.getLong("timestamp")
+                if (System.currentTimeMillis() - time > 6000) return
                 if (Skytils.config.broadcastMythCreatureDrop) {
                     val text = "§6§lRARE DROP! ${drop.rarity.baseColor}${drop.itemName} §b(Skytils User Luck!)"
                     if (Skytils.config.autoCopyRNGDrops) GuiScreen.setClipboardString(text)
@@ -232,7 +217,7 @@ object MythologicalTracker : Tracker("mythological") {
     }
 
     // TODO: 5/3/2022 fix this
-    @kotlinx.serialization.Serializable
+    @Serializable
     data class TrackerSave(
         @SerialName("dug")
         val burrowsDug: Long,
@@ -277,7 +262,7 @@ object MythologicalTracker : Tracker("mythological") {
                     0f,
                     CommonColors.YELLOW,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
                 var drawnLines = 1
                 for (mob in BurrowMob.entries) {
@@ -288,7 +273,7 @@ object MythologicalTracker : Tracker("mythological") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
                         alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                     drawnLines++
                 }
@@ -300,7 +285,7 @@ object MythologicalTracker : Tracker("mythological") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
                         alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                     drawnLines++
                 }
@@ -318,7 +303,7 @@ object MythologicalTracker : Tracker("mythological") {
                 0f,
                 CommonColors.YELLOW,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
             var drawnLines = 1
             for (mob in BurrowMob.entries) {
@@ -328,7 +313,7 @@ object MythologicalTracker : Tracker("mythological") {
                     (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                     CommonColors.CYAN,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
                 drawnLines++
             }
@@ -339,7 +324,7 @@ object MythologicalTracker : Tracker("mythological") {
                     (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                     CommonColors.CYAN,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
                 drawnLines++
             }

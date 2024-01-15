@@ -34,7 +34,7 @@ plugins {
     signing
 }
 
-version = "1.8.0-pre7"
+version = "1.8.0-pre8"
 group = "gg.skytils"
 
 repositories {
@@ -112,7 +112,7 @@ dependencies {
     }
 
     shadowMe(platform(kotlin("bom")))
-    shadowMe(platform(ktor("bom", "2.2.4", addSuffix = false)))
+    shadowMe(platform(ktor("bom", "2.3.7", addSuffix = false)))
 
     shadowMe(ktor("serialization-kotlinx-json"))
     shadowMe(ktor("serialization-gson"))

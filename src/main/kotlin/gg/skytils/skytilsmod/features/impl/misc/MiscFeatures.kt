@@ -19,10 +19,12 @@ package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
+import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
+import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
@@ -41,8 +43,8 @@ import gg.skytils.skytilsmod.utils.RenderUtil.renderItem
 import gg.skytils.skytilsmod.utils.RenderUtil.renderTexture
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.block.BlockEndPortalFrame
 import net.minecraft.client.Minecraft
@@ -56,6 +58,7 @@ import net.minecraft.entity.effect.EntityLightningBolt
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityFallingBlock
 import net.minecraft.entity.item.EntityItem
+import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.init.Blocks
@@ -71,6 +74,7 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.living.EnderTeleportEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
@@ -507,6 +511,17 @@ object MiscFeatures {
         }
     }
 
+    @SubscribeEvent
+    fun renderFishingHookAge(event: RenderWorldLastEvent) {
+        if (Utils.inSkyblock && Config.fishingHookAge) {
+            mc.theWorld?.getEntities(EntityFishHook::class.java) { entity ->
+                mc.thePlayer == entity?.angler
+            }?.filterNotNull()?.forEach { entity ->
+                RenderUtil.drawLabel(entity.positionVector.addVector(0.0, 0.5, 0.0), "%.2fs".format(entity.ticksExisted / 20.0), Color.WHITE, event.partialTicks, UMatrixStack.Compat.get())
+            }
+        }
+    }
+
     class GolemSpawnTimerElement : GuiElement("Endstone Protector Spawn Timer", x = 150, y = 20) {
         override fun render() {
             val player = mc.thePlayer
@@ -522,7 +537,7 @@ object MiscFeatures {
                     0f,
                     CommonColors.WHITE,
                     alignment,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -534,7 +549,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.WHITE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -561,7 +576,7 @@ object MiscFeatures {
                     5f,
                     CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -574,7 +589,7 @@ object MiscFeatures {
                 5f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -603,7 +618,7 @@ object MiscFeatures {
                     5f,
                     CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -616,7 +631,7 @@ object MiscFeatures {
                 5f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -660,7 +675,7 @@ object MiscFeatures {
                         0f,
                         CommonColors.RED,
                         TextAlignment.LEFT_RIGHT,
-                        TextShadow.NORMAL
+                        textShadow
                     )
                     return
                 }
@@ -672,7 +687,7 @@ object MiscFeatures {
                     0f,
                     CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -687,7 +702,7 @@ object MiscFeatures {
                     0f,
                     CommonColors.RED,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
                 return
             }
@@ -697,7 +712,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -726,7 +741,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.WHITE,
                 TextAlignment.MIDDLE,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -755,7 +770,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.WHITE,
                 TextAlignment.MIDDLE,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 

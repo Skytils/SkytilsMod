@@ -22,6 +22,7 @@ import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.hypixel.types.skyblock.Member
+import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
@@ -79,15 +80,15 @@ object PartyFinderStats {
         }
     }
 
-    private fun playerStats(username: String, uuid: UUID, profileData: Member) {
-        Skytils.hylinAPI.getPlayer(uuid).whenComplete { playerResponse ->
+    private suspend fun playerStats(username: String, uuid: UUID, profileData: Member) {
+        API.getPlayer(uuid)?.let {playerResponse ->
             try {
                 profileData.dungeons?.dungeon_types?.get("catacombs")?.also { catacombsObj ->
                     val cataData = catacombsObj.normal
                     val masterCataData = catacombsObj.master
 
                     val cataLevel =
-                        SkillUtils.calcXpWithProgress(catacombsObj.experience ?: 0.0, SkillUtils.dungeoneeringXp.values)
+                        SkillUtils.calcXpWithProgress(catacombsObj.experience, SkillUtils.dungeoneeringXp.values)
 
                     val name = playerResponse.formattedName
 
@@ -124,7 +125,7 @@ object PartyFinderStats {
                         )
                     }?: component.append("§cNo Pet Equipped!")
 
-                    profileData.pets_data.pets.find{ it.type == "SPIRIT" }?.run {
+                    profileData.pets_data.pets.find(Pet::isSpirit)?.run {
                         component.append(" §7(§6Spirit§7)\n\n")
                     } ?: component.append(" §7(No Spirit)\n\n")
 
@@ -224,14 +225,7 @@ object PartyFinderStats {
                 UChat.chat("$failPrefix §cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
                 e.printStackTrace()
             }
-        }.catch { e ->
-            e.printStackTrace()
-            UChat.chat(
-                "$failPrefix §cFailed to get dungeon stats: ${
-                    e.message
-                }"
-            )
-        }
+        } ?: UChat.chat("$failPrefix §cFailed to get dungeon stats for $username")
     }
 
     private fun Duration.timeFormat() = toComponents { minutes, seconds, _ ->

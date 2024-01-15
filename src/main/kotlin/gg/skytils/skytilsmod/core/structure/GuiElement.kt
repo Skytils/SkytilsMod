@@ -20,13 +20,15 @@ package gg.skytils.skytilsmod.core.structure
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 
-abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float, var y: Float) {
-    constructor(name: String, scale: Float = 1f, x: Int, y: Int) : this(
+abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float, var y: Float, var textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL) {
+    constructor(name: String, scale: Float = 1f, x: Int, y: Int, textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL) : this(
         name,
         scale,
         (x / UResolution.scaledWidth).toFloat(),
-        (y / UResolution.scaledHeight).toFloat()
+        (y / UResolution.scaledHeight).toFloat(),
+        textShadow
     )
 
     abstract fun render()
@@ -43,6 +45,14 @@ abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float,
         this.x = x
         this.y = y
     }
+
+    fun applyMetadata(metadata: GuiManager.GuiElementMetadata) {
+        setPos(metadata.x, metadata.y)
+        scale = metadata.scale
+        textShadow = metadata.textShadow
+    }
+
+    fun asMetadata() = GuiManager.GuiElementMetadata(x, y, scale, textShadow)
 
     val scaleX: Float
         get() {
@@ -69,9 +79,6 @@ abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float,
     }
 
     init {
-        val pos = GuiManager.GUIPOSITIONS.getOrDefault(name, x to y)
-        x = pos.first
-        y = pos.second
-        scale = GuiManager.GUISCALES.getOrDefault(name, scale)
+        applyMetadata(GuiManager.elementMetadata.getOrDefault(name, GuiManager.GuiElementMetadata.DEFAULT))
     }
 }

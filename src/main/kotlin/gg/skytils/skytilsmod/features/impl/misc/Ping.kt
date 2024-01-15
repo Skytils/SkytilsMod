@@ -136,7 +136,7 @@ object Ping {
                             else -> CommonColors.RED
                         },
                         SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                        SmartFontRenderer.TextShadow.NONE
+                        textShadow
                     )
                 }
             }
@@ -149,7 +149,7 @@ object Ping {
                 0f,
                 CommonColors.DARK_GREEN,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                SmartFontRenderer.TextShadow.NONE
+                textShadow
             )
         }
 

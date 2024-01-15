@@ -93,7 +93,7 @@ object MayorJerry {
                         0f,
                         CommonColors.ORANGE,
                         SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                 }
             }
@@ -106,7 +106,7 @@ object MayorJerry {
                 0f,
                 CommonColors.ORANGE,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -142,7 +142,7 @@ object MayorJerry {
                     5f,
                     CommonColors.ORANGE,
                     SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -155,7 +155,7 @@ object MayorJerry {
                 5f,
                 CommonColors.ORANGE,
                 SmartFontRenderer.TextAlignment.LEFT_RIGHT,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 

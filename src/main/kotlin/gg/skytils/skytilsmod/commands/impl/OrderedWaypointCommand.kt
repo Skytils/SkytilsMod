@@ -59,39 +59,42 @@ object OrderedWaypointCommand : BaseCommand("skytilsorderedwaypoint") {
                 it.island.mode == SBInfo.mode || (isUnknownIsland && it.island == SkyblockIsland.Unknown)
             }.sortedWith(categoryComparator)
         }
-        val subcommand = args.getOrNull(0)
-        if (subcommand == null || subcommand == "selectmenu") {
-            val startIndex = args.getOrNull(1)?.toIntOrNull() ?: 0
-            val toIndex = startIndex + 10.coerceAtMost(categoryCache.size)
-            val list = categoryCache.subList(startIndex, toIndex)
-            UMessage("${Skytils.prefix} §bSelect a Waypoint Category!").apply {
-                chatLineId = lineId
-                list.withIndex().forEach { (i, c) ->
-                    addTextComponent(UTextComponent("\n§a${c.name}§7 (${c.waypoints.size})").setClick(MCClickEventAction.RUN_COMMAND, "/${commandName} select ${i + startIndex}"))
-                }
-                if (startIndex >= 10) {
-                    addTextComponent(UTextComponent("\n§7[§aPrevious§7]").setClick(MCClickEventAction.RUN_COMMAND, "/${commandName} selectmenu ${startIndex - 10}"))
-                }
-                if (toIndex < categoryCache.size) {
-                    addTextComponent(UTextComponent("\n§7[§aNext§7]").setClick(MCClickEventAction.RUN_COMMAND, "/${commandName} selectmenu $toIndex"))
-                }
-            }.chat()
-        } else if (subcommand == "select") {
-            val category = categoryCache.getOrNull(args.getOrNull(1)?.toIntOrNull() ?: 0)
-                ?: throw WrongUsageException("Invalid category!")
-            UMessage("${Skytils.successPrefix} §aSelected category §b${category.name}§a!\n" +
-                    "§b§lNote: this is a BETA feature!\n" +
-                    "§bReport bugs on Discord!\n" +
-                    "§bUpdates to waypoints will not be reflected."
-            ).apply {
-                chatLineId = lineId
-            }.chat()
-            trackedSet = category.waypoints.sortedBy { it.name }.toMutableList()
-            trackedIsland = category.island
-        } else if (subcommand == "stop") {
-            trackedSet = null
-            trackedIsland = null
-            UChat.chat("${Skytils.successPrefix} §aStopped tracking waypoints!")
+        when (args.getOrNull(0)) {
+            null, "selectmenu" -> {
+                val startIndex = args.getOrNull(1)?.toIntOrNull() ?: 0
+                val toIndex = startIndex + 10.coerceAtMost(categoryCache.size)
+                val list = categoryCache.subList(startIndex, toIndex)
+                UMessage("${Skytils.prefix} §bSelect a Waypoint Category!").apply {
+                    chatLineId = lineId
+                    list.withIndex().forEach { (i, c) ->
+                        addTextComponent(UTextComponent("\n§a${c.name}§7 (${c.waypoints.size})").setClick(MCClickEventAction.RUN_COMMAND, "/${commandName} select ${i + startIndex}"))
+                    }
+                    if (startIndex >= 10) {
+                        addTextComponent(UTextComponent("\n§7[§aPrevious§7]").setClick(MCClickEventAction.RUN_COMMAND, "/${commandName} selectmenu ${startIndex - 10}"))
+                    }
+                    if (toIndex < categoryCache.size) {
+                        addTextComponent(UTextComponent("\n§7[§aNext§7]").setClick(MCClickEventAction.RUN_COMMAND, "/${commandName} selectmenu $toIndex"))
+                    }
+                }.chat()
+            }
+            "select" -> {
+                val category = categoryCache.getOrNull(args.getOrNull(1)?.toIntOrNull() ?: 0)
+                    ?: throw WrongUsageException("Invalid category!")
+                UMessage("${Skytils.successPrefix} §aSelected category §b${category.name}§a!\n" +
+                        "§b§lNote: this is a BETA feature!\n" +
+                        "§bReport bugs on Discord!\n" +
+                        "§bUpdates to waypoints will not be reflected."
+                ).apply {
+                    chatLineId = lineId
+                }.chat()
+                trackedSet = category.waypoints.sortedBy { it.name }.toMutableList()
+                trackedIsland = category.island
+            }
+            "stop" -> {
+                trackedSet = null
+                trackedIsland = null
+                UChat.chat("${Skytils.successPrefix} §aStopped tracking waypoints!")
+            }
         }
     }
 
