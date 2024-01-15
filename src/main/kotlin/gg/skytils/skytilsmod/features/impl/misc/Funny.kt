@@ -24,12 +24,13 @@ import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.GuiManager
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.gui.elements.GIFResource
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.getSkytilsResource
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.MathHelper
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -70,7 +71,7 @@ object Funny {
         if (classification.size != machineLearningModel.size) {
             Skytils.sendMessageQueue.addFirst("/lobby ptl")
 
-            TickTask(10) {
+            tickTimer(10) {
                 val cheetos = classification - machineLearningModel
 
                 UChat.chat(
@@ -96,7 +97,7 @@ object Funny {
         GuiManager.registerElement(JamCatElement)
     }
 
-    object JamCatElement : GuiElement("Jamcat", x = 0, y = 0) {
+    object JamCatElement : GuiElement("Jamcat", x = 0, y = 0) { // textShadow is a bit useless here... Too bad!
         val gif by lazy {
             GIFResource(getSkytilsResource("splashes/jamcat.gif"), frameDelay = 5)
         }

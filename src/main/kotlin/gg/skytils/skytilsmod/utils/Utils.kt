@@ -20,11 +20,13 @@ package gg.skytils.skytilsmod.utils
 import dev.falsehonesty.asmhelper.AsmHelper
 import dev.falsehonesty.asmhelper.dsl.instructions.Descriptor
 import gg.essential.lib.caffeine.cache.Cache
+import gg.essential.universal.ChatColor
 import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.gui.settings.CheckboxComponent
+import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.asm.SkytilsTransformer
@@ -56,8 +58,6 @@ import org.objectweb.asm.tree.MethodInsnNode
 import skytils.hylin.extension.getString
 import skytils.hylin.player.Player
 import skytils.hylin.player.rank.PackageRank
-import skytils.hylin.skyblock.Pet
-import skytils.hylin.skyblock.item.Tier
 import java.awt.Color
 import java.io.File
 import java.io.IOException
@@ -362,8 +362,26 @@ fun MethodInsnNode.matches(owner: String?, name: String?, desc: String?): Boolea
 val Player.formattedName
     get() = "${rankPrefix}${" ".toStringIfTrue(rank != PackageRank.NONE)}${player.getString("displayname")}"
 
+val gg.skytils.hypixel.types.player.Player.rank_prefix
+    get() = when(rank) {
+        "VIP" -> "§a[VIP]"
+        "VIP_PLUS" -> "§a[VIP§6+§a]"
+        "MVP" -> "§b[MVP]"
+        "MVP_PLUS" -> "§b[MVP${ChatColor.valueOf(plus_color)}+§b]"
+        "MVP_PLUS_PLUS" -> "${ChatColor.valueOf(mvp_plus_plus_color)}[MVP${ChatColor.valueOf(plus_color)}++${ChatColor.valueOf(mvp_plus_plus_color)}]"
+        "HELPER" -> "§9[HELPER]"
+        "MODERATOR" -> "§2[MOD]"
+        "GAME_MASTER" -> "§2[GM]"
+        "ADMIN" -> "§c[ADMIN]"
+        "YOUTUBER" -> "§c[§fYOUTUBE§c]"
+        else -> "§7"
+    }
+
+val gg.skytils.hypixel.types.player.Player.formattedName
+    get() = "${rank_prefix}${" ".toStringIfTrue(rank != "NONE")}$display_name"
+
 val Pet.isSpirit
-    get() = type == "SPIRIT" && (tier == Tier.LEGENDARY || (heldItem == "PET_ITEM_TIER_BOOST" && tier == Tier.EPIC))
+    get() = type == "SPIRIT" && (tier == "LEGENDARY" || (heldItem == "PET_ITEM_TIER_BOOST" && tier == "EPIC"))
 
 val <E> MutableMap<E, Boolean>.asSet: MutableSet<E>
     get() = Collections.newSetFromMap(this)
@@ -395,7 +413,7 @@ operator fun Vec3.times(scaleValue: Double): Vec3 = Vec3(xCoord * scaleValue, yC
  */
 fun <T> List<T>.elementPairs() = sequence {
     val arr = this@elementPairs
-    for (i in 0 until arr.size - 1)
-        for (j in i + 1 until arr.size)
+    for (i in 0..<arr.size - 1)
+        for (j in i + 1..<arr.size)
             yield(arr[i] to arr[j])
 }

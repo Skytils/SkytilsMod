@@ -71,8 +71,8 @@ object TriviaSolver {
             } else {
                 triviaSolutions.entries.find {
                     unformatted.contains(it.key)
-                }.also {
-                    if (it != null) triviaAnswers = it.value
+                }?.let {
+                    triviaAnswers = it.value
                 }
             }
 
@@ -136,9 +136,9 @@ object TriviaSolver {
     @SubscribeEvent
     fun onRenderArmorStandPre(event: RenderLivingEvent.Pre<EntityArmorStand?>) {
         if (Skytils.config.triviaSolver && triviaAnswer != null) {
-            if (event.entity is EntityArmorStand && event.entity.hasCustomName()) {
+            if (event.entity is EntityArmorStand) {
                 val name = event.entity.customNameTag
-                if (name.contains("ⓐ") || name.contains("ⓑ") || name.contains("ⓒ")) {
+                if (name.isNotEmpty() && name.contains("ⓐ") || name.contains("ⓑ") || name.contains("ⓒ")) {
                     if (!name.contains(triviaAnswer!!)) {
                         event.isCanceled = true
                     }

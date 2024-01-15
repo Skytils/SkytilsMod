@@ -48,7 +48,7 @@ object ProtectItemCommand : BaseCommand("protectitem") {
             val uuid = extraAttributes.getString("uuid")
             if (FavoriteStrategy.favoriteUUIDs.remove(uuid)) {
                 PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
-                UChat.chat("$successPrefix §aI will no longer protect your ${item.displayName}§a!")
+                UChat.chat("$successPrefix §cI will no longer protect your ${item.displayName}§a!")
             } else {
                 FavoriteStrategy.favoriteUUIDs.add(uuid)
                 PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
@@ -59,7 +59,7 @@ object ProtectItemCommand : BaseCommand("protectitem") {
                 ItemUtil.getSkyBlockItemID(item) ?: throw WrongUsageException("This item doesn't have a Skyblock ID.")
             if (FavoriteStrategy.favoriteItemIds.remove(itemId)) {
                 PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()
-                UChat.chat("$successPrefix §aI will no longer protect all of your ${itemId}s!")
+                UChat.chat("$successPrefix §cI will no longer protect all of your ${itemId}s!")
             } else {
                 FavoriteStrategy.favoriteItemIds.add(itemId)
                 PersistentSave.markDirty<FavoriteStrategy.FavoriteStrategySave>()

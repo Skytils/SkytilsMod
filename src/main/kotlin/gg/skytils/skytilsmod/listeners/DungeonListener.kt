@@ -22,11 +22,13 @@ import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.lib.caffeine.cache.Caffeine
 import gg.essential.lib.caffeine.cache.Expiry
 import gg.essential.universal.UChat
+import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.API
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
@@ -39,7 +41,7 @@ import kotlinx.coroutines.launch
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import skytils.hylin.skyblock.Pet
+import skytils.hylin.extension.nonDashedString
 import skytils.hylin.skyblock.dungeons.DungeonClass
 
 object DungeonListener {
@@ -93,14 +95,14 @@ object DungeonListener {
                 team.clear()
                 deads.clear()
                 missingPuzzles.clear()
-                TickTask(40) {
+                tickTimer(40) {
                     getMembers()
                 }
             } else if (text.stripControlCodes()
                     .trim() == "> EXTRA STATS <"
             ) {
                 if (Skytils.config.dungeonDeathCounter) {
-                    TickTask(6) {
+                    tickTimer(6) {
                         UChat.chat("§c☠ §lDeaths:§r ${team.values.sumOf { it.deaths }}\n${
                             team.values.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
                                 "  §c☠ ${it.playerName}:§r ${it.deaths}"
@@ -127,8 +129,8 @@ object DungeonListener {
     }
 
     init {
-        TickTask(4, repeats = true) {
-            if (!Utils.inDungeons) return@TickTask
+        tickTimer(4, repeats = true) {
+            if (!Utils.inDungeons) return@tickTimer
             val localMissingPuzzles = TabListUtils.tabEntries.mapNotNull {
                 val name = it.second
                 if (name.contains("✦")) {
@@ -155,7 +157,7 @@ object DungeonListener {
                 missingPuzzles.addAll(localMissingPuzzles)
             }
         }
-        TickTask(2, repeats = true) {
+        tickTimer(2, repeats = true) {
             if (Utils.inDungeons && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
                 val tabEntries = TabListUtils.tabEntries
                 val self = team[mc.thePlayer.name]
@@ -195,7 +197,7 @@ object DungeonListener {
             printDevMessage(isFirstDeath.toString(), "spiritpet")
             printDevMessage(ScoreCalculation.firstDeathHadSpirit.toString(), "spiritpet")
             if (Skytils.config.dungeonDeathCounter) {
-                TickTask(1) {
+                tickTimer(1) {
                     UChat.chat(
                         "§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${totalDeaths}§b total tracked deaths.${
                             " §6(SPIRIT)".toStringIfTrue(
@@ -228,7 +230,7 @@ object DungeonListener {
         val tabEntries = TabListUtils.tabEntries
 
         if (tabEntries.isEmpty() || !tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
-            TickTask(5) {
+            tickTimer(5) {
                 getMembers()
             }
             return
@@ -237,13 +239,13 @@ object DungeonListener {
         val partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
         if (partyCount == null) {
             println("Couldn't get party count")
-            TickTask(5) {
+            tickTimer(5) {
                 getMembers()
             }
             return
         }
         println("There are $partyCount members in this party")
-        for (i in 0 until partyCount) {
+        for (i in 0..<partyCount) {
             val pos = 1 + i * 4
             val text = tabEntries[pos].second
             val matcher = classPattern.find(text)
@@ -284,22 +286,19 @@ object DungeonListener {
     }
 
     fun checkSpiritPet() {
-        if (Skytils.hylinAPI.key.isNotEmpty()) {
-            Skytils.IO.launch {
-                runCatching {
-                    for (teammate in team.values) {
-                        val name = teammate.playerName
-                        if (hutaoFans.getIfPresent(name) != null) continue
-                        val uuid = teammate.player?.uniqueID ?: MojangUtil.getUUIDFromUsername(name) ?: continue
-                        val profile = Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(
-                            uuid
-                        ) ?: continue
-                        hutaoFans[name] = profile.pets.any(Pet::isSpirit)
+        Skytils.IO.launch {
+            runCatching {
+                for (teammate in team.values) {
+                    val name = teammate.playerName
+                    if (hutaoFans.getIfPresent(name) != null) continue
+                    val uuid = teammate.player?.uniqueID ?: MojangUtil.getUUIDFromUsername(name) ?: continue
+                    API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString())?.pets_data?.pets?.any(Pet::isSpirit)?.let {
+                        hutaoFans[name] = it
                     }
-                    printDevMessage(hutaoFans.asMap().toString(), "spiritpet")
-                }.onFailure {
-                    it.printStackTrace()
                 }
+                printDevMessage(hutaoFans.asMap().toString(), "spiritpet")
+            }.onFailure {
+                it.printStackTrace()
             }
         }
     }

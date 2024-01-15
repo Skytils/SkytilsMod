@@ -25,5 +25,5 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(EntityArmorStand.class)
 public interface AccessorEntityArmorstand {
     @Invoker
-    public void invokeSetShowArms(boolean bl);
+    void invokeSetShowArms(boolean bl);
 }

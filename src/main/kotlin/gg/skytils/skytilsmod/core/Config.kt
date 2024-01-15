@@ -19,6 +19,7 @@ package gg.skytils.skytilsmod.core
 
 import gg.essential.api.EssentialAPI
 import gg.essential.elementa.utils.withAlpha
+import gg.essential.universal.UChat
 import gg.essential.universal.UDesktop
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.Category
@@ -32,6 +33,7 @@ import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.PotionNotificationsGui
 import gg.skytils.skytilsmod.gui.SpiritLeapNamesGui
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
+import gg.skytils.skytilsmod.utils.ModChecker
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ClientCommandHandler
@@ -230,6 +232,25 @@ object Config : Vigilant(
         category = "Dungeons", subcategory = "Miscellaneous"
     )
     var noChildLeftBehind = false
+
+    @Property(
+        type = PropertyType.BUTTON, name = "Dungeon Sweat",
+        description = "Click if dungeon sweat???",
+        category = "Dungeons", subcategory = "Miscellaneous",
+        searchTags = ["predev", "pre-dev", "arrow", "tic tac toe", "solver"]
+    )
+    fun openDungeonSweat() {
+        if (ModChecker.canShowNotifications) {
+            EssentialAPI.getNotifications().push("azoopuzzoo", "hmmmmm... nice pb + ratio + sub 3 + FAST S+ + no bers + no healer + no tank + 4m 1a + no hype = kick", 3f) {
+                onClose = {
+                    UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
+                }
+            }
+        } else {
+            UChat.chat("${Skytils.prefix} §bazoopuzzoo")
+            UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
+        }
+    }
 
     @Property(
         type = PropertyType.SWITCH, name = "Dungeon Timer",
@@ -713,6 +734,13 @@ object Config : Vigilant(
     var showNextBlaze = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Line to Next Blaze",
+        description = "Draws line to next blaze to shoot in Higher or Lower.",
+        category = "Dungeons", subcategory = "Solvers"
+    )
+    var lineToNextBlaze = false
+
+    @Property(
         type = PropertyType.COLOR, name = "Lowest Blaze Color",
         description = "Color used to highlight the lowest blaze in.",
         category = "Dungeons", subcategory = "Solvers"
@@ -732,6 +760,13 @@ object Config : Vigilant(
         category = "Dungeons", subcategory = "Solvers"
     )
     var nextBlazeColor = Color(255, 255, 0, 200)
+
+    @Property(
+        type = PropertyType.COLOR, name = "Line to Next Blaze Color",
+        description = "Color used to draw line to the next blaze in.",
+        category = "Dungeons", subcategory = "Solvers"
+    )
+    var lineToNextBlazeColor = Color(255, 255, 0, 200)
 
     @Property(
         type = PropertyType.SWITCH, name = "Boulder Solver",
@@ -1407,7 +1442,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Prevent Placing Weapons",
-        description = "Stops the game from trying to place the Flower of Truth, Moody Grappleshot, Spirit Sceptre, and Weird Tuba items.",
+        description = "Stops the game from trying to place the Flower of Truth, Moody Grappleshot, Spirit Sceptre, Pumpkin Launcher and Weird Tuba items.",
         category = "Miscellaneous", subcategory = "Items"
     )
     var preventPlacingWeapons = false
@@ -2036,6 +2071,18 @@ object Config : Vigilant(
     var pressEnterToConfirmSignQuestion = false
 
     @Property(
+        type = PropertyType.BUTTON, name = "Protect Items",
+        description = "Prevents you from dropping, salvaging, or selling items that you have selected.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        searchTags = ["Lock", "Slot"]
+    )
+    fun protectItems() {
+        if (ModChecker.canShowNotifications) {
+            EssentialAPI.getNotifications().push("Protect Items Help", "Hold the item you'd like to protect, and then run /protectitem.", 5f)
+        } else UChat.chat("${Skytils.prefix} §bHold the item you'd like to protect, and then run /protectitem.")
+    }
+
+    @Property(
         type = PropertyType.TEXT, name = "Protect Items Above Value",
         description = "Prevents you from dropping, salvaging, or selling items worth more than this value. Based on Lowest BIN price.",
         category = "Miscellaneous", subcategory = "Quality of Life",
@@ -2170,6 +2217,13 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var lavaBobber = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Fishing Hook Age",
+        description = "Shows how long your fishing hook has been cast",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var fishingHookAge = false
 
     @Property(
         type = PropertyType.SELECTOR, name = "Autopet Message Hider",
@@ -2946,9 +3000,11 @@ object Config : Vigilant(
         addDependency("highlightDoorOpener", "spiritLeapNames")
 
         addDependency("showNextBlaze", "blazeSolver")
+        addDependency("lineToNextBlaze", "showNextBlaze")
         addDependency("lowestBlazeColor", "blazeSolver")
         addDependency("highestBlazeColor", "blazeSolver")
         addDependency("nextBlazeColor", "showNextBlaze")
+        addDependency("lineToNextBlazeColor", "lineToNextBlaze")
         addDependency("teleportMazeSolverColor", "teleportMazeSolver")
         addDependency("ticTacToeSolverColor", "ticTacToeSolver")
         addDependency("clickInOrderFirst", "clickInOrderTerminalSolver")
@@ -2989,7 +3045,7 @@ object Config : Vigilant(
         addDependency("assumeWitherImpact", "witherShieldCooldown")
 
         registerListener("protectItemBINThreshold") { _: String ->
-            TickTask(1) {
+            tickTimer(1) {
                 val numeric = protectItemBINThreshold.replace(Regex("[^0-9]"), "")
                 protectItemBINThreshold = numeric.ifEmpty { "0" }
                 if (protectItemBINThreshold != "0") fetchLowestBINPrices = true
@@ -3007,7 +3063,7 @@ object Config : Vigilant(
                     val loc = ResourceLocation("skytils:gui/customrarity.png")
                     mc.resourceManager.getResource(loc)
                 }.onFailure {
-                    TickTask(1) {
+                    tickTimer(1) {
                         if (itemRarityShape == 4) {
                             itemRarityShape = old
                             EssentialAPI.getNotifications()
@@ -3034,8 +3090,10 @@ object Config : Vigilant(
             val ver = UpdateChecker.SkytilsVersion(Skytils.config.lastLaunchedVersion)
             when {
                 !ver.isSafe || ver < UpdateChecker.SkytilsVersion("1.2-pre3") || Skytils.config.lastLaunchedVersion == "0" -> {
-                    if (GuiManager.GUISCALES["Crystal Hollows Map"] == 0.1f) {
-                        GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
+                    if (GuiManager.elementMetadata["Crystal Hollows Map"]?.scale == 0.1f) {
+                        GuiManager.elementMetadata["Crystal Hollows Map"] = GuiManager.elementMetadata["Crystal Hollows Map"]!!.copy(
+                            scale = 1f
+                        )
                         PersistentSave.markDirty<GuiManager>()
                     }
                 }

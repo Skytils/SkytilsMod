@@ -32,7 +32,6 @@ import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import gg.skytils.skytilsmod.utils.*
-import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -42,7 +41,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.block.BlockStainedGlass
-import net.minecraft.block.material.Material
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
@@ -614,7 +612,7 @@ object DungeonFeatures {
             val diff = it.value - System.currentTimeMillis()
             RenderUtil.drawLabel(
                 it.key.middleVec(),
-                "${(diff / 1000.0).roundToPrecision(2)}s",
+                "${"%.2f".format(diff / 1000.0)}s",
                 Color.WHITE,
                 event.partialTicks,
                 stack
@@ -756,7 +754,7 @@ object DungeonFeatures {
                     0f,
                     CommonColors.PURPLE,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -771,7 +769,7 @@ object DungeonFeatures {
                 0f,
                 CommonColors.PURPLE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -803,7 +801,7 @@ object DungeonFeatures {
                     0f,
                     CommonColors.WHITE,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -819,7 +817,7 @@ object DungeonFeatures {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 

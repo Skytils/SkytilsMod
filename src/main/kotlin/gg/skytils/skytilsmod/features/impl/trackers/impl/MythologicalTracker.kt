@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.features.impl.trackers.impl
 
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.PacketEvent
@@ -33,33 +32,21 @@ import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.Reader
 import java.io.Writer
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.math.pow
+import kotlinx.serialization.Serializable
 
 object MythologicalTracker : Tracker("mythological") {
 
     private val rareDugDrop = Regex("^RARE DROP! You dug out a (.+)!$")
     private val mythCreatureDug = Regex("^(?:Oi|Uh oh|Yikes|Woah|Oh|Danger|Good Grief)! You dug out (?:a )?(.+)!$")
-
-    private var lastMinosChamp = 0L
-
-    private val timestampFormat = DateTimeFormatter
-        .ofPattern("M/d/yy h:mm a")
-        .withZone(ZoneId.of("America/New_York"))
-        .withLocale(Locale.US)
 
     private val seenUUIDs = WeakHashMap<String, Boolean>().asSet
 
@@ -93,11 +80,11 @@ object MythologicalTracker : Tracker("mythological") {
 
         companion object {
             fun getFromId(id: String?): BurrowDrop? {
-                return values().find { it.itemId == id }
+                return entries.find { it.itemId == id }
             }
 
             fun getFromName(name: String?): BurrowDrop? {
-                return values().find { it.itemName == name }
+                return entries.find { it.itemName == name }
             }
         }
     }
@@ -119,11 +106,11 @@ object MythologicalTracker : Tracker("mythological") {
 
         companion object {
             fun getFromId(id: String?): BurrowMob? {
-                return values().find { it.mobId == id }
+                return entries.find { it.mobId == id }
             }
 
             fun getFromName(name: String?): BurrowMob? {
-                return values().find { it.mobName == name }
+                return entries.find { it.mobName == name }
             }
         }
     }
@@ -158,7 +145,7 @@ object MythologicalTracker : Tracker("mythological") {
                     burrowsDug++
                     markDirty<MythologicalTracker>()
                 } else if (unformatted.startsWith("RARE DROP! ")) {
-                    for (drop in BurrowDrop.values()) {
+                    for (drop in BurrowDrop.entries) {
                         if (!drop.mobDrop) continue
                         if (unformatted.startsWith("RARE DROP! ${drop.itemName}")) {
                             drop.droppedTimes++
@@ -177,10 +164,8 @@ object MythologicalTracker : Tracker("mythological") {
                 val extraAttr = ItemUtil.getExtraAttributes(item) ?: return
                 if (!extraAttr.hasKey("timestamp")) return
                 if (!seenUUIDs.add(extraAttr.getString("uuid"))) return
-                val time = ZonedDateTime.from(
-                    timestampFormat.parse(extraAttr.getString("timestamp"))
-                )
-                if (ZonedDateTime.now().withSecond(0).withNano(0).toEpochSecond() - time.toEpochSecond() > 120) return
+                val time = extraAttr.getLong("timestamp")
+                if (System.currentTimeMillis() - time > 6000) return
                 if (Skytils.config.broadcastMythCreatureDrop) {
                     val text = "§6§lRARE DROP! ${drop.rarity.baseColor}${drop.itemName} §b(Skytils User Luck!)"
                     if (Skytils.config.autoCopyRNGDrops) GuiScreen.setClipboardString(text)
@@ -227,12 +212,12 @@ object MythologicalTracker : Tracker("mythological") {
 
     override fun resetLoot() {
         burrowsDug = 0L
-        BurrowDrop.values().forEach { it.droppedTimes = 0L }
-        BurrowMob.values().forEach { it.dugTimes = 0L }
+        BurrowDrop.entries.forEach { it.droppedTimes = 0L }
+        BurrowMob.entries.forEach { it.dugTimes = 0L }
     }
 
     // TODO: 5/3/2022 fix this
-    @kotlinx.serialization.Serializable
+    @Serializable
     data class TrackerSave(
         @SerialName("dug")
         val burrowsDug: Long,
@@ -244,8 +229,8 @@ object MythologicalTracker : Tracker("mythological") {
     override fun read(reader: Reader) {
         val save = json.decodeFromString<TrackerSave>(reader.readText())
         burrowsDug = save.burrowsDug
-        BurrowDrop.values().forEach { it.droppedTimes = save.drops[it.itemId] ?: 0L }
-        BurrowMob.values().forEach { it.dugTimes = save.mobs[it.mobId] ?: 0L }
+        BurrowDrop.entries.forEach { it.droppedTimes = save.drops[it.itemId] ?: 0L }
+        BurrowMob.entries.forEach { it.dugTimes = save.mobs[it.mobId] ?: 0L }
     }
 
     override fun write(writer: Writer) {
@@ -253,8 +238,8 @@ object MythologicalTracker : Tracker("mythological") {
             json.encodeToString(
                 TrackerSave(
                     burrowsDug,
-                    BurrowDrop.values().associate { it.itemId to it.droppedTimes },
-                    BurrowMob.values().associate { it.mobId to it.dugTimes }
+                    BurrowDrop.entries.associate { it.itemId to it.droppedTimes },
+                    BurrowMob.entries.associate { it.mobId to it.dugTimes }
                 )
             )
         )
@@ -277,10 +262,10 @@ object MythologicalTracker : Tracker("mythological") {
                     0f,
                     CommonColors.YELLOW,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
                 var drawnLines = 1
-                for (mob in BurrowMob.values()) {
+                for (mob in BurrowMob.entries) {
                     if (mob.dugTimes == 0L) continue
                     ScreenRenderer.fontRenderer.drawString(
                         "${mob.mobName}§f: ${nf.format(mob.dugTimes)}",
@@ -288,11 +273,11 @@ object MythologicalTracker : Tracker("mythological") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
                         alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                     drawnLines++
                 }
-                for (item in BurrowDrop.values()) {
+                for (item in BurrowDrop.entries) {
                     if (item.droppedTimes == 0L) continue
                     ScreenRenderer.fontRenderer.drawString(
                         "${item.rarity.baseColor}${item.itemName}§f: §r${nf.format(item.droppedTimes)}",
@@ -300,7 +285,7 @@ object MythologicalTracker : Tracker("mythological") {
                         (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         CommonColors.CYAN,
                         alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                     drawnLines++
                 }
@@ -318,28 +303,28 @@ object MythologicalTracker : Tracker("mythological") {
                 0f,
                 CommonColors.YELLOW,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
             var drawnLines = 1
-            for (mob in BurrowMob.values()) {
+            for (mob in BurrowMob.entries) {
                 ScreenRenderer.fontRenderer.drawString(
                     "${mob.mobName}§f: 100",
                     if (leftAlign) 0f else width.toFloat(),
                     (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                     CommonColors.CYAN,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
                 drawnLines++
             }
-            for (item in BurrowDrop.values()) {
+            for (item in BurrowDrop.entries) {
                 ScreenRenderer.fontRenderer.drawString(
                     "${item.rarity.baseColor}${item.itemName}§f: §r100",
                     if (leftAlign) 0f else width.toFloat(),
                     (drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                     CommonColors.CYAN,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
                 drawnLines++
             }

@@ -28,6 +28,7 @@ import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import java.awt.Color
 
 class LocationComponent(val element: GuiElement) : UIComponent() {
@@ -39,9 +40,27 @@ class LocationComponent(val element: GuiElement) : UIComponent() {
             height = element.scaleHeight.pixels
         }
         onMouseClick { event ->
-            constrain {
-                x = MousePositionConstraint() - event.relativeX.pixels
-                y = MousePositionConstraint() - event.relativeY.pixels
+            when (event.mouseButton) {
+                1 -> {
+                    constrain {
+                        x = 10.pixels
+                        y = 10.pixels
+                        element.setPos(10, 10)
+
+                        width = element.scaleWidth.pixels
+                        height = element.scaleHeight.pixels
+                        element.scale = 1f
+                    }
+                }
+                2 -> {
+                    element.textShadow = SmartFontRenderer.TextShadow.entries[(element.textShadow.ordinal + 1) % SmartFontRenderer.TextShadow.entries.size]
+                }
+                else -> {
+                    constrain {
+                        x = MousePositionConstraint() - event.relativeX.pixels
+                        y = MousePositionConstraint() - event.relativeY.pixels
+                    }
+                }
             }
         }
         onMouseRelease {

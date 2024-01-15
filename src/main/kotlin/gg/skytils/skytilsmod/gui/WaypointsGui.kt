@@ -31,9 +31,8 @@ import gg.essential.vigilance.gui.settings.ColorComponent
 import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoint
 import gg.skytils.skytilsmod.features.impl.handlers.WaypointCategory
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoints
@@ -56,6 +55,8 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
     private val categoryContainers = HashMap<UIContainer, Category>()
 
     init {
+        lastUpdatedPlayerPosition = Skytils.mc.thePlayer?.position ?: BlockPos.ORIGIN
+
         scrollComponent = ScrollComponent(
             innerPadding = 4f,
         ).childOf(window).constrain {
@@ -72,14 +73,14 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
             height = 50.pixels()
         }
 
-        val isOnUnknownIsland = SkyblockIsland.values().none { it.mode == SBInfo.mode }
+        val isOnUnknownIsland = SkyblockIsland.entries.none { it.mode == SBInfo.mode }
         val hasAnyUnknownWaypoint = Waypoints.categories.any { it.island == SkyblockIsland.Unknown }
-        val options = SkyblockIsland.values()
+        val options = SkyblockIsland.entries
             .mapNotNull { if (it == SkyblockIsland.Unknown && !isOnUnknownIsland && !hasAnyUnknownWaypoint) null else it.displayName }
         islandDropdown = DropDown(
-            SkyblockIsland.values().indexOfFirst {
+            SkyblockIsland.entries.indexOfFirst {
                 SBInfo.mode == it.mode
-            }.run { if (this == -1) SkyblockIsland.values().indexOf(SkyblockIsland.Unknown) else this },
+            }.run { if (this == -1) SkyblockIsland.entries.indexOf(SkyblockIsland.Unknown) else this },
             options
         ).childOf(topButtons)
             .constrain {
@@ -92,14 +93,14 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
             }
 
         sortingOrder =
-            DropDown(SortingOptions.lastSelected, SortingOptions.values().map { it.displayName }).childOf(topButtons)
+            DropDown(SortingOptions.lastSelected, SortingOptions.entries.map { it.displayName }).childOf(topButtons)
                 .constrain {
                     x = SiblingConstraint(10f, true)
                 }.apply {
                     onValueChange { newValue ->
                         expandAll()
                         SortingOptions.lastSelected = newValue
-                        val sorter = SortingOptions.values()[newValue]
+                        val sorter = SortingOptions.entries[newValue]
                         val highestValues = mutableMapOf<UIContainer, Waypoint?>()
                         // First, sort each category in place
                         scrollComponent.allChildren.forEach { category ->
@@ -109,7 +110,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
                             }
                             highestValues[category] = entries[uiContainers.firstOrNull()]?.toWaypoint()
                             // Remove and re-add the waypoints in the correct order to their category
-                            category.children.removeAll(uiContainers)
+                            category.children.removeAll(uiContainers.toSet())
                             category.children.addAll(uiContainers)
                         }
                         // Then, sort the categories by their highest value according to the sorting function.
@@ -257,7 +258,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
             y = 5.pixels(alignOpposite = true)
         }.onLeftClick {
             mc.displayGuiScreen(null)
-            TickTask(2) {
+            tickTimer(2) {
                 Skytils.displayScreen = WaypointShareGui()
             }
         }
@@ -267,7 +268,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
 
     private fun loadWaypointsForSelection(selection: Int, savePrev: Boolean = true, isClosing: Boolean = false) {
         if (savePrev) {
-            val current = SkyblockIsland.values().find {
+            val current = SkyblockIsland.entries.find {
                 it.displayName == islandDropdown.childrenOfType<UIText>()
                     .find { it.componentName == "currentSelectionText" }?.getText()
             } ?: error("previous selected island not found")
@@ -290,8 +291,8 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
         categoryContainers.clear()
         scrollComponent.clearChildren()
         if (!isClosing) {
-            val island = SkyblockIsland.values()[selection]
-            val comparator = SortingOptions.values()[SortingOptions.lastSelected].comparator
+            val island = SkyblockIsland.entries[selection]
+            val comparator = SortingOptions.entries[SortingOptions.lastSelected].comparator
             // Sort the categories by their highest value, and then add the waypoints in each category sorted by their values
             Waypoints.categories.sortedWith { a, b ->
                 comparator.compare(
@@ -692,13 +693,13 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
             a.name.compareTo(b.name)
         }),
         CLOSEST("Closest", { a, b ->
-            val distanceA = mc.thePlayer?.getDistanceSq(a.pos) ?: 0.0
-            val distanceB = mc.thePlayer?.getDistanceSq(b.pos) ?: 0.0
+            val distanceA = lastUpdatedPlayerPosition.distanceSq(a.pos)
+            val distanceB = lastUpdatedPlayerPosition.distanceSq(b.pos)
             distanceA.compareTo(distanceB)
         }),
         FARTHEST("Farthest", { a, b ->
-            val distanceA = mc.thePlayer?.getDistanceSq(a.pos) ?: 0.0
-            val distanceB = mc.thePlayer?.getDistanceSq(b.pos) ?: 0.0
+            val distanceA = lastUpdatedPlayerPosition.distanceSq(a.pos)
+            val distanceB = lastUpdatedPlayerPosition.distanceSq(b.pos)
             distanceB.compareTo(distanceA)
         }),
         RECENT("Recent", { a, b ->
@@ -715,6 +716,7 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
 
     companion object {
         const val CATEGORY_INNER_PADDING = 7.5
+        var lastUpdatedPlayerPosition: BlockPos = BlockPos.ORIGIN
     }
 }
 

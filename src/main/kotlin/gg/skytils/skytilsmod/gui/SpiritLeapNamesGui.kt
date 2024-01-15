@@ -91,8 +91,8 @@ class SpiritLeapNamesGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Re
             height = ChildBasedSizeConstraint()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
         val longestTextConstraint =
-            (DungeonClass.values().maxOf { UGraphics.getStringWidth(it.className) } + 7).pixels()
-        for ((index, dClass) in DungeonClass.values().withIndex()) {
+            (DungeonClass.entries.maxOf { UGraphics.getStringWidth(it.className) } + 7).pixels()
+        for ((index, dClass) in DungeonClass.entries.withIndex()) {
 
             val text = UIText(dClass.className).constrain {
                 x = 0.pixels()
@@ -105,7 +105,7 @@ class SpiritLeapNamesGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Re
 
             val container = UIContainer().childOf(checkboxes).addChildren(text, checkbox).constrain {
                 x = 4.pixels()
-                y = RelativeConstraint(1f / DungeonClass.values().size * index)
+                y = RelativeConstraint(1f / DungeonClass.entries.size * index)
                 width = longestTextConstraint + checkbox.getWidth().pixels()
                 height = ChildBasedSizeConstraint()
             } as UIContainer

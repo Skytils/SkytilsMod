@@ -22,7 +22,7 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -51,7 +51,7 @@ object BlazeSolver {
     var lastKilledBlazeHp = 0
 
     init {
-        TickTask(4, repeats = true) {
+        tickTimer(4, repeats = true) {
             if (Skytils.config.blazeSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
                     "Higher Or Lower"
                 )
@@ -59,7 +59,7 @@ object BlazeSolver {
                 calcOrder()
             }
         }
-        TickTask(20, repeats = true) {
+        tickTimer(20, repeats = true) {
             if (Skytils.config.blazeSolver && Utils.inDungeons && DungeonListener.missingPuzzles.contains(
                     "Higher Or Lower"
                 )
@@ -202,6 +202,17 @@ object BlazeSolver {
                     event.partialTicks,
                     matrixStack
                 )
+                if (Skytils.config.lineToNextBlaze) {
+                    val secondLowestBlaze = orderedBlazes.getOrNull(1)?.blaze ?: return
+                    RenderUtil.draw3DLine(
+                        Vec3(lowestBlaze.posX, lowestBlaze.posY + 1.5, lowestBlaze.posZ),
+                        Vec3(secondLowestBlaze.posX, secondLowestBlaze.posY + 1.5, secondLowestBlaze.posZ),
+                        5,
+                        Skytils.config.lineToNextBlazeColor,
+                        event.partialTicks,
+                        matrixStack
+                    )
+                }
             }
             if (blazeMode > 0) {
                 val shootableBlaze = orderedBlazes.last()
@@ -213,6 +224,17 @@ object BlazeSolver {
                     event.partialTicks,
                     matrixStack
                 )
+                if (Skytils.config.lineToNextBlaze) {
+                    val secondHighestBlaze = orderedBlazes.getOrNull(orderedBlazes.size - 2)?.blaze ?: return
+                    RenderUtil.draw3DLine(
+                        Vec3(highestBlaze.posX, highestBlaze.posY + 1.5, highestBlaze.posZ),
+                        Vec3(secondHighestBlaze.posX, secondHighestBlaze.posY + 1.5, secondHighestBlaze.posZ),
+                        5,
+                        Skytils.config.lineToNextBlazeColor,
+                        event.partialTicks,
+                        matrixStack
+                    )
+                }
             }
         }
     }

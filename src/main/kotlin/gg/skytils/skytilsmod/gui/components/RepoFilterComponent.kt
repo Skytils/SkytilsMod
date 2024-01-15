@@ -74,7 +74,7 @@ class RepoFilterComponent(filter: SpamHider.Filter, dropDown: DropDown) : UIComp
                 y = SiblingConstraint() + 3.pixels()
                 width = basicWidthConstraint {
                     fontProvider.getStringWidth(
-                        SpamHider.FilterType.values().map { it.name.toTitleCase() }
+                        SpamHider.FilterType.entries.map { it.name.toTitleCase() }
                             .maxByOrNull { it.length }!!,
                         this.getTextScale()
                     ) * 1.5f

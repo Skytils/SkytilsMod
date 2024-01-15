@@ -38,7 +38,7 @@ class EnumUtil {
 
         companion object {
             // Accessed by reflection...
-            fun fromId(id: Int): AnchorPoint? = values().find { it.id == id }
+            fun fromId(id: Int): AnchorPoint? = entries.find { it.id == id }
         }
     }
 }

@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod
 
 import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
+import gg.skytils.event.Events
 import gg.skytils.skytilsmod.commands.impl.*
 import gg.skytils.skytilsmod.commands.stats.impl.CataCommand
 import gg.skytils.skytilsmod.commands.stats.impl.SlayerCommand
@@ -43,6 +44,7 @@ import gg.skytils.skytilsmod.features.impl.mining.StupidTreasureChestOpeningThin
 import gg.skytils.skytilsmod.features.impl.misc.*
 import gg.skytils.skytilsmod.features.impl.overlays.AuctionPriceOverlay
 import gg.skytils.skytilsmod.features.impl.protectitems.ProtectItems
+import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures
 import gg.skytils.skytilsmod.features.impl.spidersden.RainTimer
 import gg.skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import gg.skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
@@ -253,7 +255,6 @@ class Skytils {
             MayorInfo,
             SBInfo,
             SoundQueue,
-            TickTask,
             UpdateChecker,
 
             AlignmentTaskSolver,
@@ -367,6 +368,7 @@ class Skytils {
         cch.registerCommand(FragBotCommand)
         cch.registerCommand(HollowWaypointCommand)
         cch.registerCommand(LimboCommand)
+        cch.registerCommand(OrderedWaypointCommand)
         cch.registerCommand(ScamCheckCommand)
         cch.registerCommand(SlayerCommand)
 
@@ -440,7 +442,7 @@ class Skytils {
     }
 
     init {
-        TickTask(20, repeats = true) {
+        tickTimer(20, repeats = true) {
             if (mc.thePlayer != null) {
                 if (deobfEnvironment) {
                     if (DevTools.toggles.getOrDefault("forcehypixel", false)) Utils.isOnHypixel = true
@@ -555,7 +557,7 @@ class Skytils {
         val old = mc.currentScreen
         if (event.gui == null && config.reopenOptionsMenu) {
             if (old is ReopenableGUI || (old is AccessorSettingsGui && old.config is Config)) {
-                TickTask(1) {
+                tickTimer(1) {
                     if (mc.thePlayer?.openContainer == mc.thePlayer?.inventoryContainer)
                         displayScreen = OptionsGui()
                 }
