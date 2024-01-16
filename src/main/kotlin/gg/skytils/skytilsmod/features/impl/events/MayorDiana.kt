@@ -58,26 +58,6 @@ object MayorDiana {
     }
 
     @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!Utils.inSkyblock) return
-        val entity = event.entity
-        if (Skytils.config.removeLeftOverBleeds && mc.theWorld != null && entity is EntityArmorStand && entity.hasCustomName() && entity.displayName.formattedText.startsWith(
-                "§c☣ §fBleeds: §c"
-            ) && entity.ticksExisted >= 20
-        ) {
-            val aabb = entity.entityBoundingBox.expand(2.0, 5.0, 2.0)
-            if (mc.theWorld.loadedEntityList.none {
-                    it.displayName.formattedText.endsWith("§c❤") && it.displayName.formattedText.contains(
-                        "Minotaur §"
-                    ) && it.entityBoundingBox.intersectsWith(aabb)
-                }) {
-                event.isCanceled = true
-                mc.theWorld.removeEntity(entity)
-            }
-        }
-    }
-
-    @SubscribeEvent
     fun onPostRenderEntity(event: RenderLivingEvent.Post<*>) {
         if (!Utils.inSkyblock) return
         if (event.entity is EntityIronGolem) {

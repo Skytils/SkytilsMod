@@ -1067,13 +1067,6 @@ object Config : Vigilant(
     )
     var trackGaiaHits = false
 
-    /*    @Property(
-        type = PropertyType.SWITCH, name = "Hide Leftover Bleeds",
-        description = "Removes the bleeds text left behind when a player dies to a Minotaur.",
-        category = "Events", subcategory = "Mythological"
-    )*/
-    var removeLeftOverBleeds = false
-
     @Property(
         type = PropertyType.SWITCH, name = "Track Mythological Creatures",
         description = "Tracks and saves drops from Mythological Creatures.",
