@@ -1006,6 +1006,13 @@ object Config : Vigilant(
     var simonSaysSolver = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Predict Clicks for Simon Says Solver",
+        description = "Attempts to register teammate clicks on Simon Says Solver.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var predictSimonClicks = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Display Jerry Perks",
         description = "Displays the perks for Jerry.\nYou must visit Jerry in order for the display to function correctly.",
         category = "Events", subcategory = "Mayor Jerry"
@@ -2991,6 +2998,7 @@ object Config : Vigilant(
         addDependency("changeToSameColorMode", "changeAllSameColorTerminalSolver")
         addDependency("lividFinderType", "findCorrectLivid")
         addDependency("predictAlignmentClicks", "alignmentTaskSolver")
+        addDependency("predictSimonClicks", "simonSaysSolver")
 
         listOf(
             "emptyBurrowColor",

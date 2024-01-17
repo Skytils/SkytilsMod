@@ -17,19 +17,26 @@
  */
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
+import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
+import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.block.BlockButtonStone
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.network.play.server.S0BPacketAnimation
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
+import net.minecraft.util.MovingObjectPosition
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -39,6 +46,32 @@ object SimonSaysSolver {
     val startBtn = BlockPos(110, 121, 91)
     private val clickInOrder = ArrayList<BlockPos>()
     private var clickNeeded = 0
+
+    @SubscribeEvent
+    fun onPacket(event: PacketEvent) {
+        if (Skytils.config.simonSaysSolver && Utils.inDungeons && clickInOrder.isNotEmpty()) {
+            if (Skytils.config.blockIncorrectTerminalClicks && event.packet is C08PacketPlayerBlockPlacement) {
+                val pos = event.packet.position
+                if (pos.x == 110 && pos.y in 120..123 && pos.z in 92..95) {
+                    if (clickInOrder.getOrNull(clickNeeded) != pos) {
+                        event.isCanceled = true
+                    }
+                }
+            } else if (Skytils.config.predictSimonClicks && event.packet is S0BPacketAnimation && event.packet.animationType == 0) {
+                val entity = mc.theWorld.getEntityByID(event.packet.entityID) as? EntityOtherPlayerMP ?: return
+                if (entity.posX in 105.0..115.0 && entity.posY in 115.0..128.0 && entity.posZ in 87.0..100.0) {
+                    val rayCast = entity.rayTrace(5.0, RenderUtil.getPartialTicks())
+                    if (rayCast.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                        val hitPos = rayCast.blockPos ?: return
+                        if (hitPos.x in 110..111 && hitPos.y in 120..123 && hitPos.z in 92..95) {
+                            clickNeeded++
+                            UChat.chat("${Skytils.prefix} Registered teammate click on Simon Says. (Report on Discord if wrong.)")
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     @SubscribeEvent
     fun onBlockChange(event: BlockChangeEvent) {
