@@ -136,7 +136,7 @@ object ChestProfit {
             val enchant = name.substring(name.indexOf("(") + 1, name.indexOf(")"))
             return enchantNameToID(enchant)
         } else {
-            val unformatted = name.stripControlCodes()
+            val unformatted = name.stripControlCodes().replace("Shiny ", "")
             ItemFeatures.itemIdToNameLookup.entries.find {
                 it.value == unformatted && !it.value.contains("STARRED")
             }?.key
