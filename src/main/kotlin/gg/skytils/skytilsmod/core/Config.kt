@@ -3014,7 +3014,7 @@ object Config : Vigilant(
         addDependency("clickInOrderThird", "clickInOrderTerminalSolver")
         addDependency("changeToSameColorMode", "changeAllSameColorTerminalSolver")
         addDependency("lividFinderType", "findCorrectLivid")
-        addDependency("predictAlignmentClicks", "alignmentTaskSolver")
+        addDependency("predictAlignmentClicks", "alignmentTerminalSolver")
         addDependency("predictSimonClicks", "simonSaysSolver")
 
         listOf(
