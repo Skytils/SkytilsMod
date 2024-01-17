@@ -218,6 +218,20 @@ object Config : Vigilant(
     var dungeonChestProfitIncludesEssence = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Highlight Unopened Croesus Chests",
+        description = "Highlight runs in Croesus based on how many more chests can be opened.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var croesusChestHighlight = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Opened Croesus Chests",
+        description = "Hide runs in Croesus if no more chests can be opened.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var croesusHideOpened = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Map",
         description = "Displays the vanilla map on your screen using vanilla rendering code.",
         category = "Dungeons", subcategory = "Miscellaneous"
@@ -2918,6 +2932,7 @@ object Config : Vigilant(
         }
 
         addDependency("dungeonChestProfitIncludesEssence", "dungeonChestProfit")
+        addDependency("croesusHideOpened", "croesusChestHighlight")
         addDependency("kismetRerollThreshold", "dungeonChestProfit")
 
         addDependency("message270Score", "sendMessageOn270Score")
