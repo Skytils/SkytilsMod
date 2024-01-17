@@ -910,6 +910,13 @@ object Config : Vigilant(
     var tankRadiusDisplayColor = Color(100, 255, 0, 50)
 
     @Property(
+        type = PropertyType.SWITCH, name = "Block Incorrect Terminal Clicks",
+        description = "Blocks incorrect clicks on terminals.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var blockIncorrectTerminalClicks = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Middle Click on Terminals",
         description = "Replaces left clicks while on terminals with middle clicks.",
         category = "Dungeons", subcategory = "Terminal Solvers"

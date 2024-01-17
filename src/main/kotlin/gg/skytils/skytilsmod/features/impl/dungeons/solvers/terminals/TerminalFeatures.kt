@@ -22,12 +22,24 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.startsWithAny
+import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TerminalFeatures {
+
+    @SubscribeEvent
+    fun onSlotClickHigh(event: SlotClickEvent) {
+        if (!Utils.inDungeons || !Skytils.config.blockIncorrectTerminalClicks || event.container !is ContainerChest) return
+        if (event.chestName == "Correct all the panes!") {
+            if (event.slot?.stack?.displayName?.stripControlCodes()?.startsWith("Off") == true) {
+                event.isCanceled = true
+            }
+        }
+    }
+
     @SubscribeEvent
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inDungeons) return
