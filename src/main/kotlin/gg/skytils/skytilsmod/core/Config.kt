@@ -34,6 +34,7 @@ import gg.skytils.skytilsmod.gui.PotionNotificationsGui
 import gg.skytils.skytilsmod.gui.SpiritLeapNamesGui
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.utils.ModChecker
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ClientCommandHandler
@@ -237,19 +238,20 @@ object Config : Vigilant(
         type = PropertyType.BUTTON, name = "Dungeon Sweat",
         description = "Click if dungeon sweat???",
         category = "Dungeons", subcategory = "Miscellaneous",
-        searchTags = ["predev", "pre-dev", "arrow", "tic tac toe", "solver"]
+        searchTags = ["predev", "pre-dev", "arrow", "tic tac toe", "solver", "device"]
     )
     fun openDungeonSweat() {
+        if (SuperSecretSettings.azooPuzzoo)
+            SuperSecretSettings.remove("azoopuzoo")
+        else
+            SuperSecretSettings.add("azoopuzzoo")
+        SuperSecretSettings.save()
         if (ModChecker.canShowNotifications) {
-            EssentialAPI.getNotifications().push("azoopuzzoo", "hmmmmm... nice pb + ratio + sub 3 + FAST S+ + no bers + no healer + no tank + 4m 1a + no hype = kick", 3f) {
-                onClose = {
-                    UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
-                }
-            }
+            EssentialAPI.getNotifications().push("Dungeon Sweat", "Dungeon Sweat mode ${SuperSecretSettings.azooPuzzoo}")
         } else {
-            UChat.chat("${Skytils.prefix} §bazoopuzzoo")
-            UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
+            UChat.chat("${Skytils.prefix} §bDungeon Sweat mode ${SuperSecretSettings.azooPuzzoo}");
         }
+        UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
     }
 
     @Property(
