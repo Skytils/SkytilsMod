@@ -985,6 +985,13 @@ object Config : Vigilant(
     var alignmentTerminalSolver = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Predict Clicks for Alignment Solver",
+        description = "Predict the amount of clicks needed on the device in Floor 7.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var predictAlignmentClicks = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Shoot the Target Solver",
         description = "Shows all the shot blocks on the device in Floor 7.",
         category = "Dungeons", subcategory = "Terminal Solvers"
@@ -2983,6 +2990,7 @@ object Config : Vigilant(
         addDependency("clickInOrderThird", "clickInOrderTerminalSolver")
         addDependency("changeToSameColorMode", "changeAllSameColorTerminalSolver")
         addDependency("lividFinderType", "findCorrectLivid")
+        addDependency("predictAlignmentClicks", "alignmentTaskSolver")
 
         listOf(
             "emptyBurrowColor",

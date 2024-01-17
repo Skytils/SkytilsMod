@@ -22,23 +22,26 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.tickTimer
+import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
-import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.RenderUtil
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
+import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.middleVec
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
+import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
-import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.awt.Point
 import java.util.*
-import kotlin.math.floor
 import kotlin.random.Random
 
 object AlignmentTaskSolver {
@@ -55,8 +58,8 @@ object AlignmentTaskSolver {
     }
 
     private val grid = LinkedHashSet<MazeSpace>()
-
     private val directionSet = HashMap<Point, Int>()
+    private val clicks = HashMap<BlockPos, Int>()
 
     init {
         tickTimer(20, repeats = true) {
@@ -106,6 +109,36 @@ object AlignmentTaskSolver {
                 }
             }
         }
+        tickTimer(5, repeats = true) {
+            for (space in grid) {
+                if (space.type != SpaceType.PATH || space.framePos == null) continue
+                val frame =
+                    (mc.theWorld.loadedEntityList.find { it is EntityItemFrame && it.hangingPosition == space.framePos }
+                        ?: continue) as EntityItemFrame
+                val neededClicks = if (!SuperSecretSettings.bennettArthur) (directionSet.getOrElse(space.coords) { 0 } - frame.rotation + 8) % 8 else Random.nextInt(8)
+                clicks[space.framePos] = neededClicks
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onPacket(event: PacketEvent) {
+        if (directionSet.isNotEmpty() && Skytils.config.alignmentTerminalSolver && Skytils.config.blockIncorrectTerminalClicks) {
+            if (event.packet is C02PacketUseEntity && event.packet.action == C02PacketUseEntity.Action.INTERACT) {
+                val entity = event.packet.getEntityFromWorld(mc.theWorld) ?: return
+                if (entity !is EntityItemFrame) return
+                val needed = clicks[entity.hangingPosition] ?: return
+                if (needed == 0) event.isCanceled = true
+                else {
+                    val blockBehind = mc.theWorld.getBlockState(entity.hangingPosition.offset(entity.facingDirection.opposite))
+                    if (blockBehind.block == Blocks.sea_lantern) event.isCanceled = true
+                }
+
+                if (!event.isCanceled && Skytils.config.predictAlignmentClicks) {
+                    clicks[entity.hangingPosition] = (needed - 1 + 8) % 8
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -113,15 +146,9 @@ object AlignmentTaskSolver {
         val matrixStack = UMatrixStack()
         for (space in grid) {
             if (space.type != SpaceType.PATH || space.framePos == null) continue
-            val frame =
-                (mc.theWorld.loadedEntityList.find { it is EntityItemFrame && it.hangingPosition == space.framePos }
-                    ?: continue) as EntityItemFrame
-            var neededClicks =
-                if (!SuperSecretSettings.bennettArthur) directionSet.getOrElse(space.coords) { 0 } - frame.rotation else Random.nextInt(
-                    8
-                )
+            val neededClicks = clicks[space.framePos] ?: continue
             if (neededClicks == 0) continue
-            if (neededClicks < 0) neededClicks += 8
+
             RenderUtil.drawLabel(
                 space.framePos.middleVec(),
                 neededClicks.toString(),
