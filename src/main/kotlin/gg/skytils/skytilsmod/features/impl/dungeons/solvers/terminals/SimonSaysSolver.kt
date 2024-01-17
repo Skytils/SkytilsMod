@@ -29,6 +29,7 @@ import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.middleVec
 import net.minecraft.block.BlockButtonStone
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -125,6 +126,13 @@ object SimonSaysSolver {
 
         if (Skytils.config.simonSaysSolver && clickNeeded < clickInOrder.size) {
             val matrixStack = UMatrixStack()
+            RenderUtil.drawLabel(
+                startBtn.middleVec(),
+                "${clickNeeded + 1}/${clickInOrder.size}",
+                Color.WHITE,
+                event.partialTicks,
+                matrixStack
+            )
 
             for (i in clickNeeded..<clickInOrder.size) {
                 val pos = clickInOrder[i]
