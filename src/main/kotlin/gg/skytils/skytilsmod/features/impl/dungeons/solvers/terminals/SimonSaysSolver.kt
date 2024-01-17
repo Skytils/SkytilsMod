@@ -27,6 +27,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.utils.RenderUtil
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.block.BlockButtonStone
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -53,7 +54,9 @@ object SimonSaysSolver {
             if (Skytils.config.blockIncorrectTerminalClicks && event.packet is C08PacketPlayerBlockPlacement) {
                 val pos = event.packet.position
                 if (pos.x == 110 && pos.y in 120..123 && pos.z in 92..95) {
-                    if (clickInOrder.getOrNull(clickNeeded) != pos) {
+                    if (SuperSecretSettings.azooPuzzoo && clickInOrder.size == 3 && clickNeeded == 0 && pos == clickInOrder[1]) {
+                        clickNeeded++
+                    } else if (clickInOrder.getOrNull(clickNeeded) != pos) {
                         event.isCanceled = true
                     }
                 }
