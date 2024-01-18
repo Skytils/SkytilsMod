@@ -34,6 +34,7 @@ import net.minecraft.block.BlockButtonStone
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S0BPacketAnimation
 import net.minecraft.util.AxisAlignedBB
@@ -52,13 +53,19 @@ object SimonSaysSolver {
     @SubscribeEvent
     fun onPacket(event: PacketEvent) {
         if (Skytils.config.simonSaysSolver && Utils.inDungeons && clickInOrder.isNotEmpty()) {
-            if (Skytils.config.blockIncorrectTerminalClicks && event.packet is C08PacketPlayerBlockPlacement) {
-                val pos = event.packet.position
+            if (Skytils.config.blockIncorrectTerminalClicks && (event.packet is C08PacketPlayerBlockPlacement || event.packet is C07PacketPlayerDigging)) {
+                val pos = when (event.packet) {
+                    is C07PacketPlayerDigging -> event.packet.position
+                    is C08PacketPlayerBlockPlacement -> event.packet.position
+                    else -> error("can't reach")
+                }
                 if (pos.x == 110 && pos.y in 120..123 && pos.z in 92..95) {
                     if (SuperSecretSettings.azooPuzzoo && clickInOrder.size == 3 && clickNeeded == 0 && pos == clickInOrder[1]) {
                         clickNeeded++
                     } else if (clickInOrder.getOrNull(clickNeeded) != pos) {
                         event.isCanceled = true
+                    } else {
+                        clickNeeded++
                     }
                 }
             } else if (Skytils.config.predictSimonClicks && event.packet is S0BPacketAnimation && event.packet.animationType == 0) {
@@ -102,14 +109,14 @@ object SimonSaysSolver {
                             //println("Buttons on simon says were removed!")
                             clickNeeded = 0
                             clickInOrder.clear()
-                        } else if (state.block === Blocks.stone_button) {
+                        } /*else if (state.block === Blocks.stone_button) {
                             if (old.block === Blocks.stone_button) {
                                 if (state.getValue(BlockButtonStone.POWERED)) {
                                     //println("Button on simon says was pressed")
                                     clickNeeded++
                                 }
                             }
-                        }
+                        }*/
                     }
                 } else if ((pos == startBtn && state.block === Blocks.stone_button && state.getValue(BlockButtonStone.POWERED)) || Funny.ticks == 180) {
                     //println("Simon says was started")
