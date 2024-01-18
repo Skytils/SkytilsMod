@@ -100,16 +100,20 @@ object AlignmentTaskSolver {
                     val startPositions = grid.filter { it.type == SpaceType.STARTER }
                     val endPositions = grid.filter { it.type == SpaceType.END }
                     val layout = layout
-                    startPositions.zip(endPositions).forEach { (start, end) ->
-                        val pointMap = solve(layout, start.coords, end.coords)
-                        for (move in convertPointMapToMoves(pointMap)) {
-                            directionSet[move.point] = move.directionNum
+
+                    for (start in startPositions) {
+                        for (end in endPositions) {
+                            val pointMap = solve(layout, start.coords, end.coords)
+                            for (move in convertPointMapToMoves(pointMap)) {
+                                directionSet[move.point] = move.directionNum
+                            }
                         }
                     }
                 }
             }
         }
         tickTimer(5, repeats = true) {
+            if (mc.theWorld == null) return@tickTimer
             for (space in grid) {
                 if (space.type != SpaceType.PATH || space.framePos == null) continue
                 val frame =
@@ -181,9 +185,10 @@ object AlignmentTaskSolver {
         return solution.asReversed().zipWithNext { current, next ->
             val diffX = current.x - next.x
             val diffY = current.y - next.y
-            val dir = EnumFacing.HORIZONTALS.first {
+            val dir = EnumFacing.HORIZONTALS.find {
                 it.directionVec.x == diffX && it.directionVec.z == diffY
-            }
+            } ?: return@zipWithNext null
+
             val rotation = when (dir.opposite) {
                 EnumFacing.EAST -> 1
                 EnumFacing.WEST -> 5
@@ -192,7 +197,7 @@ object AlignmentTaskSolver {
                 else -> 0
             }
             return@zipWithNext GridMove(current, rotation)
-        }
+        }.filterNotNull()
     }
 
     private val layout: Array<IntArray>
