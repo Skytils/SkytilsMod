@@ -1205,6 +1205,13 @@ object Config : Vigilant(
     var talbotsTheodoliteHelper = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Hide Non-Nametag Armor Stands on Kuudra",
+        description = "Hides non nametag armor stands on Kuudra Island.",
+        category = "Kuudra", subcategory = "Performance"
+    )
+    var kuudraHideNonNametags = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dark Mode Mist",
         description = "Replaces colors in The Mist with darker variants.",
         category = "Mining", subcategory = "Quality of Life"
