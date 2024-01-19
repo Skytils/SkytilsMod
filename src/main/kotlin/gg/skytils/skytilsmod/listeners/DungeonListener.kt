@@ -28,6 +28,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.core.API
+import gg.skytils.skytilsmod.core.tickTask
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
@@ -230,6 +231,7 @@ object DungeonListener {
         val tabEntries = TabListUtils.tabEntries
 
         if (tabEntries.isEmpty() || !tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
+            println("Couldn't get party text")
             tickTimer(5) {
                 getMembers()
             }
@@ -273,6 +275,11 @@ object DungeonListener {
                     DungeonClass.EMPTY, 0,
                     pos
                 )
+
+                tickTimer(5) {
+                    team.clear()
+                    getMembers()
+                }
             }
         }
         if (partyCount != team.size) {
