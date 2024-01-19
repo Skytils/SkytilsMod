@@ -163,7 +163,7 @@ object AlignmentTaskSolver {
                     val newRot = event.packet.func_149376_c().find { it.dataValueId == 9 && it.objectType == 0 }?.`object` as? Byte ?: return
                     val currentRot = entity.rotation
                     val delta = getTurnsNeeded(currentRot, newRot.toInt())
-                    pendingClicks.computeIfPresent(entity.hangingPosition) { _, v -> getTurnsNeeded(v, delta) }
+                    pendingClicks.computeIfPresent(entity.hangingPosition) { _, v -> (v - delta).coerceAtLeast(0) }
                 }
             }
         }
