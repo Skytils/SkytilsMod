@@ -196,6 +196,7 @@ object AlignmentTaskSolver {
     fun onWorldLoad(event: WorldEvent.Load) {
         grid.clear()
         directionSet.clear()
+        pendingClicks.clear()
     }
 
     data class MazeSpace(val framePos: BlockPos? = null, val type: SpaceType, val coords: Point)
