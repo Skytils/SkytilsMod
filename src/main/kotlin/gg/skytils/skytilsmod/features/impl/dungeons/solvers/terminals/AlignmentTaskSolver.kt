@@ -148,7 +148,7 @@ object AlignmentTaskSolver {
                 val pending = pendingClicks[pos] ?: 0
 
                 if (Skytils.config.blockIncorrectTerminalClicks) {
-                    if (clicks == null || clicks - pending != 0) {
+                    if (clicks == null || (clicks != 0 && clicks - pending != 0)) {
                         val blockBehind = mc.theWorld.getBlockState(pos.offset(entity.facingDirection.opposite))
                         if (blockBehind.block == Blocks.sea_lantern) event.isCanceled = true
                     } else event.isCanceled = true
