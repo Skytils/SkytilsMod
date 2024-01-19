@@ -52,17 +52,17 @@ object SimonSaysSolver {
 
     @SubscribeEvent
     fun onPacket(event: PacketEvent) {
-        if (Skytils.config.simonSaysSolver && Utils.inDungeons && clickInOrder.isNotEmpty()) {
+        if (Skytils.config.simonSaysSolver && Utils.inDungeons && clickInOrder.isNotEmpty() && clickNeeded < clickInOrder.size) {
             if (Skytils.config.blockIncorrectTerminalClicks && (event.packet is C08PacketPlayerBlockPlacement || event.packet is C07PacketPlayerDigging)) {
                 val pos = when (event.packet) {
                     is C07PacketPlayerDigging -> event.packet.position
                     is C08PacketPlayerBlockPlacement -> event.packet.position
                     else -> error("can't reach")
-                }
-                if (pos.x == 110 && pos.y in 120..123 && pos.z in 92..95) {
+                }.east()
+                if (pos.x == 111 && pos.y in 120..123 && pos.z in 92..95) {
                     if (SuperSecretSettings.azooPuzzoo && clickInOrder.size == 3 && clickNeeded == 0 && pos == clickInOrder[1]) {
                         clickNeeded++
-                    } else if (clickInOrder.getOrNull(clickNeeded) != pos) {
+                    } else if (clickInOrder[clickNeeded] != pos) {
                         event.isCanceled = true
                     } else {
                         clickNeeded++
@@ -89,40 +89,38 @@ object SimonSaysSolver {
         val pos = event.pos
         val old = event.old
         val state = event.update
-        if (Utils.inDungeons) {
-            if (Skytils.config.simonSaysSolver && Utils.equalsOneOf(
-                    DungeonFeatures.dungeonFloor,
-                    "F7",
-                    "M7"
-                ) && DungeonTimer.phase2ClearTime != -1L && DungeonTimer.phase3ClearTime == -1L
-            ) {
-                if ((pos.y in 120..123) && pos.z in 92..95) {
-                    if (pos.x == 111) {
-                        //println("Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}")
-                        if (state.block === Blocks.sea_lantern) {
-                            if (!clickInOrder.contains(pos)) {
-                                clickInOrder.add(pos)
+        if (Utils.inDungeons && Skytils.config.simonSaysSolver && Utils.equalsOneOf(
+                DungeonFeatures.dungeonFloor,
+                "F7",
+                "M7"
+            ) && DungeonTimer.phase2ClearTime != -1L && DungeonTimer.phase3ClearTime == -1L
+        ) {
+            if ((pos.y in 120..123) && pos.z in 92..95) {
+                if (pos.x == 111) {
+                    //println("Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}")
+                    if (state.block === Blocks.sea_lantern) {
+                        if (!clickInOrder.contains(pos)) {
+                            clickInOrder.add(pos)
+                        }
+                    }
+                } else if (pos.x == 110) {
+                    if (state.block === Blocks.air) {
+                        //println("Buttons on simon says were removed!")
+                        clickNeeded = 0
+                        clickInOrder.clear()
+                    } /*else if (state.block === Blocks.stone_button) {
+                        if (old.block === Blocks.stone_button) {
+                            if (state.getValue(BlockButtonStone.POWERED)) {
+                                //println("Button on simon says was pressed")
+                                clickNeeded++
                             }
                         }
-                    } else if (pos.x == 110) {
-                        if (state.block === Blocks.air) {
-                            //println("Buttons on simon says were removed!")
-                            clickNeeded = 0
-                            clickInOrder.clear()
-                        } /*else if (state.block === Blocks.stone_button) {
-                            if (old.block === Blocks.stone_button) {
-                                if (state.getValue(BlockButtonStone.POWERED)) {
-                                    //println("Button on simon says was pressed")
-                                    clickNeeded++
-                                }
-                            }
-                        }*/
-                    }
-                } else if ((pos == startBtn && state.block === Blocks.stone_button && state.getValue(BlockButtonStone.POWERED)) || Funny.ticks == 180) {
-                    //println("Simon says was started")
-                    clickInOrder.clear()
-                    clickNeeded = 0
+                    }*/
                 }
+            } else if ((pos == startBtn && state.block === Blocks.stone_button && state.getValue(BlockButtonStone.POWERED)) || Funny.ticks == 180) {
+                //println("Simon says was started")
+                clickInOrder.clear()
+                clickNeeded = 0
             }
         }
     }
@@ -135,7 +133,7 @@ object SimonSaysSolver {
             val matrixStack = UMatrixStack()
             RenderUtil.drawLabel(
                 startBtn.middleVec(),
-                "${clickNeeded + 1}/${clickInOrder.size}",
+                "${clickNeeded}/${clickInOrder.size}",
                 Color.WHITE,
                 event.partialTicks,
                 matrixStack
