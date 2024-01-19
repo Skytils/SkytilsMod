@@ -53,7 +53,7 @@ object SimonSaysSolver {
     @SubscribeEvent
     fun onPacket(event: PacketEvent) {
         if (Skytils.config.simonSaysSolver && Utils.inDungeons && clickInOrder.isNotEmpty() && clickNeeded < clickInOrder.size) {
-            if (Skytils.config.blockIncorrectTerminalClicks && (event.packet is C08PacketPlayerBlockPlacement || event.packet is C07PacketPlayerDigging)) {
+            if (event.packet is C08PacketPlayerBlockPlacement || event.packet is C07PacketPlayerDigging) {
                 val pos = when (event.packet) {
                     is C07PacketPlayerDigging -> event.packet.position
                     is C08PacketPlayerBlockPlacement -> event.packet.position
@@ -63,7 +63,7 @@ object SimonSaysSolver {
                     if (SuperSecretSettings.azooPuzzoo && clickInOrder.size == 3 && clickNeeded == 0 && pos == clickInOrder[1]) {
                         clickNeeded++
                     } else if (clickInOrder[clickNeeded] != pos) {
-                        event.isCanceled = true
+                        if (Skytils.config.blockIncorrectTerminalClicks) event.isCanceled = true
                     } else {
                         clickNeeded++
                     }
