@@ -29,7 +29,7 @@ import org.lwjgl.input.Keyboard
 object KuudraFeatures {
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (event.entity !is EntityArmorStand || SBInfo.mode == SkyblockIsland.KuudraHollow.mode) return
+        if (event.entity !is EntityArmorStand || SBInfo.mode != SkyblockIsland.KuudraHollow.mode) return
         if (Skytils.config.kuudraHideNonNametags && !Keyboard.isKeyDown(Keyboard.KEY_LMENU)) {
             if (!event.entity.isInvisible && !event.entity.hasCustomName()) {
                 event.isCanceled = true
