@@ -34,7 +34,7 @@ object TerminalFeatures {
     fun onSlotClickHigh(event: SlotClickEvent) {
         if (!Utils.inDungeons || !Skytils.config.blockIncorrectTerminalClicks || event.container !is ContainerChest) return
         if (event.chestName == "Correct all the panes!") {
-            if (event.slot?.stack?.displayName?.stripControlCodes()?.startsWith("Off") == true) {
+            if (event.slot?.stack?.displayName?.stripControlCodes()?.startsWith("On") == true) {
                 event.isCanceled = true
             }
         }
