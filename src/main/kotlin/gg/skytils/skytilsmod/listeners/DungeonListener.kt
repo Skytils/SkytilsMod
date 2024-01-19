@@ -247,6 +247,7 @@ object DungeonListener {
             return
         }
         println("There are $partyCount members in this party")
+        var gotEmptyThisRun = false
         for (i in 0..<partyCount) {
             val pos = 1 + i * 4
             val text = tabEntries[pos].second
@@ -276,9 +277,12 @@ object DungeonListener {
                     pos
                 )
 
-                tickTimer(5) {
-                    team.clear()
-                    getMembers()
+                if (!gotEmptyThisRun) {
+                    tickTimer(5) {
+                        team.clear()
+                        getMembers()
+                    }
+                    gotEmptyThisRun = true
                 }
             }
         }
