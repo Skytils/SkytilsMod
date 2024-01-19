@@ -76,7 +76,7 @@ object SimonSaysSolver {
                         val hitPos = rayCast.blockPos ?: return
                         if (hitPos.x in 110..111 && hitPos.y in 120..123 && hitPos.z in 92..95) {
                             clickNeeded++
-                            UChat.chat("${Skytils.prefix} Registered teammate click on Simon Says. (Report on Discord if wrong.)")
+                            //UChat.chat("${Skytils.prefix} Registered teammate click on Simon Says. (Report on Discord if wrong.)")
                         }
                     }
                 }
@@ -89,11 +89,11 @@ object SimonSaysSolver {
         val pos = event.pos
         val old = event.old
         val state = event.update
-        if (Utils.inDungeons && Skytils.config.simonSaysSolver && Utils.equalsOneOf(
+        if (Utils.inDungeons && Skytils.config.simonSaysSolver && TerminalFeatures.isInPhase3() && Utils.equalsOneOf(
                 DungeonFeatures.dungeonFloor,
                 "F7",
                 "M7"
-            ) && DungeonTimer.phase2ClearTime != -1L && DungeonTimer.phase3ClearTime == -1L
+            )
         ) {
             if ((pos.y in 120..123) && pos.z in 92..95) {
                 if (pos.x == 111) {

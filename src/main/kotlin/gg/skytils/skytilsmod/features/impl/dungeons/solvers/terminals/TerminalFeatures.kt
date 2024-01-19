@@ -20,6 +20,8 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.startsWithAny
 import gg.skytils.skytilsmod.utils.stripControlCodes
@@ -29,6 +31,10 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TerminalFeatures {
+
+    fun isInPhase3(): Boolean {
+        return (SuperSecretSettings.azooPuzzoo || DungeonTimer.phase2ClearTime != -1L) && DungeonTimer.phase3ClearTime == -1L
+    }
 
     @SubscribeEvent
     fun onSlotClickHigh(event: SlotClickEvent) {
