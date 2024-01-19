@@ -297,9 +297,10 @@ object DungeonListener {
     }
 
     fun checkSpiritPet() {
+        val teamCopy = team.values.toList()
         Skytils.IO.launch {
             runCatching {
-                for (teammate in team.values) {
+                for (teammate in teamCopy) {
                     val name = teammate.playerName
                     if (hutaoFans.getIfPresent(name) != null) continue
                     val uuid = teammate.player?.uniqueID ?: MojangUtil.getUUIDFromUsername(name) ?: continue
