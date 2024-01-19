@@ -22,14 +22,10 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.tickTimer
+import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
-import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
-import gg.skytils.skytilsmod.utils.RenderUtil
-import gg.skytils.skytilsmod.utils.SuperSecretSettings
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.middleVec
-import net.minecraft.entity.DataWatcher.WatchableObject
+import gg.skytils.skytilsmod.utils.*
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -41,10 +37,11 @@ import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 import java.awt.Point
 import java.util.*
-import kotlin.collections.HashMap
 import kotlin.random.Random
 
 object AlignmentTaskSolver {
@@ -69,17 +66,12 @@ object AlignmentTaskSolver {
         tickTimer(20, repeats = true) {
             computeLayout()
         }
-        tickTimer(1, repeats = true) {
-            computeTurns()
-        }
     }
 
+    fun isSolverActive() = Skytils.config.alignmentTerminalSolver && Utils.inDungeons && mc.thePlayer != null && TerminalFeatures.isInPhase3() && Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7")
+
     fun computeLayout() {
-        if (!Skytils.config.alignmentTerminalSolver || !Utils.inDungeons || mc.thePlayer == null || (!SuperSecretSettings.azooPuzzoo && (DungeonTimer.phase2ClearTime == -1L || DungeonTimer.phase3ClearTime != -1L) || !Utils.equalsOneOf(
-                DungeonFeatures.dungeonFloor,
-                "F7", "M7"
-            ))
-        ) return
+        if (!isSolverActive()) return
         if (mc.thePlayer.getDistanceSqToCenter(topLeft) <= 25 * 25) {
             if (grid.size < 25) {
                 @Suppress("UNCHECKED_CAST")
@@ -132,14 +124,19 @@ object AlignmentTaskSolver {
             val frame =
                 (mc.theWorld.loadedEntityList.find { it is EntityItemFrame && it.hangingPosition == space.framePos }
                     ?: continue) as EntityItemFrame
-            val neededClicks = if (!SuperSecretSettings.bennettArthur) (directionSet.getOrElse(space.coords) { 0 } - frame.rotation + 8) % 8 else Random.nextInt(8)
+            val neededClicks = if (!SuperSecretSettings.bennettArthur) getTurnsNeeded(frame.rotation, directionSet.getOrElse(space.coords) { 0 }) else Random.nextInt(8)
             clicks[space.framePos] = neededClicks
         }
     }
 
     @SubscribeEvent
-    fun onPacket(event: PacketEvent) {
-        if (directionSet.isNotEmpty() && Skytils.config.alignmentTerminalSolver) {
+    fun onTick(event: ClientTickEvent) {
+        if (event.phase == TickEvent.Phase.END) computeTurns()
+    }
+
+    @SubscribeEvent
+    fun onPacketSend(event: PacketEvent.SendEvent) {
+        if (directionSet.isNotEmpty() && Skytils.config.alignmentTerminalSolver && isSolverActive()) {
             if ((Skytils.config.blockIncorrectTerminalClicks || Skytils.config.predictAlignmentClicks) && event.packet is C02PacketUseEntity && event.packet.action == C02PacketUseEntity.Action.INTERACT) {
                 val entity = event.packet.getEntityFromWorld(mc.theWorld) ?: return
                 if (entity !is EntityItemFrame) return
@@ -148,22 +145,49 @@ object AlignmentTaskSolver {
                 val pending = pendingClicks[pos] ?: 0
 
                 if (Skytils.config.blockIncorrectTerminalClicks) {
-                    if (clicks == null || (clicks != 0 && clicks - pending != 0)) {
+                    if (clicks != null && clicks == pending) {
+                        printDevMessage("Click packet on $pos was cancelled, rot: ${entity.rotation}, clicks: ${clicks}, pending: $pending", "predictalignment")
+                        event.isCanceled = true
+                    } else {
                         val blockBehind = mc.theWorld.getBlockState(pos.offset(entity.facingDirection.opposite))
-                        if (blockBehind.block == Blocks.sea_lantern) event.isCanceled = true
-                    } else event.isCanceled = true
+                        if (blockBehind.block == Blocks.sea_lantern) {
+                            printDevMessage("Click packet on $pos was cancelled, reason: lantern", "predictalignment")
+                            event.isCanceled = true
+                        }
+                        printDevMessage("Allowed click on ${pos}, rot: ${entity.rotation}, clicks ${clicks}, pending $pending", "predictalignment")
+                    }
                 }
 
                 if (!event.isCanceled && Skytils.config.predictAlignmentClicks) {
                     pendingClicks.compute(pos) { _, v -> v?.inc() ?: 1 }
+                    printDevMessage("Pending clicks on $pos: ${pendingClicks[pos]}, rot: ${entity.rotation}", "predictalignment")
                 }
-            } else if (Skytils.config.predictAlignmentClicks && event.packet is S1CPacketEntityMetadata) {
-                val entity = mc.theWorld?.getEntityByID(event.packet.entityId) ?: return
-                if (entity is EntityItemFrame && entity.hangingPosition in pendingClicks) {
-                    val newRot = event.packet.func_149376_c().find { it.dataValueId == 9 && it.objectType == 0 }?.`object` as? Byte ?: return
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onPacketReceive(event: MainReceivePacketEvent<*, *>) {
+        if (directionSet.isNotEmpty() && Skytils.config.alignmentTerminalSolver && isSolverActive()) {
+            if (Skytils.config.predictAlignmentClicks && event.packet is S1CPacketEntityMetadata) {
+                val entity = mc.theWorld?.getEntityByID(event.packet.entityId) as? EntityItemFrame ?: return
+                val pos = entity.hangingPosition
+                val pending = pendingClicks[pos]
+                if (pending != null) {
+                    val newRot = (event.packet.func_149376_c().find { it.dataValueId == 9 && it.objectType == 0 }?.`object` as? Byte ?: return).toInt()
                     val currentRot = entity.rotation
-                    val delta = getTurnsNeeded(currentRot, newRot.toInt())
-                    pendingClicks.computeIfPresent(entity.hangingPosition) { _, v -> (v - delta).coerceAtLeast(0) }
+                    val delta = getTurnsNeeded(currentRot, newRot)
+                    val newPending = pending - delta
+                    printDevMessage("$pos moved from $currentRot to $newRot, delta: $delta, current pending ${pending}, new pending $newPending", "predictalignment")
+                    pendingClicks[pos] = newPending
+
+                    val space = grid.find { it.framePos == pos } ?: return
+                    val turns = getTurnsNeeded(newRot, directionSet.getOrElse(space.coords) { 0 })
+                    val currentClicks = clicks[pos]
+                    if (turns != currentClicks) {
+                        printDevMessage("Synced clicks on $pos from $currentClicks to $turns", "predictalignment")
+                        clicks[pos] = turns
+                    }
                 }
             }
         }
@@ -171,6 +195,7 @@ object AlignmentTaskSolver {
 
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
+        if (!TerminalFeatures.isInPhase3()) return
         val matrixStack = UMatrixStack()
         for (space in grid) {
             if (space.type != SpaceType.PATH || space.framePos == null) continue
