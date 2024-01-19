@@ -61,7 +61,7 @@ object SimonSaysSolver {
                 }.east()
                 if (pos.x == 111 && pos.y in 120..123 && pos.z in 92..95) {
                     if (SuperSecretSettings.azooPuzzoo && clickInOrder.size == 3 && clickNeeded == 0 && pos == clickInOrder[1]) {
-                        clickNeeded++
+                        clickNeeded += 2
                     } else if (clickInOrder[clickNeeded] != pos) {
                         if (Skytils.config.blockIncorrectTerminalClicks) event.isCanceled = true
                     } else {
