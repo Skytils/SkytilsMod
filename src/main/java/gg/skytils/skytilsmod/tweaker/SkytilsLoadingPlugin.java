@@ -125,6 +125,15 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
 
                 showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
                 exit();
+            } else if (!KotlinVersion.CURRENT.isAtLeast(1, 9)) {
+                showMessage("<html><p>" +
+                        "Skytils has detected that you are using are missing Kotlin 1.9 features.<br>" +
+                        "This is most likely caused by an outdated version of Essential.<br>" +
+                        "You may still launch the game on this Skytils version.<br>" +
+                        "To use future versions of Skytils, you must update Essential.<br>" +
+                        "If you have already done this and are still getting this error,<br>" +
+                        "ask for support in the Discord." +
+                        "</p></html>");
             }
             if (checkForClass("com.sky.voidchat.EDFMLLoadingPlugin")) {
                 showMessage(voidChatMessage);
