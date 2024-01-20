@@ -44,7 +44,7 @@ object ChangeAllToSameColorSolver {
         ).withIndex().associate { (i, c) ->
             c.metadata to i
         }
-    private var targetIndex = -1
+    private var mostCommon = -1
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -52,9 +52,9 @@ object ChangeAllToSameColorSolver {
         val grid = event.container.inventorySlots.filter {
             it.inventory == event.container.lowerChestInventory && it.stack?.displayName?.startsWith("§a") == true
         }
-        val mostCommon =
+        mostCommon =
             ordering.keys.maxByOrNull { c -> grid.count { it.stack?.metadata == c } } ?: EnumDyeColor.RED.metadata
-        targetIndex = ordering[mostCommon]!!
+        val targetIndex = ordering[mostCommon]!!
         val mapping = grid.filter { it.stack.metadata != mostCommon }.associateWith { slot ->
             val stack = slot.stack
             val myIndex = ordering[stack.metadata]!!
@@ -98,7 +98,7 @@ object ChangeAllToSameColorSolver {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!Utils.inDungeons || !Skytils.config.changeAllSameColorTerminalSolver || !Skytils.config.blockIncorrectTerminalClicks) return
         if (event.container is ContainerChest && event.chestName == "Change all to same color!") {
-            if (event.slot?.stack?.metadata == targetIndex) event.isCanceled = true
+            if (event.slot?.stack?.metadata == mostCommon) event.isCanceled = true
         }
     }
 
