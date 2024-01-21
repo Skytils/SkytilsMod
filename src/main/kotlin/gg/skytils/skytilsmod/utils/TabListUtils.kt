@@ -21,10 +21,15 @@ import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import net.minecraft.client.network.NetworkPlayerInfo
+import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.world.WorldSettings
 
 val NetworkPlayerInfo.text: String
-    get() = mc.ingameGUI.tabList.getPlayerName(this)
+    get() = displayName?.formattedText ?: ScorePlayerTeam.formatPlayerName(
+        playerTeam,
+        gameProfile.name
+    )
+
 
 object TabListUtils {
     private val playerInfoOrdering = object : Ordering<NetworkPlayerInfo>() {
@@ -39,6 +44,7 @@ object TabListUtils {
                         p2.playerTeam?.registeredName ?: ""
                     ).compare(p1.gameProfile.name, p2.gameProfile.name).result()
                 }
+
                 p1 == null -> -1
                 else -> 0
             }
