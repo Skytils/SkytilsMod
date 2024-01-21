@@ -159,7 +159,7 @@ object AlignmentTaskSolver {
                 }
 
                 if (!event.isCanceled && Skytils.config.predictAlignmentClicks) {
-                    pendingClicks.compute(pos) { _, v -> v?.inc() ?: 1 }
+                    pendingClicks[pos] = pending + 1
                     printDevMessage("Pending clicks on $pos: ${pendingClicks[pos]}, rot: ${entity.rotation}", "predictalignment")
                 }
             }
