@@ -21,13 +21,13 @@ import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -125,21 +125,11 @@ object DungeonTimer {
                             }
                             add("§9Boss entry §bwas ${dungeonTimeFormat((bossEntryTime - dungeonStartTime) / 1000.0)}.")
                         }
-                        if (Skytils.config.sadanPhaseTimer && Utils.equalsOneOf(
-                                DungeonFeatures.dungeonFloor,
-                                "F6",
-                                "M6"
-                            )
-                        ) {
+                        if (Skytils.config.sadanPhaseTimer && dungeonFloorNumber == 6) {
                             add("§dTerracotta §btook ${diff(terraClearTime, bossEntryTime)} seconds.")
                             add("§aGiants §btook ${diff(giantsClearTime, terraClearTime)} seconds.")
                             add("§cSadan §btook ${diff(bossClearTime, giantsClearTime)} seconds.")
-                        } else if (Skytils.config.necronPhaseTimer && Utils.equalsOneOf(
-                                DungeonFeatures.dungeonFloor,
-                                "F7",
-                                "M7"
-                            )
-                        ) {
+                        } else if (Skytils.config.necronPhaseTimer && dungeonFloorNumber == 7) {
                             add("§bMaxor took ${diff(phase1ClearTime, bossEntryTime)} seconds.")
                             add("§cStorm §btook ${diff(phase2ClearTime, phase1ClearTime)} seconds.")
                             add("§eTerminals §btook ${diff(terminalClearTime, phase2ClearTime)} seconds.")
@@ -157,7 +147,7 @@ object DungeonTimer {
                 }
             }
 
-            Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7") && (message.startsWith("§r§4[BOSS] ") || message.startsWith("§r§aThe Core entrance ")) -> {
+            dungeonFloorNumber == 7 && (message.startsWith("§r§4[BOSS] ") || message.startsWith("§r§aThe Core entrance ")) -> {
                 when {
                     message.endsWith("§r§cPathetic Maxor, just like expected.§r") && phase1ClearTime == -1L -> {
                         phase1ClearTime = System.currentTimeMillis()
@@ -196,7 +186,7 @@ object DungeonTimer {
                 }
             }
 
-            Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F6", "M6") && message.startsWith("§r§c[BOSS] Sadan") -> {
+            dungeonFloorNumber == 6 && message.startsWith("§r§c[BOSS] Sadan") -> {
                 when {
                     (message.endsWith("§r§f: ENOUGH!§r") && terraClearTime == -1L) -> {
                         terraClearTime = System.currentTimeMillis()
@@ -297,12 +287,7 @@ object DungeonTimer {
 
     class NecronPhaseTimerElement : GuiElement("Necron Phase Timer", x = 200, y = 120) {
         override fun render() {
-            if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
-                    DungeonFeatures.dungeonFloor,
-                    "F7",
-                    "M7"
-                )
-            ) {
+            if (toggled && Utils.inDungeons && bossEntryTime != -1L && dungeonFloorNumber == 7) {
                 val lines = arrayListOf(
                     "§bMaxor: ${dungeonTimeFormat(((if (phase1ClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else phase1ClearTime) - bossEntryTime) / 1000.0)}"
                 ).apply {
@@ -349,12 +334,7 @@ object DungeonTimer {
 
     class SadanPhaseTimerElement : GuiElement("Sadan Phase Timer", x = 200, y = 120) {
         override fun render() {
-            if (toggled && Utils.inDungeons && bossEntryTime != -1L && Utils.equalsOneOf(
-                    DungeonFeatures.dungeonFloor,
-                    "F6",
-                    "M6"
-                )
-            ) {
+            if (toggled && Utils.inDungeons && bossEntryTime != -1L && dungeonFloorNumber == 6) {
                 val lines = arrayListOf(
                     "§dTerracotta: ${dungeonTimeFormat(((if (terraClearTime == -1L) if (scoreShownAt == -1L) System.currentTimeMillis() else scoreShownAt else terraClearTime) - bossEntryTime) / 1000.0)}"
                 ).apply {

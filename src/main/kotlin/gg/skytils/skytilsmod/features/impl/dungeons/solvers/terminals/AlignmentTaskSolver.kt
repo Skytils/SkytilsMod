@@ -24,7 +24,6 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
-import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.init.Blocks
@@ -68,7 +67,8 @@ object AlignmentTaskSolver {
         }
     }
 
-    fun isSolverActive() = Skytils.config.alignmentTerminalSolver && Utils.inDungeons && mc.thePlayer != null && TerminalFeatures.isInPhase3() && Utils.equalsOneOf(DungeonFeatures.dungeonFloor, "F7", "M7")
+    fun isSolverActive() =
+        Skytils.config.alignmentTerminalSolver && Utils.inDungeons && mc.thePlayer != null && TerminalFeatures.isInPhase3()
 
     fun computeLayout() {
         if (!isSolverActive()) return

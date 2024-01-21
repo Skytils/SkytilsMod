@@ -17,14 +17,11 @@
  */
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
-import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
-import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
-import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -89,12 +86,7 @@ object SimonSaysSolver {
         val pos = event.pos
         val old = event.old
         val state = event.update
-        if (Utils.inDungeons && Skytils.config.simonSaysSolver && TerminalFeatures.isInPhase3() && Utils.equalsOneOf(
-                DungeonFeatures.dungeonFloor,
-                "F7",
-                "M7"
-            )
-        ) {
+        if (Utils.inDungeons && Skytils.config.simonSaysSolver && TerminalFeatures.isInPhase3()) {
             if ((pos.y in 120..123) && pos.z in 92..95) {
                 if (pos.x == 111) {
                     //println("Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}")
