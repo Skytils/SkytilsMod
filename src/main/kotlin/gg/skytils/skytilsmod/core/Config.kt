@@ -1002,10 +1002,10 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Predict Clicks for Alignment Solver",
-        description = "Predict the amount of clicks needed on the device in Floor 7.",
+        description = "Predict the amount of clicks needed on the alignment device in Floor 7.\nHighly recommended for high latency.",
         category = "Dungeons", subcategory = "Terminal Solvers"
     )
-    var predictAlignmentClicks = false
+    var predictAlignmentClicks = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Shoot the Target Solver",
