@@ -700,6 +700,18 @@ object RenderUtil {
         }
     }
 
+    fun drawCircle(matrixStack: UMatrixStack, x: Double, y: Double, z: Double, partialTicks: Float, radius: Double, edges: Int, r: Int, g: Int, b: Int, a: Int = 255) {
+        val ug = UGraphics.getFromTessellator()
+        val angleDelta = Math.PI * 2 / edges
+        GL11.glLineWidth(5f)
+        ug.beginWithDefaultShader(UGraphics.DrawMode.LINE_STRIP, UGraphics.CommonVertexFormats.POSITION_COLOR)
+        repeat(edges) { idx ->
+            ug.pos(matrixStack, x - mc.renderManager.viewerPosX + radius * cos(idx * angleDelta), y - mc.renderManager.viewerPosY, z - mc.renderManager.viewerPosZ + radius * sin(idx * angleDelta)).color(r, g, b, a).endVertex()
+        }
+        ug.pos(matrixStack, x + radius - mc.renderManager.viewerPosX, y - mc.renderManager.viewerPosY, z - mc.renderManager.viewerPosZ).color(r, g, b, a).endVertex()
+        ug.drawDirect()
+    }
+
     fun getViewerPos(partialTicks: Float): Triple<Double, Double, Double> {
         val viewer = mc.renderViewEntity
         val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks

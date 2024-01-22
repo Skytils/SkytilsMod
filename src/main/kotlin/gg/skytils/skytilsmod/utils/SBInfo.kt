@@ -26,7 +26,6 @@ import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 import net.minecraft.client.gui.inventory.GuiChest
@@ -184,7 +183,7 @@ enum class SkyblockIsland(val displayName: String, val mode: String) {
     Hub("Hub", "hub"),
     DarkAuction("Dark Auction", "dark_auction"),
     JerryWorkshop("Jerry's Workshop", "winter"),
-    Instanced("Instanced", "instanced"),
+    KuudraHollow("Kuudra's Hollow", "kuudra"),
     TheRift("The Rift", "rift"),
     Unknown("(Unknown)", "");
 

@@ -48,6 +48,9 @@ object UpdateChecker {
     val updateDownloadURL: String
         get() = updateAsset.downloadUrl
 
+    val currentTag = Skytils.VERSION.substringBefore("-dev")
+    val currentVersion = SkytilsVersion(currentTag)
+
     fun getJarNameFromUrl(url: String): String {
         return url.split(Regex("/")).last()
     }
@@ -164,9 +167,6 @@ object UpdateChecker {
                 else -> return println("Update Channel set as none")
             }
             val latestTag = latestRelease.tagName
-            val currentTag = Skytils.VERSION.substringBefore("-dev")
-
-            val currentVersion = SkytilsVersion(currentTag)
             val latestVersion = SkytilsVersion(latestTag.substringAfter("v"))
             if (currentVersion < latestVersion) {
                 updateObj = latestRelease

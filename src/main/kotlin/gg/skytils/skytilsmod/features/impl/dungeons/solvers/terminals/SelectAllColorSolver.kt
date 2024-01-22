@@ -32,8 +32,11 @@ import kotlin.random.Random
 object SelectAllColorSolver {
 
     @JvmField
-    val shouldClick = ArrayList<Int>()
+    val shouldClick = hashSetOf<Int>()
     private var colorNeeded: String? = null
+    private val colors by lazy {
+        EnumDyeColor.entries.associateWith { it.getName().replace("_", " ").uppercase() }
+    }
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -41,9 +44,9 @@ object SelectAllColorSolver {
                 "Select all the"
             )
         ) {
-            val promptColor = EnumDyeColor.entries.find {
-                event.chestName.contains(it.getName().replace("_", " ").uppercase())
-            }?.unlocalizedName
+            val promptColor = colors.entries.find { (_, name) ->
+                event.chestName.contains(name)
+            }?.key?.unlocalizedName
             if (promptColor != colorNeeded) {
                 colorNeeded = promptColor
                 shouldClick.clear()
@@ -79,10 +82,18 @@ object SelectAllColorSolver {
         if (event.container is ContainerChest) {
             if (event.chestName.startsWith("Select all the")) {
                 val slot = event.slot
-                if (shouldClick.size > 0 && !shouldClick.contains(slot.slotNumber) && slot.inventory !== mc.thePlayer.inventory) {
+                if (shouldClick.isNotEmpty() && slot.slotNumber !in shouldClick && slot.inventory !== mc.thePlayer.inventory) {
                     event.isCanceled = true
                 }
             }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!Utils.inDungeons || !Skytils.config.selectAllColorTerminalSolver || !Skytils.config.blockIncorrectTerminalClicks) return
+        if (event.container is ContainerChest && event.chestName.startsWith("Select all the")) {
+            if (shouldClick.isNotEmpty() && !shouldClick.contains(event.slotId)) event.isCanceled = true
         }
     }
 

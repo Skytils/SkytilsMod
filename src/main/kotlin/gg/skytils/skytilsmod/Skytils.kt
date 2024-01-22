@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod
 
+import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
 import gg.skytils.event.Events
@@ -293,6 +294,7 @@ class Skytils {
             IcePathSolver,
             ItemFeatures,
             KeyShortcuts,
+            KuudraFeatures,
             LockOrb,
             MasterMode7Features,
             MayorDiana,
@@ -396,6 +398,20 @@ class Skytils {
 
         if (config.overrideReparty || !cch.commands.containsKey("rp")) {
             cch.commandMap["rp"] = RepartyCommand
+        }
+
+        if (UpdateChecker.currentVersion.specialVersionType != UpdateChecker.UpdateType.RELEASE && config.updateChannel == 2) {
+            if (ModChecker.canShowNotifications) {
+                EssentialAPI.getNotifications().push("Skytils Update Checker", "You are on a development version of Skytils. Click here to change your update channel to pre-release.") {
+                    onAction = {
+                        config.updateChannel = 1
+                        config.markDirty()
+                        EssentialAPI.getNotifications().push("Skytils Update Checker", "Your update channel has been changed to pre-release.", duration = 3f)
+                    }
+                }
+            } else {
+                UChat.chat("$prefix §fYou are on a development version of Skytils. Change your update channel to pre-release to get notified of new updates.")
+            }
         }
     }
 

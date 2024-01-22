@@ -35,7 +35,8 @@ import kotlin.random.Random
 
 object ChangeAllToSameColorSolver {
     private val ordering =
-        setOf(EnumDyeColor.RED,
+        setOf(
+            EnumDyeColor.RED,
             EnumDyeColor.ORANGE,
             EnumDyeColor.YELLOW,
             EnumDyeColor.GREEN,
@@ -43,6 +44,7 @@ object ChangeAllToSameColorSolver {
         ).withIndex().associate { (i, c) ->
             c.metadata to i
         }
+    private var mostCommon = -1
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
@@ -50,7 +52,8 @@ object ChangeAllToSameColorSolver {
         val grid = event.container.inventorySlots.filter {
             it.inventory == event.container.lowerChestInventory && it.stack?.displayName?.startsWith("§a") == true
         }
-        val mostCommon = ordering.keys.maxByOrNull { c -> grid.count { it.stack?.metadata == c } } ?: EnumDyeColor.RED.metadata
+        mostCommon =
+            ordering.keys.maxByOrNull { c -> grid.count { it.stack?.metadata == c } } ?: EnumDyeColor.RED.metadata
         val targetIndex = ordering[mostCommon]!!
         val mapping = grid.filter { it.stack.metadata != mostCommon }.associateWith { slot ->
             val stack = slot.stack
@@ -89,6 +92,14 @@ object ChangeAllToSameColorSolver {
             GlStateManager.enableDepth()
         }
         GlStateManager.translate(0f, 0f, -299f)
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!Utils.inDungeons || !Skytils.config.changeAllSameColorTerminalSolver || !Skytils.config.blockIncorrectTerminalClicks) return
+        if (event.container is ContainerChest && event.chestName == "Change all to same color!") {
+            if (event.slot?.stack?.metadata == mostCommon) event.isCanceled = true
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
