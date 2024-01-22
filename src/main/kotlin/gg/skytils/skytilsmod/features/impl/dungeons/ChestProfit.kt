@@ -20,23 +20,27 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.features.impl.misc.ItemFeatures
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
+import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 
 
 /**
@@ -110,6 +114,30 @@ object ChestProfit {
         }
     }
 
+    @SubscribeEvent
+    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
+        if (!Skytils.config.croesusChestHighlight) return
+        if (SBInfo.mode != SkyblockIsland.DungeonHub.mode) return
+        if (event.container !is ContainerChest || event.slot.inventory == mc.thePlayer.inventory) return
+        val stack = event.slot.stack ?: return
+        if (stack.item == Items.skull) {
+            val name = stack.displayName
+            if (!(name == "§cThe Catacombs" || name == "§cMaster Mode Catacombs")) return
+            val lore = ItemUtil.getItemLore(stack)
+            event.slot highlight when {
+                lore.any { line -> line == "§aNo more Chests to open!" } -> {
+                    if (Skytils.config.croesusHideOpened) {
+                        event.isCanceled = true
+                        return
+                    } else Color(255, 0, 0, 100)
+                }
+                lore.any { line -> line == "§8No Chests Opened!" } -> Color(0, 255, 0, 100)
+                lore.any { line -> line.startsWith("§8Opened Chest: ") } -> Color(255, 255, 0, 100)
+                else -> return
+            }
+        }
+    }
+
     private fun getChestPrice(lore: List<String>): Double {
         lore.forEach {
             val line = it.stripControlCodes()
@@ -136,7 +164,7 @@ object ChestProfit {
             val enchant = name.substring(name.indexOf("(") + 1, name.indexOf(")"))
             return enchantNameToID(enchant)
         } else {
-            val unformatted = name.stripControlCodes()
+            val unformatted = name.stripControlCodes().replace("Shiny ", "")
             ItemFeatures.itemIdToNameLookup.entries.find {
                 it.value == unformatted && !it.value.contains("STARRED")
             }?.key

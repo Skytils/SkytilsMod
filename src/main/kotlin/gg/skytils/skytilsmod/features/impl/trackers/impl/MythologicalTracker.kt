@@ -19,6 +19,8 @@
 package gg.skytils.skytilsmod.features.impl.trackers.impl
 
 import gg.essential.universal.UChat
+import gg.essential.universal.utils.MCClickEventAction
+import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.structure.GuiElement
@@ -168,8 +170,11 @@ object MythologicalTracker : Tracker("mythological") {
                 if (System.currentTimeMillis() - time > 6000) return
                 if (Skytils.config.broadcastMythCreatureDrop) {
                     val text = "§6§lRARE DROP! ${drop.rarity.baseColor}${drop.itemName} §b(Skytils User Luck!)"
-                    if (Skytils.config.autoCopyRNGDrops) GuiScreen.setClipboardString(text)
-                    UChat.chat(text)
+                    if (Skytils.config.autoCopyRNGDrops) GuiScreen.setClipboardString(text.stripControlCodes())
+                    UTextComponent(text)
+                        .setClick(MCClickEventAction.RUN_COMMAND, "/skytilscopy ${text.stripControlCodes()}")
+                        .setHoverText("§aClick to copy to clipboard.")
+                        .chat()
                     SoundQueue.addToQueue(
                         SoundQueue.QueuedSound(
                             "note.pling",

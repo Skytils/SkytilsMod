@@ -34,7 +34,6 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlinx.coroutines.Job
@@ -88,6 +87,12 @@ object DungeonFeatures {
         "aim"
     )
     var dungeonFloor: String? = null
+        set(value) {
+            field = value
+            dungeonFloorNumber = value?.drop(1)?.ifEmpty { "0" }?.toIntOrNull()
+        }
+    var dungeonFloorNumber: Int? = null
+        private set
     var hasBossSpawned = false
     private var isInTerracottaPhase = false
     private var terracottaEndTime = -1.0
@@ -176,15 +181,14 @@ object DungeonFeatures {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
         if (Utils.inDungeons) {
             if (dungeonFloor == null) {
-                for (line in ScoreboardUtil.sidebarLines) {
-                    if (line.contains("The Catacombs (")) {
-                        dungeonFloor = line.substringAfter("(").substringBefore(")")
-                        ScoreCalculation.floorReq.set(
-                            ScoreCalculation.floorRequirements[dungeonFloor]
-                                ?: ScoreCalculation.floorRequirements["default"]!!
-                        )
-                        break
-                    }
+                ScoreboardUtil.sidebarLines.find {
+                    it.contains("The Catacombs (")
+                }?.let {
+                    dungeonFloor = it.substringAfter("(").substringBefore(")")
+                    ScoreCalculation.floorReq.set(
+                        ScoreCalculation.floorRequirements[dungeonFloor]
+                            ?: ScoreCalculation.floorRequirements["default"]!!
+                    )
                 }
             }
             if (!hasClearedText) {

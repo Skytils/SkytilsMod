@@ -34,6 +34,7 @@ import gg.skytils.skytilsmod.gui.PotionNotificationsGui
 import gg.skytils.skytilsmod.gui.SpiritLeapNamesGui
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.utils.ModChecker
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ClientCommandHandler
@@ -220,6 +221,20 @@ object Config : Vigilant(
     var dungeonChestProfitIncludesEssence = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Highlight Unopened Croesus Chests",
+        description = "Highlight runs in Croesus based on how many more chests can be opened.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var croesusChestHighlight = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Opened Croesus Chests",
+        description = "Hide runs in Croesus if no more chests can be opened.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var croesusHideOpened = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Map",
         description = "Displays the vanilla map on your screen using vanilla rendering code.",
         category = "Dungeons", subcategory = "Miscellaneous"
@@ -237,19 +252,20 @@ object Config : Vigilant(
         type = PropertyType.BUTTON, name = "Dungeon Sweat",
         description = "Click if dungeon sweat???",
         category = "Dungeons", subcategory = "Miscellaneous",
-        searchTags = ["predev", "pre-dev", "arrow", "tic tac toe", "solver"]
+        searchTags = ["predev", "pre-dev", "arrow", "tic tac toe", "solver", "device"]
     )
     fun openDungeonSweat() {
+        if (SuperSecretSettings.azooPuzzoo)
+            SuperSecretSettings.remove("azoopuzoo")
+        else
+            SuperSecretSettings.add("azoopuzzoo")
+        SuperSecretSettings.save()
         if (ModChecker.canShowNotifications) {
-            EssentialAPI.getNotifications().push("azoopuzzoo", "hmmmmm... nice pb + ratio + sub 3 + FAST S+ + no bers + no healer + no tank + 4m 1a + no hype = kick", 3f) {
-                onClose = {
-                    UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
-                }
-            }
+            EssentialAPI.getNotifications().push("Dungeon Sweat", "Dungeon Sweat mode ${SuperSecretSettings.azooPuzzoo}")
         } else {
-            UChat.chat("${Skytils.prefix} §bazoopuzzoo")
-            UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
+            UChat.chat("${Skytils.prefix} §bDungeon Sweat mode ${SuperSecretSettings.azooPuzzoo}");
         }
+        UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
     }
 
     @Property(
@@ -910,6 +926,13 @@ object Config : Vigilant(
     var tankRadiusDisplayColor = Color(100, 255, 0, 50)
 
     @Property(
+        type = PropertyType.SWITCH, name = "Block Incorrect Terminal Clicks",
+        description = "Blocks incorrect clicks on terminals.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var blockIncorrectTerminalClicks = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Middle Click on Terminals",
         description = "Replaces left clicks while on terminals with middle clicks.",
         category = "Dungeons", subcategory = "Terminal Solvers"
@@ -978,6 +1001,13 @@ object Config : Vigilant(
     var alignmentTerminalSolver = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Predict Clicks for Alignment Solver",
+        description = "Predict the amount of clicks needed on the alignment device in Floor 7.\nHighly recommended for high latency.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var predictAlignmentClicks = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Shoot the Target Solver",
         description = "Shows all the shot blocks on the device in Floor 7.",
         category = "Dungeons", subcategory = "Terminal Solvers"
@@ -990,6 +1020,13 @@ object Config : Vigilant(
         category = "Dungeons", subcategory = "Terminal Solvers"
     )
     var simonSaysSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Predict Clicks for Simon Says Solver",
+        description = "Attempts to register teammate clicks on Simon Says Solver.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var predictSimonClicks = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Display Jerry Perks",
@@ -1066,13 +1103,6 @@ object Config : Vigilant(
         searchTags = ["Griffin", "Diana", "Myth"]
     )
     var trackGaiaHits = false
-
-    /*    @Property(
-        type = PropertyType.SWITCH, name = "Hide Leftover Bleeds",
-        description = "Removes the bleeds text left behind when a player dies to a Minotaur.",
-        category = "Events", subcategory = "Mythological"
-    )*/
-    var removeLeftOverBleeds = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Track Mythological Creatures",
@@ -1173,6 +1203,13 @@ object Config : Vigilant(
         category = "Farming", subcategory = "Quality of Life"
     )
     var talbotsTheodoliteHelper = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Non-Nametag Armor Stands on Kuudra",
+        description = "Hides non nametag armor stands on Kuudra Island.",
+        category = "Kuudra", subcategory = "Performance"
+    )
+    var kuudraHideNonNametags = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Dark Mode Mist",
@@ -2973,6 +3010,7 @@ object Config : Vigilant(
         }
 
         addDependency("dungeonChestProfitIncludesEssence", "dungeonChestProfit")
+        addDependency("croesusHideOpened", "croesusChestHighlight")
         addDependency("kismetRerollThreshold", "dungeonChestProfit")
 
         addDependency("message270Score", "sendMessageOn270Score")
@@ -2998,6 +3036,8 @@ object Config : Vigilant(
         addDependency("clickInOrderThird", "clickInOrderTerminalSolver")
         addDependency("changeToSameColorMode", "changeAllSameColorTerminalSolver")
         addDependency("lividFinderType", "findCorrectLivid")
+        addDependency("predictAlignmentClicks", "alignmentTerminalSolver")
+        addDependency("predictSimonClicks", "simonSaysSolver")
 
         listOf(
             "emptyBurrowColor",

@@ -34,7 +34,7 @@ plugins {
     signing
 }
 
-version = "1.8.0-pre8"
+version = "1.8.0-pre12"
 group = "gg.skytils"
 
 repositories {
@@ -216,9 +216,12 @@ tasks {
             "META-INF/maven/**",
             "META-INF/versions/**",
             "META-INF/com.android.tools/**",
-            "fabric.mod.json"
+            "fabric.mod.json",
+            "/**/META-INF/services/io.ktor.serialization.kotlinx.KotlinxSerializationExtensionProvider"
         )
-        mergeServiceFiles()
+        mergeServiceFiles {
+            exclude("/**/META-INF/services/io.ktor.serialization.kotlinx.KotlinxSerializationExtensionProvider")
+        }
     }
     withType<AbstractArchiveTask> {
         isPreserveFileTimestamps = false

@@ -28,6 +28,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.core.API
+import gg.skytils.skytilsmod.core.tickTask
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
@@ -230,6 +231,7 @@ object DungeonListener {
         val tabEntries = TabListUtils.tabEntries
 
         if (tabEntries.isEmpty() || !tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
+            println("Couldn't get party text")
             tickTimer(5) {
                 getMembers()
             }
@@ -245,6 +247,7 @@ object DungeonListener {
             return
         }
         println("There are $partyCount members in this party")
+        var gotEmptyThisRun = false
         for (i in 0..<partyCount) {
             val pos = 1 + i * 4
             val text = tabEntries[pos].second
@@ -273,6 +276,14 @@ object DungeonListener {
                     DungeonClass.EMPTY, 0,
                     pos
                 )
+
+                if (!gotEmptyThisRun) {
+                    tickTimer(5) {
+                        team.clear()
+                        getMembers()
+                    }
+                    gotEmptyThisRun = true
+                }
             }
         }
         if (partyCount != team.size) {
@@ -286,9 +297,10 @@ object DungeonListener {
     }
 
     fun checkSpiritPet() {
+        val teamCopy = team.values.toList()
         Skytils.IO.launch {
             runCatching {
-                for (teammate in team.values) {
+                for (teammate in teamCopy) {
                     val name = teammate.playerName
                     if (hutaoFans.getIfPresent(name) != null) continue
                     val uuid = teammate.player?.uniqueID ?: MojangUtil.getUUIDFromUsername(name) ?: continue
