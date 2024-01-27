@@ -2275,7 +2275,7 @@ object Config : Vigilant(
     var rev5TNTPing = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Slayer Boss Hitbox",
+        type = PropertyType.SWITCH, name = "Slayer Mini-Boss Hitbox",
         description = "Draws a box around slayer mini-bosses.",
         category = "Slayer", subcategory = "Quality of Life"
     )
