@@ -22,6 +22,8 @@ import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.lib.caffeine.cache.Caffeine
 import gg.essential.lib.caffeine.cache.Expiry
 import gg.essential.universal.UChat
+import gg.skytils.event.Events
+import gg.skytils.event.impl.TickEvent
 import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
@@ -44,6 +46,8 @@ import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import skytils.hylin.extension.nonDashedString
 import skytils.hylin.skyblock.dungeons.DungeonClass
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
 
 object DungeonListener {
 
@@ -96,7 +100,7 @@ object DungeonListener {
                 team.clear()
                 deads.clear()
                 missingPuzzles.clear()
-                tickTimer(40) {
+                tickTimer(20) {
                     getMembers()
                 }
             } else if (text.stripControlCodes()
@@ -226,16 +230,27 @@ object DungeonListener {
         }
     }
 
+    private var lock = ReentrantLock()
+
     private fun getMembers() {
-        if (team.isNotEmpty() || !Utils.inDungeons) return
+        if (team.isNotEmpty() || !Utils.inDungeons || lock.isLocked) return
         val tabEntries = TabListUtils.tabEntries
+
+        lock.lock()
+        if (!ScoreCalculation.dungeonStarted) {
+            println("Dungeon hasn't started yet")
+            tickTimer(5) {
+                getMembers()
+            }
+            return lock.unlock()
+        }
 
         if (tabEntries.isEmpty() || !tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
             println("Couldn't get party text")
             tickTimer(5) {
                 getMembers()
             }
-            return
+            return lock.unlock()
         }
 
         val partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
@@ -244,10 +259,9 @@ object DungeonListener {
             tickTimer(5) {
                 getMembers()
             }
-            return
+            return lock.unlock()
         }
         println("There are $partyCount members in this party")
-        var gotEmptyThisRun = false
         for (i in 0..<partyCount) {
             val pos = 1 + i * 4
             val text = tabEntries[pos].second
@@ -276,14 +290,10 @@ object DungeonListener {
                     DungeonClass.EMPTY, 0,
                     pos
                 )
-
-                if (!gotEmptyThisRun) {
-                    tickTimer(5) {
-                        team.clear()
-                        getMembers()
-                    }
-                    gotEmptyThisRun = true
-                }
+                 tickTimer(5) {
+                    team.clear()
+                    getMembers()
+                 }
             }
         }
         if (partyCount != team.size) {
@@ -292,8 +302,12 @@ object DungeonListener {
         if (team.values.any { it.dungeonClass == DungeonClass.EMPTY }) {
             UChat.chat("$failPrefix §cSomething isn't right! One or more of your party members has an empty class! Could the server be lagging?")
         }
-        CooldownTracker.updateCooldownReduction()
-        checkSpiritPet()
+
+        if (team.isNotEmpty()) {
+            CooldownTracker.updateCooldownReduction()
+            checkSpiritPet()
+        }
+        lock.unlock()
     }
 
     fun checkSpiritPet() {
