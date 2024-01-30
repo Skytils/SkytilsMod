@@ -31,7 +31,7 @@ object KuudraFeatures {
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (event.entity !is EntityArmorStand || SBInfo.mode != SkyblockIsland.KuudraHollow.mode) return
         if (Skytils.config.kuudraHideNonNametags && !Keyboard.isKeyDown(Keyboard.KEY_LMENU)) {
-            if (!event.entity.isInvisible && !event.entity.hasCustomName()) {
+            if (event.entity.isInvisible && !event.entity.alwaysRenderNameTag) {
                 event.isCanceled = true
             }
         }
