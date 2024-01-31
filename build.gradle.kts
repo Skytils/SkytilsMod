@@ -21,8 +21,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm") version "1.9.20"
-    kotlin("plugin.serialization") version "1.9.20"
+    kotlin("jvm") version "1.9.21"
+    kotlin("plugin.serialization") version "1.9.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("net.kyori.blossom") version "2.0.0"
     id("io.github.juuxel.loom-quiltflower") version "1.10.0"
@@ -116,6 +116,13 @@ dependencies {
 
     shadowMe(ktor("serialization-kotlinx-json"))
     shadowMe(ktor("serialization-gson"))
+
+    shadowMe("org.jetbrains.kotlinx:kotlinx-serialization-json") {
+        version {
+            strictly("[1.5.1,)")
+            prefer("1.6.2")
+        }
+    }
 
     shadowMe(ktorClient("core"))
     shadowMe(ktorClient("cio"))
