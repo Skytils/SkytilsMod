@@ -68,9 +68,9 @@ object DungeonTimer {
                 scoreShownAt = System.currentTimeMillis()
             }
 
-            (message == "§r§aStarting in 1 second.§r") && dungeonStartTime == -1L -> {
+/*            (message == "§r§aStarting in 1 second.§r") && dungeonStartTime == -1L -> {
                 dungeonStartTime = System.currentTimeMillis() + 1000
-            }
+            }*/
 
             message.endsWith(" §r§ehas obtained §r§a§r§6§r§8Wither Key§r§e!§r") || unformatted == "A Wither Key was picked up!" || message.endsWith(
                 "§r§ehas obtained §r§8Wither Key§r§e!§r"

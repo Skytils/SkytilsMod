@@ -258,8 +258,6 @@ object ScoreCalculation {
             }
         }
 
-    var dungeonStarted = false
-
     fun updateText(score: Int) {
         Utils.checkThreadAndQueue {
             ScoreCalculationElement.text.clear()
@@ -327,13 +325,15 @@ object ScoreCalculation {
         if (line.startsWith("Cleared: ")) {
             val matcher = dungeonClearedPattern.find(line)
             if (matcher != null) {
-                dungeonStarted = true
+                if (DungeonTimer.dungeonStartTime == -1L)
+                    DungeonTimer.dungeonStartTime = System.currentTimeMillis()
                 clearedPercentage.set(matcher.groups["percentage"]?.value?.toIntOrNull() ?: 0)
                 return
             }
         }
         if (line.startsWith("Time Elapsed:")) {
-            dungeonStarted = true
+            if (DungeonTimer.dungeonStartTime == -1L)
+                DungeonTimer.dungeonStartTime = System.currentTimeMillis()
             val matcher = timeElapsedPattern.find(line)
             if (matcher != null) {
                 val hours = matcher.groups["hrs"]?.value?.toIntOrNull() ?: 0
@@ -505,8 +505,6 @@ object ScoreCalculation {
         deaths.set(0)
         crypts.set(0)
         totalRoomMap.clear()
-
-        dungeonStarted = false
     }
 
     init {
