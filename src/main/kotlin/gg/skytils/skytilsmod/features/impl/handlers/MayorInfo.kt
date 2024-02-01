@@ -144,7 +144,7 @@ object MayorInfo {
     }
 
     fun fetchJerryData() = Skytils.IO.launch {
-        val res = client.get("https://${Skytils.domain}/api/mayor").body<JerrySession>()
+        val res = client.get("https://${Skytils.domain}/api/mayor/jerry").body<JerrySession>()
         tickTimer(1) {
             newJerryPerks = res.nextSwitch
             jerryMayor = res.mayor
