@@ -21,8 +21,10 @@ import gg.skytils.skytilsmod.events.SkytilsEvent
 import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.entity.Entity
 import net.minecraftforge.fml.common.eventhandler.Cancelable
+import net.minecraftforge.fml.common.eventhandler.Event.HasResult
 
 @Cancelable
+@HasResult
 data class CheckRenderEntityEvent<T : Entity>(
     val entity: T,
     val camera: ICamera,

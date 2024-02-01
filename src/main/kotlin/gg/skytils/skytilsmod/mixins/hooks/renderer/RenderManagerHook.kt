@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.mixins.hooks.renderer
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.entity.Entity
+import net.minecraftforge.fml.common.eventhandler.Event
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 fun shouldRender(
@@ -30,13 +31,16 @@ fun shouldRender(
     camZ: Double,
     cir: CallbackInfoReturnable<Boolean>
 ) {
-    if (
-        CheckRenderEntityEvent(
-            entityIn,
-            camera,
-            camX,
-            camY,
-            camZ
-        ).postAndCatch()
-    ) cir.returnValue = false
+    val event = CheckRenderEntityEvent(
+        entityIn,
+        camera,
+        camX,
+        camY,
+        camZ
+    )
+    when {
+        event.postAndCatch() -> cir.returnValue = false
+        event.result == Event.Result.DENY -> cir.returnValue = false
+        event.result == Event.Result.ALLOW -> cir.returnValue = true
+    }
 }
