@@ -153,6 +153,10 @@ object MayorInfo {
 
     fun sendJerryData(mayor: Mayor?, nextSwitch: Long) = Skytils.IO.launch {
         if (mayor == null || nextSwitch <= System.currentTimeMillis()) return@launch
+        if (!Skytils.trustClientTime) {
+            println("Client's time isn't trusted, skip sending jerry data.")
+            return@launch
+        }
         try {
             val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
             val commentForDecompilers =
