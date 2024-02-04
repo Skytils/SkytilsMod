@@ -32,82 +32,44 @@ import gg.essential.elementa.state.State
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UMinecraft
 import gg.essential.vigilance.gui.VigilancePalette
+import gg.skytils.hypixel.types.player.Player
+import gg.skytils.hypixel.types.skyblock.Member
+import gg.skytils.hypixel.types.skyblock.Profile
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.hylinAPI
+import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
 import gg.skytils.skytilsmod.gui.profile.components.*
 import gg.skytils.skytilsmod.gui.profile.states.alwaysMap
 import gg.skytils.skytilsmod.gui.profile.states.alwaysUpdateState
 import gg.skytils.skytilsmod.utils.MojangUtil
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.nonDashedString
+import gg.skytils.skytilsmod.utils.toMCItems
 import kotlinx.coroutines.launch
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
-import skytils.hylin.extension.nonDashedString
-import skytils.hylin.player.Player
-import skytils.hylin.skyblock.Member
-import skytils.hylin.skyblock.Profile
-import skytils.hylin.skyblock.Skills
 import java.awt.Color
 import java.util.*
 
 class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, drawDefaultBackground = false) {
     private val uuidState: State<UUID> = BasicState(uuid).also {
         it.onSetValue { uuid ->
-            val profile = GameProfile(uuid, "")
-            Skytils.launch {
-                launch {
-                    hylinAPI.getPlayer(uuid).whenComplete {
-                        hypixelPlayer.set(it)
-                    }
-                }
-                launch {
-                    hylinAPI.getSkyblockProfiles(uuid).whenComplete { list ->
-                        list.forEach { println(it.cuteName) }
-                        profiles.set(list)
-                        selection.set(list.indexOfFirst { it.selected })
-                    }
-                }
-                launch {
-                    UMinecraft.getMinecraft().sessionService.fillProfileProperties(profile, true)
-                }.invokeOnCompletion {
-                    gameProfileState.set(profile)
-                }
-            }
+            loadProfile(uuid)
         }
     }
     private val hypixelPlayer: State<Player?> = BasicState(null)
     private val profiles: State<List<Profile>?> = alwaysUpdateState(null)
     private val selection: State<Int> = BasicState(0)
     private val profileList: State<List<String>> =
-        profiles.alwaysMap { selection.set(0); it?.map { profile -> profile.cuteName } ?: listOf("None") }
+        profiles.alwaysMap { selection.set(0); it?.map { profile -> profile.name } ?: listOf("None") }
     private val profileState: State<Member?> = selection.zip(profiles).alwaysMap { (selection, profiles) ->
         val a = profiles?.get(selection)?.members?.get(uuidState.get().nonDashedString())
         a
     }
     private val gameProfileState: State<GameProfile?> = BasicState(null)
-
     override fun afterInitialization() {
-        Skytils.launch {
-            val profile = GameProfile(uuidState.get(), "")
-            launch {
-                hylinAPI.getPlayer(uuidState.get()).whenComplete {
-                    hypixelPlayer.set(it)
-                }
-            }
-            launch {
-                hylinAPI.getSkyblockProfiles(uuidState.get()).whenComplete { profileList ->
-                    profiles.set(profileList)
-                    selection.set(profileList.indexOfFirst { it.selected })
-                }
-            }
-            launch {
-                UMinecraft.getMinecraft().sessionService.fillProfileProperties(profile, true)
-            }.invokeOnCompletion {
-                gameProfileState.set(profile)
-            }
-        }
+        loadProfile(uuidState.get())
     }
 
     // Navbar Section
@@ -215,10 +177,10 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, dr
             height = FixedChildBasedRangeConstraint() + 5.pixels
         } childOf contentContainer
 
-    private val taming = SkillComponent(
+    private val taming by SkillComponent(
         ItemComponent(Items.spawn_egg),
         Color(65, 102, 245).toConstraint(),
-        Skills::tamingXP,
+        "SKILL_TAMING",
         profileState
     )
         .constrain {
@@ -228,10 +190,10 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, dr
             height = 20.pixels()
         } childOf skillContainer
 
-    private val farming = SkillComponent(
+    private val farming by SkillComponent(
         ItemComponent(Items.golden_hoe),
         Color(65, 102, 245).toConstraint(),
-        Skills::farmingXP,
+        "SKILL_FARMING",
         profileState
     )
         .constrain {
@@ -241,10 +203,10 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, dr
             height = 20.pixels()
         } childOf skillContainer
 
-    private val mining = SkillComponent(
+    private val mining by SkillComponent(
         ItemComponent(Items.stone_pickaxe),
         Color(65, 102, 245).toConstraint(),
-        Skills::miningXP,
+        "SKILL_MINING",
         profileState
     )
         .constrain {
@@ -254,10 +216,10 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, dr
             height = 20.pixels()
         } childOf skillContainer
 
-    private val combat = SkillComponent(
+    private val combat by SkillComponent(
         ItemComponent(Items.stone_sword),
         Color(65, 102, 245).toConstraint(),
-        Skills::combatXP,
+        "SKILL_COMBAT",
         profileState
     )
         .constrain {
@@ -267,10 +229,10 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, dr
             height = 20.pixels()
         } childOf skillContainer
 
-    private val foraging = SkillComponent(
+    private val foraging by SkillComponent(
         ItemComponent(Item.getItemFromBlock(Blocks.sapling), 3),
         Color(65, 102, 245).toConstraint(),
-        Skills::foragingXP,
+        "SKILL_FORAGING",
         profileState
     )
         .constrain {
@@ -280,10 +242,10 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, dr
             height = 20.pixels()
         } childOf skillContainer
 
-    private val fishing = SkillComponent(
+    private val fishing by SkillComponent(
         ItemComponent(Items.fishing_rod),
         Color(65, 102, 245).toConstraint(),
-        Skills::fishingXP,
+        "SKILL_FISHING",
         profileState
     )
         .constrain {
@@ -293,10 +255,10 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, dr
             height = 20.pixels()
         } childOf skillContainer
 
-    private val enchanting = SkillComponent(
+    private val enchanting by SkillComponent(
         ItemComponent(Item.getItemFromBlock(Blocks.enchanting_table)),
         Color(65, 102, 245).toConstraint(),
-        Skills::enchantingXP,
+        "SKILL_ENCHANTING",
         profileState
     )
         .constrain {
@@ -306,10 +268,10 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, dr
             height = 20.pixels()
         } childOf skillContainer
 
-    private val alchemy = SkillComponent(
+    private val alchemy by SkillComponent(
         ItemComponent(Items.brewing_stand),
         Color(65, 102, 245).toConstraint(),
-        Skills::alchemyXP,
+        "SKILL_ALCHEMY",
         profileState
     )
         .constrain {
@@ -319,10 +281,10 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, dr
             height = 20.pixels()
         } childOf skillContainer
 
-    private val carpentry = SkillComponent(
+    private val carpentry by SkillComponent(
         ItemComponent(Item.getItemFromBlock(Blocks.crafting_table)),
         Color(65, 102, 245).toConstraint(),
-        Skills::carpentryXP,
+        "SKILL_CARPENTRY",
         profileState
     )
         .constrain {
@@ -332,10 +294,10 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, dr
             height = 20.pixels()
         } childOf skillContainer
 
-    private val runecrafting = SkillComponent(
+    private val runecrafting by SkillComponent(
         ItemComponent(Items.magma_cream),
         Color(65, 102, 245).toConstraint(),
-        Skills::runecraftingXP,
+        "SKILL_RUNECRAFTING",
         profileState
     )
         .constrain {
@@ -345,24 +307,25 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, dr
             height = 20.pixels()
         } childOf skillContainer
 
-    private val wardrobe = WardrobeComponent(profileState).constrain {
+    private val wardrobe by WardrobeComponent(profileState).constrain {
         x = 5.percent
         y = SiblingConstraint(5f)
     } childOf contentContainer
 
-    private val inventory = InventoryComponent(profileState.alwaysMap { it?.inventory }).constrain {
+    private val inventory = InventoryComponent(profileState.alwaysMap { it?.inventory?.inventory?.toMCItems() }).constrain {
         x = 5.percent()
         y = SiblingConstraint(5f)
         width = (9 * (16 + 2)).pixels
         height = (4 * (16 + 2)).pixels
     } childOf contentContainer
 
-    private val hotm = HOTMComponent(profileState).constrain {
+    //TODO: Fix HOTM
+/*    private val hotm = HOTMComponent(profileState).constrain {
         x = CramSiblingConstraint(5f) + 5.percent
         y = CramSiblingConstraint(5f)
         width = (9 * (16 + 2)).pixels
         height = (7 * (16 + 2)).pixels
-    } childOf contentContainer
+    } childOf contentContainer*/
 
     private val dungeons = DungeonsComponent(hypixelPlayer, profileState).constrain {
         x = 0.pixels
@@ -384,6 +347,28 @@ class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, dr
                 x = 10.pixels
                 y = 10.pixels
             } childOf window
+        }
+    }
+
+    fun loadProfile(uuid: UUID) {
+        val profile = GameProfile(uuid, "")
+        Skytils.launch {
+            launch {
+                hypixelPlayer.set(API.getPlayer(uuid))
+
+            }
+            launch {
+                API.getSkyblockProfiles(uuid).let {
+                    profiles.set(it)
+                    selection.set(it?.indexOfFirst { it.selected } ?: 0)
+                    println(it?.joinToString("\n") { it.name })
+                }
+            }
+            launch {
+                UMinecraft.getMinecraft().sessionService.fillProfileProperties(profile, true)
+            }.invokeOnCompletion {
+                gameProfileState.set(profile)
+            }
         }
     }
 

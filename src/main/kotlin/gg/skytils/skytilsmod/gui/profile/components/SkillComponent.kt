@@ -20,15 +20,16 @@ package gg.skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.constraints.ColorConstraint
 import gg.essential.elementa.state.State
+import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.skytilsmod.utils.SkillUtils
-import skytils.hylin.skyblock.Member
-import skytils.hylin.skyblock.Skills
-import kotlin.reflect.KProperty
+import gg.skytils.skytilsmod.utils.toTitleCase
+import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonPrimitive
 
 class SkillComponent(
     var image: ItemComponent,
     var color: ColorConstraint,
-    val skillField: KProperty<Float?>,
+    val skillField: String,
     userState: State<Member?>
 ) : XPComponent(
     image,
@@ -36,21 +37,21 @@ class SkillComponent(
 ) {
     val skillCap = userState.map { user ->
         kotlin.runCatching {
-            if (skillField == Skills::farmingXP) {
-                return@runCatching SkillUtils.maxSkillLevels["farming"]!! + (user?.jacob?.perks?.farmingLevelCap ?: 0)
+            if (skillField == "SKILL_FARMING") {
+                return@runCatching SkillUtils.maxSkillLevels["farming"]!! + (user?.jacob?.perks?.get("farming_level_cap")?.jsonPrimitive?.intOrNull ?: 0)
             } else {
-                return@runCatching SkillUtils.maxSkillLevels[skillField.name.substringBefore("XP")]
+                return@runCatching SkillUtils.maxSkillLevels[skillField.substringAfter("SKILL_").lowercase()]
             }
         }.getOrNull() ?: 50
     }
     val skillXP = userState.map { user ->
-        user?.skills?.let { skills -> skillField.getter.call(skills) } ?: 0f
+        user?.player_data?.experience?.get(skillField) ?: 0.0
     }
     val skillLevel = (skillXP.zip(skillCap)).map { (xp, cap) ->
-        if (skillField == Skills::runecraftingXP) {
-            SkillUtils.calcXpWithOverflowAndProgress(xp.toDouble(), cap, SkillUtils.runeXp.values)
+        if (skillField == "SKILL_RUNECRAFTING") {
+            SkillUtils.calcXpWithOverflowAndProgress(xp, cap, SkillUtils.runeXp.values)
         } else {
-            SkillUtils.calcXpWithOverflowAndProgress(xp.toDouble(), cap, SkillUtils.skillXp.values)
+            SkillUtils.calcXpWithOverflowAndProgress(xp, cap, SkillUtils.skillXp.values)
         }
     }
     val progress = skillLevel.map { (level, _, percent) ->
@@ -61,7 +62,7 @@ class SkillComponent(
     init {
         super.bindText(skillLevel.map { level ->
             "${
-                skillField.name.lowercase().substringBefore("xp").replaceFirstChar { it.uppercase() }
+                skillField.substringAfter("SKILL_").toTitleCase()
             } ${level.first}"
         })
         super.bindPercent(progress)

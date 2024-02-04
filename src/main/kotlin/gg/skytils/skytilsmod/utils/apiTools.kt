@@ -197,3 +197,7 @@ fun Inventory.toMCItems() =
             }
         }
     }
+
+fun UUID.nonDashedString(): String {
+    return this.toString().replace("-", "")
+}

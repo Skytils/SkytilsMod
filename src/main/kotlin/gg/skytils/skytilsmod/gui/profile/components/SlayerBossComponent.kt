@@ -26,18 +26,17 @@ import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
 import gg.essential.universal.UMinecraft
+import gg.skytils.hypixel.types.skyblock.SlayerBossData
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.SkillUtils
 import gg.skytils.skytilsmod.utils.toTitleCase
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import skytils.hylin.skyblock.slayer.RevenantSlayer
-import skytils.hylin.skyblock.slayer.StandardSlayer
 
-class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) : UIRoundedRectangle(2f) {
+class SlayerBossComponent(slayer: State<SlayerBossData?>, type: String) : UIRoundedRectangle(2f) {
     val xpSet = SkillUtils.slayerXp[type] ?: SkillUtils.slayerXp.values.first()
 
-    val slayerXp = slayer.map { it?.xp?.toDouble() ?: 0.0 }
+    val slayerXp = slayer.map { it?.xp ?: 0.0 }
 
     val levelData = slayerXp.map {
         SkillUtils.calcXpWithOverflowAndProgress(
@@ -101,7 +100,7 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
     }.bindText(slayer.map {
         """
             #Tier I
-            #${it?.t0Kills ?: 0}
+            #${it?.boss_kills?.get("boss_kills_tier_0") ?: 0}
         """.trimMargin("#")
     }) childOf this
 
@@ -112,7 +111,7 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
     }.bindText(slayer.map {
         """
             #Tier II
-            #${it?.t1Kills ?: 0}
+            #${it?.boss_kills?.get("boss_kills_tier_1") ?: 0}
         """.trimMargin("#")
     }) childOf this
 
@@ -123,7 +122,7 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
     }.bindText(slayer.map {
         """
             #Tier III
-            #${it?.t2Kills ?: 0}
+            #${it?.boss_kills?.get("boss_kills_tier_2") ?: 0}
         """.trimMargin("#")
     }) childOf this
 
@@ -134,7 +133,7 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
     }.bindText(slayer.map {
         """
             #Tier IV
-            #${it?.t3Kills ?: 0}
+            #${it?.boss_kills?.get("boss_kills_tier_3") ?: 0}
         """.trimMargin("#")
     }) childOf this
 
@@ -143,10 +142,11 @@ class SlayerBossComponent<T : StandardSlayer>(slayer: State<T?>, type: String) :
         y = CopyConstraintFloat() boundTo t1Kills
         width = textWidth
     }.bindText(slayer.map {
-        if (it is RevenantSlayer) {
+        // TODO: find better way to do this
+        if (it?.boss_kills?.containsKey("boss_kills_tier_4") == true) {
             """
                 #Tier V
-                #${it.t4Kills ?: 0}
+                #${it.boss_kills["boss_kills_tier_4"] ?: 0}
             """.trimMargin("#")
         } else ""
     }) childOf this

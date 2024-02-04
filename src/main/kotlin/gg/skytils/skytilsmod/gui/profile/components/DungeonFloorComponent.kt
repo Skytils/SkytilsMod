@@ -28,14 +28,17 @@ import gg.essential.elementa.constraints.CopyConstraintFloat
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.vigilance.gui.VigilancePalette
+import gg.skytils.hypixel.types.skyblock.DungeonModeData
 import gg.skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
 import gg.skytils.skytilsmod.utils.toStringIfTrue
-import skytils.hylin.skyblock.dungeons.DungeonBase
 import java.awt.Color
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
-class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int, val isMaster: Boolean) :
-    UIRoundedRectangle(5f) {
+class DungeonFloorComponent(val dungeonBase: DungeonModeData, val floorNum: Int, val isMaster: Boolean) : UIRoundedRectangle(5f) {
+
+    val floor: String = floorNum.toString()
+
     init {
         constrain {
             width = ChildBasedMaxSizeConstraint() + 10.pixels
@@ -43,7 +46,7 @@ class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int, val is
             color = VigilancePalette.getDarkBackground().constraint
         }
 
-        val title = UIText("${"Master ".toStringIfTrue(isMaster)}Floor $floor").constrain {
+        val title = UIText("${"Master ".toStringIfTrue(isMaster)}Floor ${if (floorNum == 0) "Entrance" else floor}").constrain {
             x = CenterConstraint()
             y = 5.pixels
             textScale = 1.5f.pixels
@@ -51,25 +54,25 @@ class DungeonFloorComponent(val dungeonBase: DungeonBase, val floor: Int, val is
         } childOf this
 
         val pairs = ArrayList<Pair<String, Any>>(7)
-        dungeonBase.timesPlayed?.get(floor)?.apply { pairs.add("Times Played" to this) }
-        dungeonBase.watcherKills?.get(floor)?.apply { pairs.add("Watcher Kills" to this) }
-        dungeonBase.completions?.get(floor)?.apply { pairs.add("Completions" to this) }
-        dungeonBase.bestScores?.get(floor)?.apply { pairs.add("Best Score" to this) }
-        dungeonBase.fastestTime?.get(floor)
-            ?.apply { pairs.add("Fastest Time" to timeFormat()) }
-        dungeonBase.fastestTimeS?.get(floor)
-            ?.apply { pairs.add("Fastest Time S" to timeFormat()) }
-        dungeonBase.fastestTimeSPlus?.get(floor)
-            ?.apply { pairs.add("Fastest Time S+" to timeFormat()) }
+        dungeonBase.times_played[floor]?.apply { pairs.add("Times Played" to this) }
+        dungeonBase.watcher_kills[floor]?.apply { pairs.add("Watcher Kills" to this) }
+        dungeonBase.tier_completions[floor]?.apply { pairs.add("Completions" to this) }
+        dungeonBase.best_score[floor]?.apply { pairs.add("Best Score" to this) }
+        dungeonBase.fastest_time[floor]
+            ?.apply { pairs.add("Fastest Time" to milliseconds.timeFormat()) }
+        dungeonBase.fastest_time_s[floor]
+            ?.apply { pairs.add("Fastest Time S" to milliseconds.timeFormat()) }
+        dungeonBase.fastest_time_s_plus[floor]
+            ?.apply { pairs.add("Fastest Time S+" to milliseconds.timeFormat()) }
 
         val text by UIWrappedText(pairs.joinToString("\n") {
             "§7${it.first}: §f${it.second}"
         }.ifEmpty { "Maybe get better??" }).constrain {
             x = 5.pixels
             y = SiblingConstraint(5f)
-            width = pairs.maxOf {
+            width = (pairs.maxOfOrNull {
                 fontProvider.getStringWidth("§7${it.first}: §f${it.second}", 10f)
-            }.pixels
+            } ?: fontProvider.getStringWidth("Maybe get better??", 10f)).pixels
         } childOf this
 
         children.add(children.size - 1, UIBlock(Color(0x4166f5).constraint).constrain {

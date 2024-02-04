@@ -22,15 +22,12 @@ import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.lib.caffeine.cache.Caffeine
 import gg.essential.lib.caffeine.cache.Expiry
 import gg.essential.universal.UChat
-import gg.skytils.event.Events
-import gg.skytils.event.impl.TickEvent
 import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.core.API
-import gg.skytils.skytilsmod.core.tickTask
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
@@ -44,10 +41,7 @@ import kotlinx.coroutines.launch
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import skytils.hylin.extension.nonDashedString
 import skytils.hylin.skyblock.dungeons.DungeonClass
-import java.util.concurrent.locks.Lock
-import java.util.concurrent.locks.ReentrantLock
 
 object DungeonListener {
     val team = hashMapOf<String, DungeonTeammate>()

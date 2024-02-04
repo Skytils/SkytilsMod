@@ -99,7 +99,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import skytils.hylin.HylinAPI
 import sun.misc.Unsafe
 import java.io.File
 import java.net.DatagramPacket
@@ -174,10 +173,6 @@ class Skytils {
         }
 
         override val coroutineContext: CoroutineContext = dispatcher + SupervisorJob() + CoroutineName("Skytils")
-
-        val hylinAPI by lazy {
-            HylinAPI("", false, this, HylinConnectionHandler, "https://hypixel.skytils.gg")
-        }
 
         val deobfEnvironment by lazy {
             Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", false) as Boolean
