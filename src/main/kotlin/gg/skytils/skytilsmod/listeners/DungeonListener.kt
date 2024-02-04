@@ -41,7 +41,6 @@ import kotlinx.coroutines.launch
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import skytils.hylin.skyblock.dungeons.DungeonClass
 
 object DungeonListener {
     val team = hashMapOf<String, DungeonTeammate>()

@@ -37,7 +37,7 @@ import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.features.impl.handlers.SpiritLeap
 import gg.skytils.skytilsmod.gui.components.SimpleButton
-import skytils.hylin.skyblock.dungeons.DungeonClass
+import gg.skytils.skytilsmod.utils.DungeonClass
 import java.awt.Color
 
 class SpiritLeapNamesGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), ReopenableGUI {
