@@ -147,7 +147,7 @@ object MiscFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inSkyblock || event.type == 2.toByte()) return
         val unformatted = event.message.unformattedText.stripControlCodes().trim()
         val formatted = event.message.formattedText
         if (formatted.startsWith("§r§cYou died") && Skytils.config.preventMovingOnDeath) {

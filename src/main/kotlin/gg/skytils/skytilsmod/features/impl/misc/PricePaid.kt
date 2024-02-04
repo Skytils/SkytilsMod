@@ -43,7 +43,7 @@ object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onPacket(event: PacketEvent.ReceiveEvent) {
-        if (!Utils.inSkyblock || lastBought == null || event.packet !is S02PacketChat) return
+        if (!Utils.inSkyblock || lastBought == null || event.packet !is S02PacketChat || event.packet.type == 2.toByte()) return
         val formatted = event.packet.chatComponent.formattedText
         val unformatted = event.packet.chatComponent.unformattedText.stripControlCodes()
 

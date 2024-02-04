@@ -383,7 +383,7 @@ object DungeonFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inSkyblock || event.type == 2.toByte()) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Utils.inDungeons) {
             if (Skytils.config.autoCopyFailToClipboard) {

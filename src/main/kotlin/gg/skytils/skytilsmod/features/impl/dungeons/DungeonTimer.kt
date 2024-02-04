@@ -60,7 +60,7 @@ object DungeonTimer {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inDungeons || event.type.toInt() == 2) return
+        if (!Utils.inDungeons || event.type == 2.toByte()) return
         val message = event.message.formattedText
         val unformatted = event.message.unformattedText.stripControlCodes()
         when {
