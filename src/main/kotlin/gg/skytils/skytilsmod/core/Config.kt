@@ -464,6 +464,13 @@ object Config : Vigilant(
     var kismetRerollThreshold = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Dungeon Secret Display",
+        description = "Shows the amount of dungeon secrets in the current room.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var dungeonSecretDisplay = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Ghost Leap Names",
         description = "Shows names next to the heads on the Ghost Leap menu.",
         category = "Dungeons", subcategory = "Quality of Life"
