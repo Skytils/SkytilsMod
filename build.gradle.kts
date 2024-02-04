@@ -96,13 +96,6 @@ dependencies {
         exclude(module = "gson")
     }
 
-    shadowMeMod("com.github.Skytils:Hylin:3ad11efbc1") {
-        exclude(module = "kotlin-reflect")
-        exclude(module = "kotlin-stdlib-jdk8")
-        exclude(module = "kotlin-stdlib-jdk7")
-        exclude(module = "kotlin-stdlib")
-        exclude(module = "kotlinx-coroutines-core")
-    }
     shadowMeMod("com.github.Skytils:AsmHelper:91ecc2bd9c") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
