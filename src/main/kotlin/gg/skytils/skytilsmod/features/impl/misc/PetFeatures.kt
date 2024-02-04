@@ -55,7 +55,7 @@ object PetFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type.toInt() == 2) return
+        if (!Utils.inSkyblock || event.type == 2.toByte()) return
         val message = event.message.formattedText
         if (message.startsWith("§r§aYou despawned your §r§")) {
             lastPet = null

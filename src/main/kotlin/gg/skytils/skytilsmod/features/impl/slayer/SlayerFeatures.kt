@@ -387,7 +387,7 @@ object SlayerFeatures : CoroutineScope {
             }
         }
 
-        if (packet is S02PacketChat) {
+        if (packet is S02PacketChat && packet.type != 2.toByte()) {
             val unformatted = packet.chatComponent.unformattedText.stripControlCodes()
             if (unformatted.trim().startsWith("RNGesus Meter")) {
                 val rngMeter =

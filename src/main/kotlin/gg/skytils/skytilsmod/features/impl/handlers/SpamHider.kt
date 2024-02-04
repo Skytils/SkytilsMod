@@ -205,7 +205,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
             lastSpooked = System.currentTimeMillis()
         }
         if (packet !is S02PacketChat) return
-        if (packet.type.toInt() == 2) return
+        if (packet.type == 2.toByte()) return
         val unformatted = packet.chatComponent.unformattedText.stripControlCodes()
         val formatted = packet.chatComponent.formattedText
 

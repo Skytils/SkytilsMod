@@ -54,7 +54,7 @@ object BossHPDisplays {
 
     @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inDungeons || event.type.toInt() == 2) return
+        if (!Utils.inDungeons || event.type == 2.toByte()) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (unformatted.startsWith("[BOSS] Sadan")) {
             if (unformatted.contains("My giants! Unleashed!")) {

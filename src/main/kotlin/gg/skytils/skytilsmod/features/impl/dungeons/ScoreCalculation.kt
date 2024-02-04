@@ -436,7 +436,7 @@ object ScoreCalculation {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChatReceived(event: ClientChatReceivedEvent) {
-        if (!Utils.inDungeons || mc.thePlayer == null) return
+        if (!Utils.inDungeons || mc.thePlayer == null || event.type == 2.toByte()) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.scoreCalculationReceiveAssist) {
             if (unformatted.startsWith("Party > ") || (unformatted.contains(":") && !unformatted.contains(">"))) {
