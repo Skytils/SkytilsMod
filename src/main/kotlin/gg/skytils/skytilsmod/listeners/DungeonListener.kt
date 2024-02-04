@@ -89,6 +89,7 @@ object DungeonListener {
         if (event.packet is S02PacketChat) {
             val text = event.packet.chatComponent.formattedText
             if (text == "§r§aStarting in 1 second.§r") {
+                printDevMessage("Starting dungeon", "dungeonlistener")
                 team.clear()
                 deads.clear()
                 missingPuzzles.clear()
@@ -156,6 +157,7 @@ object DungeonListener {
                 val tabEntries = TabListUtils.tabEntries
                 if (team.isEmpty() || (DungeonTimer.dungeonStartTime != -1L && team.values.any { it.dungeonClass == DungeonClass.EMPTY  })) {
                     if (tabEntries.isNotEmpty() && tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
+                        printDevMessage("Parsing party", "dungeonlistener")
                         val partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
                         if (partyCount != null) {
                             println("There are $partyCount members in this party")

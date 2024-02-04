@@ -55,7 +55,7 @@ object SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
     private val nameSlotCache = HashMap<Int, String>()
 
     @SubscribeEvent
-    fun onGuiDrawPost(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onGuiDrawPost(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
             if ((Skytils.config.spiritLeapNames && event.chestName == "Spirit Leap") || (Skytils.config.reviveStoneNames && event.chestName == "Revive A Teammate") || (Skytils.config.ghostTeleportMenuNames && event.chestName == "Teleport to Player")) {
