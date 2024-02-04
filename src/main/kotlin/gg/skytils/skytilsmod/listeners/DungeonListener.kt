@@ -31,6 +31,7 @@ import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
@@ -82,43 +83,57 @@ object DungeonListener {
     private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
     private val deathRegex = Regex("§r§c ☠ §r§7(?:You were |(?:§.)+(?<username>\\w+)§r).* and became a ghost§r§7\\.§r")
     private val reviveRegex = Regex("^§r§a ❣ §r§7(?:§.)+(?<username>\\w+)§r§a was revived")
+    private val secretsRegex = Regex("§7(?<secrets>\\d+)\\/(?<maxSecrets>\\d+) Secrets")
 
     @SubscribeEvent
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inDungeons) return
         if (event.packet is S02PacketChat) {
             val text = event.packet.chatComponent.formattedText
-            if (text == "§r§aStarting in 1 second.§r") {
-                printDevMessage("Starting dungeon", "dungeonlistener")
-                team.clear()
-                deads.clear()
-                missingPuzzles.clear()
-            } else if (text.stripControlCodes()
-                    .trim() == "> EXTRA STATS <"
-            ) {
-                if (Skytils.config.dungeonDeathCounter) {
-                    tickTimer(6) {
-                        UChat.chat("§c☠ §lDeaths:§r ${team.values.sumOf { it.deaths }}\n${
-                            team.values.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
-                                "  §c☠ ${it.playerName}:§r ${it.deaths}"
-                            }
-                        }"
-                        )
+            if (event.packet.type == 2.toByte()) {
+                secretsRegex.find(text)?.destructured?.let { (secrets, maxSecrets) ->
+                    val sec = secrets.toInt()
+                    val max = maxSecrets.toInt().coerceAtLeast(sec)
+
+                    DungeonFeatures.DungeonSecretDisplay.secrets = sec
+                    DungeonFeatures.DungeonSecretDisplay.maxSecrets = max
+                }?.ifNull {
+                    DungeonFeatures.DungeonSecretDisplay.secrets = -1
+                    DungeonFeatures.DungeonSecretDisplay.maxSecrets = -1
+                }
+            } else {
+                if (text == "§r§aStarting in 1 second.§r") {
+                    printDevMessage("Starting dungeon", "dungeonlistener")
+                    team.clear()
+                    deads.clear()
+                    missingPuzzles.clear()
+                } else if (text.stripControlCodes()
+                        .trim() == "> EXTRA STATS <"
+                ) {
+                    if (Skytils.config.dungeonDeathCounter) {
+                        tickTimer(6) {
+                            UChat.chat("§c☠ §lDeaths:§r ${team.values.sumOf { it.deaths }}\n${
+                                team.values.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
+                                    "  §c☠ ${it.playerName}:§r ${it.deaths}"
+                                }
+                            }"
+                            )
+                        }
                     }
+                    if (Skytils.config.autoRepartyOnDungeonEnd) {
+                        RepartyCommand.processCommand(mc.thePlayer, emptyArray())
+                    }
+                } else if (text.startsWith("§r§c ☠ ") && text.endsWith(" and became a ghost§r§7.§r")) {
+                    val match = deathRegex.find(text) ?: return
+                    val username = match.groups["username"]?.value ?: mc.thePlayer.name
+                    val teammate = team[username] ?: return
+                    markDead(teammate)
+                } else if (text.startsWith("§r§a ❣ ")) {
+                    val match = reviveRegex.find(text) ?: return
+                    val username = match.groups["username"]!!.value
+                    val teammate = team[username] ?: return
+                    markRevived(teammate)
                 }
-                if (Skytils.config.autoRepartyOnDungeonEnd) {
-                    RepartyCommand.processCommand(mc.thePlayer, emptyArray())
-                }
-            } else if (text.startsWith("§r§c ☠ ") && text.endsWith(" and became a ghost§r§7.§r")) {
-                val match = deathRegex.find(text) ?: return
-                val username = match.groups["username"]?.value ?: mc.thePlayer.name
-                val teammate = team[username] ?: return
-                markDead(teammate)
-            } else if (text.startsWith("§r§a ❣ ")) {
-                val match = reviveRegex.find(text) ?: return
-                val username = match.groups["username"]!!.value
-                val teammate = team[username] ?: return
-                markRevived(teammate)
             }
         }
     }
