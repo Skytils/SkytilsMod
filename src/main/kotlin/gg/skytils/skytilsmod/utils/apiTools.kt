@@ -188,8 +188,12 @@ object UUIDAsString : KSerializer<UUID> {
 @OptIn(ExperimentalEncodingApi::class)
 fun Inventory.toMCItems() =
     data.let { data ->
-        val list = CompressedStreamTools.readCompressed(Base64.decode(data).inputStream()).getTagList("i", Constants.NBT.TAG_COMPOUND)
-        (0 until list.tagCount()).map { idx ->
-            list.getCompoundTagAt(idx).takeUnless { it.hasNoTags() }?.let { ItemStack.loadItemStackFromNBT(it) }
+        if (data.isEmpty()) {
+            emptyList()
+        } else {
+            val list = CompressedStreamTools.readCompressed(Base64.decode(data).inputStream()).getTagList("i", Constants.NBT.TAG_COMPOUND)
+            (0 until list.tagCount()).map { idx ->
+                list.getCompoundTagAt(idx).takeUnless { it.hasNoTags() }?.let { ItemStack.loadItemStackFromNBT(it) }
+            }
         }
     }
