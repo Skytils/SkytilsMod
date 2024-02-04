@@ -148,7 +148,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
             try {
                 GlStateManager.pushMatrix()
                 GlStateManager.translate(element.scaleX, element.scaleY, 0f)
-                GlStateManager.scale(element.scale, element.scale, 0f)
+                GlStateManager.scale(element.scale, element.scale, 1f)
                 element.render()
                 GlStateManager.popMatrix()
             } catch (ex: Exception) {
