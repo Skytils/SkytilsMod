@@ -138,8 +138,6 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                     }
                 });
                 if (realFile.getParentFile().getName().equals("essential") && name.contains("Essential")) {
-                    showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>", openModFolder);
-                } else {
                     JButton watchVideo = new JButton("Open Tutorial Video");
                     watchVideo.addMouseListener(new MouseAdapter() {
                         @Override
@@ -152,6 +150,8 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                         }
                     });
                     showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>", openModFolder, watchVideo);
+                } else {
+                    showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>", openModFolder);
                 }
                 exit();
             }
