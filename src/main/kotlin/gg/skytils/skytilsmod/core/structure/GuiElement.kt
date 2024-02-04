@@ -79,6 +79,8 @@ abstract class GuiElement(var name: String, var scale: Float = 1f, var x: Float,
     }
 
     init {
-        applyMetadata(GuiManager.elementMetadata.getOrDefault(name, GuiManager.GuiElementMetadata.DEFAULT))
+        GuiManager.elementMetadata[name]?.let {
+            applyMetadata(it)
+        }
     }
 }

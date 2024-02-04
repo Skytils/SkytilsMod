@@ -251,9 +251,5 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     }
 
     @Serializable
-    data class GuiElementMetadata(val x: Float, val y: Float, val scale: Float = 1f, val textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL) {
-        companion object {
-            val DEFAULT = GuiElementMetadata(0f, 0f, 1f, SmartFontRenderer.TextShadow.NORMAL)
-        }
-    }
+    data class GuiElementMetadata(val x: Float, val y: Float, val scale: Float = 1f, val textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL)
 }
