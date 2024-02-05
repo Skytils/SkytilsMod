@@ -148,7 +148,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
             try {
                 GlStateManager.pushMatrix()
                 GlStateManager.translate(element.scaleX, element.scaleY, 0f)
-                GlStateManager.scale(element.scale, element.scale, 0f)
+                GlStateManager.scale(element.scale, element.scale, 1f)
                 element.render()
                 GlStateManager.popMatrix()
             } catch (ex: Exception) {
@@ -251,9 +251,5 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     }
 
     @Serializable
-    data class GuiElementMetadata(val x: Float, val y: Float, val scale: Float = 1f, val textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL) {
-        companion object {
-            val DEFAULT = GuiElementMetadata(0f, 0f, 1f, SmartFontRenderer.TextShadow.NORMAL)
-        }
-    }
+    data class GuiElementMetadata(val x: Float, val y: Float, val scale: Float = 1f, val textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL)
 }

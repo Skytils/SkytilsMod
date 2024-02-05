@@ -26,19 +26,17 @@ import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
 import gg.essential.vigilance.gui.VigilancePalette
+import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
 import gg.skytils.skytilsmod.gui.profile.states.alwaysMap
-import skytils.hylin.skyblock.Member
-import skytils.hylin.skyblock.item.Inventory
+import gg.skytils.skytilsmod.utils.toMCItems
+import net.minecraft.item.ItemStack
 
 class WardrobeComponent(val profileState: State<Member?>) : UIContainer() {
 
     private val armor =
         ArmorComponent(profileState.map { p ->
-            p?.armor.also { it?.items?.reverse() } ?: Inventory(
-                "armor",
-                ArrayList(4)
-            )
+            p?.inventory?.armor?.toMCItems()?.asReversed() ?: emptyList()
         }, false).constrain {
             width = FixedChildBasedRangeConstraint()
             height = ChildBasedMaxSizeConstraint()
@@ -55,19 +53,18 @@ class WardrobeComponent(val profileState: State<Member?>) : UIContainer() {
         profileState.onSetValue { profile ->
             Window.enqueueRenderOperation {
                 wardrobeContainer.clearChildren()
-                profile?.wardrobe?.items?.run {
+                profile?.inventory?.wardrobe?.toMCItems()?.run {
                     (0..<size / 4).map { slot ->
                         val page = slot / 9
                         profileState.alwaysMap { prof ->
-                            Inventory(
-                                "Wardrobe slot $slot",
-                                prof?.wardrobe?.items?.slice((0..3).map { it * 9 + slot % 9 + page * 36 })
-                                    ?.toMutableList()
-                                    ?: ArrayList(4)
-                            )
+                            prof?.inventory?.wardrobe?.toMCItems()?.slice(
+                                (0..3).map {
+                                    it * 9 + slot % 9 + page * 36
+                                }
+                            ) ?: ArrayList(4)
                         }
                     }.forEach { state ->
-                        if (state.get().items.any { it == null }) return@forEach
+                        if (state.get().any { it == null }) return@forEach
                         ArmorComponent(state, true).constrain {
                             x = CramSiblingConstraint(2f)
                             y = CramSiblingConstraint(2f)
@@ -97,25 +94,23 @@ class WardrobeComponent(val profileState: State<Member?>) : UIContainer() {
 
     }
 
-    class ArmorComponent(invState: State<Inventory>, val vertical: Boolean) : UIContainer() {
-        private var invState: State<Inventory> = invState.also {
+    class ArmorComponent(invState: State<List<ItemStack?>>, val vertical: Boolean) : UIContainer() {
+        private var invState: State<List<ItemStack?>> = invState.also {
             it.onSetValue(::parseSlots)
         }
 
-        fun bindInv(newState: State<Inventory>) = apply {
+        fun bindInv(newState: State<List<ItemStack?>>) = apply {
             invState = newState
             invState.onSetValue(::parseSlots)
         }
 
-        fun parseSlots(inv: Inventory) = Window.enqueueRenderOperation {
+        fun parseSlots(inv: List<ItemStack?>) = Window.enqueueRenderOperation {
             clearChildren()
-            inv.run {
-                items.forEach { item ->
-                    insertChildAt(SlotComponent(item?.asMinecraft).constrain {
-                        x = if (vertical) 0.pixels else SiblingConstraint(2f)
-                        y = if (vertical) SiblingConstraint(2f) else 0.pixels
-                    }, children.size)
-                }
+            for (i in 0..3) {
+                insertChildAt(SlotComponent(inv.getOrNull(i)).constrain {
+                    x = if (vertical) 0.pixels else SiblingConstraint(2f)
+                    y = if (vertical) SiblingConstraint(2f) else 0.pixels
+                }, children.size)
             }
         }
     }

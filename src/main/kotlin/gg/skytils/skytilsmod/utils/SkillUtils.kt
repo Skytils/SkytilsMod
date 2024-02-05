@@ -18,10 +18,6 @@
 
 package gg.skytils.skytilsmod.utils
 
-import skytils.hylin.skyblock.Pet
-import skytils.hylin.skyblock.item.Tier
-import java.util.*
-
 object SkillUtils {
     val maxSkillLevels = LinkedHashMap<String, Int>()
     val skillXp = LinkedHashMap<Int, Long>()
@@ -295,20 +291,6 @@ object SkillUtils {
         val overflow = calcXpWithOverflow(experience, cap, values)
         return Triple(overflow.first, overflow.second, calcXpWithProgress(experience, values))
     }
-
-    val Pet.level: Int
-        get() {
-            val offset = petRarityOffset[tier.toString()]!!
-            val maxLevel = if (type == "GOLDEN_DRAGON") 200 else 100
-            val levels = petLevels.sliceArray(offset..<offset + maxLevel - 1)
-
-            var xpRemaining = xp
-            for ((i, xp) in levels.withIndex()) {
-                if (xp > xpRemaining) return i - 1
-                xpRemaining -= xp
-            }
-            return maxLevel
-        }
 
     val gg.skytils.hypixel.types.skyblock.Pet.level: Int
         get () {

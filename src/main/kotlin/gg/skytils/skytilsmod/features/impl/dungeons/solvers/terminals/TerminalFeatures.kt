@@ -37,7 +37,7 @@ object TerminalFeatures {
         return (SuperSecretSettings.azooPuzzoo || DungeonTimer.phase2ClearTime != -1L) && DungeonTimer.terminalClearTime == -1L && dungeonFloorNumber == 7
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClickHigh(event: SlotClickEvent) {
         if (!Utils.inDungeons || !Skytils.config.blockIncorrectTerminalClicks || event.container !is ContainerChest) return
         if (event.chestName == "Correct all the panes!") {

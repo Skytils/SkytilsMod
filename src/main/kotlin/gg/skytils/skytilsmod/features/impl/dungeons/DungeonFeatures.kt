@@ -125,6 +125,7 @@ object DungeonFeatures {
     )
 
     init {
+        DungeonSecretDisplay
         LividGuiElement()
         SpiritBearSpawnTimer()
     }
@@ -382,7 +383,7 @@ object DungeonFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inSkyblock || event.type == 2.toByte()) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Utils.inDungeons) {
             if (Skytils.config.autoCopyFailToClipboard) {
@@ -832,6 +833,57 @@ object DungeonFeatures {
 
         override val toggled: Boolean
             get() = Skytils.config.findCorrectLivid
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    object DungeonSecretDisplay : GuiElement("Dungeon Secret Display", x = 0.05f, y = 0.4f) {
+        var secrets = -1
+        var maxSecrets = -1
+
+        override fun render() {
+            if (toggled && Utils.inDungeons && secrets > 0 && maxSecrets > 0) {
+                val leftAlign = scaleX < sr.scaledWidth / 2f
+                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                val color = when (secrets / maxSecrets.toDouble()) {
+                    in 0.0..0.5 -> CommonColors.RED
+                    in 0.5..0.75 -> CommonColors.YELLOW
+                    else -> CommonColors.GREEN
+                }
+
+                ScreenRenderer.fontRenderer.drawString(
+                    "Secrets: ${secrets}/${maxSecrets}",
+                    if (leftAlign) 0f else 0f + width,
+                    0f,
+                    color,
+                    alignment,
+                    textShadow
+                )
+            }
+        }
+
+        override fun demoRender() {
+            val leftAlign = scaleX < sr.scaledWidth / 2f
+            val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "Secrets: 0/0",
+                if (leftAlign) 0f else 0f + width,
+                0f,
+                CommonColors.WHITE,
+                alignment,
+                textShadow
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Secrets: 0/0")
+
+        override val toggled: Boolean
+            get() = Skytils.config.spiritBearTimer
 
         init {
             Skytils.guiManager.registerElement(this)

@@ -40,7 +40,7 @@ object BetterStash {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (Skytils.config.betterStash && Utils.inSkyblock) {
+        if (Skytils.config.betterStash && Utils.inSkyblock && event.type != 2.toByte()) {
             if (stashRegex.matches(event.message.unformattedText)) {
                 event.isCanceled = true
                 Skytils.sendMessageQueue.add("/viewstash")

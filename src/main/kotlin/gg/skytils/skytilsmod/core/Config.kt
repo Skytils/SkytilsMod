@@ -1367,10 +1367,10 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Boss Bar Fix",
-        description = "Hides the Witherborn boss bars.",
+        description = "Attempts to stop boss bars from disappearing.",
         category = "Miscellaneous", subcategory = "Fixes"
     )
-    var bossBarFix = true
+    var bossBarFix = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Fix Falling Sand Rendering",

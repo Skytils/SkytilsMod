@@ -25,15 +25,15 @@ import gg.essential.elementa.components.Window
 import gg.essential.elementa.constraints.*
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
+import gg.skytils.hypixel.types.player.Player
+import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.SkillUtils
+import gg.skytils.skytilsmod.utils.toTitleCase
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
-import skytils.hylin.player.Player
-import skytils.hylin.skyblock.Member
-import skytils.hylin.skyblock.dungeons.DungeonClass
 import java.awt.Color
 
 class DungeonsComponent(private val playerState: State<Player?>, private val profileState: State<Member?>) :
@@ -56,7 +56,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
         y = 5.pixels
     } childOf classes
 
-    val selectedClass by UIText().bindText(profileState.map { "Selected Class: ${it?.dungeons?.selectedClass?.className ?: "None"}" })
+    val selectedClass by UIText().bindText(profileState.map { "Selected Class: ${it?.dungeons?.selected_dungeon_class?.toTitleCase() ?: "None"}" })
         .constrain {
             x = 5.percent
             y = SiblingConstraint(5f)
@@ -65,7 +65,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
     val healer by DungeonClassComponent(
         ItemComponent(ItemStack(Items.potionitem.setPotionEffect(Potion.heal.name), 1, 8261)),
         Color(65, 102, 245).constraint,
-        DungeonClass.HEALER,
+        "healer",
         profileState
     ).constrain {
         x = 5.percent
@@ -77,7 +77,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
     val mage by DungeonClassComponent(
         ItemComponent(ItemStack(Items.blaze_rod)),
         Color(65, 102, 245).constraint,
-        DungeonClass.MAGE,
+        "mage",
         profileState
     ).constrain {
         x = 52.5.percent
@@ -89,7 +89,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
     val berserk by DungeonClassComponent(
         ItemComponent(ItemStack(Items.iron_sword)),
         Color(65, 102, 245).constraint,
-        DungeonClass.BERSERK,
+        "berserk",
         profileState
     ).constrain {
         x = 5.percent
@@ -101,7 +101,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
     val archer by DungeonClassComponent(
         ItemComponent(ItemStack(Items.bow)),
         Color(65, 102, 245).constraint,
-        DungeonClass.ARCHER,
+        "archer",
         profileState
     ).constrain {
         x = 52.5.percent
@@ -113,7 +113,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
     val tank by DungeonClassComponent(
         ItemComponent(ItemStack(Items.leather_chestplate)),
         Color(65, 102, 245).constraint,
-        DungeonClass.TANK,
+        "tank",
         profileState
     ).constrain {
         x = 5.percent
@@ -129,7 +129,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
     } childOf catacombs
 
     private val cataData = profileState.map {
-        it?.dungeons?.dungeons?.get("catacombs")
+        it?.dungeons?.dungeon_types?.get("catacombs")
     }
 
     private val cataXp = cataData.map {
@@ -180,13 +180,13 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
     } childOf floors
 
     val highestFloorBeaten by UIText()
-        .bindText(normalData.map { "Highest Floor Beaten: ${it?.highestCompletion?.let { if (it == 0) "Entrance" else "Floor $it" } ?: "None"}" })
+        .bindText(normalData.map { "Highest Floor Beaten: ${it?.highest_tier_completed?.let { if (it == 0) "Entrance" else "Floor $it" } ?: "None"}" })
         .constrain {
             x = 5.percent
         } childOf floorData
 
     val highestMasterFloorBeaten by UIText()
-        .bindText(masterData.map { "Highest Master Floor Beaten: ${it?.highestCompletion?.let { "Floor $it" } ?: "None"}" })
+        .bindText(masterData.map { "Highest Master Floor Beaten: ${it?.highest_tier_completed?.let { "Floor $it" } ?: "None"}" })
         .constrain {
             x = 5.percent
             y = SiblingConstraint(5f)
@@ -233,7 +233,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
         normalData.onSetValue { dungeon ->
             Window.enqueueRenderOperation {
                 normalFloorContainer.clearChildren()
-                dungeon?.highestCompletion?.let { highest ->
+                dungeon?.highest_tier_completed?.let { highest ->
                     (0..highest).forEach {
                         DungeonFloorComponent(dungeon, it, false).constrain {
                             x = CramSiblingConstraint(5f)
@@ -247,7 +247,7 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
         masterData.onSetValue { dungeon ->
             Window.enqueueRenderOperation {
                 masterFloorContainer.clearChildren()
-                dungeon?.highestCompletion?.let { highest ->
+                dungeon?.highest_tier_completed?.let { highest ->
                     (1..highest).forEach {
                         DungeonFloorComponent(dungeon, it, true).constrain {
                             x = CramSiblingConstraint(5f)

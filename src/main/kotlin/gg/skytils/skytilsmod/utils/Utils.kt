@@ -55,9 +55,6 @@ import net.minecraft.util.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.MinecraftForge
 import org.objectweb.asm.tree.MethodInsnNode
-import skytils.hylin.extension.getString
-import skytils.hylin.player.Player
-import skytils.hylin.player.rank.PackageRank
 import java.awt.Color
 import java.io.File
 import java.io.IOException
@@ -358,9 +355,6 @@ fun File.ensureFile() = (parentFile.exists() || parentFile.mkdirs()) && createNe
 fun MethodInsnNode.matches(owner: String?, name: String?, desc: String?): Boolean {
     return (owner == null || this.owner == owner) && (name == null || this.name == name) && (desc == null || this.desc == desc)
 }
-
-val Player.formattedName
-    get() = "${rankPrefix}${" ".toStringIfTrue(rank != PackageRank.NONE)}${player.getString("displayname")}"
 
 val gg.skytils.hypixel.types.player.Player.rank_prefix
     get() = when(rank) {

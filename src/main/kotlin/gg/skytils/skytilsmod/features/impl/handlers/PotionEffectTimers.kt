@@ -34,7 +34,6 @@ import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.startsWithAny
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
@@ -61,20 +60,18 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
     @SubscribeEvent
     fun onPacket(event: PacketEvent.ReceiveEvent) {
         if (!Utils.inSkyblock || Utils.inDungeons || notifications.size == 0) return
-        when (event.packet) {
-            is S02PacketChat -> {
-                val message = event.packet.chatComponent.formattedText
-                if (message.startsWithAny("§a§lBUFF! §f", "§r§aYou ate ")) {
-                    tickTimer(1) {
-                        UMessage(
-                            UTextComponent("${Skytils.prefix} §fYour potion effects have been updated! Click me to update your effect timers.").setClick(
-                                MCClickEventAction.RUN_COMMAND,
-                                "/skytilsupdatepotioneffects"
-                            )
-                        ).apply {
-                            chatLineId = -693020
-                        }.chat()
-                    }
+        if (event.packet is S02PacketChat && event.packet.type != 2.toByte()) {
+            val message = event.packet.chatComponent.formattedText
+            if (message.startsWithAny("§a§lBUFF! §f", "§r§aYou ate ")) {
+                tickTimer(1) {
+                    UMessage(
+                        UTextComponent("${Skytils.prefix} §fYour potion effects have been updated! Click me to update your effect timers.").setClick(
+                            MCClickEventAction.RUN_COMMAND,
+                            "/skytilsupdatepotioneffects"
+                        )
+                    ).apply {
+                        chatLineId = -693020
+                    }.chat()
                 }
             }
         }

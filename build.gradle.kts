@@ -21,8 +21,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm") version "1.9.20"
-    kotlin("plugin.serialization") version "1.9.20"
+    kotlin("jvm") version "1.9.21"
+    kotlin("plugin.serialization") version "1.9.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("net.kyori.blossom") version "2.0.0"
     id("io.github.juuxel.loom-quiltflower") version "1.10.0"
@@ -34,7 +34,7 @@ plugins {
     signing
 }
 
-version = "1.8.0-pre12"
+version = "1.8.1"
 group = "gg.skytils"
 
 repositories {
@@ -96,13 +96,6 @@ dependencies {
         exclude(module = "gson")
     }
 
-    shadowMeMod("com.github.Skytils:Hylin:3ad11efbc1") {
-        exclude(module = "kotlin-reflect")
-        exclude(module = "kotlin-stdlib-jdk8")
-        exclude(module = "kotlin-stdlib-jdk7")
-        exclude(module = "kotlin-stdlib")
-        exclude(module = "kotlinx-coroutines-core")
-    }
     shadowMeMod("com.github.Skytils:AsmHelper:91ecc2bd9c") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
@@ -116,6 +109,13 @@ dependencies {
 
     shadowMe(ktor("serialization-kotlinx-json"))
     shadowMe(ktor("serialization-gson"))
+
+    shadowMe("org.jetbrains.kotlinx:kotlinx-serialization-json") {
+        version {
+            strictly("[1.5.1,)")
+            prefer("1.6.2")
+        }
+    }
 
     shadowMe(ktorClient("core"))
     shadowMe(ktorClient("cio"))

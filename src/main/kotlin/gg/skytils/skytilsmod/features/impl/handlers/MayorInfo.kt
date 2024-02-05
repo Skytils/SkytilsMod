@@ -105,10 +105,10 @@ object MayorInfo {
         ) return
         if (event.container is ContainerChest) {
             val chestName = event.chestName
-            if (((chestName == "Mayor Jerry" && event.slot.slotNumber == 11) || (chestName == "Calendar and Events" || event.slot.slotNumber == 46)) && event.slot.hasStack) {
+            if (((chestName == "Mayor Jerry" && event.slot.slotNumber == 13) || (chestName == "Calendar and Events" && event.slot.slotNumber == 46)) && event.slot.hasStack) {
                 val lore = ItemUtil.getItemLore(event.slot.stack)
                 if (!lore.contains("§9Perkpocalypse Perks:")) return
-                val endingIn = lore.find { it.startsWith("§7Next set of perks in") } ?: return
+                val endingIn = lore.asReversed().find { it.startsWith("§7Next set of perks in") } ?: return
                 val perks =
                     lore.subList(lore.indexOf("§9Perkpocalypse Perks:"), lore.size - 1).filter { it.startsWith("§b") }
                         .map { it.stripControlCodes() }.ifEmpty { return }
@@ -144,7 +144,7 @@ object MayorInfo {
     }
 
     fun fetchJerryData() = Skytils.IO.launch {
-        val res = client.get("https://${Skytils.domain}/api/mayor").body<JerrySession>()
+        val res = client.get("https://${Skytils.domain}/api/mayor/jerry").body<JerrySession>()
         tickTimer(1) {
             newJerryPerks = res.nextSwitch
             jerryMayor = res.mayor
@@ -153,6 +153,10 @@ object MayorInfo {
 
     fun sendJerryData(mayor: Mayor?, nextSwitch: Long) = Skytils.IO.launch {
         if (mayor == null || nextSwitch <= System.currentTimeMillis()) return@launch
+        if (!Skytils.trustClientTime) {
+            println("Client's time isn't trusted, skip sending jerry data.")
+            return@launch
+        }
         try {
             val serverId = UUID.randomUUID().toString().replace("-".toRegex(), "")
             val commentForDecompilers =

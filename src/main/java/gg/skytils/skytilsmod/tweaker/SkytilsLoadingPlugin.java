@@ -22,7 +22,12 @@ import kotlin.KotlinVersion;
 import kotlin.text.StringsKt;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 
@@ -46,11 +51,10 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
     public static final String kotlinErrorMessage =
             "<html><p>" +
                     "Skytils has detected a mod with an older version of Kotlin.<br>" +
-                    "The most common culprit is the ChatTriggers mod.<br>" +
-                    "If you do have ChatTriggers, you can update to 1.3.2<br>" +
-                    "or later to fix the issue. https://www.chattriggers.com/<br>" +
                     "In order to resolve this conflict you must<br>" +
                     "delete the outdated mods.<br>" +
+                    "You can also try to rename Skytils to be above other mods alphabetically<br>" +
+                    "by changing Skytils.jar to !Skytils.jar<br>" +
                     "If you have already done this and are still getting this error,<br>" +
                     "or need assistance, ask for support in the Discord.";
 
@@ -122,8 +126,33 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                 String name = realFile.getName().contains(".jar") ? realFile.getName() : StringsKt.substringAfterLast(StringsKt.substringBeforeLast(file.getAbsolutePath(), ".jar", "unknown"), "/", "Unknown");
 
                 if (name.endsWith("!")) name = name.substring(0, name.length() - 1);
-
-                showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>");
+                JButton openModFolder = new JButton("Open Mod Folder");
+                openModFolder.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        try {
+                            Desktop.getDesktop().open(new File("./mods"));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+                if (realFile.getParentFile().getName().equals("essential") && name.contains("Essential")) {
+                    JButton watchVideo = new JButton("Open Tutorial Video");
+                    watchVideo.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            try {
+                                Desktop.getDesktop().browse(URI.create("https://l.skytils.gg/update-essential-video"));
+                            } catch (Exception ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    });
+                    showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>", openModFolder, watchVideo);
+                } else {
+                    showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>", openModFolder);
+                }
                 exit();
             }
             if (checkForClass("com.sky.voidchat.EDFMLLoadingPlugin")) {

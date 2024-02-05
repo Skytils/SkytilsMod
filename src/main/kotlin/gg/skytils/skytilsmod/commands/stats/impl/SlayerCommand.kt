@@ -24,9 +24,6 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.commands.stats.StatCommand
 import gg.skytils.skytilsmod.utils.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import skytils.hylin.extension.nonDashedString
 import java.util.*
 
 

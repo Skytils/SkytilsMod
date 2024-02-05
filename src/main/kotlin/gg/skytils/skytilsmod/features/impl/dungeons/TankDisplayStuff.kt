@@ -21,6 +21,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.listeners.DungeonListener
+import gg.skytils.skytilsmod.utils.DungeonClass
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.bindColor
@@ -28,7 +29,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
-import skytils.hylin.skyblock.dungeons.DungeonClass
 
 object TankDisplayStuff {
 

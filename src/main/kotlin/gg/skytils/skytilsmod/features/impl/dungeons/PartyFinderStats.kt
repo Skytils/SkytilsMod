@@ -37,7 +37,6 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.common.util.Constants
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import skytils.hylin.extension.nonDashedString
 import java.util.*
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
@@ -193,7 +192,7 @@ object PartyFinderStats {
                         val masterCompletionObj = masterCataData.tier_completions
                         component.append(
                             UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(
-                                (1..highestFloor.toInt()).map { floor ->
+                                (1..highestFloor).map { floor ->
                                     "§c§l●§4 Floor $floor: §e ${
                                         masterCompletionObj["$floor"]?.let { completions ->
                                             "$completions §7(§6S+ §e${masterCataData.fastest_time_s_plus["$floor"]?.toDuration(DurationUnit.MILLISECONDS)?.timeFormat() ?: "§cNo Comp"}§7)"

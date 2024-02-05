@@ -25,12 +25,11 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.utils.MojangUtil
+import gg.skytils.skytilsmod.utils.nonDashedString
 import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
-import skytils.hylin.extension.nonDashedString
-import java.lang.Exception
 import java.util.*
 
 abstract class StatCommand(

@@ -28,10 +28,10 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.core.API
-import gg.skytils.skytilsmod.core.tickTask
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
@@ -42,11 +42,8 @@ import kotlinx.coroutines.launch
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import skytils.hylin.extension.nonDashedString
-import skytils.hylin.skyblock.dungeons.DungeonClass
 
 object DungeonListener {
-
     val team = hashMapOf<String, DungeonTeammate>()
     val deads = hashSetOf<DungeonTeammate>()
     val missingPuzzles = hashSetOf<String>()
@@ -86,45 +83,57 @@ object DungeonListener {
     private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
     private val deathRegex = Regex("§r§c ☠ §r§7(?:You were |(?:§.)+(?<username>\\w+)§r).* and became a ghost§r§7\\.§r")
     private val reviveRegex = Regex("^§r§a ❣ §r§7(?:§.)+(?<username>\\w+)§r§a was revived")
+    private val secretsRegex = Regex("§7(?<secrets>\\d+)\\/(?<maxSecrets>\\d+) Secrets")
 
     @SubscribeEvent
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inDungeons) return
         if (event.packet is S02PacketChat) {
             val text = event.packet.chatComponent.formattedText
-            if (text == "§r§aStarting in 1 second.§r") {
-                team.clear()
-                deads.clear()
-                missingPuzzles.clear()
-                tickTimer(40) {
-                    getMembers()
+            if (event.packet.type == 2.toByte()) {
+                secretsRegex.find(text)?.destructured?.let { (secrets, maxSecrets) ->
+                    val sec = secrets.toInt()
+                    val max = maxSecrets.toInt().coerceAtLeast(sec)
+
+                    DungeonFeatures.DungeonSecretDisplay.secrets = sec
+                    DungeonFeatures.DungeonSecretDisplay.maxSecrets = max
+                }?.ifNull {
+                    DungeonFeatures.DungeonSecretDisplay.secrets = -1
+                    DungeonFeatures.DungeonSecretDisplay.maxSecrets = -1
                 }
-            } else if (text.stripControlCodes()
-                    .trim() == "> EXTRA STATS <"
-            ) {
-                if (Skytils.config.dungeonDeathCounter) {
-                    tickTimer(6) {
-                        UChat.chat("§c☠ §lDeaths:§r ${team.values.sumOf { it.deaths }}\n${
-                            team.values.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
-                                "  §c☠ ${it.playerName}:§r ${it.deaths}"
-                            }
-                        }"
-                        )
+            } else {
+                if (text == "§r§aStarting in 1 second.§r") {
+                    printDevMessage("Starting dungeon", "dungeonlistener")
+                    team.clear()
+                    deads.clear()
+                    missingPuzzles.clear()
+                } else if (text.stripControlCodes()
+                        .trim() == "> EXTRA STATS <"
+                ) {
+                    if (Skytils.config.dungeonDeathCounter) {
+                        tickTimer(6) {
+                            UChat.chat("§c☠ §lDeaths:§r ${team.values.sumOf { it.deaths }}\n${
+                                team.values.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
+                                    "  §c☠ ${it.playerName}:§r ${it.deaths}"
+                                }
+                            }"
+                            )
+                        }
                     }
+                    if (Skytils.config.autoRepartyOnDungeonEnd) {
+                        RepartyCommand.processCommand(mc.thePlayer, emptyArray())
+                    }
+                } else if (text.startsWith("§r§c ☠ ") && text.endsWith(" and became a ghost§r§7.§r")) {
+                    val match = deathRegex.find(text) ?: return
+                    val username = match.groups["username"]?.value ?: mc.thePlayer.name
+                    val teammate = team[username] ?: return
+                    markDead(teammate)
+                } else if (text.startsWith("§r§a ❣ ")) {
+                    val match = reviveRegex.find(text) ?: return
+                    val username = match.groups["username"]!!.value
+                    val teammate = team[username] ?: return
+                    markRevived(teammate)
                 }
-                if (Skytils.config.autoRepartyOnDungeonEnd) {
-                    RepartyCommand.processCommand(mc.thePlayer, emptyArray())
-                }
-            } else if (text.startsWith("§r§c ☠ ") && text.endsWith(" and became a ghost§r§7.§r")) {
-                val match = deathRegex.find(text) ?: return
-                val username = match.groups["username"]?.value ?: mc.thePlayer.name
-                val teammate = team[username] ?: return
-                markDead(teammate)
-            } else if (text.startsWith("§r§a ❣ ")) {
-                val match = reviveRegex.find(text) ?: return
-                val username = match.groups["username"]!!.value
-                val teammate = team[username] ?: return
-                markRevived(teammate)
             }
         }
     }
@@ -161,17 +170,73 @@ object DungeonListener {
         tickTimer(2, repeats = true) {
             if (Utils.inDungeons && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
                 val tabEntries = TabListUtils.tabEntries
-                val self = team[mc.thePlayer.name]
-                for (teammate in team.values) {
-                    if (tabEntries.size <= teammate.tabEntryIndex) continue
-                    val entry = tabEntries[teammate.tabEntryIndex].second
-                    if (!entry.contains(teammate.playerName)) continue
-                    teammate.player = mc.theWorld.playerEntities.find {
-                        it.name == teammate.playerName && it.uniqueID.version() == 4
+                if (team.isEmpty() || (DungeonTimer.dungeonStartTime != -1L && team.values.any { it.dungeonClass == DungeonClass.EMPTY  })) {
+                    if (tabEntries.isNotEmpty() && tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
+                        printDevMessage("Parsing party", "dungeonlistener")
+                        val partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
+                        if (partyCount != null) {
+                            println("There are $partyCount members in this party")
+                            for (i in 0..<partyCount) {
+                                val pos = 1 + i * 4
+                                val text = tabEntries[pos].second
+                                val matcher = classPattern.find(text)
+                                if (matcher == null) {
+                                    println("Skipping over entry $text due to it not matching")
+                                    continue
+                                }
+                                val name = matcher.groups["name"]!!.value
+                                if (matcher.groups["class"] != null) {
+                                    val dungeonClass = matcher.groups["class"]!!.value
+                                    val classLevel = matcher.groups["lvl"]!!.value.romanToDecimal()
+                                    println("Parsed teammate $name, they are a $dungeonClass $classLevel")
+                                    team[name] =
+                                        DungeonTeammate(
+                                            name,
+                                            DungeonClass.getClassFromName(
+                                                dungeonClass
+                                            ), classLevel,
+                                            pos
+                                        )
+                                } else {
+                                    println("Parsed teammate $name with value EMPTY, $text")
+                                    team[name] = DungeonTeammate(
+                                        name,
+                                        DungeonClass.EMPTY, 0,
+                                        pos
+                                    )
+                                }
+                            }
+                            if (partyCount != team.size) {
+                                UChat.chat("$failPrefix §cSomething isn't right! I expected $partyCount members but only got ${team.size}")
+                            }
+
+                            if (DungeonTimer.dungeonStartTime != -1L && System.currentTimeMillis() - DungeonTimer.dungeonStartTime >= 2000 && team.values.any { it.dungeonClass == DungeonClass.EMPTY }) {
+                                UChat.chat("$failPrefix §cSomething isn't right! One or more of your party members has an empty class! Could the server be lagging?")
+                            }
+
+                            if (team.isNotEmpty()) {
+                                CooldownTracker.updateCooldownReduction()
+                                checkSpiritPet()
+                            }
+                        } else {
+                            println("Couldn't get party count")
+                        }
+                    } else {
+                        println("Couldn't get party text")
                     }
-                    if (self?.dead != true) {
-                        if (entry.endsWith("§r§cDEAD§r§f)§r")) markDead(teammate)
-                        else markRevived(teammate)
+                } else {
+                    val self = team[mc.thePlayer.name]
+                    for (teammate in team.values) {
+                        if (tabEntries.size <= teammate.tabEntryIndex) continue
+                        val entry = tabEntries[teammate.tabEntryIndex].second
+                        if (!entry.contains(teammate.playerName)) continue
+                        teammate.player = mc.theWorld.playerEntities.find {
+                            it.name == teammate.playerName && it.uniqueID.version() == 4
+                        }
+                        if (self?.dead != true) {
+                            if (entry.endsWith("§r§cDEAD§r§f)§r")) markDead(teammate)
+                            else markRevived(teammate)
+                        }
                     }
                 }
             }
@@ -224,76 +289,6 @@ object DungeonListener {
         team.values.forEach {
             it.dead = false
         }
-    }
-
-    private fun getMembers() {
-        if (team.isNotEmpty() || !Utils.inDungeons) return
-        val tabEntries = TabListUtils.tabEntries
-
-        if (tabEntries.isEmpty() || !tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
-            println("Couldn't get party text")
-            tickTimer(5) {
-                getMembers()
-            }
-            return
-        }
-
-        val partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
-        if (partyCount == null) {
-            println("Couldn't get party count")
-            tickTimer(5) {
-                getMembers()
-            }
-            return
-        }
-        println("There are $partyCount members in this party")
-        var gotEmptyThisRun = false
-        for (i in 0..<partyCount) {
-            val pos = 1 + i * 4
-            val text = tabEntries[pos].second
-            val matcher = classPattern.find(text)
-            if (matcher == null) {
-                println("Skipping over entry $text due to it not matching")
-                continue
-            }
-            val name = matcher.groups["name"]!!.value
-            if (matcher.groups["class"] != null) {
-                val dungeonClass = matcher.groups["class"]!!.value
-                val classLevel = matcher.groups["lvl"]!!.value.romanToDecimal()
-                println("Parsed teammate $name, they are a $dungeonClass $classLevel")
-                team[name] =
-                    DungeonTeammate(
-                        name,
-                        DungeonClass.getClassFromName(
-                            dungeonClass
-                        ), classLevel,
-                        pos
-                    )
-            } else {
-                println("Parsed teammate $name with value EMPTY, $text")
-                team[name] = DungeonTeammate(
-                    name,
-                    DungeonClass.EMPTY, 0,
-                    pos
-                )
-
-                if (!gotEmptyThisRun) {
-                    tickTimer(5) {
-                        team.clear()
-                        getMembers()
-                    }
-                    gotEmptyThisRun = true
-                }
-            }
-        }
-        if (partyCount != team.size) {
-            UChat.chat("$failPrefix §cSomething isn't right! I expected $partyCount members but only got ${team.size}")
-        }
-        if (team.values.any { it.dungeonClass == DungeonClass.EMPTY }) {
-            UChat.chat("$failPrefix §cSomething isn't right! One or more of your party members has an empty class! Could the server be lagging?")
-        }
-        CooldownTracker.updateCooldownReduction()
-        checkSpiritPet()
     }
 
     fun checkSpiritPet() {

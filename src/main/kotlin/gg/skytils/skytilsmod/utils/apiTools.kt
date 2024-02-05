@@ -36,9 +36,6 @@ import java.util.*
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-private typealias NonDashedUUID = String
-private typealias MobName = String
-
 @Serializable
 sealed class HypixelResponse {
     abstract val success: Boolean
@@ -48,33 +45,34 @@ sealed class HypixelResponse {
 @Serializable
 data class TypesProfileResponse(
     override val success: Boolean,
-    val profiles: List<Profile>?
+    val profiles: List<Profile>? = null
 ) : HypixelResponse()
 
 @Serializable
 data class PlayerResponse(override val success: Boolean, val player: Player?) : HypixelResponse()
 
-@Serializable
-data class ProfileResponse(override val success: Boolean, val profile: SkyblockProfile) : HypixelResponse()
+enum class DungeonClass {
+    ARCHER,
+    BERSERK,
+    MAGE,
+    HEALER,
+    TANK,
+    EMPTY;
 
-@Serializable
-data class SkyblockProfile(val members: Map<NonDashedUUID, ProfileMember>)
+    val className = name.toTitleCase()
+    val apiName = name.lowercase()
 
-@Serializable
-data class ProfileMember(
-    val slayer: SlayerData
-)
+    override fun toString(): String {
+        return this.className
+    }
 
-@Serializable
-class SlayerData(
-    @SerialName("slayer_bosses")
-    val slayerBosses: Map<MobName, SlayerBoss> = emptyMap()
-)
-
-@Serializable
-data class SlayerBoss(
-    val xp: Long = 0L
-)
+    companion object {
+        fun getClassFromName(name: String): DungeonClass {
+            return name.lowercase().let { entries.find { c -> c.apiName == it } }
+                ?: throw IllegalArgumentException("No class could be found for the name $name")
+        }
+    }
+}
 
 @Serializable
 data class PetInfo(
@@ -188,8 +186,16 @@ object UUIDAsString : KSerializer<UUID> {
 @OptIn(ExperimentalEncodingApi::class)
 fun Inventory.toMCItems() =
     data.let { data ->
-        val list = CompressedStreamTools.readCompressed(Base64.decode(data).inputStream()).getTagList("i", Constants.NBT.TAG_COMPOUND)
-        (0 until list.tagCount()).map { idx ->
-            list.getCompoundTagAt(idx).takeUnless { it.hasNoTags() }?.let { ItemStack.loadItemStackFromNBT(it) }
+        if (data.isEmpty()) {
+            emptyList()
+        } else {
+            val list = CompressedStreamTools.readCompressed(Base64.decode(data).inputStream()).getTagList("i", Constants.NBT.TAG_COMPOUND)
+            (0 until list.tagCount()).map { idx ->
+                list.getCompoundTagAt(idx).takeUnless { it.hasNoTags() }?.let { ItemStack.loadItemStackFromNBT(it) }
+            }
         }
     }
+
+fun UUID.nonDashedString(): String {
+    return this.toString().replace("-", "")
+}

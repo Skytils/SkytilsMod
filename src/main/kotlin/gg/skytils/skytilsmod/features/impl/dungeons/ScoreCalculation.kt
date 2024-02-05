@@ -325,11 +325,15 @@ object ScoreCalculation {
         if (line.startsWith("Cleared: ")) {
             val matcher = dungeonClearedPattern.find(line)
             if (matcher != null) {
+                if (DungeonTimer.dungeonStartTime == -1L)
+                    DungeonTimer.dungeonStartTime = System.currentTimeMillis()
                 clearedPercentage.set(matcher.groups["percentage"]?.value?.toIntOrNull() ?: 0)
                 return
             }
         }
         if (line.startsWith("Time Elapsed:")) {
+            if (DungeonTimer.dungeonStartTime == -1L)
+                DungeonTimer.dungeonStartTime = System.currentTimeMillis()
             val matcher = timeElapsedPattern.find(line)
             if (matcher != null) {
                 val hours = matcher.groups["hrs"]?.value?.toIntOrNull() ?: 0
@@ -432,7 +436,7 @@ object ScoreCalculation {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChatReceived(event: ClientChatReceivedEvent) {
-        if (!Utils.inDungeons || mc.thePlayer == null) return
+        if (!Utils.inDungeons || mc.thePlayer == null || event.type == 2.toByte()) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.scoreCalculationReceiveAssist) {
             if (unformatted.startsWith("Party > ") || (unformatted.contains(":") && !unformatted.contains(">"))) {

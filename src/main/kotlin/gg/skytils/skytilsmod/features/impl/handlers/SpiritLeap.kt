@@ -22,13 +22,13 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
+import gg.skytils.skytilsmod.utils.DungeonClass
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
@@ -37,7 +37,6 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import skytils.hylin.skyblock.dungeons.DungeonClass
 import java.io.File
 import java.io.Reader
 import java.io.Writer
@@ -56,7 +55,7 @@ object SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
     private val nameSlotCache = HashMap<Int, String>()
 
     @SubscribeEvent
-    fun onGuiDrawPost(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onGuiDrawPost(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
             if ((Skytils.config.spiritLeapNames && event.chestName == "Spirit Leap") || (Skytils.config.reviveStoneNames && event.chestName == "Revive A Teammate") || (Skytils.config.ghostTeleportMenuNames && event.chestName == "Teleport to Player")) {

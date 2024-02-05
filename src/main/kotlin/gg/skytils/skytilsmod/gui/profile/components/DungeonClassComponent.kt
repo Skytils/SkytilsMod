@@ -20,21 +20,21 @@ package gg.skytils.skytilsmod.gui.profile.components
 
 import gg.essential.elementa.constraints.ColorConstraint
 import gg.essential.elementa.state.State
+import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.skytilsmod.utils.SkillUtils
-import skytils.hylin.skyblock.Member
-import skytils.hylin.skyblock.dungeons.DungeonClass
+import gg.skytils.skytilsmod.utils.toTitleCase
 
 class DungeonClassComponent(
     var image: ItemComponent,
     var color: ColorConstraint,
-    val dungeonClass: DungeonClass,
+    val dungeonClass: String,
     userState: State<Member?>
 ) : XPComponent(
     image,
     colorConstraint = color
 ) {
     val skillXP = userState.map { user ->
-        user?.dungeons?.classExperiences?.get(dungeonClass)
+        user?.dungeons?.player_classes?.get(dungeonClass)?.experience
     }
     val skillLevel = skillXP.map { xp ->
         SkillUtils.calcXpWithOverflowAndProgress(
@@ -51,7 +51,7 @@ class DungeonClassComponent(
     init {
         super.bindText(skillLevel.map { level ->
             "${
-                dungeonClass.className
+                dungeonClass.toTitleCase()
             } ${level.first}"
         })
         super.bindPercent(progress)
