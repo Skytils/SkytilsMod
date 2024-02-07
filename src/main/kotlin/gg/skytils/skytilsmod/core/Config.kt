@@ -3071,8 +3071,13 @@ object Config : Vigilant(
             }
         }
 
-        registerListener("darkModeMist") { _: Boolean -> mc.renderGlobal.loadRenderers() }
-        registerListener("recolorCarpets") { _: Boolean -> mc.renderGlobal.loadRenderers() }
+        setOf(
+            "darkModeMist",
+            "gardenPlotCleanupHelper",
+            "recolorCarpets"
+        ).forEach { propertyName ->
+            registerListener(propertyName) { _: Boolean -> mc.renderGlobal.loadRenderers() }
+        }
 
         registerListener("itemRarityShape") { i: Int ->
             if (i == 4 && Loader.instance().hasReachedState(LoaderState.POSTINITIALIZATION)) {
