@@ -41,6 +41,7 @@ import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import kotlinx.coroutines.launch
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DungeonListener {
@@ -79,11 +80,18 @@ object DungeonListener {
 
     val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\((?<count>[1-5])\\)§r")
     private val classPattern =
-        Regex("§r(?:§.)+(?:\\[.+] )?(?<name>\\w+?)(?:§.)* (?:§r(?:§[\\da-fklmno]){1,2}.+ )?§r§f\\(§r§d(?:(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)|§r§7EMPTY)§r§f\\)§r")
+        Regex("§r(?:§.)+(?:\\[.+] )?(?<name>\\w+?)(?:§.)* (?:§r(?:§[\\da-fklmno]){1,2}.+ )?§r§f\\(§r§d(?:(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)|§r§7EMPTY|§r§cDEAD)§r§f\\)§r")
     private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
     private val deathRegex = Regex("§r§c ☠ §r§7(?:You were |(?:§.)+(?<username>\\w+)§r).* and became a ghost§r§7\\.§r")
     private val reviveRegex = Regex("^§r§a ❣ §r§7(?:§.)+(?<username>\\w+)§r§a was revived")
     private val secretsRegex = Regex("§7(?<secrets>\\d+)\\/(?<maxSecrets>\\d+) Secrets")
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        team.clear()
+        deads.clear()
+        missingPuzzles.clear()
+    }
 
     @SubscribeEvent
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
@@ -102,12 +110,7 @@ object DungeonListener {
                     DungeonFeatures.DungeonSecretDisplay.maxSecrets = -1
                 }
             } else {
-                if (text == "§r§aStarting in 1 second.§r") {
-                    printDevMessage("Starting dungeon", "dungeonlistener")
-                    team.clear()
-                    deads.clear()
-                    missingPuzzles.clear()
-                } else if (text.stripControlCodes()
+                if (text.stripControlCodes()
                         .trim() == "> EXTRA STATS <"
                 ) {
                     if (Skytils.config.dungeonDeathCounter) {
@@ -176,6 +179,10 @@ object DungeonListener {
                         val partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
                         if (partyCount != null) {
                             println("There are $partyCount members in this party")
+                            if (team.size != partyCount) {
+                                println("Clearing team as the party size has changed ${team.size} -> $partyCount")
+                                team.clear()
+                            }
                             for (i in 0..<partyCount) {
                                 val pos = 1 + i * 4
                                 val text = tabEntries[pos].second
