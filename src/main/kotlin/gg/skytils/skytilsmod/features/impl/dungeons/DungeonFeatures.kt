@@ -844,7 +844,7 @@ object DungeonFeatures {
         var maxSecrets = -1
 
         override fun render() {
-            if (toggled && Utils.inDungeons && secrets > 0 && maxSecrets > 0) {
+            if (toggled && Utils.inDungeons && maxSecrets > 0) {
                 val leftAlign = scaleX < sr.scaledWidth / 2f
                 val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 val color = when (secrets / maxSecrets.toDouble()) {
