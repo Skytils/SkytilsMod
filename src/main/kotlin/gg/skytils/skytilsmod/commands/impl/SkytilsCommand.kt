@@ -119,7 +119,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                             DataFetcher.reloadData().invokeOnCompletion {
                                 it?.run {
                                     UChat.chat("$failPrefix §cFailed to reload repository data due to a ${it::class.simpleName ?: "error"}: ${it.message}!")
-                                }?.ifNull {
+                                }.ifNull {
                                     UChat.chat("$prefix §bRepository data has been §freloaded§b successfully.")
                                 }
                             }
@@ -132,7 +132,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                             }.invokeOnCompletion {
                                 it?.run {
                                     UChat.chat("$failPrefix §cFailed to reload mayor data due to a ${it::class.simpleName ?: "error"}: ${it.message}!")
-                                }?.ifNull {
+                                }.ifNull {
                                     UChat.chat("$prefix §bMayor data has been §freloaded§b successfully.")
                                 }
                             }

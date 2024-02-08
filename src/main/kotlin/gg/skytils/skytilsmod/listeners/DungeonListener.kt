@@ -102,16 +102,19 @@ object DungeonListener {
         if (event.packet is S02PacketChat) {
             val text = event.packet.chatComponent.formattedText
             if (event.packet.type == 2.toByte()) {
-                secretsRegex.find(text)?.destructured?.let { (secrets, maxSecrets) ->
-                    val sec = secrets.toInt()
-                    val max = maxSecrets.toInt().coerceAtLeast(sec)
+                if (Skytils.config.dungeonSecretDisplay) {
+                    secretsRegex.find(text)?.destructured?.also { (secrets, maxSecrets) ->
+                        val sec = secrets.toInt()
+                        val max = maxSecrets.toInt().coerceAtLeast(sec)
 
-                    DungeonFeatures.DungeonSecretDisplay.secrets = sec
-                    DungeonFeatures.DungeonSecretDisplay.maxSecrets = max
-                }?.ifNull {
-                    DungeonFeatures.DungeonSecretDisplay.secrets = -1
-                    DungeonFeatures.DungeonSecretDisplay.maxSecrets = -1
+                        DungeonFeatures.DungeonSecretDisplay.secrets = sec
+                        DungeonFeatures.DungeonSecretDisplay.maxSecrets = max
+                    }.ifNull {
+                        DungeonFeatures.DungeonSecretDisplay.secrets = -1
+                        DungeonFeatures.DungeonSecretDisplay.maxSecrets = -1
+                    }
                 }
+
             } else {
                 if (text.stripControlCodes()
                         .trim() == "> EXTRA STATS <"
