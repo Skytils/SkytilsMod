@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.gui
 
+import gg.essential.api.EssentialAPI
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.*
@@ -264,6 +265,18 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
         }
 
         loadWaypointsForSelection(islandDropdown.getValue(), savePrev = false)
+
+        if (hasAnyUnknownWaypoint) {
+            EssentialAPI.getNotifications()
+                .push("Unknown Island Detected", "You have waypoints on an unknown island. Would you like to transfer them to a different island?", 5f) {
+                    onAction = {
+                        mc.displayGuiScreen(null)
+                        tickTimer(2) {
+                            Skytils.displayScreen = WaypointUnknownGui()
+                        }
+                    }
+                }
+        }
     }
 
     private fun loadWaypointsForSelection(selection: Int, savePrev: Boolean = true, isClosing: Boolean = false) {

@@ -32,7 +32,6 @@ import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.features.impl.handlers.CategoryList
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoint
 import gg.skytils.skytilsmod.features.impl.handlers.WaypointCategory
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoints
@@ -42,15 +41,9 @@ import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.SkyblockIsland
 import gg.skytils.skytilsmod.utils.childContainers
-import kotlinx.serialization.encodeToString
-import org.apache.commons.codec.binary.Base64
-import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
-import org.apache.commons.compress.compressors.gzip.GzipParameters
 import java.awt.Color
-import java.io.ByteArrayOutputStream
-import java.util.zip.Deflater
 
-class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
+class WaypointUnknownGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
     companion object {
         private const val CATEGORY_INNER_VERTICAL_PADDING = 7.5
@@ -73,22 +66,16 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             height = 70.percent() + 2.pixels()
         }
 
-        val hasUnknown = Waypoints.categories.any { it.island == SkyblockIsland.Unknown }
         islandDropdown = DropDown(
             SkyblockIsland.entries.indexOfFirst {
                 SBInfo.mode == it.mode
             }.coerceAtLeast(0),
-            SkyblockIsland.entries
-                .mapNotNull { if (it == SkyblockIsland.Unknown && !hasUnknown) null else it.displayName }
+            SkyblockIsland.entries.mapNotNull { if (it == SkyblockIsland.Unknown) null else it.displayName }
         )
             .childOf(window)
             .constrain {
                 x = 5.pixels(true)
                 y = 5.percent()
-            }.also {
-                it.onValueChange { s ->
-                    loadWaypointsForSelection(s)
-                }
             }
 
         UIText("Waypoints").childOf(window).constrain {
@@ -111,14 +98,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             mc.displayGuiScreen(null)
         }
 
-        SimpleButton("Import from Clipboard").childOf(bottomButtons).constrain {
-            x = SiblingConstraint(5f)
-            y = 0.pixels()
-        }.onLeftClick {
-            importFromClipboard()
-        }
-
-        SimpleButton("Export Selected to Clipboard").childOf(bottomButtons).constrain {
+        SimpleButton("Move to Selected Island").childOf(bottomButtons).constrain {
             x = SiblingConstraint(5f)
             y = 0.pixels()
         }.onLeftClick {
@@ -127,7 +107,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
         HelpComponent(
             window,
-            "This menu is used to share waypoints with other people. To import waypoints from another person, copy the *entire* string of text to your clipboard, and then click 'Import from Clipboard'. To send waypoints to someone else, make sure the ones you want to share are selected and then click 'Export Selected to Clipboard'. Make sure the very long string of text is not cut off by any character limits, or people will not be able to import your waypoints."
+            "This menu is used to move waypoints without a known island to the correct island."
         )
 
         SimpleButton("Select All").childOf(window).constrain {
@@ -147,75 +127,64 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             }
         }
 
-        loadWaypointsForSelection(islandDropdown.getValue())
-    }
-
-    private fun importFromClipboard() {
-        runCatching {
-            val clipboard = getClipboardString()
-            val categories = Waypoints.getWaypointsFromString(clipboard)
-            Waypoints.categories.addAll(categories)
-            EssentialAPI.getNotifications().push(
-                "Waypoints Imported",
-                "Successfully imported ${categories.sumOf { it.waypoints.size }} waypoints!",
-                2.5f
-            )
-
-            PersistentSave.markDirty<Waypoints>()
-            loadWaypointsForSelection(islandDropdown.getValue())
-        }.onFailure {
-            it.printStackTrace()
-            EssentialAPI.getNotifications()
-                .push("Error", "Failed to import waypoints, reason: ${it::class.simpleName}: ${it.message}")
-        }
+        loadWaypoints()
     }
 
     private fun exportSelectedWaypoints() {
         val island = SkyblockIsland.entries[islandDropdown.getValue()]
 
-        // Convert the selected waypoints into an object that can be easily serialized
-        val categories = categoryContainers.map { entry ->
-            WaypointCategory(
-                name = entry.value.name,
-                waypoints = entry.value.container.childContainers.mapNotNull {
-                    if (entries[it]?.selected?.checked != true) null
-                    else entries[it]?.waypoint
-                }.toHashSet(),
-                isExpanded = true,
-                island = island
-            )
-        }.toSet()
-        val str = Skytils.json.encodeToString(CategoryList(categories))
-            .lines().joinToString("", transform = String::trim)
+        val newCategories = HashSet<WaypointCategory>()
+        val remainingUnknownCategories = HashSet<WaypointCategory>()
 
-        val data = Base64.encodeBase64String(ByteArrayOutputStream().use { bs ->
-            GzipCompressorOutputStream(bs, GzipParameters().apply {
-                compressionLevel = Deflater.BEST_COMPRESSION
-            }).use { gs ->
-                gs.write(str.encodeToByteArray())
+        categoryContainers.forEach { entry ->
+            entry.value.container.childContainers.partition {
+                entries[it]?.selected?.checked == true
+            }.let { (selected, unselected) ->
+                if (selected.isNotEmpty())
+                    newCategories.add(
+                        WaypointCategory(
+                            name = entry.value.name,
+                            waypoints = selected.mapNotNullTo(HashSet()) { entries[it]?.waypoint },
+                            isExpanded = true,
+                            island = island
+                        )
+                    )
+
+                if (unselected.isNotEmpty())
+                    remainingUnknownCategories.add(
+                        WaypointCategory(
+                            name = entry.value.name,
+                            waypoints = unselected.mapNotNullTo(HashSet()) { entries[it]?.waypoint },
+                            isExpanded = true,
+                            island = SkyblockIsland.Unknown
+                        )
+                    )
             }
-            bs.toByteArray()
-        })
+        }
 
+        Waypoints.categories.removeAll { it.island == SkyblockIsland.Unknown }
+        Waypoints.categories.addAll(newCategories)
+        Waypoints.categories.addAll(remainingUnknownCategories)
 
-        setClipboardString("<Skytils-Waypoint-Data>(V1):${data}")
+        PersistentSave.markDirty<Waypoints>()
 
-        val count = categories.sumOf { it.waypoints.size }
+        val count = newCategories.sumOf { it.waypoints.size }
         EssentialAPI.getNotifications()
             .push(
-                "Waypoints Exported",
-                "$count ${island.displayName} waypoints were copied to your clipboard!",
+                "Waypoints Moved",
+                "$count waypoints were moved to ${island.displayName}!",
                 2.5f
             )
+
+        loadWaypoints()
     }
 
-    private fun loadWaypointsForSelection(selection: Int) {
+    private fun loadWaypoints() {
         entries.clear()
         categoryContainers.clear()
         scrollComponent.clearChildren()
-        val island = SkyblockIsland.entries[selection]
         Waypoints.categories.filter {
-            it.island == island
+            it.island == SkyblockIsland.Unknown
         }.forEach {
             val category = addNewCategory(it.name ?: "Uncategorized")
             it.waypoints.sortedBy { w -> "${w.name} ${w.pos} ${w.enabled}" }.forEach { waypoint ->
