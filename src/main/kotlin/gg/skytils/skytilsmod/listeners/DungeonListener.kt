@@ -35,13 +35,16 @@ import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorChatComponentText
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.addSuffix
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import kotlinx.coroutines.launch
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
+import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DungeonListener {
@@ -84,7 +87,7 @@ object DungeonListener {
     private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
     private val deathRegex = Regex("§r§c ☠ §r§7(?:You were |(?:§.)+(?<username>\\w+)§r).* and became a ghost§r§7\\.§r")
     private val reviveRegex = Regex("^§r§a ❣ §r§7(?:§.)+(?<username>\\w+)§r§a was revived")
-    private val secretsRegex = Regex("§7(?<secrets>\\d+)\\/(?<maxSecrets>\\d+) Secrets")
+    private val secretsRegex = Regex("\\s*§7(?<secrets>\\d+)\\/(?<maxSecrets>\\d+) Secrets")
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
@@ -137,6 +140,19 @@ object DungeonListener {
                     val teammate = team[username] ?: return
                     markRevived(teammate)
                 }
+            }
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onChatLow(event: ClientChatReceivedEvent) {
+        if (Skytils.config.dungeonSecretDisplay && Utils.inDungeons && event.type == 2.toByte()) {
+            if (event.message is AccessorChatComponentText) {
+                (event.message as AccessorChatComponentText).text = (event.message as AccessorChatComponentText).text.replace(secretsRegex, "")
+            }
+            event.message.siblings.forEach {
+                if (it !is AccessorChatComponentText) return@forEach
+                it.text = it.text.replace(secretsRegex, "")
             }
         }
     }
