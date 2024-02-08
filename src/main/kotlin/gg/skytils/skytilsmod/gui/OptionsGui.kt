@@ -34,10 +34,11 @@ import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.openGUI
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.GuiScreen
 import java.awt.Desktop
 import java.net.URI
 
-class OptionsGui :
+class OptionsGui(val parent: GuiScreen? = null) :
     WindowScreen(ElementaVersion.V2, newGuiScale = EssentialAPI.getGuiUtil().getGuiScale()) {
 
     private val skytilsText: UIText =

@@ -116,7 +116,8 @@ import kotlin.math.abs
     name = Skytils.MOD_NAME,
     version = Skytils.VERSION,
     acceptedMinecraftVersions = "[1.8.9]",
-    clientSideOnly = true
+    clientSideOnly = true,
+    guiFactory = "gg.skytils.skytilsmod.core.ForgeGuiFactory"
 )
 class Skytils {
 
@@ -574,7 +575,9 @@ class Skytils {
     @SubscribeEvent
     fun onGuiChange(event: GuiOpenEvent) {
         val old = mc.currentScreen
-        if (event.gui == null && config.reopenOptionsMenu) {
+        if (event.gui == null && old is OptionsGui && old.parent != null) {
+            displayScreen = old.parent
+        } else if (event.gui == null && config.reopenOptionsMenu) {
             if (old is ReopenableGUI || (old is AccessorSettingsGui && old.config is Config)) {
                 tickTimer(1) {
                     if (mc.thePlayer?.openContainer == mc.thePlayer?.inventoryContainer)
