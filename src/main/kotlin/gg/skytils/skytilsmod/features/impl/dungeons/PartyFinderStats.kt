@@ -177,10 +177,10 @@ object PartyFinderStats {
                         val completionObj = cataData.tier_completions
                         component.append(
                             UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText(
-                                (0..highestFloor.toInt()).map { floor ->
-                                    "§2§l●§a Floor ${if (floor == 0) "Entrance" else floor}: §e ${
+                                (0..highestFloor).map { floor ->
+                                    "§2§l●§a Floor ${if (floor == 0) "Entrance" else floor}: §e${
                                         completionObj["$floor"]?.let { completions ->
-                                            "$completions §7(§6S+ §e${cataData.fastest_time_s_plus["$floor"]?.toDuration(DurationUnit.MILLISECONDS)?.timeFormat() ?: "§cNo Comp"}§7)"
+                                            "${completions.toInt()} §7(§6S+ §e${cataData.fastest_time_s_plus["$floor"]?.toDuration(DurationUnit.MILLISECONDS)?.timeFormat() ?: "§cNo Comp"}§7)"
                                         } ?: "§cDNF"
                                     }"
                                 }.joinToString("\n")
@@ -193,9 +193,9 @@ object PartyFinderStats {
                         component.append(
                             UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(
                                 (1..highestFloor).map { floor ->
-                                    "§c§l●§4 Floor $floor: §e ${
+                                    "§c§l●§4 Floor $floor: §e${
                                         masterCompletionObj["$floor"]?.let { completions ->
-                                            "$completions §7(§6S+ §e${masterCataData.fastest_time_s_plus["$floor"]?.toDuration(DurationUnit.MILLISECONDS)?.timeFormat() ?: "§cNo Comp"}§7)"
+                                            "${completions.toInt()} §7(§6S+ §e${masterCataData.fastest_time_s_plus["$floor"]?.toDuration(DurationUnit.MILLISECONDS)?.timeFormat() ?: "§cNo Comp"}§7)"
                                         } ?: "§cDNF"
                                     }"
                                 }.joinToString("\n")
