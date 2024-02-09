@@ -68,7 +68,7 @@ object MojangUtil {
     suspend fun getUUIDFromUsername(name: String): UUID? {
         val username = name.lowercase()
         return usernameToUuid.getIfPresent(username) ?: run {
-            makeMojangRequest("https://api.mojang.com/users/profiles/minecraft/$username").let {
+            makeMojangRequest("https://api.minecraftservices.com/minecraft/profile/lookup/name/$username").let {
                 when (it.status) {
                     HttpStatusCode.OK -> {
                         val (id, _) = it.body<ProfileResponse>()
@@ -86,7 +86,7 @@ object MojangUtil {
 
     suspend fun getUsernameFromUUID(uuid: UUID): String? {
         return uuidToUsername.getIfPresent(uuid) ?: run {
-            makeMojangRequest("https://api.mojang.com/user/profile/${uuid}").let {
+            makeMojangRequest("https://api.minecraftservices.com/minecraft/profile/lookup/${uuid}").let {
                 when (it.status) {
                     HttpStatusCode.OK -> {
                         val (_, name) = it.body<ProfileResponse>()
@@ -114,7 +114,7 @@ object MojangUtil {
      */
     private suspend fun makeMojangRequest(url: String): HttpResponse {
         if (requestCount.incrementAndGet() % 6 == 0) {
-            client.get("https://api.mojang.com/users/profiles/minecraft/SlashSlayer?ts=${System.currentTimeMillis()}")
+            client.get("https://api.minecraftservices.com/minecraft/profile/lookup/name/SlashSlayer?ts=${System.currentTimeMillis()}")
         }
         return client.get(url)
     }
