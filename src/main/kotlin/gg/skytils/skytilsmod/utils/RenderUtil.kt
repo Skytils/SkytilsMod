@@ -749,7 +749,7 @@ object RenderUtil {
      *
      * Working particularly well in RenderLivingEvent.Pre/Post<*>
      */
-    fun fixRenderPos(x: Double, y: Double, z: Double, invert: Boolean = false): Triple<Double, Double, Double> {
+    fun fixRenderPos(x: Double, y: Double, z: Double, invert: Boolean = false) : Triple<Double, Double, Double> {
         return Triple(x + getRenderX(), y + getRenderY(), z + getRenderZ())
     }
 
