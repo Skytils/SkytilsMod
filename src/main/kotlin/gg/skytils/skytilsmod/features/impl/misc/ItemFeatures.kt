@@ -84,7 +84,6 @@ import kotlin.math.pow
 
 object ItemFeatures {
 
-    private val candyPattern = Regex("§a\\((\\d+)/10\\) Pet Candy Used")
     private val headPattern =
         Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
 
