@@ -2241,6 +2241,27 @@ object Config : Vigilant(
     var fishingHookAge = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Tropy Fish Tracker",
+        description = "Tracks trophy fish caught.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var trophyFishTracker = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Trophy Fish Totals",
+        description = "Shows totals of each trophy fish.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var showTrophyFishTotals = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Total Trophy Fish",
+        description = "Shows the total of all trophy fish caught.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var showTotalTrophyFish = false
+
+    @Property(
         type = PropertyType.SELECTOR, name = "Autopet Message Hider",
         description = "Removes autopet messages from your chat.",
         category = "Pets", subcategory = "Quality of Life",
@@ -3061,6 +3082,9 @@ object Config : Vigilant(
         addDependency("includeModifiersInSellValue", "containerSellValue")
 
         addDependency("assumeWitherImpact", "witherShieldCooldown")
+
+        addDependency("showTrophyFishTotals", "trophyFishTracker")
+        addDependency("showTotalTrophyFish", "trophyFishTracker")
 
         registerListener("protectItemBINThreshold") { _: String ->
             tickTimer(1) {

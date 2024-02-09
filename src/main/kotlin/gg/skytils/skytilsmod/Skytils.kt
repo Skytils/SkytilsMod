@@ -28,6 +28,7 @@ import gg.skytils.skytilsmod.core.*
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.crimson.KuudraFeatures
+import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
 import gg.skytils.skytilsmod.features.impl.dungeons.*
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.*
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*
@@ -336,6 +337,7 @@ class Skytils {
             TicTacToeSolver,
             TreasureHunter,
             TriviaSolver,
+            TrophyFish,
             VisitorHelper,
             WaterBoardSolver,
             Waypoints,
@@ -375,6 +377,7 @@ class Skytils {
         cch.registerCommand(OrderedWaypointCommand)
         cch.registerCommand(ScamCheckCommand)
         cch.registerCommand(SlayerCommand)
+        cch.registerCommand(TrophyFishCommand)
 
         if (!cch.commands.containsKey("armorcolor")) {
             cch.registerCommand(ArmorColorCommand)
@@ -481,6 +484,8 @@ class Skytils {
             !event.isLocal && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
                 ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
         }.onFailure { it.printStackTrace() }.getOrDefault(false)
+
+        TrophyFish.loadFromApi()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
