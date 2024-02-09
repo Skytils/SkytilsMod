@@ -115,6 +115,7 @@ object MojangUtil {
     private suspend fun makeMojangRequest(url: String): HttpResponse {
         if (requestCount.incrementAndGet() % 6 == 0) {
             client.get("https://api.minecraftservices.com/minecraft/profile/lookup/name/SlashSlayer?ts=${System.currentTimeMillis()}")
+            requestCount.getAndIncrement()
         }
         return client.get(url)
     }
