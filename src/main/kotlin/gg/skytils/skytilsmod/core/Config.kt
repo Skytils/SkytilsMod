@@ -2260,6 +2260,13 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var showTotalTrophyFish = false
+    
+    @Property(
+        type = PropertyType.SWITCH, name = "Claim Own Auctions / Bazaar Orders Only",
+        description = "Prevents claiming auctions or bazaar orders made by your co-op members.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var claimOwnAHBZOnly = false
 
     @Property(
         type = PropertyType.SELECTOR, name = "Autopet Message Hider",
