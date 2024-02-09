@@ -21,6 +21,7 @@ import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
@@ -646,12 +647,11 @@ object ItemFeatures {
                     }
             }
         }
-        if (Skytils.config.showPetCandies && item.item === Items.skull) { // TODO: Use NBT
-            lore?.forEach { line ->
-                candyPattern.find(line)?.let {
-                    stackTip = it.groups[1]!!.value
-                    return@forEach
-                }
+        if (Skytils.config.showPetCandies && item.item === Items.skull) {
+            val petInfoString = getExtraAttributes(item)?.getString("petInfo")
+            if (!petInfoString.isNullOrBlank()) {
+                val petInfo = json.decodeFromString<PetInfo>(petInfoString)
+                stackTip = petInfo.candyUsed.toString()
             }
         }
         if (stackTip.isNotEmpty()) {
