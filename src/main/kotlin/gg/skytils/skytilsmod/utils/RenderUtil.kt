@@ -749,7 +749,7 @@ object RenderUtil {
      *
      * Working particularly well in RenderLivingEvent.Pre/Post<*>
      */
-    fun fixRenderPos(x: Double, y: Double, z: Double, invert: Boolean = false) : Triple<Double, Double, Double> {
+    fun fixRenderPos(x: Double, y: Double, z: Double, invert: Boolean = false): Triple<Double, Double, Double> {
         return Triple(x + getRenderX(), y + getRenderY(), z + getRenderZ())
     }
 
@@ -863,10 +863,11 @@ object RenderUtil {
     }
 
     fun drawAllInList(element: GuiElement, lines: Collection<String>) {
+        val width = lines.maxOf { ScreenRenderer.fontRenderer.getStringWidth(it) }
         val leftAlign = element.scaleX < UResolution.scaledWidth / 2f
         val alignment =
             if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
-        val xPos = if (leftAlign) 0f else element.scaleWidth
+        val xPos = if (leftAlign) 0f else width.toFloat()
         for ((i, str) in lines.withIndex()) {
             ScreenRenderer.fontRenderer.drawString(
                 str,
