@@ -582,6 +582,21 @@ object Config : Vigilant(
     var changeHurtColorOnWitherKingsDragons = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Quiver Display",
+        description = "Displays the amount of arrows in your quiver.\n§cThis won't work if your quiver has slime balls or similar items in it.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var showArrowsInQuiver = false
+
+    @Property(
+        type = PropertyType.NUMBER, name = "Restock Arrows Warning",
+        description = "Shows a warning when your quiver is about to run out of arrows. Set to 0 to disable.\n§cThis won't work if your quiver has slime balls or similar items in it.",
+        category = "Dungeons", subcategory = "Quality of Life",
+        min = 0, max = 1500, increment = 100
+    )
+    var restockArrowsWarning = 0
+
+    @Property(
         type = PropertyType.SWITCH, name = "Retexture Wither King's Dragons",
         description = "Retextures the dragons in Master Mode 7 to their respective colors.",
         category = "Dungeons", subcategory = "Quality of Life"
