@@ -688,7 +688,7 @@ object DungeonFeatures {
                 if (sound == "game.player.hurt" && pitch == 0f && volume == 0f) event.isCanceled = true
                 if (sound == "random.eat" && pitch == 0.6984127f && volume == 1f) event.isCanceled = true
             }
-            if (Skytils.config.showArrowsInQuiver && sound == "random.bow" && volume == 1f && arrowCount != -1) {
+            if (sound == "random.bow" && volume == 1f && arrowCount != -1) {
                 val extraAttr = ItemUtil.getExtraAttributes(mc.thePlayer.heldItem)
                 if (extraAttr != null) {
                     val level = when {
