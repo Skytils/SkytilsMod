@@ -39,6 +39,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.awt.Point
 import java.util.*
+import kotlin.collections.ArrayDeque
 import kotlin.math.abs
 
 object IcePathSolver {
@@ -202,7 +203,7 @@ object IcePathSolver {
         queue.addLast(Point(startX, startY))
         iceCaveColors[startY][startX] = startPoint
         while (queue.size != 0) {
-            val currPos = queue.pollFirst()
+            val currPos = queue.removeFirst()
             // traverse adjacent nodes while sliding on the ice
             for (dir in EnumFacing.HORIZONTALS) {
                 val nextPos = move(iceCave, iceCaveColors, currPos, dir)
@@ -220,7 +221,7 @@ object IcePathSolver {
                         steps.add(currPos)
                         while (tmp !== startPoint) {
                             count++
-                            tmp = iceCaveColors[tmp!!.y][tmp.x]
+                            tmp = iceCaveColors[tmp.y][tmp.x]!!
                             steps.add(tmp)
                         }
                         //System.out.println("Silverfish solved in " + count + " moves.");
