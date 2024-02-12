@@ -84,7 +84,7 @@ object DungeonFeatures {
     private val deathOrPuzzleFail =
         Regex("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
     private val jaxForgedRegex = Regex("§r§aJax forged §r§.+§r§8 x(?<amount>\\d+)§r§a.*!§r")
-    private val arrowRefillRegex = Regex("§r§aYou filled your quiver with §r§f\\d+ §r§aextra arrows!§r")
+    private val arrowRefillRegex = Regex("§r§aYou filled your quiver with §r§f(?<amount>\\d+) §r§aextra arrows!§r")
     private val clearQuiverRegex = Regex("§r§aCleared your quiver!§r")
     private val fiftyArrowsLeftRegex = Regex("§r§cYou only have 50 arrows left in your Quiver!§r")
     private val thornMissMessages = arrayOf(
@@ -130,7 +130,7 @@ object DungeonFeatures {
         "Fels",
         "Withermancer"
     )
-    private var arrowCount = -1
+    private var arrowCount = -1 // -1 = unknown, -2 = contaminated with other items
 
     init {
         DungeonSecretDisplay
@@ -396,17 +396,17 @@ object DungeonFeatures {
         val formatted = event.message.formattedText
         val unformatted = event.message.unformattedText.stripControlCodes()
 
-        if (clearQuiverRegex.containsMatchIn(formatted)) {
+        if (clearQuiverRegex.matches(formatted)) {
             arrowCount = 0
         } else if (fiftyArrowsLeftRegex.matches(formatted)) {
-            arrowCount = 50 // I think this only exists for 50 which is why it's hardcoded
-        } else if (arrowRefillRegex.matches(formatted)) {
-            arrowCount = 45 * 64 // I think it'll always fill it completely unless slimeballs or so
+            arrowCount = 50
         } else {
             val jax = jaxForgedRegex.find(formatted)?.groups?.get("amount")?.value?.toIntOrNull()
+            val refill = arrowRefillRegex.find(formatted)?.groups?.get("amount")?.value?.toIntOrNull()
+            val amount = jax ?: refill
 
-            if (jax != null) {
-                arrowCount += jax
+            if (amount != null) {
+                arrowCount += amount
             }
         }
 
@@ -685,7 +685,7 @@ object DungeonFeatures {
                 if (sound == "game.player.hurt" && pitch == 0f && volume == 0f) event.isCanceled = true
                 if (sound == "random.eat" && pitch == 0.6984127f && volume == 1f) event.isCanceled = true
             }
-            if (sound == "random.bow" && volume == 1f && arrowCount != -1) {
+            if (sound == "random.bow" && volume == 1f && arrowCount >= 0) {
                 val extraAttr = ItemUtil.getExtraAttributes(mc.thePlayer.heldItem)
                 if (extraAttr != null) {
                     val level = when {
@@ -714,8 +714,8 @@ object DungeonFeatures {
 
             if (chest != null && chest.lowerChestInventory.name == "Quiver") {
                 arrowCount = 0
-                for (slot in chest.inventorySlots) {
-                    if (!slot.hasStack || slot.stack.item == Item.getItemFromBlock(Blocks.stained_glass_pane)) continue //or Blocks.stained_glass_pane
+                for (slot in chest.inventorySlots.subList(0, 45)) {
+                    if (!slot.hasStack || slot.stack.item == Blocks.stained_glass_pane) continue
                     if (slot.stack.item == Items.arrow) {
                         arrowCount += slot.stack.stackSize
                     } else {
@@ -956,8 +956,8 @@ object DungeonFeatures {
             val leftAlign = scaleX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             val color = when {
-                arrowCount < 200 -> CommonColors.RED
-                arrowCount < 500 -> CommonColors.YELLOW
+                arrowCount < 400 -> CommonColors.RED
+                arrowCount < 800 -> CommonColors.YELLOW
                 else -> CommonColors.GREEN
             }
             val text = "Quiver: " + when (arrowCount) {
