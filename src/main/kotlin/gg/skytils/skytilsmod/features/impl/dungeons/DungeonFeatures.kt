@@ -57,6 +57,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
+import net.minecraft.item.Item
 import net.minecraft.item.ItemSkull
 import net.minecraft.network.play.server.*
 import net.minecraft.potion.Potion
@@ -82,7 +83,7 @@ import kotlin.random.Random
 object DungeonFeatures {
     private val deathOrPuzzleFail =
         Regex("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
-    private val jaxForgedRegex = Regex("§r§aJax forged §r§.+§r§8 x(?<amount>\\d+)§r§a!§r")
+    private val jaxForgedRegex = Regex("§r§aJax forged §r§.+§r§8 x(?<amount>\\d+)§r§a.*!§r")
     private val arrowRefillRegex = Regex("§r§aYou filled your quiver with §r§f\\d+ §r§aextra arrows!§r")
     private val clearQuiverRegex = Regex("§r§aCleared your quiver!§r")
     private val fiftyArrowsLeftRegex = Regex("§r§cYou only have 50 arrows left in your Quiver!§r")
@@ -405,11 +406,7 @@ object DungeonFeatures {
             val jax = jaxForgedRegex.find(formatted)?.groups?.get("amount")?.value?.toIntOrNull()
 
             if (jax != null) {
-                if (arrowCount != -1 && jax == 64) {
-                    arrowCount += 64
-                } else if (jax != 64) {
-                    arrowCount = 45 * 64 // I think it'll always fill it completely unless slimeballs or so
-                }
+                arrowCount += jax
             }
         }
 
@@ -697,6 +694,9 @@ object DungeonFeatures {
                     }
                     val randomNum = Random.nextInt(0, 100)
                     if (level <= randomNum + 1 && arrowCount > 0) {
+                        if (Skytils.config.restockArrowsWarning != 0 && arrowCount == Skytils.config.restockArrowsWarning) {
+                            GuiManager.createTitle("§cRESTOCK ARROWS", 60)
+                        }
                         arrowCount -= 1
                     }
                 }
@@ -710,15 +710,19 @@ object DungeonFeatures {
         val old = mc.currentScreen
 
         if (old is GuiChest) {
-            val chest = old.inventorySlots as? ContainerChest ?: return
-            val chestName = chest.lowerChestInventory.name
+            val chest = old.inventorySlots as? ContainerChest
 
-            if (chestName == "Quiver") {
-                arrowCount = chest.inventorySlots.map { slot ->
-                    if (slot.inventory != mc.thePlayer?.inventory && slot.hasStack && slot.slotNumber <= 44) {
-                        slot.stack.stackSize
-                    } else 0
-                }.reduce { acc, slot -> acc + slot }
+            if (chest != null && chest.lowerChestInventory.name == "Quiver") {
+                arrowCount = 0
+                for (slot in chest.inventorySlots) {
+                    if (!slot.hasStack || slot.stack.item == Item.getItemFromBlock(Blocks.stained_glass_pane)) continue //or Blocks.stained_glass_pane
+                    if (slot.stack.item == Items.arrow) {
+                        arrowCount += slot.stack.stackSize
+                    } else {
+                        arrowCount = -2
+                        break
+                    }
+                }
             }
         }
     }
@@ -795,10 +799,6 @@ object DungeonFeatures {
         blazes = 0
         hasClearedText = false
         terracottaSpawns.clear()
-
-        if (Skytils.config.restockArrowsWarning != 0 && arrowCount != -1 && arrowCount < Skytils.config.restockArrowsWarning) {
-            GuiManager.createTitle("§cRESTOCK ARROWS", 60)
-        }
     }
 
     class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", x = 0.05f, y = 0.4f) {
@@ -960,7 +960,11 @@ object DungeonFeatures {
                 arrowCount < 500 -> CommonColors.YELLOW
                 else -> CommonColors.GREEN
             }
-            val text = if (arrowCount == -1) "Quiver: Open Quiver!" else "Quiver: $arrowCount"
+            val text = "Quiver: " + when (arrowCount) {
+                -2 -> "Contaminated!"
+                -1 -> "Open Quiver!"
+                else -> arrowCount
+            }
 
             ScreenRenderer.fontRenderer.drawString(
                 text,
@@ -976,7 +980,7 @@ object DungeonFeatures {
             val leftAlign = scaleX < sr.scaledWidth / 2f
             val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
-                "Quiver: 1000",
+                "Quiver: 2000",
                 if (leftAlign) 0f else 0f + width,
                 0f,
                 CommonColors.GREEN,
@@ -988,7 +992,7 @@ object DungeonFeatures {
         override val height: Int
             get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("Quiver: 1000")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Quiver: 2000")
 
         override val toggled: Boolean
             get() = Skytils.config.showArrowsInQuiver
