@@ -130,7 +130,7 @@ object DungeonFeatures {
         "Fels",
         "Withermancer"
     )
-    private var arrowCount = -1 // -1 = unknown, -2 = contaminated with other items
+    private var arrowCount = -1
 
     init {
         DungeonSecretDisplay
@@ -685,7 +685,7 @@ object DungeonFeatures {
                 if (sound == "game.player.hurt" && pitch == 0f && volume == 0f) event.isCanceled = true
                 if (sound == "random.eat" && pitch == 0.6984127f && volume == 1f) event.isCanceled = true
             }
-            if (sound == "random.bow" && volume == 1f && arrowCount >= 0) {
+            if (sound == "random.bow" && volume == 1f && arrowCount >= 0 && mc.thePlayer.heldItem.item == Items.bow) {
                 val extraAttr = ItemUtil.getExtraAttributes(mc.thePlayer.heldItem)
                 if (extraAttr != null) {
                     val level = when {
@@ -693,7 +693,7 @@ object DungeonFeatures {
                         else -> extraAttr.getCompoundTag("enchantments")?.getInteger("infinite_quiver")?.times(3) ?: 0
                     }
                     val randomNum = Random.nextInt(0, 100)
-                    if (level <= randomNum + 1 && arrowCount > 0) {
+                    if (level <= randomNum + 1) {
                         if (Skytils.config.restockArrowsWarning != 0 && arrowCount == Skytils.config.restockArrowsWarning) {
                             GuiManager.createTitle("§cRESTOCK ARROWS", 60)
                         }
@@ -713,16 +713,13 @@ object DungeonFeatures {
             val chest = old.inventorySlots as? ContainerChest
 
             if (chest != null && chest.lowerChestInventory.name == "Quiver") {
-                arrowCount = 0
-                for (slot in chest.inventorySlots.subList(0, 45)) {
-                    if (!slot.hasStack || slot.stack.item == Blocks.stained_glass_pane) continue
-                    if (slot.stack.item == Items.arrow) {
-                        arrowCount += slot.stack.stackSize
-                    } else {
-                        arrowCount = -2
-                        break
-                    }
-                }
+                arrowCount = chest.inventorySlots.subList(0, 45).filter {
+                    it.hasStack && it.stack.item == Items.arrow
+                }.sumOf { it.stack.stackSize }
+
+                //arrowCount = chest.inventorySlots.subList(0, 45).map {
+                //    if (it.hasStack && it.stack.item == Items.arrow) it.stack.stackSize else 0
+                //}.reduce { acc, i -> acc + i }
             }
         }
     }
@@ -961,7 +958,6 @@ object DungeonFeatures {
                 else -> CommonColors.GREEN
             }
             val text = "Quiver: " + when (arrowCount) {
-                -2 -> "Contaminated!"
                 -1 -> "Open Quiver!"
                 else -> arrowCount
             }
