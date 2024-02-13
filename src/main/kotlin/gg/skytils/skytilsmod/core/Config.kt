@@ -590,7 +590,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.NUMBER, name = "Restock Arrows Warning",
-        description = "Shows a warning when your quiver is about to run out of arrows. Set to 0 to disable.",
+        description = "Shows a warning when your quiver is low on arrows. Set to 0 to disable.",
         category = "Dungeons", subcategory = "Quality of Life",
         min = 0, max = 1500, increment = 100
     )
