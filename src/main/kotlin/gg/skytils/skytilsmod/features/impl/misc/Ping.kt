@@ -92,7 +92,7 @@ object Ping {
                         }${diff.roundToPrecision(2)} §7ms"
                         UChat.chat(s)
                         UChat.chat("$prefix §aCopied ping to clipboard.")
-                        GuiScreen.setClipboardString("$prefix ${diff.roundToPrecision(2)} ms")
+                        GuiScreen.setClipboardString("Skytils » ${diff.roundToPrecision(2)} ms")
                     }
                 }
             }
