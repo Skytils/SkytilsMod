@@ -36,5 +36,6 @@ import java.util.*
 object ChiwodeDike : BaseCommand("chiwodedike") {
     override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
         UChat.chat("${Skytils.failPrefix} §c闭上你的钢门。")
+        Skytils.sendMessageQueue.add("Skytils-SC > ${Skytils.config.message270Score.ifBlank { "270 score" }}")
     }
 }

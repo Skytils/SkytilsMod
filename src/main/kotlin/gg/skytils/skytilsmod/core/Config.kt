@@ -353,9 +353,8 @@ object Config : Vigilant(
         placeholder = "Skytils > 270 score"
     )
     var message270Score = ""
-        set(value) {
-            field = PlaceHolders.replacePlaceHolder(value)
-        }
+        get() = PlaceHolders.replacePlaceHolder(field)
+
     @Property(
         type = PropertyType.SWITCH, name = "Create Title on 270 score",
         description = "Create title on 270 score.",
@@ -385,9 +384,7 @@ object Config : Vigilant(
         placeholder = "Skytils > 300 score"
     )
     var message300Score = ""
-        set(value) {
-            field = PlaceHolders.replacePlaceHolder(value)
-        }
+        get() = PlaceHolders.replacePlaceHolder(field)
 
     @Property(
         type = PropertyType.SWITCH, name = "Create Title on 300 score",
