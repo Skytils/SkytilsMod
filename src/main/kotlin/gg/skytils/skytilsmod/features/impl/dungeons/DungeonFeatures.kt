@@ -716,10 +716,6 @@ object DungeonFeatures {
                 arrowCount = chest.inventorySlots.subList(0, 45).filter {
                     it.hasStack && it.stack.item == Items.arrow
                 }.sumOf { it.stack.stackSize }
-
-                //arrowCount = chest.inventorySlots.subList(0, 45).map {
-                //    if (it.hasStack && it.stack.item == Items.arrow) it.stack.stackSize else 0
-                //}.reduce { acc, i -> acc + i }
             }
         }
     }
