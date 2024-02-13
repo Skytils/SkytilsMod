@@ -34,6 +34,7 @@ import gg.skytils.skytilsmod.gui.PotionNotificationsGui
 import gg.skytils.skytilsmod.gui.SpiritLeapNamesGui
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.utils.ModChecker
+import gg.skytils.skytilsmod.utils.PlaceHolders
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.util.ResourceLocation
@@ -352,7 +353,9 @@ object Config : Vigilant(
         placeholder = "Skytils > 270 score"
     )
     var message270Score = ""
-
+        set(value) {
+            field = PlaceHolders.replacePlaceHolder(value)
+        }
     @Property(
         type = PropertyType.SWITCH, name = "Create Title on 270 score",
         description = "Create title on 270 score.",
@@ -382,6 +385,9 @@ object Config : Vigilant(
         placeholder = "Skytils > 300 score"
     )
     var message300Score = ""
+        set(value) {
+            field = PlaceHolders.replacePlaceHolder(value)
+        }
 
     @Property(
         type = PropertyType.SWITCH, name = "Create Title on 300 score",
