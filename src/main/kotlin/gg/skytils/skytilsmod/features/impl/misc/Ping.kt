@@ -31,11 +31,13 @@ import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.hasMoved
+import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.multiplayer.ServerData
 import net.minecraft.client.network.OldServerPinger
 import net.minecraft.network.play.client.C16PacketClientStatus
 import net.minecraft.network.play.server.S01PacketJoinGame
 import net.minecraft.network.play.server.S37PacketStatistics
+import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.abs
 import kotlin.math.absoluteValue
@@ -79,17 +81,18 @@ object Ping {
                     pingCache = diff
                     if (invokedCommand) {
                         invokedCommand = false
-                        UChat.chat(
-                            "$prefix §${
-                                when {
-                                    diff < 50 -> "a"
-                                    diff < 100 -> "2"
-                                    diff < 149 -> "e"
-                                    diff < 249 -> "6"
-                                    else -> "c"
-                                }
-                            }${diff.roundToPrecision(2)} §7ms"
-                        )
+                        val s="$prefix §${
+                            when {
+                                diff < 50 -> "a"
+                                diff < 100 -> "2"
+                                diff < 149 -> "e"
+                                diff < 249 -> "6"
+                                else -> "c"
+                            }
+                        }${diff.roundToPrecision(2)} §7ms"
+                        UChat.chat(s)
+                        UChat.chat("$prefix §aCopied ping to clipboard.")
+                        GuiScreen.setClipboardString("$prefix ${diff.roundToPrecision(2)} ms")
                     }
                 }
             }
