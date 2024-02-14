@@ -33,12 +33,14 @@ import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
+import gg.skytils.skytilsmod.utils.cheats.Nametags
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.ccbluex.liquidbounce.utils.render.ColorUtils
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
@@ -584,6 +586,15 @@ object DungeonFeatures {
                                     RenderUtil.getPartialTicks()
                                 )
                             }
+                        }
+                    }
+                    if (!hasBossSpawned && Skytils.config.nametagsStarredMobs && event.entity is EntityArmorStand && event.entity.hasCustomName() && event.entity.alwaysRenderNameTag) {
+                        val name = event.entity.name
+                        if (name.startsWith("§6✯ ") && name.endsWith("§c❤")) {
+                            Nametags.renderNameTag(
+                                event.entity,
+                                ColorUtils.stripColor(event.entity.displayName.unformattedText)
+                            )
                         }
                     }
                 }

@@ -430,6 +430,14 @@ object Config : Vigilant(
     var boxStarredMobsColor = Color(0, 255, 255, 255)
 
     @Property(
+        type = PropertyType.SWITCH, name = "Nametag starred mobs",
+        description = "Makes you see starred mobs' nametags through walls.\n" +
+                "&cWARNING: This is a CHEAT feature.Use at OWN RISK.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var nametagsStarredMobs = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Box Skeleton Masters",
         description = "Draws the bounding box for Skeleton Masters.",
         category = "Dungeons", subcategory = "Quality of Life"
