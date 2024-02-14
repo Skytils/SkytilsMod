@@ -278,6 +278,7 @@ class Skytils {
             ContainerSellValue,
             CooldownTracker,
             CustomNotifications,
+            ChinaHat,
             DamageSplash,
             DungeonFeatures,
             DungeonMap,

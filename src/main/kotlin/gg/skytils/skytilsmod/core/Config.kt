@@ -249,6 +249,7 @@ object Config : Vigilant(
     )
     var noChildLeftBehind = false
 
+
     @Property(
         type = PropertyType.BUTTON, name = "Dungeon Sweat",
         description = "Click if dungeon sweat???",
@@ -1777,6 +1778,34 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Other"
     )
     var randomStuff = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "ChinaHat",
+        description = "funny thing",
+        category = "Miscellaneous", subcategory = "Sucj"
+    )
+    var chinaHat = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "ChinaHatOnly3rdPerson",
+        description = "only shows chinahat in 3rd person.",
+        category = "Miscellaneous", subcategory = "Sucj"
+    )
+    var chinaHattrd = false
+
+    @Property(
+        type = PropertyType.COLOR, name = "ChinaHatColor",
+        description = "color of chinahat.",
+        category = "Miscellaneous", subcategory = "Sucj"
+    )
+    var chinaHatColor = Color(0, 255, 255, 255)
+
+    @Property(
+        type = PropertyType.SWITCH, name = "ChinaHatRainbow",
+        description = "decide if chinahat is rainbow.",
+        category = "Miscellaneous", subcategory = "Sucj"
+    )
+    var chinaHatRainbow = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Scam Check",
