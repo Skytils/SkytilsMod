@@ -582,21 +582,6 @@ object Config : Vigilant(
     var changeHurtColorOnWitherKingsDragons = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Quiver Display",
-        description = "Displays the amount of arrows in your quiver.",
-        category = "Dungeons", subcategory = "Quality of Life"
-    )
-    var showArrowsInQuiver = false
-
-    @Property(
-        type = PropertyType.NUMBER, name = "Restock Arrows Warning",
-        description = "Shows a warning when your quiver is low on arrows. Set to 0 to disable.",
-        category = "Dungeons", subcategory = "Quality of Life",
-        min = 0, max = 1500, increment = 100
-    )
-    var restockArrowsWarning = 0
-
-    @Property(
         type = PropertyType.SWITCH, name = "Retexture Wither King's Dragons",
         description = "Retextures the dragons in Master Mode 7 to their respective colors.",
         category = "Dungeons", subcategory = "Quality of Life"
@@ -609,6 +594,21 @@ object Config : Vigilant(
         category = "Dungeons", subcategory = "Quality of Life"
     )
     var reviveStoneNames = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Quiver Display",
+        description = "Displays the amount of arrows in your quiver.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var quiverDisplay = false
+
+    @Property(
+        type = PropertyType.NUMBER, name = "Restock Arrows Warning",
+        description = "Shows a warning when your quiver is low on arrows. Set to 0 to disable.",
+        category = "Dungeons", subcategory = "Quality of Life",
+        min = 0, max = 1400, increment = 100
+    )
+    var restockArrowsWarning = 0
 
     @Property(
         type = PropertyType.SWITCH, name = "Say Blaze Done",

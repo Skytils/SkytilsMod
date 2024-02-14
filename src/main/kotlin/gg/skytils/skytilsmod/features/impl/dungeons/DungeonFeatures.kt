@@ -57,7 +57,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
-import net.minecraft.item.Item
 import net.minecraft.item.ItemSkull
 import net.minecraft.network.play.server.*
 import net.minecraft.potion.Potion
@@ -685,7 +684,7 @@ object DungeonFeatures {
                 if (sound == "game.player.hurt" && pitch == 0f && volume == 0f) event.isCanceled = true
                 if (sound == "random.eat" && pitch == 0.6984127f && volume == 1f) event.isCanceled = true
             }
-            if (sound == "random.bow" && volume == 1f && arrowCount >= 0 && mc.thePlayer.heldItem.item == Items.bow) {
+            if (sound == "random.bow" && volume == 1f && arrowCount > 0 && mc.thePlayer.heldItem.item == Items.bow) {
                 val extraAttr = ItemUtil.getExtraAttributes(mc.thePlayer.heldItem)
                 if (extraAttr != null) {
                     val level = when {
@@ -987,7 +986,7 @@ object DungeonFeatures {
             get() = ScreenRenderer.fontRenderer.getStringWidth("Quiver: 2000")
 
         override val toggled: Boolean
-            get() = Skytils.config.showArrowsInQuiver
+            get() = Skytils.config.quiverDisplay
 
         init {
             Skytils.guiManager.registerElement(this)
