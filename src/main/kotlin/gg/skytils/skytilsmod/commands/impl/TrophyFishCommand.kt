@@ -18,30 +18,53 @@
 
 package gg.skytils.skytilsmod.commands.impl
 
-import gg.essential.universal.ChatColor
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
-import gg.skytils.skytilsmod.commands.BaseCommand
+import gg.skytils.hypixel.types.skyblock.Member
+import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.commands.stats.StatCommand
+import gg.skytils.skytilsmod.core.MC
 import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.minecraft.client.entity.EntityPlayerSP
+import java.util.*
 
-object TrophyFishCommand : BaseCommand("trophy", listOf("tf", "trophyfish")) {
-    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
-        if (args.isEmpty()) {
-            UChat.chat(TrophyFish.generateTrophyFishList().joinToString("\n"))
-            return
+object TrophyFishCommand : StatCommand("trophy", aliases = listOf("tf", "trophyfish")) {
+
+    override fun displayStats(username: String, uuid: UUID, profileData: Member) {
+        Skytils.IO.launch {
+            val trophyFishData = TrophyFish.getTrophyFishData(uuid)
+            withContext(Dispatchers.MC) {
+                if (trophyFishData == null) {
+                    printMessage("${Skytils.failPrefix} §cFailed to retrieve trophy fish data for ${username}.")
+                } else printMessage("${Skytils.prefix} §bTrophy Fish for $username\n${TrophyFish.generateTrophyFishList(trophyFishData)}")
+            }
         }
-        when(args[0]) {
+    }
+
+    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
+        when(args.getOrNull(0)) {
             "reload" -> {
-                val text = UMessage("${ChatColor.BLUE}Loading data...").mutable()
+                val text = UMessage("${Skytils.prefix} §9Loading data...").mutable()
                 text.chat()
-                TrophyFish.loadFromApi()
-                text.edit("${ChatColor.BLUE}Loaded!")
+                Skytils.IO.launch {
+                    TrophyFish.loadFromApi()
+                    withContext(Dispatchers.MC) {
+                        text.edit("${Skytils.successPrefix} §aLoaded!")
+                    }
+                }
             }
             "total" -> {
-                UChat.chat(TrophyFish.generateTrophyFishList(true).joinToString("\n"))
+                UChat.chat(TrophyFish.generateLocalTrophyFishList(true).joinToString("\n"))
             }
-            else -> getCommandUsage(player)
+            null -> {
+                UChat.chat(TrophyFish.generateLocalTrophyFishList().joinToString("\n"))
+            }
+            else -> {
+                super.processCommand(player, args)
+            }
         }
     }
 }
