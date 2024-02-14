@@ -322,6 +322,7 @@ class Skytils {
             PotionEffectTimers,
             PricePaid,
             ProtectItems,
+            QuiverStuff,
             RainTimer,
             RandomStuff,
             RelicWaypoints,
@@ -494,6 +495,7 @@ class Skytils {
 
         IO.launch {
             TrophyFish.loadFromApi()
+            QuiverStuff.loadFromApi()
         }
     }
 

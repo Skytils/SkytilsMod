@@ -42,6 +42,7 @@ import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
 import gg.skytils.skytilsmod.features.impl.misc.Ping
 import gg.skytils.skytilsmod.features.impl.misc.PricePaid
+import gg.skytils.skytilsmod.features.impl.misc.QuiverStuff
 import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.*
@@ -99,6 +100,17 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 PartyFinderStats.printStats(args[1], false)
             }
 
+            "quiver" -> if (args.size == 1) {
+                UChat.chat("$prefix §b/skytils quiver <refresh>")
+            } else {
+                when (args[1].lowercase()) {
+                    "refresh" -> {
+                        QuiverStuff.loadFromApi()
+                    }
+                    else -> UChat.chat("$prefix §b/skytils quiver <refresh>")
+                }
+            }
+            
             "griffin" -> if (args.size == 1) {
                 UChat.chat("$prefix §b/skytils griffin <refresh>")
             } else {

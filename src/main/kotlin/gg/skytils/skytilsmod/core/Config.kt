@@ -596,21 +596,6 @@ object Config : Vigilant(
     var reviveStoneNames = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Quiver Display",
-        description = "Displays the amount of arrows in your quiver.",
-        category = "Dungeons", subcategory = "Quality of Life"
-    )
-    var quiverDisplay = false
-
-    @Property(
-        type = PropertyType.NUMBER, name = "Restock Arrows Warning",
-        description = "Shows a warning when your quiver is low on arrows. Set to 0 to disable.",
-        category = "Dungeons", subcategory = "Quality of Life",
-        min = 0, max = 1400, increment = 100
-    )
-    var restockArrowsWarning = 0
-
-    @Property(
         type = PropertyType.SWITCH, name = "Say Blaze Done",
         description = "Says in chat when blaze is done.",
         category = "Dungeons", subcategory = "Quality of Life"
@@ -831,7 +816,6 @@ object Config : Vigilant(
         category = "Dungeons", subcategory = "Solvers"
     )
     var creeperBeamsSolver = false
-
 
     @Property(
         type = PropertyType.SWITCH, name = "Ice Fill Solver",
@@ -2205,6 +2189,21 @@ object Config : Vigilant(
         searchTags = ["Lock"]
     )
     var protectStarredItems = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Quiver Display",
+        description = "Displays the amount of arrows in your quiver.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var quiverDisplay = false
+
+    @Property(
+        type = PropertyType.NUMBER, name = "Restock Arrows Warning",
+        description = "Shows a warning when your quiver is low on arrows. Set to 0 to disable.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        min = 0, max = 1400, increment = 100
+    )
+    var restockArrowsWarning = 0
 
     @Property(
         type = PropertyType.SWITCH, name = "Spider's Den Rain Timer",
