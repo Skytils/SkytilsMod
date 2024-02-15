@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.mixins.transformers.entity;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import gg.skytils.skytilsmod.Skytils;
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase;
 import gg.skytils.skytilsmod.mixins.hooks.entity.EntityLivingBaseHook;
 import net.minecraft.entity.Entity;
@@ -62,6 +63,24 @@ public abstract class MixinEntityLivingBase extends Entity implements ExtensionE
     private void setChildState(CallbackInfoReturnable<Boolean> cir) {
         hook.isChild(cir);
     }
+
+    /**
+     * Why do I deprecate this?
+     * Simply disabling the effect will make the player able to sprint,
+     * which should not happen when blindness effect is active,
+     * and may be considered cheating by some of the anticheats?
+     * maybe.
+     * <p>
+     * Instead, I modified the fog.
+     * see MixinEntityRenderer.java for details.
+     */
+    /*@Inject(method = "isPotionActive(Lnet/minecraft/potion/Potion;)Z", at = @At("HEAD"), cancellable = true)
+    private void isPotionActive(Potion p_isPotionActive_1_, final CallbackInfoReturnable<Boolean> callbackInfoReturnable) {
+
+
+        if((p_isPotionActive_1_ == Potion.confusion || p_isPotionActive_1_ == Potion.blindness) && Skytils.Companion.getConfig().getAntiblind())
+            callbackInfoReturnable.setReturnValue(false);
+    }*/
 
     @NotNull
     @Override

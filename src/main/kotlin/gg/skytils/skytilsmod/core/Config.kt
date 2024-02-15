@@ -1808,6 +1808,20 @@ object Config : Vigilant(
     var chinaHatRainbow = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Pearl solver",
+        description = "Shows where pearls land.",
+        category = "Miscellaneous", subcategory = "Sucj",
+    )
+    var projectiles = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Antiblind",
+        description = "Makes you immune to blind caused my potion effect/pumpkin head.",
+        category = "Miscellaneous", subcategory = "Sucj",
+    )
+    var antiblind = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Scam Check",
         description = "Check if the other party is a known scammer when trading.\nThis relies on databases not controlled by Skytils and may not contain all scammers.",
         category = "Miscellaneous", subcategory = "Other"

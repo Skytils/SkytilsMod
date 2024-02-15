@@ -338,7 +338,8 @@ class Skytils {
             VisitorHelper,
             WaterBoardSolver,
             Waypoints,
-            MouseHelperHook
+            MouseHelperHook,
+            Projectiles
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 

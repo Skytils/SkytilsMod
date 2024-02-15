@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.gui;
 
+import gg.skytils.skytilsmod.Skytils;
 import gg.skytils.skytilsmod.mixins.hooks.gui.GuiIngameHookKt;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiIngame;
@@ -60,4 +61,9 @@ public abstract class MixinGuiIngame extends Gui {
         return GuiIngameHookKt.onWorldBorder(f);
     }
 
+    @Inject(method = "renderPumpkinOverlay", at = @At("HEAD"), cancellable = true)
+    private void renderPumpkinOverlay(final CallbackInfo callbackInfo) {
+        if (Skytils.Companion.getConfig().getAntiblind())
+            callbackInfo.cancel();
+    }
 }
