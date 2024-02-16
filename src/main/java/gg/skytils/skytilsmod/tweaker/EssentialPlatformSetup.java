@@ -128,7 +128,7 @@ public class EssentialPlatformSetup {
                 });
 
                 showMessage("<html><p>" +
-                        "Your version of Skytils requires a<br>" +
+                        "Your version of Skytils (" + Reference.VERSION  + ") requires a<br>" +
                         "mandatory update before you can play!<br>" +
                         "Please download the latest version,<br>" +
                         "join the Discord for support.<br>" +
