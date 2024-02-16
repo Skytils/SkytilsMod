@@ -39,7 +39,7 @@ object TrophyFishCommand : StatCommand("trophy", aliases = listOf("tf", "trophyf
             withContext(Dispatchers.MC) {
                 if (trophyFishData == null) {
                     printMessage("${Skytils.failPrefix} §cFailed to retrieve trophy fish data for ${username}.")
-                } else printMessage("${Skytils.prefix} §bTrophy Fish for $username\n${TrophyFish.generateTrophyFishList(trophyFishData)}")
+                } else printMessage("${Skytils.prefix} §bTrophy Fish for $username\n${TrophyFish.generateTrophyFishList(trophyFishData).joinToString("\n")}")
             }
         }
     }
