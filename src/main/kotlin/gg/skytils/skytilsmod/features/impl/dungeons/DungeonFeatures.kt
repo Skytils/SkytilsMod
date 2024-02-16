@@ -588,7 +588,7 @@ object DungeonFeatures {
                             }
                         }
                     }
-                    if (!hasBossSpawned && Skytils.config.nametagsStarredMobs && event.entity is EntityArmorStand && event.entity.hasCustomName() && event.entity.alwaysRenderNameTag) {
+                    if (!hasBossSpawned && Skytils.config.nametags && Skytils.config.nametagStarred && event.entity is EntityArmorStand && event.entity.hasCustomName() && event.entity.alwaysRenderNameTag) {
                         val name = event.entity.name
                         if (name.startsWith("§6✯ ") && name.endsWith("§c❤")) {
                             Nametags.renderNameTag(

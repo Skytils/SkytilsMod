@@ -430,13 +430,7 @@ object Config : Vigilant(
     )
     var boxStarredMobsColor = Color(0, 255, 255, 255)
 
-    @Property(
-        type = PropertyType.SWITCH, name = "Nametag starred mobs",
-        description = "Makes you see starred mobs' nametags through walls.\n" +
-                "&cWARNING: This is a CHEAT feature.Use at OWN RISK.",
-        category = "Dungeons", subcategory = "Quality of Life"
-    )
-    var nametagsStarredMobs = false
+
 
     @Property(
         type = PropertyType.SWITCH, name = "Box Skeleton Masters",
@@ -1820,6 +1814,27 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Sucj",
     )
     var antiblind = true
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Nametags",
+        description = "Makes you see certain mobs.\n" +
+                "&cWARNING: This is a CHEAT feature.Use at OWN RISK.",
+        category = "Miscellaneous", subcategory = "Sucj"
+    )
+    var nametags = false
+
+    @Property(
+        type = PropertyType.CHECKBOX, name = "Nametag Starred mobs",
+        category = "Miscellaneous", subcategory = "Sucj"
+    )
+    var nametagStarred = true
+
+    @Property(
+        type = PropertyType.CHECKBOX, name = "Nametag Starred mobs",
+        category = "Miscellaneous", subcategory = "Sucj"
+    )
+    var nametagPlayers = false
+
 
     @Property(
         type = PropertyType.SWITCH, name = "Scam Check",

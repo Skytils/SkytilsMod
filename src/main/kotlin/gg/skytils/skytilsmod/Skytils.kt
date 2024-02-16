@@ -62,6 +62,7 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandle
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiStreamUnavailable
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
 import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.cheats.Nametags
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
 import io.ktor.client.*
@@ -339,7 +340,8 @@ class Skytils {
             WaterBoardSolver,
             Waypoints,
             MouseHelperHook,
-            Projectiles
+            Projectiles,
+            Nametags
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 
