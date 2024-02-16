@@ -17,6 +17,7 @@
  */
 package gg.skytils.skytilsmod.utils.graphics.colors
 
+import gg.skytils.skytilsmod.utils.Utils.colorFromString
 import gg.skytils.skytilsmod.utils.bindColor
 import java.awt.Color
 import kotlin.math.min
@@ -112,8 +113,8 @@ class CyclingTwoColorGradient(var color1: Color, var color2: Color, var speed: D
             require(string.startsWith("cyclingtwocolorgradient(") && string.endsWith(")")) { "Invalid cycling two color gradient format" }
             return try {
                 val split = string.substringAfter("cyclingtwocolorgradient(").substringBeforeLast(')').split(",")
-                val color1 = Color(split[0].toInt(), true)
-                val color2 = Color(split[1].toInt(), true)
+                val color1 = colorFromString(split[0])
+                val color2 = colorFromString(split[1])
                 val speed = split[2].toDouble()
                 val offset = split[3].toDouble()
                 CyclingTwoColorGradient(color1, color2, speed, offset)

@@ -153,6 +153,18 @@ object Utils {
         }
     }
 
+    fun colorFromString(string: String): Color {
+        return try {
+            web(string)
+        } catch (e: IllegalArgumentException) {
+            try {
+                Color(string.toInt(), true)
+            } catch (ignored: NumberFormatException) {
+                throw e
+            }
+        }
+    }
+
     private fun getCustomColorFromColor(color: Color) = CustomColor.fromInt(color.rgb)
 
     fun checkThreadAndQueue(run: () -> Unit) {
