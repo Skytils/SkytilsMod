@@ -19,14 +19,13 @@
 package gg.skytils.skytilsmod.utils
 
 import gg.essential.api.EssentialAPI
-import gg.essential.api.config.EssentialConfig
+import gg.essential.universal.UDesktop
 import gg.skytils.skytilsmod.Skytils
 import kotlinx.coroutines.launch
 import net.minecraft.client.ClientBrandRetriever
 import net.minecraftforge.common.ForgeVersion
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.Loader
-import java.awt.Desktop
 import java.awt.Image
 import java.awt.Toolkit
 import java.awt.event.MouseAdapter
@@ -71,7 +70,7 @@ object ModChecker {
                 )
             }.getOrNull()
             val discordLink = createButton("Join the Discord") {
-                Desktop.getDesktop().browse(URI("https://discord.gg/skytils"))
+                UDesktop.browse(URI("https://discord.gg/skytils"))
             }
 
             val close = createButton("Close") {

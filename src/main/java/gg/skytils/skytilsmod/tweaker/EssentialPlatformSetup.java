@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.tweaker;
 
+import gg.essential.universal.UDesktop;
 import gg.skytils.skytilsmod.Reference;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -108,7 +109,7 @@ public class EssentialPlatformSetup {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         try {
-                            Desktop.getDesktop().browse(URI.create("https://skytils.gg"));
+                            UDesktop.browse(URI.create("https://skytils.gg"));
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
@@ -120,7 +121,7 @@ public class EssentialPlatformSetup {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         try {
-                            Desktop.getDesktop().open(new File("./mods"));
+                            UDesktop.open(new File("./mods"));
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
