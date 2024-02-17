@@ -24,6 +24,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
+import gg.skytils.skytilsmod.utils.SkillUtils.level
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
@@ -650,7 +651,10 @@ object ItemFeatures {
             val petInfoString = getExtraAttributes(item)?.getString("petInfo")
             if (!petInfoString.isNullOrBlank()) {
                 val petInfo = json.decodeFromString<PetInfo>(petInfoString)
-                if (petInfo.candyUsed > 0) {
+                val level = petInfo.level
+                val maxLevel = if (petInfo.type == "GOLDEN_DRAGON") 200 else 100
+
+                if (petInfo.candyUsed > 0 && level != maxLevel) {
                     stackTip = petInfo.candyUsed.toString()
                 }
             }
