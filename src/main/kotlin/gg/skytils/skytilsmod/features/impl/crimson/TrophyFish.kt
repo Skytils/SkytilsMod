@@ -79,13 +79,20 @@ object TrophyFish {
         generateTrophyFishList(trophyFish, total)
 
     fun generateTrophyFishList(data: Map<String, Fish>, total: Boolean = false) =
-        data.entries.sortedBy { (fish, _) -> TrophyFish.entries.indexOfFirst { it.name == fish } }.mapNotNull { (fish, data) ->
-            val name = TrophyFish.entries.find { it.name == fish }?.formattedName ?: return@mapNotNull null
-            name + (if (total) " ${ChatColor.DARK_AQUA}[${ChatColor.LIGHT_PURPLE}${data.total}${ChatColor.DARK_AQUA}] " else " ${ChatColor.DARK_AQUA}» ") +
-                    "${ChatColor.DARK_GRAY}${data.bronze}${ChatColor.DARK_AQUA}-" +
-                    "${ChatColor.GRAY}${data.silver}${ChatColor.DARK_AQUA}-" +
-                    "${ChatColor.GOLD}${data.gold}${ChatColor.DARK_AQUA}-" +
-                    "${ChatColor.AQUA}${data.diamond}"
+        data.entries
+            .mapNotNull { (fish, data) -> (TrophyFish.entries.find { it.name == fish } ?: return@mapNotNull null) to data }
+            .sortedBy { (type, _) -> TrophyFish.entries.indexOf(type) }
+            .map { (type, data) ->
+                type.formattedName +
+                        if (total) {
+                            " ${ChatColor.DARK_AQUA}[${ChatColor.LIGHT_PURPLE}${data.total}${ChatColor.DARK_AQUA}] "
+                        } else {
+                            " ${ChatColor.DARK_AQUA}» "
+                        } +
+                        "${ChatColor.DARK_GRAY}${data.bronze}${ChatColor.DARK_AQUA}-" +
+                        "${ChatColor.GRAY}${data.silver}${ChatColor.DARK_AQUA}-" +
+                        "${ChatColor.GOLD}${data.gold}${ChatColor.DARK_AQUA}-" +
+                        "${ChatColor.AQUA}${data.diamond}"
         }
 
     class Fish(var bronze: Int = 0, var silver: Int = 0, var gold: Int = 0, var diamond: Int = 0) {
