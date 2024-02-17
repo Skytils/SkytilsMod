@@ -21,56 +21,60 @@ package gg.skytils.skytilsmod.features.impl.misc
 import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.UPlayer
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
-import gg.skytils.skytilsmod.utils.ItemUtil
-import gg.skytils.skytilsmod.utils.RenderUtil.renderItem
-import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
-import gg.skytils.skytilsmod.utils.nonDashedString
-import gg.skytils.skytilsmod.utils.toMCItems
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
-import kotlin.Pair
 
 object QuiverStuff {
     private val clearQuiverRegex = Regex("§r§aCleared your quiver!§r")
+
+    // Currently this gets triggered incorrectly: §r§cYou don't have any more arrows left in your Quiver!§r
+    private val emptyQuiverRegex = Regex("§r§cYour quiver is empty!§r")
     private val littleArrowsLeft = Regex("§r§cYou only have (?<amount>\\d+) arrows left in your Quiver!§r")
     private val arrowRefillRegex = Regex("§r§aYou filled your quiver with §r§f(?<amount>\\d+) §r§aextra arrows!§r")
-    private val jaxForgedRegex = Regex("§r§aJax forged §r§.(?<selected>[\\w ]+)§r§8 x(?<amount>\\d+)§r§a.*!§r")
-    private val selectedArrowRegex = Regex("§r§aYou set your selected arrow type to §r§.(?<selected>[\\w ]+)§r§a!§r")
-
-    private var newArrows = Array(45) { Pair("NONE", 0) }
-    private var selectedType = ""
-    //TODO: Add §c and such before the name
+    private val jaxForgedRegex = Regex("§r§aJax forged §r(?<type>§.[\\w -]+)§r§8 x(?<amount>\\d+)§r§a.*!§r")
+    private val selectedArrowRegex = Regex("§r§aYou set your selected arrow type to §r(?<selected>§.[\\w -]+)§r§a!§r")
+    private val resetPreferenceRegex = Regex("§r§cYour favorite arrow has been reset!§r")
     private val arrowMap = mapOf(
-        "Flint Arrow" to "ARROW",
-        "Reinforced Iron Arrow" to "REINFORCED_IRON_ARROW",
-        "Gold-tipped Arrow" to "GOLD_TIPPED_ARROW",
-        "Redstone-tipped Arrow" to "REDSTONE_TIPPED_ARROW",
-        "Emerald-tipped Arrow" to "EMERALD_TIPPED_ARROW",
-        "Bouncy Arrow" to "BOUNCY_ARROW",
-        "Icy Arrow" to "ICY_ARROW",
-        "Armorshred Arrow" to "ARMORSHRED_ARROW",
-        "Explosive Arrow" to "EXPLOSIVE_ARROW",
-        "Glue Arrow" to "GLUE_ARROW",
-        "Nansorb Arrow" to "NANSORB_ARROW",
-        "None" to "NONE"
+        "§fFlint Arrow" to "ARROW",
+        "§fReinforced Iron Arrow" to "REINFORCED_IRON_ARROW",
+        "§fGold-tipped Arrow" to "GOLD_TIPPED_ARROW",
+        "§aRedstone-tipped Arrow" to "REDSTONE_TIPPED_ARROW",
+        "§aEmerald-tipped Arrow" to "EMERALD_TIPPED_ARROW",
+        "§9Bouncy Arrow" to "BOUNCY_ARROW",
+        "§9Icy Arrow" to "ICY_ARROW",
+        "§9Armorshred Arrow" to "ARMORSHRED_ARROW",
+        "§9Explosive Arrow" to "EXPLOSIVE_ARROW",
+        "§9Glue Arrow" to "GLUE_ARROW",
+        "§9Nansorb Arrow" to "NANSORB_ARROW",
+        "§cNone" to "NONE",
+        "§cUnknown" to "UNKNOWN"
     )
+
+    private var selectedType = "UNKNOWN"
+    private var quiver = mutableListOf<Pair<String, Int>?>()
+    private var arrowCount: Int
+        get() = getArrows(if (selectedType == "NONE") "ARROW" else selectedType)
+        set(value) {
+            setArrows(value, if (selectedType == "NONE") "ARROW" else selectedType)
+        }
 
     init {
         QuiverDisplay
@@ -80,167 +84,207 @@ object QuiverStuff {
     fun loadFromApi() {
         val data =
             API.getSelectedSkyblockProfileSync(UPlayer.getUUID())?.members?.get(UPlayer.getUUID().nonDashedString())
-        selectedType = data?.itemData?.favoriteArrow?.ifBlank { "NONE" } ?: "NONE"
-        data?.inventory?.bag?.quiver?.toMCItems()?.forEachIndexed { index, it ->
-            val itemId = ItemUtil.getSkyBlockItemID(it)
-            if (it == null || it.item != Items.arrow || itemId == null) {
-                newArrows[index] = Pair("NONE", 0)
-            } else {
-                newArrows[index] = Pair(itemId, it.stackSize)
+                ?: return
+
+        selectedType = data.item_data.favorite_arrow.ifBlank { "NONE" }
+        updateArrows(data.inventory.bag.quiver.toMCItems())
+    }
+
+    private fun updateArrows(itemStacks: List<ItemStack?>) {
+        quiver = itemStacks.filter { it?.item != Item.getItemFromBlock(Blocks.stained_glass_pane) }.map {
+            if (it == null || it.item != Items.arrow) return@map null
+            val itemId = ItemUtil.getSkyBlockItemID(it) ?: return@map null
+
+            if (arrowMap.entries.find { entry -> entry.value == itemId } != null) {
+                Pair(itemId, it.stackSize)
+            } else Pair("UNKNOWN", it.stackSize)
+        }.toMutableList()
+
+        println("Quiver: \n$quiver")
+        println("Selected: $selectedType")
+        println("arrowCount: $arrowCount")
+    }
+
+    private fun getArrows(type: String): Int {
+        val currentType = arrowMap.entries.find { entry -> entry.value == type }?.value ?: "UNKNOWN"
+        return quiver.filterNotNull().map {
+            if (currentType == it.first) {
+                it.second
+            } else 0
+        }.fold(0) { acc, i -> acc + i }
+    }
+
+    private fun setArrows(amount: Int, type: String) {
+        val currentType = arrowMap.entries.find { entry -> entry.value == type }?.value ?: "UNKNOWN"
+        var amountToRemove = arrowCount - amount
+        if (amountToRemove == 0) return
+
+        println("Removing $amountToRemove arrows ($type)")
+        if (amountToRemove > 0) {
+            for (i in quiver.indices) {
+                val pair = quiver[i] ?: continue
+                if (pair.first != currentType) continue
+
+                if (pair.second > amountToRemove) {
+                    quiver[i] = Pair(pair.first, pair.second - amountToRemove)
+                    amountToRemove = 0
+                    break
+                } else {
+                    amountToRemove -= pair.second
+                    quiver[i] = null
+                }
             }
         }
+
+        var amountToAdd = -amountToRemove
+
+        if (amountToAdd > 0) {
+            for (i in quiver.indices) {
+                val pair = quiver[i] ?: continue
+                if (pair.first != currentType) continue
+
+                if (pair.second + amountToAdd <= 64) {
+                    quiver[i] = Pair(pair.first, pair.second + amountToAdd)
+                    amountToAdd = 0
+                    break
+                } else {
+                    amountToAdd -= 64 - pair.second
+                    quiver[i] = Pair(pair.first, 64)
+                }
+            }
+        }
+
+        if (amountToAdd > 0) {
+            for (i in quiver.indices) {
+                if (quiver[i] != null) continue
+                if (amountToAdd <= 64) {
+                    quiver[i] = Pair(currentType, amountToAdd)
+                    amountToAdd = 0
+                    break
+                } else {
+                    amountToAdd -= 64
+                    quiver[i] = Pair(currentType, 64)
+                }
+            }
+        }
+
+        if (amountToAdd > 0) {
+            println("Quiver is full, couldn't add $amountToAdd arrows ($currentType)")
+        }
+
+        println("Quiver: \n$quiver")
+        println("arrowCount: $arrowCount")
+        println("Selected: $selectedType;Actual $currentType")
+    }
+
+    private fun sendWarning() {
+        val text = if (selectedType == "NONE" || selectedType == "UNKNOWN") {
+            "§fArrows"
+        } else {
+            arrowMap.entries.find { type -> type.value == selectedType }?.key ?: selectedType
+        }
+        GuiManager.createTitle("§cRESTOCK $text", 60)
     }
 
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
-        val oldGui = mc.currentScreen
+        val oldGui = Skytils.mc.currentScreen
 
         ((oldGui as? GuiChest)?.inventorySlots as? ContainerChest)?.let { chest ->
-            if (chest.lowerChestInventory.name == "Quiver") {
-                chest.inventorySlots.subList(0, 45).forEachIndexed { index, it ->
-                    if (!it.hasStack || it.stack.item != Items.arrow) {
-                        newArrows[index] = Pair("NONE", 0)
-                    } else {
-                        newArrows[index] = Pair(ItemUtil.getSkyBlockItemID(it.stack) ?: "NONE", it.stack.stackSize)
-                    }
+            val chestName = chest.lowerChestInventory.name
+            val itemStacks = chest.inventorySlots.map { it.stack }
+
+            if (chestName == "Quiver") {
+                updateArrows(itemStacks.subList(0, 45))
+            } else if (chestName == "Forge Arrows") {
+                itemStacks.find { ItemUtil.getSkyBlockItemID(it) == "ARROW_SWAPPER" }?.let {
+                    val line = ItemUtil.getItemLore(it).find { lore -> lore.startsWith("§aSelected: ") }
+                    selectedType = arrowMap[line?.substringAfter("§aSelected: ")] ?: "UNKNOWN"
+                    println("Line: $line;fromMap: ${arrowMap[line?.substringAfter("§aSelected: ")]}")
+                    println("Selected: $selectedType")
                 }
             }
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type == 2.toByte()) return
+    fun onChatReceived(event: ClientChatReceivedEvent) {
+        if (event.type == 2.toByte() || !Utils.inSkyblock) return
         val formatted = event.message.formattedText
 
         clearQuiverRegex.find(formatted)?.let {
-            newArrows = Array(45) { Pair("NONE", 0) }
+            println("CLEARED")
+            quiver.clear()
         }
 
-        littleArrowsLeft.find(formatted)?.let {
-            val amount = it.groups["amount"]?.value?.toIntOrNull() ?: return@let
-            var totalAmountExcluding = 0
-            if (selectedType == "NONE") {
-                for (i in 0 until 45) {
-                    val arrow = newArrows[i]
-                    if (arrow.second == 0) continue
-                    totalAmountExcluding += arrow.second
-                    if (totalAmountExcluding > amount) {
-                        newArrows[i] = Pair(arrow.first, arrow.second - (totalAmountExcluding - amount))
-                        break
-                    } else if (totalAmountExcluding == amount) {
-                        newArrows[i] = Pair("NONE", 0)
-                        break
-                    } else {
-                        newArrows[i] = Pair("NONE", 0)
-                    }
-                }
-            } else {
-                for (i in 0 until 45) {
-                    val arrow = newArrows[i]
-                    if (arrow.first != selectedType || arrow.second == 0) continue
-                    totalAmountExcluding += arrow.second
-                    if (totalAmountExcluding > amount) {
-                        newArrows[i] = Pair(arrow.first, arrow.second - (totalAmountExcluding - amount))
-                        break
-                    } else if (totalAmountExcluding == amount) {
-                        newArrows[i] = Pair("NONE", 0)
-                        break
-                    } else {
-                        newArrows[i] = Pair("NONE", 0)
-                    }
-                }
+        emptyQuiverRegex.find(formatted)?.let {
+            if (quiver.isNotEmpty()) {
+                println("IS EMPTY")
+                quiver.clear()
             }
+        }
+
+        littleArrowsLeft.find(formatted)?.let { result ->
+            val amount = result.groups["amount"]?.value?.toIntOrNull() ?: return@let
+
+            println("LITTLE ARROWS LEFT: amount=$amount")
+            arrowCount = amount
         }
 
         arrowRefillRegex.find(formatted)?.let {
             val amount = it.groups["amount"]?.value?.toIntOrNull() ?: return@let
-            var remaining = amount
-            for (i in 0 until 45) {
-                val arrow = newArrows[i]
-                if (!Utils.equalsOneOf(arrow.first, "NONE", "ARROW") || arrow.second == 64) continue
-                val toAdd = 64 - arrow.second
-                if (toAdd >= remaining) {
-                    newArrows[i] = Pair("ARROW", arrow.second + remaining)
-                    break
-                } else {
-                    newArrows[i] = Pair("ARROW", 64)
-                    remaining -= toAdd
-                }
-            }
+
+            println("DHUB REFILL: amount=$amount")
+            setArrows(getArrows("ARROW") + amount, "ARROW")
         }
 
         jaxForgedRegex.find(formatted)?.let {
-            val selected = arrowMap[it.groups["selected"]?.value] ?: return@let
+            val forged = arrowMap[it.groups["type"]?.value] ?: "UNKNOWN"
             val amount = it.groups["amount"]?.value?.toIntOrNull() ?: return@let
-            var remaining = amount
-            for (i in 0 until 45) {
-                val arrow = newArrows[i]
-                if (!Utils.equalsOneOf(arrow.first, "NONE", selected) || arrow.second == 64) continue
-                val toAdd = 64 - arrow.second
-                if (toAdd >= remaining) {
-                    newArrows[i] = Pair(selected, arrow.second + remaining)
-                    break
-                } else {
-                    newArrows[i] = Pair(selected, 64)
-                    remaining -= toAdd
-                }
+
+            println("JAX REFILL: amount=$amount;type=$forged")
+            setArrows(getArrows(forged) + amount, forged)
+        }
+
+        selectedArrowRegex.find(formatted)?.let { result ->
+            val selected = result.groups["selected"]?.value
+            selectedType = arrowMap.entries.find { it.key.substring(2) == selected?.substring(2) }?.value ?: "UNKNOWN"
+
+            println("SELECTED ARROW: selected=$selectedType")
+            if (Skytils.config.restockArrowsWarning != 0 && arrowCount < Skytils.config.restockArrowsWarning) {
+                sendWarning()
             }
         }
 
-        selectedArrowRegex.find(formatted)?.let {
-            selectedType = arrowMap[it.groups["selected"]?.value] ?: return@let
-
-            val selectedArrowCount =
-                newArrows.filter { arrow -> arrow.first == selectedType || selectedType == "NONE" }.sumOf { arrow ->
-                    arrow.second
-                }
-
-            if (Skytils.config.restockArrowsWarning != 0 && selectedArrowCount < Skytils.config.restockArrowsWarning) {
-                GuiManager.createTitle(
-                    "§cRESTOCK ${arrowMap.entries.find { type -> type.value == selectedType }?.key?.plus("s") ?: selectedType}",
-                    60
-                )
-            }
+        resetPreferenceRegex.find(formatted)?.let {
+            println("RESET PREFERENCE")
+            selectedType = "NONE"
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
-        if (!Utils.inSkyblock || event.packet !is S29PacketSoundEffect) return
-        val packet = event.packet
-        val sound = packet.soundName
-        val volume = packet.volume
-        val selectedArrowCount = newArrows.filter { arrow -> arrow.first == selectedType || selectedType == "NONE" }
-            .sumOf { arrow -> arrow.second }
+        if (!Utils.inSkyblock) return
+        if (event.packet is S29PacketSoundEffect) {
+            val packet = event.packet
+            val sound = packet.soundName
+            val volume = packet.volume
 
-        if (sound == "random.bow" && volume == 1f && selectedArrowCount > 0 && mc.thePlayer.heldItem.item == Items.bow) {
-            val extraAttr = ItemUtil.getExtraAttributes(mc.thePlayer.heldItem)
-            if (extraAttr != null) {
-                val level = when {
-                    mc.thePlayer.isSneaking -> 0
-                    else -> extraAttr.getCompoundTag("enchantments")?.getInteger("infinite_quiver")?.times(3) ?: 0
-                }
-                val randomNum = Random.nextInt(0, 100)
-                if (level <= randomNum + 1) {
-                    if (Skytils.config.restockArrowsWarning != 0 && selectedArrowCount == Skytils.config.restockArrowsWarning) {
-                        GuiManager.createTitle(
-                            "§cRESTOCK ${arrowMap.entries.find { it.value == selectedType }?.key?.plus("s") ?: selectedType}",
-                            60
-                        )
+            if (sound == "random.bow" && volume == 1f && arrowCount > 0 && Skytils.mc.thePlayer.heldItem.item == Items.bow) {
+                val extraAttr = ItemUtil.getExtraAttributes(Skytils.mc.thePlayer.heldItem)
+                if (extraAttr != null) {
+                    val level = when {
+                        Skytils.mc.thePlayer.isSneaking -> 0
+                        else -> extraAttr.getCompoundTag("enchantments")?.getInteger("infinite_quiver")?.times(3) ?: 0
                     }
-
-                    for (i in 0 until 45) {
-                        val arrow = newArrows[i]
-                        if (arrow.first == selectedType) {
-                            if (arrow.second == 1) {
-                                newArrows[i] = Pair("NONE", 0)
-                                break
-                            } else {
-                                newArrows[i] = Pair(selectedType, arrow.second - 1)
-                                break
-                            }
+                    val randomNum = Random.nextInt(0, 100)
+                    if (level <= randomNum + 1) {
+                        if (Skytils.config.restockArrowsWarning != 0 && arrowCount == Skytils.config.restockArrowsWarning) {
+                            sendWarning()
                         }
+
+                        println("SHOOTING ARROW")
+                        arrowCount--
                     }
                 }
             }
@@ -252,23 +296,22 @@ object QuiverStuff {
 
         override fun render() {
             if (!toggled || !Utils.inSkyblock) return
-            val arrowCount = newArrows.filter { arrow -> arrow.first == selectedType || selectedType == "NONE" }
-                .sumOf { arrow -> arrow.second }
+            val temp = arrowCount
 
             val color = when {
-                arrowCount < 400 -> CommonColors.RED
-                arrowCount < 1200 -> CommonColors.YELLOW
+                temp < 400 -> CommonColors.RED
+                temp < 1200 -> CommonColors.YELLOW
                 else -> CommonColors.GREEN
             }
 
-            renderItem(arrowItem, 0, 0)
+            RenderUtil.renderItem(arrowItem, 0, 0)
             ScreenRenderer.fontRenderer.drawString(
-                arrowCount.toString(), 20f, 5f, color, SmartFontRenderer.TextAlignment.LEFT_RIGHT, textShadow
+                temp.toString(), 20f, 5f, color, SmartFontRenderer.TextAlignment.LEFT_RIGHT, textShadow
             )
         }
 
         override fun demoRender() {
-            renderItem(arrowItem, 0, 0)
+            RenderUtil.renderItem(arrowItem, 0, 0)
             ScreenRenderer.fontRenderer.drawString(
                 "2000", 20f, 5f, CommonColors.GREEN, SmartFontRenderer.TextAlignment.LEFT_RIGHT, textShadow
             )
@@ -292,8 +335,8 @@ object QuiverStuff {
             if (!toggled || !Utils.inSkyblock) return
             val alignment =
                 if (scaleX < UResolution.scaledWidth / 2f) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
-            val text =
-                "Selected: §r${arrowMap.entries.find { it.value == selectedType && it.value != "NONE" }?.key?.plus("s") ?: if (selectedType == "NONE") "None" else selectedType}"
+            val selected = arrowMap.entries.find { it.value == selectedType }?.key ?: "§cUnknown"
+            val text = "Selected: §r$selected"
 
             ScreenRenderer.fontRenderer.drawString(
                 text,
@@ -310,7 +353,7 @@ object QuiverStuff {
             val alignment =
                 if (scaleX < UResolution.scaledWidth / 2f) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
             ScreenRenderer.fontRenderer.drawString(
-                "Selected: §rSkytils Arrow",
+                "Selected: Redstone-tipped Arrow",
                 if (scaleX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
                 0f,
                 CommonColors.GREEN,
@@ -322,7 +365,7 @@ object QuiverStuff {
         override val height: Int
             get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("Selected: Skytils Arrow")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Selected: Redstone-tipped Arrow")
         override val toggled: Boolean
             get() = Skytils.config.showSelectedArrowDisplay
 

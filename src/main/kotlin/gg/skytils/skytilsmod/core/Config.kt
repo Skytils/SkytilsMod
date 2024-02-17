@@ -2201,7 +2201,7 @@ object Config : Vigilant(
         type = PropertyType.NUMBER, name = "Restock Arrows Warning",
         description = "Shows a warning when your quiver is low on arrows. Set to 0 to disable.",
         category = "Miscellaneous", subcategory = "Quality of Life",
-        min = 0, max = 1400, increment = 100
+        min = 0, max = 1200, increment = 100
     )
     var restockArrowsWarning = 0
 
