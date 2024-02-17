@@ -34,7 +34,7 @@ import java.util.UUID
 
 object TrophyFish {
     private val trophyFish = mutableMapOf<String, Fish>()
-    private val trophyFishRegex = Regex("TROPHY FISH! You caught an? (\\w+) (BRONZE|SILVER|GOLD|DIAMOND)\\.")
+    private val trophyFishRegex = Regex("TROPHY FISH! You caught an? ([\\w ]+) (BRONZE|SILVER|GOLD|DIAMOND)\\.")
 
 
     init {
