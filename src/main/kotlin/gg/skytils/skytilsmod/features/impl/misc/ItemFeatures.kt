@@ -650,7 +650,9 @@ object ItemFeatures {
             val petInfoString = getExtraAttributes(item)?.getString("petInfo")
             if (!petInfoString.isNullOrBlank()) {
                 val petInfo = json.decodeFromString<PetInfo>(petInfoString)
-                stackTip = petInfo.candyUsed.toString()
+                if (petInfo.candyUsed > 0) {
+                    stackTip = petInfo.candyUsed.toString()
+                }
             }
         }
         if (stackTip.isNotEmpty()) {
