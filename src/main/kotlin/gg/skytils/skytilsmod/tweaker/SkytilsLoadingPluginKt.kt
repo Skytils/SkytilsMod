@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.tweaker
 
 import SkytilsInstallerFrame
+import gg.essential.universal.UDesktop
 import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.asm.SkytilsTransformer
 import gg.skytils.skytilsmod.tweaker.TweakerUtil.exit
@@ -37,7 +38,6 @@ import net.minecraftforge.common.ForgeVersion
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
 import org.spongepowered.asm.launch.MixinBootstrap
 import org.spongepowered.asm.mixin.MixinEnvironment
-import java.awt.Desktop
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
@@ -95,14 +95,14 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
                                         .exec("\"$runtime\" -jar \"${forgeFile.canonicalPath}\"")
                                     exit()
                                 } else {
-                                    Desktop.getDesktop().browse(forgeUri)
+                                    UDesktop.browse(forgeUri)
                                 }
                             }
                         }.onFailure {
                             it.printStackTrace()
-                            Desktop.getDesktop().browse(forgeUri)
+                            UDesktop.browse(forgeUri)
                         }
-                    } else Desktop.getDesktop().browse(forgeUri)
+                    } else UDesktop.browse(forgeUri)
                 }
                 showMessage(
                     """
@@ -119,7 +119,7 @@ class SkytilsLoadingPluginKt : IFMLLoadingPlugin {
                     .any { it.name.startsWith("club.sk1er.patcher") }
             ) {
                 val sk1erClubButton = createButton("Go to Sk1er.Club") {
-                    Desktop.getDesktop().browse(URL("https://sk1er.club/mods/patcher").toURI())
+                    UDesktop.browse(URL("https://sk1er.club/mods/patcher").toURI())
                 }
                 showMessage(
                     """

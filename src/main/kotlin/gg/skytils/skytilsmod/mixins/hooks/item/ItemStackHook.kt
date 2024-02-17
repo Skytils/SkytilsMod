@@ -67,7 +67,7 @@ fun modifyDisplayName(s: String): String {
                         displayName.replace(starPattern, "")
                             .replace(masterStarPattern, "")
                     }§c${count}✪"
-                }?.ifNull {
+                }.ifNull {
                     displayName = "${displayName.replace(starPattern, "")}§6${displayName.countMatches(starPattern)}✪"
                 }
             } else if (Skytils.config.starDisplayType == 1) {

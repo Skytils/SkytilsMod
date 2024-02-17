@@ -18,18 +18,22 @@
 package gg.skytils.skytilsmod.gui
 
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.IO
+import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.core.UpdateChecker
 import gg.skytils.skytilsmod.utils.MathUtil
+import io.ktor.client.plugins.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.util.cio.*
+import io.ktor.utils.io.*
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.launch
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.util.EnumChatFormatting
 import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
-import java.net.HttpURLConnection
-import java.net.URL
-import java.net.URLDecoder
-import kotlin.concurrent.thread
 import kotlin.math.floor
 
 /**
@@ -47,7 +51,7 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
     }
 
     private var backButton: GuiButton? = null
-    private var progress = 0f
+    private var progress = 0.0
     override fun initGui() {
         buttonList.add(GuiButton(0, width / 2 - 100, height / 3 * 2, 200, 20, "").also { backButton = it })
         updateText()
@@ -58,7 +62,7 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
             val directory = File(Skytils.modDir, "updates")
             val url = UpdateChecker.updateDownloadURL
             val jarName = UpdateChecker.getJarNameFromUrl(url)
-            thread(name = "Skytils-update-downloader-thread") {
+            IO.launch(CoroutineName("Skytils-update-downloader-thread")) {
                 downloadUpdate(url, directory)
                 if (!failed) {
                     UpdateChecker.scheduleCopyUpdateAtShutdown(jarName)
@@ -78,18 +82,20 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
         backButton!!.displayString = if (failed || complete) "Back" else "Cancel"
     }
 
-    private fun downloadUpdate(url: String, directory: File) {
+    private suspend fun downloadUpdate(urlString: String, directory: File) {
         try {
-            val st = URL(url).openConnection() as HttpURLConnection
-            st.setRequestProperty(
-                "User-Agent",
-                "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2"
-            )
-            st.connect()
-            if (st.responseCode != HttpURLConnection.HTTP_OK) {
+            val url = Url(urlString)
+
+            val st = client.get(url) {
+                expectSuccess = false
+                onDownload { bytesSentTotal, contentLength ->
+                    progress = bytesSentTotal / contentLength.toDouble()
+                }
+            }
+            if (st.status != HttpStatusCode.OK) {
                 failed = true
                 updateText()
-                println("$url returned status code ${st.responseCode}")
+                println("$url returned status code ${st.status}")
                 return
             }
             if (!directory.exists() && !directory.mkdirs()) {
@@ -98,33 +104,12 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
                 println("Couldn't create update file directory")
                 return
             }
-            val urlParts = url.split("/".toRegex()).toTypedArray()
-            val fileLength = st.contentLength.toFloat()
-            val fileSaved = File(directory, URLDecoder.decode(urlParts[urlParts.size - 1], "UTF-8"))
-            val fis = st.inputStream
-            val fos: OutputStream = FileOutputStream(fileSaved)
-            val data = ByteArray(1024)
-            var total: Long = 0
-            var count: Int
-            while (fis.read(data).also { count = it } != -1) {
-                if (mc.currentScreen != this@UpdateGui) {
-                    // Cancelled
-                    fos.close()
-                    fis.close()
-                    failed = true
-                    return
-                }
-                total += count.toLong()
-                progress = total / fileLength
-                fos.write(data, 0, count)
-            }
-            fos.flush()
-            fos.close()
-            fis.close()
-            if (mc.currentScreen !== this@UpdateGui) {
+            val fileSaved = File(directory, url.pathSegments.last().decodeURLPart())
+            if (mc.currentScreen !== this@UpdateGui || st.bodyAsChannel().copyTo(fileSaved.writeChannel()) == 0L) {
                 failed = true
                 return
             }
+            println("Downloaded update to $fileSaved")
         } catch (ex: Exception) {
             ex.printStackTrace()
             failed = true

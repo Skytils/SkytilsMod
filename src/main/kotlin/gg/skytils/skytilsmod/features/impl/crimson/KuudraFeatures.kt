@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.misc
+package gg.skytils.skytilsmod.features.impl.crimson
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent

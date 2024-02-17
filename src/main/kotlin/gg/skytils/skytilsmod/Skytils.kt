@@ -27,6 +27,8 @@ import gg.skytils.skytilsmod.commands.stats.impl.SlayerCommand
 import gg.skytils.skytilsmod.core.*
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
+import gg.skytils.skytilsmod.features.impl.crimson.KuudraFeatures
+import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
 import gg.skytils.skytilsmod.features.impl.dungeons.*
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.*
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*
@@ -115,7 +117,8 @@ import kotlin.math.abs
     name = Skytils.MOD_NAME,
     version = Skytils.VERSION,
     acceptedMinecraftVersions = "[1.8.9]",
-    clientSideOnly = true
+    clientSideOnly = true,
+    guiFactory = "gg.skytils.skytilsmod.core.ForgeGuiFactory"
 )
 class Skytils {
 
@@ -334,6 +337,7 @@ class Skytils {
             TicTacToeSolver,
             TreasureHunter,
             TriviaSolver,
+            TrophyFish,
             VisitorHelper,
             WaterBoardSolver,
             Waypoints,
@@ -373,6 +377,7 @@ class Skytils {
         cch.registerCommand(OrderedWaypointCommand)
         cch.registerCommand(ScamCheckCommand)
         cch.registerCommand(SlayerCommand)
+        cch.registerCommand(TrophyFishCommand)
 
         if (!cch.commands.containsKey("armorcolor")) {
             cch.registerCommand(ArmorColorCommand)
@@ -479,6 +484,10 @@ class Skytils {
             !event.isLocal && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
                 ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
         }.onFailure { it.printStackTrace() }.getOrDefault(false)
+
+        IO.launch {
+            TrophyFish.loadFromApi()
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -573,7 +582,9 @@ class Skytils {
     @SubscribeEvent
     fun onGuiChange(event: GuiOpenEvent) {
         val old = mc.currentScreen
-        if (event.gui == null && config.reopenOptionsMenu) {
+        if (event.gui == null && old is OptionsGui && old.parent != null) {
+            displayScreen = old.parent
+        } else if (event.gui == null && config.reopenOptionsMenu) {
             if (old is ReopenableGUI || (old is AccessorSettingsGui && old.config is Config)) {
                 tickTimer(1) {
                     if (mc.thePlayer?.openContainer == mc.thePlayer?.inventoryContainer)
