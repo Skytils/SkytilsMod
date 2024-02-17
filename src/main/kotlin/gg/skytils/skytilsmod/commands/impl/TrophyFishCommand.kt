@@ -20,26 +20,35 @@ package gg.skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
-import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.commands.stats.StatCommand
+import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.core.MC
 import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
+import gg.skytils.skytilsmod.utils.MojangUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.client.entity.EntityPlayerSP
-import java.util.*
 
-object TrophyFishCommand : StatCommand("trophy", aliases = listOf("tf", "trophyfish")) {
+object TrophyFishCommand : BaseCommand("trophy", aliases = listOf("tf", "trophyfish")) {
 
-    override fun displayStats(username: String, uuid: UUID, profileData: Member) {
+    fun displayStats(username: String, total: Boolean) {
+        val message = UMessage("${Skytils.prefix} §9Loading trophy fish data for ${username}.").mutable()
         Skytils.IO.launch {
+            val uuid = MojangUtil.getUUIDFromUsername(username) ?: run {
+                message.edit("${Skytils.failPrefix} §cFailed to find minecraft player \"$username\".")
+                return@launch
+            }
             val trophyFishData = TrophyFish.getTrophyFishData(uuid)
             withContext(Dispatchers.MC) {
                 if (trophyFishData == null) {
-                    printMessage("${Skytils.failPrefix} §cFailed to retrieve trophy fish data for ${username}.")
-                } else printMessage("${Skytils.prefix} §bTrophy Fish for $username\n${TrophyFish.generateTrophyFishList(trophyFishData).joinToString("\n")}")
+                    message.edit("${Skytils.failPrefix} §cFailed to retrieve trophy fish data for ${username}.")
+                } else message.edit("${Skytils.prefix} §bTrophy Fish for $username\n" +
+                        TrophyFish.generateTrophyFishList(trophyFishData, total).joinToString("\n") +
+                        if (total) {
+                            "\n" + TrophyFish.generateTotalTrophyFish(trophyFishData)
+                        } else ""
+                )
             }
         }
     }
@@ -57,13 +66,18 @@ object TrophyFishCommand : StatCommand("trophy", aliases = listOf("tf", "trophyf
                 }
             }
             "total" -> {
-                UChat.chat(TrophyFish.generateLocalTrophyFishList(true).joinToString("\n"))
+                UChat.chat(
+                    TrophyFish.generateLocalTrophyFishList(true).joinToString("\n") +
+                            "\n" + TrophyFish.generateLocalTotalTrophyFish()
+                )
             }
             null -> {
-                UChat.chat(TrophyFish.generateLocalTrophyFishList().joinToString("\n"))
+                UChat.chat(
+                    TrophyFish.generateLocalTrophyFishList(false).joinToString("\n")
+                )
             }
             else -> {
-                super.processCommand(player, args)
+                displayStats(args[0], "total" in args.map(String::lowercase))
             }
         }
     }

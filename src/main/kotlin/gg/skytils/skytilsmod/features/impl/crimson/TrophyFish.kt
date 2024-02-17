@@ -95,6 +95,14 @@ object TrophyFish {
                         "${ChatColor.AQUA}${data.diamond}"
         }
 
+    fun generateLocalTotalTrophyFish() =
+        generateTotalTrophyFish(trophyFish)
+
+    fun generateTotalTrophyFish(data: Map<String, Fish>) =
+        "${ChatColor.LIGHT_PURPLE}Total ${ChatColor.DARK_AQUA}» ${ChatColor.LIGHT_PURPLE}" + data.values.fold(0) { acc, fish ->
+            acc + fish.total
+        }
+
     class Fish(var bronze: Int = 0, var silver: Int = 0, var gold: Int = 0, var diamond: Int = 0) {
         val total: Int
             get() = bronze + silver + gold + diamond
@@ -140,9 +148,7 @@ object TrophyFish {
             }
             if (Config.showTotalTrophyFish) {
                 fr.drawString(
-                    "${ChatColor.LIGHT_PURPLE}Total ${ChatColor.DARK_AQUA}» ${ChatColor.LIGHT_PURPLE}" + trophyFish.values.fold(0) { acc, e ->
-                        acc + e.total
-                    },
+                    generateLocalTotalTrophyFish(),
                     0f,
                     (trophyFish.size * fr.FONT_HEIGHT).toFloat(),
                     CommonColors.WHITE,
