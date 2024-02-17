@@ -41,6 +41,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 import java.awt.Point
 import java.util.*
+import kotlin.collections.ArrayDeque
 import kotlin.random.Random
 
 object AlignmentTaskSolver {
@@ -286,8 +287,8 @@ object AlignmentTaskSolver {
         ) { arrayOfNulls<Point>(grid[0].size) }
         queue.addLast(start)
         gridCopy[start.y][start.x] = start
-        while (queue.size != 0) {
-            val currPos = queue.pollFirst()!!
+        while (queue.isNotEmpty()) {
+            val currPos = queue.removeFirst()
             // traverse adjacent nodes while sliding on the ice
             for (dir in directions) {
                 val nextPos = move(grid, gridCopy, currPos, dir)

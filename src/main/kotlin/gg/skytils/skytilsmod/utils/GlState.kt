@@ -24,7 +24,6 @@ import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
 import org.lwjgl.opengl.GLContext
 import java.nio.FloatBuffer
-import java.util.*
 
 class GlState {
 

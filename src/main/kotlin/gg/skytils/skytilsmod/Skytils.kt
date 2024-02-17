@@ -485,7 +485,9 @@ class Skytils {
                 ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
         }.onFailure { it.printStackTrace() }.getOrDefault(false)
 
-        TrophyFish.loadFromApi()
+        IO.launch {
+            TrophyFish.loadFromApi()
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

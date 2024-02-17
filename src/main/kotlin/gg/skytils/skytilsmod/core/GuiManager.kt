@@ -46,7 +46,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
-import java.util.*
 
 object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     val elements = hashMapOf<Int, GuiElement>()
@@ -60,7 +59,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     var subtitleDisplayTicks = 0
 
     private val gui = Window(ElementaVersion.V2)
-    private val toastQueue: Queue<Toast> = LinkedList()
+    private val toastQueue = ArrayDeque<Toast>()
     private val maxToasts: Int
         get() = ((UResolution.scaledHeight * 0.5) / 32).toInt()
     private val takenSlots = sortedSetOf<Int>()
@@ -86,7 +85,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
             takenSlots.add(index)
             toast.animateBeforeHide {
                 takenSlots.remove(index)
-                toastQueue.poll()?.let { newToast ->
+                toastQueue.removeFirstOrNull()?.let { newToast ->
                     addToast(newToast)
                 }
             }
@@ -96,25 +95,21 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
         }
     }
 
-    fun getByID(ID: Int): GuiElement? {
-        return elements[ID]
+    fun getByID(id: Int): GuiElement? {
+        return elements[id]
     }
 
     fun getByName(name: String?): GuiElement? {
         return names[name]
     }
 
-    fun searchElements(query: String): List<GuiElement> {
-        val results: MutableList<GuiElement> = ArrayList()
-        for ((key, value) in names) {
-            if (key.contains(query)) results.add(value)
-        }
-        return results
+    fun searchElements(query: String): Collection<GuiElement> {
+        return names.filter { it.key.contains(query) }.values
     }
 
     @SubscribeEvent
     fun renderPlayerInfo(event: RenderGameOverlayEvent.Post) {
-        if (Skytils.usingLabymod && Minecraft.getMinecraft().ingameGUI !is GuiIngameForge) return
+        if (Skytils.usingLabymod && mc.ingameGUI !is GuiIngameForge) return
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
         GlState.pushState()
         MinecraftForge.EVENT_BUS.post(RenderHUDEvent(event))
