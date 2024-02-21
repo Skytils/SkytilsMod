@@ -57,31 +57,35 @@ object PartyFinderStats {
             val match = partyFinderRegex.find(event.message.formattedText.stripControlCodes()) ?: return
             val username = match.groups["name"]?.value ?: return
             if (username == mc.thePlayer.name) return
-            Skytils.launch {
-                val uuid = try {
-                    MojangUtil.getUUIDFromUsername(username)
-                } catch (e: MojangUtil.MojangException) {
-                    e.printStackTrace()
-                    UChat.chat("$failPrefix §cFailed to get UUID, reason: ${e.message}")
-                    return@launch
-                } ?: return@launch
-                API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString())?.let { member ->
-                    playerStats(username, uuid, member)
-                }
-            }.invokeOnCompletion { error ->
-                if (error != null) {
-                    error.printStackTrace()
-                    UChat.chat(
-                        "$failPrefix §cUnable to retrieve profile information: ${
-                            error.message
-                        }"
-                    )
-                }
+            printStats(username, true)
+        }
+    }
+
+    fun printStats(username: String, withKick: Boolean) {
+        Skytils.launch {
+            val uuid = try {
+                MojangUtil.getUUIDFromUsername(username)
+            } catch (e: MojangUtil.MojangException) {
+                e.printStackTrace()
+                UChat.chat("$failPrefix §cFailed to get UUID, reason: ${e.message}")
+                return@launch
+            } ?: return@launch
+            API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString())?.let { member ->
+                playerStats(username, uuid, member, withKick)
+            }
+        }.invokeOnCompletion { error ->
+            if (error != null) {
+                error.printStackTrace()
+                UChat.chat(
+                    "$failPrefix §cUnable to retrieve profile information: ${
+                        error.message
+                    }"
+                )
             }
         }
     }
 
-    private suspend fun playerStats(username: String, uuid: UUID, profileData: Member) {
+    private suspend fun playerStats(username: String, uuid: UUID, profileData: Member, withKick: Boolean) {
         API.getPlayer(uuid)?.let { playerResponse ->
             try {
                 profileData.dungeons?.dungeon_types?.get("catacombs")?.also { catacombsObj ->
@@ -267,10 +271,14 @@ object PartyFinderStats {
                         )
                     }
 
-                    component.append(
-                        UTextComponent("\n§c§l[KICK]\n").setHoverText("§cClick to kick ${name}§c.")
-                            .setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username")
-                    ).append("&2&m--------------------------------").chat()
+                    if (withKick) {
+                        component.append(
+                            UTextComponent("\n§c§l[KICK]\n").setHoverText("§cClick to kick ${name}§c.")
+                                .setClick(ClickEvent.Action.SUGGEST_COMMAND, "/p kick $username")
+                        )
+                    }
+
+                    component.append("&2&m--------------------------------").chat()
                 } ?: UChat.chat("$failPrefix §c$username has not entered The Catacombs!")
             } catch (e: Throwable) {
                 UChat.chat("$failPrefix §cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
