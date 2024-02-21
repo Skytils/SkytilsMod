@@ -130,7 +130,11 @@ object PartyFinderStats {
                         component.append(" §7(§6Spirit§7)\n\n")
                     } ?: component.append(" §7(No Spirit)\n\n")
 
-                    profileData.inventory.inventory.toMCItems().mapNotNull { ItemUtil.getExtraAttributes(it) }
+                    val allItems = profileData.inventory.inventory.toMCItems() +
+                            profileData.inventory.ender_chest.toMCItems() +
+                            profileData.inventory.backpacks.map { it.value.toMCItems() }.flatten()
+
+                    allItems.mapNotNull { ItemUtil.getExtraAttributes(it) }
                         .associateWith { ItemUtil.getSkyBlockItemID(it) }.let { (extraAttribs, itemIds) ->
                             val items = buildSet {
                                 //Archer
@@ -156,7 +160,8 @@ object PartyFinderStats {
                                     itemIds.contains("FLOWER_OF_TRUTH") -> add("§cFoT")
                                 }
                                 //Miscellaneous
-                                add(checkItemId(itemIds, "DARK_CLAYMORE", "§7Dark Claymore"))
+                                add(checkItemId(itemIds, "GYROKINETIC_WAND", "§5Gyro"))
+                                add(checkItemId(itemIds, "DARK_CLAYMORE", "§7Claymore"))
                                 add(checkItemId(itemIds, "GIANTS_SWORD", "§2Giant's Sword"))
                                 add(checkItemId(itemIds, "ICE_SPRAY_WAND", "§bIce Spray"))
                                 checkStonk(itemIds, extraAttribs)?.run { add(this) }
