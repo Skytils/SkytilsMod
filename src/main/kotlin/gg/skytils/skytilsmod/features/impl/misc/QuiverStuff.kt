@@ -40,6 +40,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.random.Random
 
 object QuiverStuff {
     private val clearQuiverRegex = Regex("§r§aCleared your quiver!§r")
@@ -254,7 +255,7 @@ object QuiverStuff {
                         Skytils.mc.thePlayer.isSneaking -> 0
                         else -> extraAttr.getCompoundTag("enchantments")?.getInteger("infinite_quiver")?.times(3) ?: 0
                     }
-                    val randomNum = Utils.random.nextInt(0, 100)
+                    val randomNum = Random.nextInt(0, 100)
 
                     if (level <= randomNum + 1) {
                         if (Skytils.config.restockArrowsWarning != 0 && arrowCount == Skytils.config.restockArrowsWarning) {
