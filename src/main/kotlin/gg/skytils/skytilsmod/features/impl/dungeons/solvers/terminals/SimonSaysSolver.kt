@@ -22,7 +22,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
-import gg.skytils.skytilsmod.features.impl.misc.Funny
+import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
