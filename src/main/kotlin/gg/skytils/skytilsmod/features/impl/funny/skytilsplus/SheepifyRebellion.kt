@@ -18,18 +18,16 @@
 
 package gg.skytils.skytilsmod.features.impl.funny.skytilsplus
 
-import gg.essential.universal.UChat
-import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.tickTask
-import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumChatFormatting
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import gg.skytils.skytilsmod.utils.ReflectionHelper.getClassHelper
 import gg.skytils.skytilsmod.utils.ReflectionHelper.getFieldHelper
 import gg.skytils.skytilsmod.utils.ReflectionHelper.getMethodHelper
-import gg.skytils.skytilsmod.utils.RenderUtil
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
+import gg.skytils.skytilsmod.utils.Utils
+import kotlinx.serialization.Serializable
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.client.multiplayer.WorldClient
-import net.minecraft.client.network.NetHandlerPlayClient
-import net.minecraft.client.renderer.entity.RenderPlayer
 import net.minecraft.client.renderer.entity.RendererLivingEntity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.passive.EntitySheep
@@ -37,9 +35,8 @@ import net.minecraft.item.EnumDyeColor
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
 object SheepifyRebellion {
     val fakeWorld by lazy {
@@ -51,48 +48,43 @@ object SheepifyRebellion {
 
     val sheepMap = hashMapOf<AbstractClientPlayer, EntitySheep>()
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-/*        sheepMap[event.entity]?.let {
-            event.isCanceled = true
-        }*/
+    val skytilsPlusUsernames = mutableSetOf<String>()
+    val skytilsPlusColors = mutableMapOf<String, EnumDyeColor>()
+
+    val lookup = EnumDyeColor.entries.associateBy { ((it as AccessorEnumDyeColor).chatColor as AccessorEnumChatFormatting).formattingCode }
+
+    val isEnabled by lazy {
+        Utils.isBSMod || SuperSecretSettings.sheepifyRebellion
     }
 
     @SubscribeEvent
     fun playerSpawn(event: EntityJoinWorldEvent) {
-        if (event.entity is AbstractClientPlayer) {
-            val sheep = EntitySheep(fakeWorld)
-            sheepMap[event.entity as AbstractClientPlayer] = sheep
-            sheep.forceSpawn = true
-            sheep.motionX = 0.0
-            sheep.motionY = 0.0
-            sheep.motionZ = 0.0
-            sheep.setLocationAndAngles(event.entity.posX, event.entity.posY, event.entity.posZ, event.entity.rotationYaw, event.entity.rotationPitch)
-            sheep.fleeceColor = EnumDyeColor.RED
-            //event.world.spawnEntityInWorld(sheep)
-            //sheep.mountEntity(event.entity)
-            //sheep.customNameTag = event.entity.name
-            //sheep.alwaysRenderNameTag = true
-        }
-    }
+        if (!Utils.inSkyblock || !isEnabled || event.entity !is AbstractClientPlayer || event.entity.uniqueID.version() != 4) return
+        val color = skytilsPlusColors[event.entity.name] ?: return
+        val sheep = EntitySheep(fakeWorld)
+        sheepMap[event.entity as AbstractClientPlayer] = sheep
+        sheep.forceSpawn = true
+        sheep.motionX = 0.0
+        sheep.motionY = 0.0
+        sheep.motionZ = 0.0
+        sheep.setNoAI(true)
+        sheep.noClip = true
+        sheep.fleeceColor = color
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase == TickEvent.Phase.START) {
-            sheepMap.forEach { (player, sheep) ->
-                //sheep.setPositionAndRotation(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch)
-/*                sheep.copyLocationAndAnglesFrom(player)
-                sheep.setRotationYawHead(player.rotationYawHead)
-                sheep.prevLimbSwingAmount = player.prevLimbSwingAmount
-                sheep.limbSwingAmount = player.limbSwingAmount
-                sheep.limbSwing = player.limbSwing*/
-            }
+        if (skytilsPlusUsernames.contains(event.entity.name)) {
+            sheep.customNameTag = "jeb_"
+            sheep.alwaysRenderNameTag = false
         }
     }
 
     @SubscribeEvent
     fun playerLeave(event: LivingDeathEvent) {
         sheepMap.remove(event.entity)?.setDead()
+    }
+
+    @SubscribeEvent
+    fun onWorldUnload(event: WorldEvent.Unload) {
+        sheepMap.clear()
     }
 
     @SubscribeEvent
@@ -115,8 +107,8 @@ object SheepifyRebellion {
         entity.swingProgress = originalEntity.swingProgress
         entity.isSwingInProgress = originalEntity.isSwingInProgress
         entity.setRenderYawOffset(originalEntity.renderYawOffset)
-        /*        for (i in event.entity.inventory.indices) {
-            entity.inventory[i] = originalEntity.inventory[i]
-        }*/
     }
+
+    @Serializable
+    data class SkytilsPlusData(val active: List<String>, val inactive: List<String>)
 }

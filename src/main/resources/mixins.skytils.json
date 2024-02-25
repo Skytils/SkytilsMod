@@ -10,6 +10,7 @@
     "accessors.AccessorChatComponentText",
     "accessors.AccessorCommandHandler",
     "accessors.AccessorEntityArmorstand",
+    "accessors.AccessorEnumChatFormatting",
     "accessors.AccessorEnumDyeColor",
     "accessors.AccessorGuiChat",
     "accessors.AccessorGuiContainer",

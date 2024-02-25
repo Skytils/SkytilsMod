@@ -28,6 +28,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver
 import gg.skytils.skytilsmod.features.impl.farming.FarmingFeatures
 import gg.skytils.skytilsmod.features.impl.farming.TreasureHunter
+import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SheepifyRebellion
 import gg.skytils.skytilsmod.features.impl.handlers.Mayor
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.features.impl.handlers.SpamHider
@@ -44,6 +45,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.*
+import net.minecraft.item.EnumDyeColor
 import net.minecraft.util.BlockPos
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.jvm.jvmName
@@ -168,6 +170,25 @@ object DataFetcher {
                         SummonSkins.skinMap.clear()
                         SummonSkins.skinMap.putAll(this)
                         SummonSkins.loadSkins()
+                    }
+                }
+
+                if (SheepifyRebellion.isEnabled) {
+                    get<Map<String, String>>("https://gist.githubusercontent.com/My-Name-Is-Jeff/4ddf4e88360c34a8582b82834b3511c8/raw/coloreddata.json") {
+                        Utils.checkThreadAndQueue {
+                            SheepifyRebellion.skytilsPlusColors.clear()
+                            SheepifyRebellion.skytilsPlusColors.putAll(this.entries.associate {
+                                it.key to (SheepifyRebellion.lookup[it.value.firstOrNull()] ?: EnumDyeColor.WHITE)
+                            })
+                        }
+                    }
+
+                    get<SheepifyRebellion.SkytilsPlusData>("https://gist.githubusercontent.com/My-Name-Is-Jeff/4ddf4e88360c34a8582b82834b3511c8/raw/plusdata.json") {
+                        Utils.checkThreadAndQueue {
+                            SheepifyRebellion.skytilsPlusUsernames.clear()
+                            SheepifyRebellion.skytilsPlusUsernames.addAll(active)
+                            SheepifyRebellion.skytilsPlusUsernames.addAll(inactive)
+                        }
                     }
                 }
             } catch (e: Throwable) {

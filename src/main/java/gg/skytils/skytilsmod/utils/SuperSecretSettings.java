@@ -40,6 +40,7 @@ public class SuperSecretSettings {
     public static boolean chamberOfSecrets = false;
     public static boolean jamCat = false;
     public static boolean noSychic = false;
+    public static boolean sheepifyRebellion = false;
     public static boolean smolPeople = false;
     public static boolean tryItAndSee = false;
     public static boolean twilightGiant = false;
@@ -106,6 +107,7 @@ public class SuperSecretSettings {
         chamberOfSecrets = settings.contains("chamberofsecrets");
         jamCat = settings.contains("jamcat");
         noSychic = settings.contains("nosychic");
+        sheepifyRebellion = settings.contains("sheepifyRebellion");
         smolPeople = settings.contains("smolpeople");
         tryItAndSee = settings.contains("tryItAndSee");
         twilightGiant = settings.contains("twilightGiant");
