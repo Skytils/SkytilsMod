@@ -9,6 +9,7 @@
     "accessors.AccessorC0EPacketClickWindow",
     "accessors.AccessorChatComponentText",
     "accessors.AccessorCommandHandler",
+    "accessors.AccessorEntity",
     "accessors.AccessorEntityArmorstand",
     "accessors.AccessorEnumChatFormatting",
     "accessors.AccessorEnumDyeColor",

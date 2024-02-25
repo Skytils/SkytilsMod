@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.features.impl.funny.skytilsplus
 
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntity
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumChatFormatting
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import gg.skytils.skytilsmod.utils.ReflectionHelper.getClassHelper
@@ -110,6 +111,9 @@ object SheepifyRebellion {
     }
 
     fun copyProperties(entity: EntityLivingBase, originalEntity: EntityLivingBase) {
+        entity as AccessorEntity
+        originalEntity as AccessorEntity
+
         entity.copyLocationAndAnglesFrom(originalEntity)
         entity.setRotationYawHead(originalEntity.rotationYawHead)
         entity.prevLimbSwingAmount = originalEntity.prevLimbSwingAmount
@@ -119,6 +123,10 @@ object SheepifyRebellion {
         entity.swingProgress = originalEntity.swingProgress
         entity.isSwingInProgress = originalEntity.isSwingInProgress
         entity.setRenderYawOffset(originalEntity.renderYawOffset)
+        entity.hurtTime = originalEntity.hurtTime
+        entity.fire = originalEntity.fire
+        entity.deathTime = originalEntity.deathTime
+        entity.arrowCountInEntity = originalEntity.arrowCountInEntity
     }
 
     @Serializable
