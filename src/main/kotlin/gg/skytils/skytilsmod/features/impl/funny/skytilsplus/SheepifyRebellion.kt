@@ -136,7 +136,7 @@ object SheepifyRebellion {
                     fakeEntity.rabbitType = (least % 7).toInt().takeIf { it != 6 } ?: 99
                 }
                 is EntitySlime -> {
-                    (fakeEntity as AccessorEntitySlime).slimeSize = (least % 3).toInt()
+                    (fakeEntity as AccessorEntitySlime).invokeSetSlimeSize((least % 3).toInt())
                 }
             }
         } else if (isSkytilsPlus) {

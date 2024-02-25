@@ -23,13 +23,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(EntitySlime.class)
+@Mixin({EntitySlime.class})
 public interface AccessorEntitySlime {
-    @Unique
-    @Invoker("getSlimeSize")
-    int getSlimeSize();
-
-    @Unique
     @Invoker("setSlimeSize")
-    void setSlimeSize(int size);
+    void invokeSetSlimeSize(int size);
 }
