@@ -173,7 +173,7 @@ object DataFetcher {
                     }
                 }
 
-                if (SheepifyRebellion.isEnabled) {
+                if (SheepifyRebellion.isSkytilsPlus) {
                     get<Map<String, String>>("https://gist.githubusercontent.com/My-Name-Is-Jeff/4ddf4e88360c34a8582b82834b3511c8/raw/coloreddata.json") {
                         Utils.checkThreadAndQueue {
                             SheepifyRebellion.skytilsPlusColors.clear()

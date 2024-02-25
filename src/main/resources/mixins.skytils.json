@@ -11,6 +11,7 @@
     "accessors.AccessorCommandHandler",
     "accessors.AccessorEntity",
     "accessors.AccessorEntityArmorstand",
+    "accessors.AccessorEntitySlime",
     "accessors.AccessorEnumChatFormatting",
     "accessors.AccessorEnumDyeColor",
     "accessors.AccessorGuiChat",

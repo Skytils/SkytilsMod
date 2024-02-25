@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.features.impl.funny.skytilsplus
 
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntity
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntitySlime
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumChatFormatting
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import gg.skytils.skytilsmod.utils.ReflectionHelper.getClassHelper
@@ -32,15 +33,18 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.client.renderer.entity.RendererLivingEntity
 import net.minecraft.entity.EntityAgeable
+import net.minecraft.entity.EntityList
 import net.minecraft.entity.EntityLivingBase
-import net.minecraft.entity.passive.EntityOcelot
-import net.minecraft.entity.passive.EntitySheep
+import net.minecraft.entity.monster.EntitySkeleton
+import net.minecraft.entity.monster.EntitySlime
+import net.minecraft.entity.passive.*
 import net.minecraft.item.EnumDyeColor
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.abs
 
 object SheepifyRebellion {
     val fakeWorld by lazy {
@@ -57,9 +61,11 @@ object SheepifyRebellion {
 
     val lookup = EnumDyeColor.entries.associateBy { ((it as AccessorEnumDyeColor).chatColor as AccessorEnumChatFormatting).formattingCode }
 
-    val isEnabled by lazy {
+    val isSkytilsPlus by lazy {
         Utils.isBSMod || SuperSecretSettings.sheepifyRebellion
     }
+
+    val palEntities = (50..68) + (90..101)
 
     @SubscribeEvent
     fun playerSpawn(event: EntityJoinWorldEvent) {
@@ -70,7 +76,32 @@ object SheepifyRebellion {
         if (SuperSecretSettings.catGaming && event.entity is EntityPlayerSP) {
             fakeEntity = EntityOcelot(fakeWorld)
             fakeEntity.tameSkin = 3
-        } else if (Utils.inSkyblock && isEnabled) {
+        } else if (Utils.inSkyblock && SuperSecretSettings.palworld) {
+            val uuid = event.entity.uniqueID
+            val most = abs(uuid.mostSignificantBits)
+            val least = abs(uuid.leastSignificantBits)
+            fakeEntity = EntityList.createEntityByID(if (SuperSecretSettings.cattiva) 98 else palEntities[(most % palEntities.size).toInt()], fakeWorld) as EntityLivingBase
+            when (fakeEntity) {
+                is EntityOcelot -> fakeEntity.tameSkin = (least % 4).toInt()
+                is EntitySheep -> fakeEntity.fleeceColor = EnumDyeColor.byDyeDamage((least % 16).toInt())
+                is EntityWolf -> {
+                    fakeEntity.isTamed = true
+                    fakeEntity.collarColor = EnumDyeColor.byDyeDamage((least % 16).toInt())
+                }
+                is EntitySkeleton -> fakeEntity.skeletonType = (least % 2).toInt()
+                is EntityHorse -> {
+                    fakeEntity.horseType = (least % 5).toInt()
+                    fakeEntity.horseVariant = (most % 7).toInt() or ((least % 5).toInt() shl 8)
+                    fakeEntity.isHorseSaddled = (most % 2).toInt() == 1
+                }
+                is EntityRabbit -> {
+                    fakeEntity.rabbitType = (least % 7).toInt().takeIf { it != 6 } ?: 99
+                }
+                is EntitySlime -> {
+                    (fakeEntity as AccessorEntitySlime).slimeSize = (least % 3).toInt()
+                }
+            }
+        } else if (Utils.inSkyblock && isSkytilsPlus) {
             val color = skytilsPlusColors[event.entity.name] ?: return
             fakeEntity = EntitySheep(fakeWorld)
             fakeEntity.fleeceColor = color

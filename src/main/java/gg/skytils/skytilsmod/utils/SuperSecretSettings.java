@@ -39,8 +39,10 @@ public class SuperSecretSettings {
     public static boolean breefingDog = false;
     public static boolean catGaming = false;
     public static boolean chamberOfSecrets = false;
+    public static boolean cattiva = false;
     public static boolean jamCat = false;
     public static boolean noSychic = false;
+    public static boolean palworld = false;
     public static boolean sheepifyRebellion = false;
     public static boolean smolPeople = false;
     public static boolean tryItAndSee = false;
@@ -107,8 +109,10 @@ public class SuperSecretSettings {
         breefingDog = settings.contains("breefingdog");
         catGaming = settings.contains("catgaming");
         chamberOfSecrets = settings.contains("chamberofsecrets");
+        cattiva = settings.contains("cattiva");
         jamCat = settings.contains("jamcat");
         noSychic = settings.contains("nosychic");
+        palworld = settings.contains("palworld");
         sheepifyRebellion = settings.contains("sheepifyRebellion");
         smolPeople = settings.contains("smolpeople");
         tryItAndSee = settings.contains("tryItAndSee");
