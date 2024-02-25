@@ -67,7 +67,13 @@ object SheepifyRebellion {
         Utils.isBSMod || SuperSecretSettings.sheepifyRebellion
     }
 
-    val palEntities = (50..68) + (90..101)
+    val palEntities by lazy {
+        mutableListOf<Int>().apply {
+            addAll(50..68)
+            addAll(90..101)
+            remove(63) // vault the ender dragon cause the model is different
+        }
+    }
 
     @SubscribeEvent
     fun playerSpawn(event: EntityJoinWorldEvent) {
