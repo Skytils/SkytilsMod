@@ -78,6 +78,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.cache.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
@@ -214,6 +215,7 @@ class Skytils {
             }
             install(ContentNegotiation) {
                 json(json)
+                json(json, ContentType.Text.Plain)
             }
             install(HttpCache)
             install(HttpRequestRetry) {
