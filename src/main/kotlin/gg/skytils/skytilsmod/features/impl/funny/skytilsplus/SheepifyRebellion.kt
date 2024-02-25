@@ -144,6 +144,9 @@ object SheepifyRebellion {
                 is EntitySlime -> {
                     (fakeEntity as AccessorEntitySlime).invokeSetSlimeSize((least % 3).toInt())
                 }
+                is EntityBat -> {
+                    fakeEntity.isBatHanging = false
+                }
             }
         } else if (isSkytilsPlus) {
             val color = skytilsPlusColors[entity.name] ?: return
@@ -196,6 +199,8 @@ object SheepifyRebellion {
         if (originalEntity.isChild && entity is EntityAgeable) {
             entity.growingAge = -1
         }
+
+        entity.ticksExisted = originalEntity.ticksExisted
     }
 
     @Serializable
