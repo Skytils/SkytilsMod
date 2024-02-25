@@ -18,6 +18,8 @@
 
 package gg.skytils.skytilsmod.features.impl.funny.skytilsplus
 
+import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntity
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntitySlime
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumChatFormatting
@@ -71,13 +73,49 @@ object SheepifyRebellion {
     fun playerSpawn(event: EntityJoinWorldEvent) {
         if (event.entity !is AbstractClientPlayer || event.entity.uniqueID.version() != 4) return
 
-        var fakeEntity: EntityLivingBase? = null
+        if (Utils.inSkyblock) {
+            checkForFakeModel(event.entity as AbstractClientPlayer)
+        } else if (event.entity is EntityPlayerSP) {
+            val world = event.world
+            tickTimer(5) {
+                if (Utils.inSkyblock && mc.theWorld == world) {
+                    event.world.playerEntities.forEach {
+                        if (it is AbstractClientPlayer && it.uniqueID.version() == 4 && it !in dummyModelMap) {
+                            checkForFakeModel(it)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-        if (SuperSecretSettings.catGaming && event.entity is EntityPlayerSP) {
+    @SubscribeEvent
+    fun playerLeave(event: LivingDeathEvent) {
+        dummyModelMap.remove(event.entity)?.setDead()
+    }
+
+    @SubscribeEvent
+    fun onWorldUnload(event: WorldEvent.Unload) {
+        dummyModelMap.clear()
+    }
+
+    @SubscribeEvent
+    fun onRender(event: RenderLivingEvent.Pre<*>) {
+        val fakeEntity = dummyModelMap[event.entity] ?: return
+        event.isCanceled = true
+        val renderer = event.renderer.renderManager.getEntityRenderObject<EntityLivingBase>(fakeEntity)
+        copyProperties(fakeEntity, event.entity)
+        renderer.doRender(fakeEntity, event.x, event.y, event.z, event.entity.rotationYaw, 1f)
+        (event.renderer as RendererLivingEntity<EntityLivingBase>).renderName(event.entity, event.x, event.y, event.z)
+    }
+
+    fun checkForFakeModel(entity: AbstractClientPlayer) {
+        var fakeEntity: EntityLivingBase? = null
+        if (SuperSecretSettings.catGaming && entity is EntityPlayerSP) {
             fakeEntity = EntityOcelot(fakeWorld)
             fakeEntity.tameSkin = 3
-        } else if (Utils.inSkyblock && SuperSecretSettings.palworld) {
-            val uuid = event.entity.uniqueID
+        } else if (SuperSecretSettings.palworld) {
+            val uuid = entity.uniqueID
             val most = abs(uuid.mostSignificantBits)
             val least = abs(uuid.leastSignificantBits)
             fakeEntity = EntityList.createEntityByID(if (SuperSecretSettings.cattiva) 98 else palEntities[(most % palEntities.size).toInt()], fakeWorld) as EntityLivingBase
@@ -101,45 +139,25 @@ object SheepifyRebellion {
                     (fakeEntity as AccessorEntitySlime).slimeSize = (least % 3).toInt()
                 }
             }
-        } else if (Utils.inSkyblock && isSkytilsPlus) {
-            val color = skytilsPlusColors[event.entity.name] ?: return
+        } else if (isSkytilsPlus) {
+            val color = skytilsPlusColors[entity.name] ?: return
             fakeEntity = EntitySheep(fakeWorld)
             fakeEntity.fleeceColor = color
 
-            if (skytilsPlusUsernames.contains(event.entity.name)) {
+            if (skytilsPlusUsernames.contains(entity.name)) {
                 fakeEntity.customNameTag = "jeb_"
                 fakeEntity.alwaysRenderNameTag = false
             }
         }
 
         if (fakeEntity != null) {
-            dummyModelMap[event.entity as AbstractClientPlayer] = fakeEntity
+            dummyModelMap[entity] = fakeEntity
             fakeEntity.forceSpawn = true
             fakeEntity.motionX = 0.0
             fakeEntity.motionY = 0.0
             fakeEntity.motionZ = 0.0
             fakeEntity.noClip = true
         }
-    }
-
-    @SubscribeEvent
-    fun playerLeave(event: LivingDeathEvent) {
-        dummyModelMap.remove(event.entity)?.setDead()
-    }
-
-    @SubscribeEvent
-    fun onWorldUnload(event: WorldEvent.Unload) {
-        dummyModelMap.clear()
-    }
-
-    @SubscribeEvent
-    fun onRender(event: RenderLivingEvent.Pre<*>) {
-        val fakeEntity = dummyModelMap[event.entity] ?: return
-        event.isCanceled = true
-        val renderer = event.renderer.renderManager.getEntityRenderObject<EntityLivingBase>(fakeEntity)
-        copyProperties(fakeEntity, event.entity)
-        renderer.doRender(fakeEntity, event.x, event.y, event.z, event.entity.rotationYaw, 1f)
-        (event.renderer as RendererLivingEntity<EntityLivingBase>).renderName(event.entity, event.x, event.y, event.z)
     }
 
     fun copyProperties(entity: EntityLivingBase, originalEntity: EntityLivingBase) {
