@@ -31,6 +31,7 @@ import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.client.renderer.entity.RendererLivingEntity
+import net.minecraft.entity.EntityAgeable
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.passive.EntityOcelot
 import net.minecraft.entity.passive.EntitySheep
@@ -127,6 +128,10 @@ object SheepifyRebellion {
         entity.fire = originalEntity.fire
         entity.deathTime = originalEntity.deathTime
         entity.arrowCountInEntity = originalEntity.arrowCountInEntity
+
+        if (originalEntity.isChild && entity is EntityAgeable) {
+            entity.growingAge = -1
+        }
     }
 
     @Serializable
