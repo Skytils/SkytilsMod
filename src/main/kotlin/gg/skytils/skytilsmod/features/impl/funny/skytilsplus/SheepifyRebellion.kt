@@ -128,6 +128,15 @@ object SheepifyRebellion {
         entity.fire = originalEntity.fire
         entity.deathTime = originalEntity.deathTime
         entity.arrowCountInEntity = originalEntity.arrowCountInEntity
+        entity.isSprinting = originalEntity.isSprinting
+        entity.isSneaking = originalEntity.isSneaking
+        entity.isInvisible = originalEntity.isInvisible
+
+        if (entity.inventory.size >= originalEntity.inventory.size) {
+            for (i in originalEntity.inventory.indices) {
+                entity.inventory[i] = originalEntity.inventory[i]
+            }
+        }
 
         if (originalEntity.isChild && entity is EntityAgeable) {
             entity.growingAge = -1
