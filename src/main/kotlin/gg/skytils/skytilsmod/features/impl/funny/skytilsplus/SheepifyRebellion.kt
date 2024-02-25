@@ -27,9 +27,11 @@ import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import kotlinx.serialization.Serializable
 import net.minecraft.client.entity.AbstractClientPlayer
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.client.renderer.entity.RendererLivingEntity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.passive.EntityOcelot
 import net.minecraft.entity.passive.EntitySheep
 import net.minecraft.item.EnumDyeColor
 import net.minecraftforge.client.event.RenderLivingEvent
@@ -46,7 +48,7 @@ object SheepifyRebellion {
         } ?: error("Failed to get FakeWorld")
     }
 
-    val sheepMap = hashMapOf<AbstractClientPlayer, EntitySheep>()
+    val dummyModelMap = hashMapOf<AbstractClientPlayer, EntityLivingBase>()
 
     val skytilsPlusUsernames = mutableSetOf<String>()
     val skytilsPlusColors = mutableMapOf<String, EnumDyeColor>()
@@ -59,41 +61,51 @@ object SheepifyRebellion {
 
     @SubscribeEvent
     fun playerSpawn(event: EntityJoinWorldEvent) {
-        if (!Utils.inSkyblock || !isEnabled || event.entity !is AbstractClientPlayer || event.entity.uniqueID.version() != 4) return
-        val color = skytilsPlusColors[event.entity.name] ?: return
-        val sheep = EntitySheep(fakeWorld)
-        sheepMap[event.entity as AbstractClientPlayer] = sheep
-        sheep.forceSpawn = true
-        sheep.motionX = 0.0
-        sheep.motionY = 0.0
-        sheep.motionZ = 0.0
-        sheep.setNoAI(true)
-        sheep.noClip = true
-        sheep.fleeceColor = color
+        if (event.entity !is AbstractClientPlayer || event.entity.uniqueID.version() != 4) return
 
-        if (skytilsPlusUsernames.contains(event.entity.name)) {
-            sheep.customNameTag = "jeb_"
-            sheep.alwaysRenderNameTag = false
+        var fakeEntity: EntityLivingBase? = null
+
+        if (SuperSecretSettings.catGaming && event.entity is EntityPlayerSP) {
+            fakeEntity = EntityOcelot(fakeWorld)
+            fakeEntity.tameSkin = 3
+        } else if (Utils.inSkyblock && isEnabled) {
+            val color = skytilsPlusColors[event.entity.name] ?: return
+            fakeEntity = EntitySheep(fakeWorld)
+            fakeEntity.fleeceColor = color
+
+            if (skytilsPlusUsernames.contains(event.entity.name)) {
+                fakeEntity.customNameTag = "jeb_"
+                fakeEntity.alwaysRenderNameTag = false
+            }
+        }
+
+        if (fakeEntity != null) {
+            dummyModelMap[event.entity as AbstractClientPlayer] = fakeEntity
+            fakeEntity.forceSpawn = true
+            fakeEntity.motionX = 0.0
+            fakeEntity.motionY = 0.0
+            fakeEntity.motionZ = 0.0
+            fakeEntity.noClip = true
         }
     }
 
     @SubscribeEvent
     fun playerLeave(event: LivingDeathEvent) {
-        sheepMap.remove(event.entity)?.setDead()
+        dummyModelMap.remove(event.entity)?.setDead()
     }
 
     @SubscribeEvent
     fun onWorldUnload(event: WorldEvent.Unload) {
-        sheepMap.clear()
+        dummyModelMap.clear()
     }
 
     @SubscribeEvent
     fun onRender(event: RenderLivingEvent.Pre<*>) {
-        val sheep = sheepMap[event.entity] ?: return
+        val fakeEntity = dummyModelMap[event.entity] ?: return
         event.isCanceled = true
-        val renderSheep = event.renderer.renderManager.getEntityRenderObject<EntitySheep>(sheep)
-        copyProperties(sheep, event.entity)
-        renderSheep.doRender(sheep, event.x, event.y, event.z, event.entity.rotationYaw, 1f)
+        val renderer = event.renderer.renderManager.getEntityRenderObject<EntityLivingBase>(fakeEntity)
+        copyProperties(fakeEntity, event.entity)
+        renderer.doRender(fakeEntity, event.x, event.y, event.z, event.entity.rotationYaw, 1f)
         (event.renderer as RendererLivingEntity<EntityLivingBase>).renderName(event.entity, event.x, event.y, event.z)
     }
 
