@@ -93,15 +93,14 @@ object PartyFinderStats {
 
                     val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
                     val component = UMessage("&2&m--------------------------------\n").append(
-                            "$name §8» §dCata §9${
-                                NumberUtil.nf.format(cataLevel)
-                            } "
-                        ).append(
-                            UTextComponent("§7[Stats]\n\n").setHoverText("§7Click to run: /skytilscata $username")
-                                .setClick(
-                                    ClickEvent.Action.RUN_COMMAND, "/skytilscata $username"
-                                )
+                        "$name §8» §dCata §9${
+                            NumberUtil.nf.format(cataLevel)
+                        } "
+                    ).append(
+                        UTextComponent("§7[Stats]\n\n").setHoverText("§7Click to run: /skytilscata $username").setClick(
+                            ClickEvent.Action.RUN_COMMAND, "/skytilscata $username"
                         )
+                    )
                     profileData.inventory.armor.toMCItems().filterNotNull().forEach { armorPiece ->
                         val lore = armorPiece.getTooltip(mc.thePlayer, false)
                         component.append(
@@ -119,8 +118,8 @@ object PartyFinderStats {
                                     activePet.type.splitToWords()
                                 }"
                             ).setHoverText(
-                                "§b" + (activePet.heldItem?.lowercase()?.replace("pet_item_", "")?.splitToWords()
-                                    ?: "§cNo Pet Item")
+                                "§b${activePet.heldItem?.lowercase()?.replace("pet_item_", "")?.splitToWords()
+                                    ?: "§cNo Pet Item"}"
                             )
                         )
                     } ?: component.append("§cNo Pet Equipped!")
@@ -164,9 +163,11 @@ object PartyFinderStats {
 
                                 remove(null)
                             }
-                            component.append(UTextComponent("§dImportant Items: §7(Hover)\n").setHoverText(items.joinToString(
-                                "§8, "
-                            ).ifBlank { "§c§lNone" }))
+                            component.append(
+                                UTextComponent("§dImportant Items: §7(Hover)\n").setHoverText(items.joinToString(
+                                    "§8, "
+                                ).ifBlank { "§c§lNone" })
+                            )
                         }
                     val bloodMobsKilled = (profileData.player_stats.kills["watcher_summon_undead"]?.toInt()
                         ?: 0) + (profileData.player_stats.kills["master_watcher_summon_undead"]?.toInt() ?: 0)
@@ -183,36 +184,40 @@ object PartyFinderStats {
 
                     cataData.highest_tier_completed.let { highestFloor ->
                         val completionObj = cataData.tier_completions
-                        component.append(UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText((0..highestFloor).joinToString(
-                            "\n"
-                        ) { floor ->
-                            "§2§l●§a Floor ${if (floor == 0) "Entrance" else floor}: §e${
-                                completionObj["$floor"]?.let { completions ->
-                                    "${completions.toInt()} §7(§6S+ §e${
-                                        cataData.fastest_time_s_plus["$floor"]?.toDuration(
-                                            DurationUnit.MILLISECONDS
-                                        )?.timeFormat() ?: "§cNo Comp"
-                                    }§7)"
-                                } ?: "§cDNF"
-                            }"
-                        }))
+                        component.append(
+                            UTextComponent("§aFloor Completions: §7(Hover)\n").setHoverText((0..highestFloor).joinToString(
+                                "\n"
+                            ) { floor ->
+                                "§2§l●§a Floor ${if (floor == 0) "Entrance" else floor}: §e${
+                                    completionObj["$floor"]?.let { completions ->
+                                        "${completions.toInt()} §7(§6S+ §e${
+                                            cataData.fastest_time_s_plus["$floor"]?.toDuration(
+                                                DurationUnit.MILLISECONDS
+                                            )?.timeFormat() ?: "§cNo Comp"
+                                        }§7)"
+                                    } ?: "§cDNF"
+                                }"
+                            })
+                        )
                     }
 
                     masterCataData?.highest_tier_completed?.let { highestFloor ->
                         val masterCompletionObj = masterCataData.tier_completions
-                        component.append(UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText((1..highestFloor).joinToString(
-                            "\n"
-                        ) { floor ->
-                            "§c§l●§4 Floor $floor: §e${
-                                masterCompletionObj["$floor"]?.let { completions ->
-                                    "${completions.toInt()} §7(§6S+ §e${
-                                        masterCataData.fastest_time_s_plus["$floor"]?.toDuration(
-                                            DurationUnit.MILLISECONDS
-                                        )?.timeFormat() ?: "§cNo Comp"
-                                    }§7)"
-                                } ?: "§cDNF"
-                            }"
-                        }))
+                        component.append(
+                            UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText((1..highestFloor).joinToString(
+                                "\n"
+                            ) { floor ->
+                                "§c§l●§4 Floor $floor: §e${
+                                    masterCompletionObj["$floor"]?.let { completions ->
+                                        "${completions.toInt()} §7(§6S+ §e${
+                                            masterCataData.fastest_time_s_plus["$floor"]?.toDuration(
+                                                DurationUnit.MILLISECONDS
+                                            )?.timeFormat() ?: "§cNo Comp"
+                                        }§7)"
+                                    } ?: "§cDNF"
+                                }"
+                            })
+                        )
                     }
 
                     component.append(
