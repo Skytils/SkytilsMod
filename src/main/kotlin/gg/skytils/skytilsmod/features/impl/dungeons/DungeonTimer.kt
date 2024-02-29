@@ -320,7 +320,7 @@ object DungeonTimer {
         }
 
         override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 5
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * 6
         override val width: Int
             get() = ScreenRenderer.fontRenderer.getStringWidth("§7Wither King: 0s")
 

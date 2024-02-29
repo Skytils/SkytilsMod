@@ -18,17 +18,16 @@
 package gg.skytils.skytilsmod.features.impl.handlers
 
 import gg.essential.universal.UChat
+import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.utils.ItemUtil
-import gg.skytils.skytilsmod.utils.PetInfo
 import gg.skytils.skytilsmod.utils.toStringIfTrue
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.double
 import kotlinx.serialization.json.jsonPrimitive
@@ -47,7 +46,7 @@ object AuctionData {
         var id = ItemUtil.getSkyBlockItemID(extraAttr) ?: return null
         when (id) {
             "PET" -> if (extraAttr.getString("petInfo").startsWith("{")) {
-                val petInfo = json.decodeFromString<PetInfo>(extraAttr.getString("petInfo"))
+                val petInfo = json.decodeFromString<Pet>(extraAttr.getString("petInfo"))
                 id = "PET-${petInfo.type}-${petInfo.tier}"
             }
 

@@ -54,11 +54,11 @@ object IceFillSolver {
             if (DungeonListener.missingPuzzles.contains("Ice Fill") && (job == null || job?.isCancelled == true || job?.isCompleted == true)) {
                 if (chestPos == null || roomFacing == null) {
                     job = Skytils.launch {
+                        val playerX = mc.thePlayer.posX.toInt()
+                        val playerZ = mc.thePlayer.posZ.toInt()
+                        val xRange = playerX - 25..playerX + 25
+                        val zRange = playerZ - 25..playerZ + 25
                         findChest@ for (te in mc.theWorld.loadedTileEntityList) {
-                            val playerX = mc.thePlayer.posX.toInt()
-                            val playerZ = mc.thePlayer.posZ.toInt()
-                            val xRange = playerX - 25..playerX + 25
-                            val zRange = playerZ - 25..playerZ + 25
                             if (te.pos.y == 75 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
                             ) {
                                 val pos = te.pos

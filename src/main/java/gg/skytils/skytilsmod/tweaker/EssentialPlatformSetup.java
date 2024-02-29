@@ -40,7 +40,7 @@ import java.util.Objects;
 import static gg.skytils.skytilsmod.tweaker.TweakerUtil.*;
 
 public class EssentialPlatformSetup {
-    private static final String[] dataURLCandidates = {System.getProperty("skytils.dataURL"), Reference.dataUrl, "https://skytilsmod-data.pages.dev/", "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"};
+    private static final String[] dataURLCandidates = {System.getProperty("skytils.dataURL"), Reference.dataUrl, "https://skytilsmod-data.pages.dev/", "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/", "https://mirror.ghproxy.com/https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/"};
 
     private static boolean trySetDataUrl(String url) {
         if (url == null) return false;

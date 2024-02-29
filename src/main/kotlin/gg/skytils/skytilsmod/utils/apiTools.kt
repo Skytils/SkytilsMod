@@ -75,19 +75,6 @@ enum class DungeonClass {
 }
 
 @Serializable
-data class PetInfo(
-    val type: String,
-    val exp: Double,
-    val tier: String,
-    val active: Boolean = false,
-    val hideInfo: Boolean = false,
-    val heldItem: String? = null,
-    val candyUsed: Int = 0,
-    val skin: String? = null,
-    val uuid: String? = null
-)
-
-@Serializable
 data class GithubRelease(
     @SerialName("tag_name")
     val tagName: String,

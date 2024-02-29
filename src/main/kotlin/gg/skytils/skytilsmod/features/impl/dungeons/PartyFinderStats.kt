@@ -192,13 +192,17 @@ object PartyFinderStats {
                         val masterCompletionObj = masterCataData.tier_completions
                         component.append(
                             UTextComponent("§l§4MM §cFloor Completions: §7(Hover)\n").setHoverText(
-                                (1..highestFloor).map { floor ->
+                                (1..highestFloor).joinToString("\n") { floor ->
                                     "§c§l●§4 Floor $floor: §e ${
                                         masterCompletionObj["$floor"]?.let { completions ->
-                                            "$completions §7(§6S+ §e${masterCataData.fastest_time_s_plus["$floor"]?.toDuration(DurationUnit.MILLISECONDS)?.timeFormat() ?: "§cNo Comp"}§7)"
+                                            "$completions §7(§6S+ §e${
+                                                masterCataData.fastest_time_s_plus["$floor"]?.toDuration(
+                                                    DurationUnit.MILLISECONDS
+                                                )?.timeFormat() ?: "§cNo Comp"
+                                            }§7)"
                                         } ?: "§cDNF"
                                     }"
-                                }.joinToString("\n")
+                                }
                             )
                         )
                     }
