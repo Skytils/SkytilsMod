@@ -312,7 +312,7 @@ object ChestProfit {
         override val height: Int
             get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * DungeonChest.entries.size
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("Obsidian Chest: 300M")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Obsidian Chest: +300M")
 
         override val toggled: Boolean
             get() = Skytils.config.dungeonChestProfit

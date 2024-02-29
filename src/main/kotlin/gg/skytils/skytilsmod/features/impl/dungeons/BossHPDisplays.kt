@@ -185,13 +185,13 @@ object BossHPDisplays {
         }
 
         override fun demoRender() {
-            RenderUtil.drawAllInList(this, GIANT_NAMES.map { "$it §a20M§c❤" })
+            RenderUtil.drawAllInList(this, GIANT_NAMES.map { "$it §a19.5M§c❤" })
         }
 
         override val height: Int
             get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * GIANT_NAMES.size
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("§3§lThe Diamond Giant §a19.9M§c❤")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("§3§lThe Diamond Giant §a19.5M§c❤")
 
         override val toggled: Boolean
             get() = Skytils.config.showGiantHP
