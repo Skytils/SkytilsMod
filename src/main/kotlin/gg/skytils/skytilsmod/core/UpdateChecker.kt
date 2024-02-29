@@ -17,6 +17,7 @@
  */
 package gg.skytils.skytilsmod.core
 
+import gg.essential.universal.UDesktop
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.gui.RequestUpdateGui
@@ -38,7 +39,6 @@ import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion
-import java.awt.Desktop
 import java.io.File
 
 object UpdateChecker {
@@ -93,7 +93,7 @@ object UpdateChecker {
                     if (!sipStatus.inputStream.use { it.bufferedReader().readText() }
                             .contains("System Integrity Protection status: disabled.")) {
                         println("SIP is NOT disabled, opening Finder.")
-                        Desktop.getDesktop().open(oldJar.parentFile)
+                        UDesktop.open(oldJar.parentFile)
                         return@Thread
                     }
                 }

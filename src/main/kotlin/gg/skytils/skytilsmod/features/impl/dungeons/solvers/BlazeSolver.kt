@@ -84,9 +84,9 @@ object BlazeSolver {
                     val blazeZ = blaze.posZ.toInt()
                     val xRange = blazeX - 13..blazeX + 13
                     val zRange = blazeZ - 13..blazeZ + 13
+                    val y1 = 70 + diffY
+                    val y2 = 69 - diffY
                     findChest@ for (te in mc.theWorld.loadedTileEntityList) {
-                        val y1 = 70 + diffY
-                        val y2 = 69 - diffY
                         if ((te.pos.y == y1 || te.pos.y == y2) && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
                         ) {
                             val pos = te.pos

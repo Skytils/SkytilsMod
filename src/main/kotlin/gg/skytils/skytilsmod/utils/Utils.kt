@@ -36,7 +36,8 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
-import gg.skytils.skytilsmod.utils.graphics.colors.RainbowColor.Companion.fromString
+import gg.skytils.skytilsmod.utils.graphics.colors.CyclingTwoColorGradient
+import gg.skytils.skytilsmod.utils.graphics.colors.RainbowColor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.minecraft.client.gui.ChatLine
@@ -137,14 +138,27 @@ object Utils {
 
     fun customColorFromString(string: String?): CustomColor {
         if (string == null) throw NullPointerException("Argument cannot be null!")
-        if (string.startsWith("rainbow(")) {
-            return fromString(string)
-        }
-        return try {
+        return if (string.startsWith("rainbow(")) {
+            RainbowColor.fromString(string)
+        } else if (string.startsWith("cyclingtwocolorgradient(")) {
+            CyclingTwoColorGradient.fromString(string)
+        } else try {
             getCustomColorFromColor(web(string))
         } catch (e: IllegalArgumentException) {
             try {
                 CustomColor.fromInt(string.toInt())
+            } catch (ignored: NumberFormatException) {
+                throw e
+            }
+        }
+    }
+
+    fun colorFromString(string: String): Color {
+        return try {
+            web(string)
+        } catch (e: IllegalArgumentException) {
+            try {
+                Color(string.toInt(), true)
             } catch (ignored: NumberFormatException) {
                 throw e
             }

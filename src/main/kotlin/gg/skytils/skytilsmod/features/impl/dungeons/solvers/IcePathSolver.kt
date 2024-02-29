@@ -39,6 +39,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.awt.Point
 import java.util.*
+import kotlin.collections.ArrayDeque
 import kotlin.math.abs
 
 object IcePathSolver {
@@ -77,11 +78,11 @@ object IcePathSolver {
                     silverfish = it as EntitySilverfish
                     if (silverfishChestPos == null || roomFacing == null) {
                         Skytils.launch {
+                            val playerX = mc.thePlayer.posX.toInt()
+                            val playerZ = mc.thePlayer.posZ.toInt()
+                            val xRange = playerX - 25..playerX + 25
+                            val zRange = playerZ - 25..playerZ + 25
                             findChest@ for (te in mc.theWorld.loadedTileEntityList) {
-                                val playerX = mc.thePlayer.posX.toInt()
-                                val playerZ = mc.thePlayer.posZ.toInt()
-                                val xRange = playerX - 25..playerX + 25
-                                val zRange = playerZ - 25..playerZ + 25
                                 if (te.pos.y == 67 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
                                 ) {
                                     val pos = te.pos
@@ -202,7 +203,7 @@ object IcePathSolver {
         queue.addLast(Point(startX, startY))
         iceCaveColors[startY][startX] = startPoint
         while (queue.size != 0) {
-            val currPos = queue.pollFirst()
+            val currPos = queue.removeFirst()
             // traverse adjacent nodes while sliding on the ice
             for (dir in EnumFacing.HORIZONTALS) {
                 val nextPos = move(iceCave, iceCaveColors, currPos, dir)
@@ -220,7 +221,7 @@ object IcePathSolver {
                         steps.add(currPos)
                         while (tmp !== startPoint) {
                             count++
-                            tmp = iceCaveColors[tmp!!.y][tmp.x]
+                            tmp = iceCaveColors[tmp.y][tmp.x]!!
                             steps.add(tmp)
                         }
                         //System.out.println("Silverfish solved in " + count + " moves.");

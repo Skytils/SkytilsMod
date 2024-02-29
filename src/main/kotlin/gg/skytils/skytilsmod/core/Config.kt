@@ -26,6 +26,7 @@ import gg.essential.vigilance.data.Category
 import gg.essential.vigilance.data.Property
 import gg.essential.vigilance.data.PropertyType
 import gg.essential.vigilance.data.SortingBehavior
+import gg.skytils.skytilsmod.Reference
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
@@ -46,7 +47,7 @@ import java.net.URI
 
 object Config : Vigilant(
     File("./config/skytils/config.toml"),
-    if (Utils.isBSMod) "BSMod" else "Skytils",
+    (if (Utils.isBSMod) "BSMod" else "Skytils") + " (${Reference.VERSION})",
     sortingBehavior = ConfigSorting
 ) {
     @Property(
