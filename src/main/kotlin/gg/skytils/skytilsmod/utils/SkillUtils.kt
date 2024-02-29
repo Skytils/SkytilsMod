@@ -305,17 +305,4 @@ object SkillUtils {
             }
             return maxLevel
         }
-
-    val PetInfo.level: Int
-        get () {
-            val offset = petRarityOffset[tier] ?: 0
-            val maxLevel = if (type == "GOLDEN_DRAGON") 200 else 100
-            val levels = petLevels.sliceArray(offset..< offset + maxLevel - 1)
-
-            levels.reduceIndexed { index, acc, i ->
-                if (exp < acc) return index - 1
-                acc + i
-            }
-            return maxLevel
-        }
 }
