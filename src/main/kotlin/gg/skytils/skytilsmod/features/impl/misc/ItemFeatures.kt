@@ -20,7 +20,9 @@ package gg.skytils.skytilsmod.features.impl.misc
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
+import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
@@ -42,6 +44,7 @@ import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.RenderUtil.renderRarity
+import gg.skytils.skytilsmod.utils.SkillUtils.level
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -83,7 +86,6 @@ import kotlin.math.pow
 
 object ItemFeatures {
 
-    private val candyPattern = Regex("§a\\((\\d+)/10\\) Pet Candy Used")
     private val headPattern =
         Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
 
@@ -646,11 +648,15 @@ object ItemFeatures {
                     }
             }
         }
-        if (Skytils.config.showPetCandies && item.item === Items.skull) { // TODO: Use NBT
-            lore?.forEach { line ->
-                candyPattern.find(line)?.let {
-                    stackTip = it.groups[1]!!.value
-                    return@forEach
+        if (Skytils.config.showPetCandies && item.item === Items.skull) {
+            val petInfoString = getExtraAttributes(item)?.getString("petInfo")
+            if (!petInfoString.isNullOrBlank()) {
+                val petInfo = json.decodeFromString<Pet>(petInfoString)
+                val level = petInfo.level
+                val maxLevel = if (petInfo.type == "GOLDEN_DRAGON") 200 else 100
+
+                if (petInfo.candyUsed > 0 && level != maxLevel) {
+                    stackTip = petInfo.candyUsed.toString()
                 }
             }
         }
