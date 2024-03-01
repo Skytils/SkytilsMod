@@ -22,6 +22,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.passive.EntityPig
@@ -44,20 +45,18 @@ object TechnoMayor {
     fun onRenderSpecialLivingPre(event: RenderLivingEvent.Specials.Pre<EntityLivingBase?>) {
         if (!Utils.inSkyblock) return
         val e = event.entity
-        if (e !is EntityArmorStand || !e.hasCustomName() || e.isDead || e.customNameTag != "§6§lSHINY ORB") return
+        if (!e.isValidPigLabel()) return
         val pos = e.position
         mc.theWorld.getEntitiesWithinAABBExcludingEntity(
             e,
             AxisAlignedBB(pos, BlockPos(pos.x + 1, pos.y + 1, pos.z + 1))
         ).find {
-            if (it is EntityArmorStand && it.hasCustomName() && it.getCustomNameTag().contains(mc.thePlayer.name)) {
-                it.worldObj.removeEntity(it)
-                e.worldObj.removeEntity(e)
-                shinyPigs.putIfAbsent(Vec3(pos.x + 0.5, (pos.y - 2).toDouble(), pos.z + 0.5), latestPig)
-                latestPig = null
-                return@find true
-            }
-            return@find false
+            it is EntityArmorStand && mc.thePlayer.name in it.customNameTag
+        }?.let {
+            it.worldObj.removeEntity(it)
+            e.worldObj.removeEntity(e)
+            shinyPigs.putIfAbsent(Vec3(pos.x + 0.5, (pos.y - 2).toDouble(), pos.z + 0.5), latestPig)
+            latestPig = null
         }
     }
 
@@ -71,6 +70,7 @@ object TechnoMayor {
 
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()
+        GlState.pushState()
         for (entry in shinyPigs) {
             val orb = entry.key
             val pig = entry.value
@@ -108,49 +108,31 @@ object TechnoMayor {
                     RenderUtil.drawOutlinedBoundingBox(pig.entityBoundingBox, Color.RED, 1f, event.partialTicks)
                 }
             }
-            GlStateManager.disableLighting()
-            GlStateManager.enableTexture2D()
-            GlStateManager.enableDepth()
-            GlStateManager.enableCull()
-
         }
+        GlState.popState()
     }
 
     @SubscribeEvent
     fun onEntityInteract(event: EntityInteractEvent) {
-        if (event.target !is EntityPig) return
-        val entity = event.target
-        mc.theWorld.getEntitiesWithinAABBExcludingEntity(
-            entity,
-            AxisAlignedBB(
-                BlockPos(entity.posX - 1, entity.posY, entity.posZ - 1),
-                BlockPos(entity.posX + 1, entity.posY + 2, entity.posZ + 1)
-            )
-        ).find {
-            if (it is EntityArmorStand && it.hasCustomName() && !it.isDead && it.customNameTag == "§6§lSHINY PIG") {
-                latestPig = entity as EntityPig
-                return@find true
-            }
-            return@find false
-        }
+        if (!Utils.inSkyblock) return
+        checkPig(event.target as? EntityPig ?: return)
     }
 
     @SubscribeEvent
     fun onEntityAttack(event: AttackEntityEvent) {
-        if (event.target !is EntityPig) return
-        val entity = event.target
-        mc.theWorld.getEntitiesWithinAABBExcludingEntity(
+        if (!Utils.inSkyblock) return
+        checkPig(event.target as? EntityPig ?: return)
+    }
+
+    fun checkPig(entity: EntityPig) {
+        if (mc.theWorld.getEntitiesWithinAABBExcludingEntity(
             entity,
             AxisAlignedBB(
                 BlockPos(entity.posX - 1, entity.posY, entity.posZ - 1),
                 BlockPos(entity.posX + 1, entity.posY + 2, entity.posZ + 1)
             )
-        ).find {
-            if (it is EntityArmorStand && it.hasCustomName() && !it.isDead && it.customNameTag == "§6§lSHINY PIG") {
-                latestPig = entity as EntityPig
-                return@find true
-            }
-            return@find false
+        ).any { it.isValidPigLabel() }) {
+            latestPig = entity
         }
     }
 
@@ -159,4 +141,6 @@ object TechnoMayor {
         shinyPigs.clear()
         latestPig = null
     }
+
+    private fun Entity.isValidPigLabel() = this is EntityArmorStand && !isDead && customNameTag == "§6§lSHINY PIG"
 }

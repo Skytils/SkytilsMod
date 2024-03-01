@@ -1140,7 +1140,7 @@ object Config : Vigilant(
         type = PropertyType.SWITCH, name = "Show Shiny Pig Locations",
         description = "Shows the location of the pig and draws a line to its orb.",
         category = "Events", subcategory = "Technoblade",
-        searchTags = ["Shiny", "Technoblade", "Pig"]
+        searchTags = ["Pig"]
     )
     var shinyPigLocations = false
 
