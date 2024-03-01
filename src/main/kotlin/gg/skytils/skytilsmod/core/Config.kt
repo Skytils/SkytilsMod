@@ -264,7 +264,7 @@ object Config : Vigilant(
         if (ModChecker.canShowNotifications) {
             EssentialAPI.getNotifications().push("Dungeon Sweat", "Dungeon Sweat mode ${SuperSecretSettings.azooPuzzoo}")
         } else {
-            UChat.chat("${Skytils.prefix} §bDungeon Sweat mode ${SuperSecretSettings.azooPuzzoo}");
+            UChat.chat("${Skytils.prefix} §bDungeon Sweat mode ${SuperSecretSettings.azooPuzzoo}")
         }
         UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
     }
@@ -1132,9 +1132,10 @@ object Config : Vigilant(
         type = PropertyType.SWITCH, name = "Show Shiny Orb Waypoints",
         description = "Creates a waypoint of where your shiny orbs are",
         category = "Events", subcategory = "Technoblade",
-        searchTags = ["Shiny", "Technoblade", "Pig"]
+        searchTags = ["Pig"]
     )
     var shinyOrbWaypoints = false
+
     @Property(
         type = PropertyType.SWITCH, name = "Show Shiny Pig Locations",
         description = "Shows the location of the pig and draws a line to its orb.",

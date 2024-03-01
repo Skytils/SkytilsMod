@@ -51,7 +51,7 @@ object TechnoMayor {
             AxisAlignedBB(pos, BlockPos(pos.x + 1, pos.y + 1, pos.z + 1))
         ).find {
             if (it is EntityArmorStand && it.hasCustomName() && it.getCustomNameTag().contains(mc.thePlayer.name)) {
-                it.worldObj.removeEntity(it);
+                it.worldObj.removeEntity(it)
                 e.worldObj.removeEntity(e)
                 shinyPigs.putIfAbsent(Vec3(pos.x + 0.5, (pos.y - 2).toDouble(), pos.z + 0.5), latestPig)
                 latestPig = null
@@ -60,19 +60,14 @@ object TechnoMayor {
             return@find false
         }
     }
+
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Utils.inSkyblock) return
         if (SBInfo.mode != SkyblockIsland.Hub.mode && SBInfo.mode != SkyblockIsland.FarmingIsland.mode) return
         if (!Skytils.config.shinyOrbWaypoints) return
 
-        val iterator = shinyPigs.entries.iterator();
-        while (iterator.hasNext()) {
-            val it = iterator.next();
-            if (it.value == null || it.value!!.isDead) {
-                iterator.remove()
-            }
-        }
+        shinyPigs.values.removeAll { it?.isDead != false }
 
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()
@@ -106,8 +101,10 @@ object TechnoMayor {
                         event.partialTicks,
                         matrixStack
                     )
-                    RenderUtil.draw3DLine(Vec3(pig.posX, pig.posY + 0.5, pig.posZ), Vec3(orb.x, orb.y + 1.5, orb.z),
-                        1, Color.RED, event.partialTicks, matrixStack)
+                    RenderUtil.draw3DLine(
+                        Vec3(pig.posX, pig.posY + 0.5, pig.posZ), Vec3(orb.x, orb.y + 1.5, orb.z),
+                        1, Color.RED, event.partialTicks, matrixStack
+                    )
                     RenderUtil.drawOutlinedBoundingBox(pig.entityBoundingBox, Color.RED, 1f, event.partialTicks)
                 }
             }
@@ -118,14 +115,17 @@ object TechnoMayor {
 
         }
     }
+
     @SubscribeEvent
     fun onEntityInteract(event: EntityInteractEvent) {
         if (event.target !is EntityPig) return
-        val entity = event.target;
+        val entity = event.target
         mc.theWorld.getEntitiesWithinAABBExcludingEntity(
             entity,
-            AxisAlignedBB(BlockPos(entity.posX - 1, entity.posY, entity.posZ - 1),
-                BlockPos(entity.posX + 1, entity.posY + 2, entity.posZ + 1))
+            AxisAlignedBB(
+                BlockPos(entity.posX - 1, entity.posY, entity.posZ - 1),
+                BlockPos(entity.posX + 1, entity.posY + 2, entity.posZ + 1)
+            )
         ).find {
             if (it is EntityArmorStand && it.hasCustomName() && !it.isDead && it.customNameTag == "§6§lSHINY PIG") {
                 latestPig = entity as EntityPig
@@ -134,14 +134,17 @@ object TechnoMayor {
             return@find false
         }
     }
+
     @SubscribeEvent
     fun onEntityAttack(event: AttackEntityEvent) {
         if (event.target !is EntityPig) return
-        val entity = event.target;
+        val entity = event.target
         mc.theWorld.getEntitiesWithinAABBExcludingEntity(
             entity,
-            AxisAlignedBB(BlockPos(entity.posX - 1, entity.posY, entity.posZ - 1),
-                BlockPos(entity.posX + 1, entity.posY + 2, entity.posZ + 1))
+            AxisAlignedBB(
+                BlockPos(entity.posX - 1, entity.posY, entity.posZ - 1),
+                BlockPos(entity.posX + 1, entity.posY + 2, entity.posZ + 1)
+            )
         ).find {
             if (it is EntityArmorStand && it.hasCustomName() && !it.isDead && it.customNameTag == "§6§lSHINY PIG") {
                 latestPig = entity as EntityPig
@@ -150,6 +153,7 @@ object TechnoMayor {
             return@find false
         }
     }
+
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
         shinyPigs.clear()
