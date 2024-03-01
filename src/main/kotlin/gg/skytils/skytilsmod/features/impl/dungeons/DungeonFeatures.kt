@@ -32,17 +32,14 @@ import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import gg.skytils.skytilsmod.utils.*
-import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.block.BlockStainedGlass
-import net.minecraft.block.material.Material
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
@@ -90,6 +87,12 @@ object DungeonFeatures {
         "aim"
     )
     var dungeonFloor: String? = null
+        set(value) {
+            field = value
+            dungeonFloorNumber = value?.drop(1)?.ifEmpty { "0" }?.toIntOrNull()
+        }
+    var dungeonFloorNumber: Int? = null
+        private set
     var hasBossSpawned = false
     private var isInTerracottaPhase = false
     private var terracottaEndTime = -1.0
@@ -105,7 +108,6 @@ object DungeonFeatures {
     private val lastBlockPos = BlockPos(7, 77, 34)
     private var startWithoutFullParty = false
     private var blazes = 0
-    private var secondsToPortal = 0f
     var hasClearedText = false
     private var terracottaSpawns = hashMapOf<BlockPos, Long>()
     private val dungeonMobSpawns = setOf(
@@ -123,8 +125,8 @@ object DungeonFeatures {
     )
 
     init {
+        DungeonSecretDisplay
         LividGuiElement()
-        PortalTimer()
         SpiritBearSpawnTimer()
     }
 
@@ -139,7 +141,7 @@ object DungeonFeatures {
         } else if (isInTerracottaPhase && Skytils.config.terracottaRespawnTimer && dungeonFloor?.endsWith('6') == true) {
             if (event.old.block == Blocks.air && event.update.block == Blocks.flower_pot) {
                 // TODO: verify M6 time
-                terracottaSpawns[event.pos] = System.currentTimeMillis() + if (dungeonFloor == "F6") 15000 else 13000
+                terracottaSpawns[event.pos] = System.currentTimeMillis() + if (dungeonFloor == "F6") 15000 else 12000
             }
         }
     }
@@ -180,15 +182,14 @@ object DungeonFeatures {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
         if (Utils.inDungeons) {
             if (dungeonFloor == null) {
-                for (line in ScoreboardUtil.sidebarLines) {
-                    if (line.contains("The Catacombs (")) {
-                        dungeonFloor = line.substringAfter("(").substringBefore(")")
-                        ScoreCalculation.floorReq.set(
-                            ScoreCalculation.floorRequirements[dungeonFloor]
-                                ?: ScoreCalculation.floorRequirements["default"]!!
-                        )
-                        break
-                    }
+                ScoreboardUtil.sidebarLines.find {
+                    it.contains("The Catacombs (")
+                }?.let {
+                    dungeonFloor = it.substringAfter("(").substringBefore(")")
+                    ScoreCalculation.floorReq.set(
+                        ScoreCalculation.floorRequirements[dungeonFloor]
+                            ?: ScoreCalculation.floorRequirements["default"]!!
+                    )
                 }
             }
             if (!hasClearedText) {
@@ -219,8 +220,6 @@ object DungeonFeatures {
                 GuiManager.createTitle("Spirit Pet", 20)
                 alertedSpiritPet = true
             }
-
-            secondsToPortal = (mc.thePlayer.maxInPortalTime / 20f) * (1 - mc.thePlayer.timeInPortal)
 
             if (Skytils.config.findCorrectLivid && !foundLivid) {
                 if (equalsOneOf(dungeonFloor, "F5", "M5")) {
@@ -384,7 +383,7 @@ object DungeonFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inSkyblock || event.type == 2.toByte()) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Utils.inDungeons) {
             if (Skytils.config.autoCopyFailToClipboard) {
@@ -466,10 +465,8 @@ object DungeonFeatures {
             ) {
                 GlStateManager.disableCull()
                 GlStateManager.disableDepth()
-                val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(1f)
-                val x = event.entity.posX - viewerX
-                val y = event.entity.posY - viewerY
-                val z = event.entity.posZ - viewerZ
+                val (vx, vy, vz) = RenderUtil.getViewerPos(RenderUtil.getPartialTicks())
+                val (x, y, z) = RenderUtil.fixRenderPos(event.x - vx, event.y - vy, event.z - vz)
                 RenderUtil.drawFilledBoundingBox(
                     matrixStack,
                     AxisAlignedBB(x, y, z, x + 0.75, y + 1.975, z + 0.75),
@@ -536,8 +533,17 @@ object DungeonFeatures {
                             RenderUtil.getPartialTicks()
                         )
                     } else if (hasBossSpawned && Skytils.config.boxSpiritBears && event.entity.name == "Spirit Bear" && event.entity is EntityOtherPlayerMP) {
+                        val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
+                        val aabb = AxisAlignedBB(
+                            x - 0.5,
+                            y,
+                            z - 0.5,
+                            x + 0.5,
+                            y + 2,
+                            z + 0.5
+                        )
                         RenderUtil.drawOutlinedBoundingBox(
-                            event.entity.entityBoundingBox,
+                            aabb,
                             Color(121, 11, 255, 255),
                             3f,
                             RenderUtil.getPartialTicks()
@@ -547,25 +553,8 @@ object DungeonFeatures {
                     if (!hasBossSpawned && Skytils.config.boxStarredMobs && event.entity is EntityArmorStand && event.entity.hasCustomName() && event.entity.alwaysRenderNameTag) {
                         val name = event.entity.name
                         if (name.startsWith("§6✯ ") && name.endsWith("§c❤")) {
-                            val x =
-                                RenderUtil.interpolate(
-                                    event.entity.lastTickPosX,
-                                    event.entity.posX,
-                                    RenderUtil.getPartialTicks()
-                                )
-                            val y =
-                                RenderUtil.interpolate(
-                                    event.entity.lastTickPosY,
-                                    event.entity.posY,
-                                    RenderUtil.getPartialTicks()
-                                )
-                            val z =
-                                RenderUtil.interpolate(
-                                    event.entity.lastTickPosZ,
-                                    event.entity.posZ,
-                                    RenderUtil.getPartialTicks()
-                                )
-                            val color = Color(0, 255, 255, 255)
+                            val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
+                            val color = Skytils.config.boxStarredMobsColor
                             if ("Spider" in name) {
                                 RenderUtil.drawOutlinedBoundingBox(
                                     AxisAlignedBB(
@@ -600,13 +589,14 @@ object DungeonFeatures {
                 }
             }
             if (event.entity == lividTag) {
+                val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
                 val aabb = AxisAlignedBB(
-                    event.entity.posX - 0.5,
-                    event.entity.posY - 2,
-                    event.entity.posZ - 0.5,
-                    event.entity.posX + 0.5,
-                    event.entity.posY,
-                    event.entity.posZ + 0.5
+                    x - 0.5,
+                    y - 2,
+                    z - 0.5,
+                    x + 0.5,
+                    y,
+                    z + 0.5
                 )
                 RenderUtil.drawOutlinedBoundingBox(
                     aabb,
@@ -627,7 +617,7 @@ object DungeonFeatures {
             val diff = it.value - System.currentTimeMillis()
             RenderUtil.drawLabel(
                 it.key.middleVec(),
-                "${(diff / 1000.0).roundToPrecision(2)}s",
+                "${"%.2f".format(diff / 1000.0)}s",
                 Color.WHITE,
                 event.partialTicks,
                 stack
@@ -694,8 +684,8 @@ object DungeonFeatures {
                     }
                 }
 
-                chestName == "Start Dungeon?" -> {
-                    if (!startWithoutFullParty && Skytils.config.noChildLeftBehind && event.slot?.stack?.displayName == "§aStart Dungeon?") {
+                chestName == "Ready Up" -> {
+                    if (!startWithoutFullParty && Skytils.config.noChildLeftBehind) {
                         val teamCount =
                             (DungeonListener.partyCountPattern.find(TabListUtils.tabEntries[0].second)?.groupValues?.get(
                                 1
@@ -752,51 +742,6 @@ object DungeonFeatures {
         terracottaSpawns.clear()
     }
 
-    class PortalTimer : GuiElement("Blood Room Portal Timer", x = 0.05f, y = 0.4f) {
-        override fun render() {
-            if (!toggled || !Utils.inDungeons || DungeonTimer.bloodClearTime == -1L || DungeonTimer.bossEntryTime != -1L || mc.thePlayer?.isInsideOfMaterial(
-                    Material.portal
-                ) == false
-            ) return
-            val leftAlign = scaleX < sr.scaledWidth / 2f
-            val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-            ScreenRenderer.fontRenderer.drawString(
-                "§a${secondsToPortal.roundToPrecision(2)}s",
-                if (leftAlign) 0f else width.toFloat(),
-                0f,
-                CommonColors.RED,
-                alignment,
-                SmartFontRenderer.TextShadow.NORMAL
-            )
-        }
-
-        override fun demoRender() {
-            val leftAlign = scaleX < sr.scaledWidth / 2f
-            val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-            ScreenRenderer.fontRenderer.drawString(
-                "§aPortal: 3.99s",
-                if (leftAlign) 0f else 0f + width,
-                0f,
-                CommonColors.RED,
-                alignment,
-                SmartFontRenderer.TextShadow.NORMAL
-            )
-        }
-
-        override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
-
-        override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("Portal: 3.99s")
-
-        override val toggled: Boolean
-            get() = Skytils.config.bloodPortalTimer
-
-        init {
-            Skytils.guiManager.registerElement(this)
-        }
-    }
-
     class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", x = 0.05f, y = 0.4f) {
         override fun render() {
             if (toggled && lastLitUpTime != -1L) {
@@ -814,7 +759,7 @@ object DungeonFeatures {
                     0f,
                     CommonColors.PURPLE,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -829,7 +774,7 @@ object DungeonFeatures {
                 0f,
                 CommonColors.PURPLE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -861,7 +806,7 @@ object DungeonFeatures {
                     0f,
                     CommonColors.WHITE,
                     alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -877,7 +822,7 @@ object DungeonFeatures {
                 0f,
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -888,6 +833,57 @@ object DungeonFeatures {
 
         override val toggled: Boolean
             get() = Skytils.config.findCorrectLivid
+
+        init {
+            Skytils.guiManager.registerElement(this)
+        }
+    }
+
+    object DungeonSecretDisplay : GuiElement("Dungeon Secret Display", x = 0.05f, y = 0.4f) {
+        var secrets = -1
+        var maxSecrets = -1
+
+        override fun render() {
+            if (toggled && Utils.inDungeons && maxSecrets > 0) {
+                val leftAlign = scaleX < sr.scaledWidth / 2f
+                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                val color = when (secrets / maxSecrets.toDouble()) {
+                    in 0.0..0.5 -> CommonColors.RED
+                    in 0.5..0.75 -> CommonColors.YELLOW
+                    else -> CommonColors.GREEN
+                }
+
+                ScreenRenderer.fontRenderer.drawString(
+                    "Secrets: ${secrets}/${maxSecrets}",
+                    if (leftAlign) 0f else 0f + width,
+                    0f,
+                    color,
+                    alignment,
+                    textShadow
+                )
+            }
+        }
+
+        override fun demoRender() {
+            val leftAlign = scaleX < sr.scaledWidth / 2f
+            val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            ScreenRenderer.fontRenderer.drawString(
+                "Secrets: 0/0",
+                if (leftAlign) 0f else 0f + width,
+                0f,
+                CommonColors.WHITE,
+                alignment,
+                textShadow
+            )
+        }
+
+        override val height: Int
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
+        override val width: Int
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Secrets: 0/0")
+
+        override val toggled: Boolean
+            get() = Skytils.config.dungeonSecretDisplay
 
         init {
             Skytils.guiManager.registerElement(this)

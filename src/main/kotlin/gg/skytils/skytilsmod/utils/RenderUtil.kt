@@ -29,6 +29,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.mixins.hooks.renderer.skipGlint
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorRenderManager
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -699,6 +700,18 @@ object RenderUtil {
         }
     }
 
+    fun drawCircle(matrixStack: UMatrixStack, x: Double, y: Double, z: Double, partialTicks: Float, radius: Double, edges: Int, r: Int, g: Int, b: Int, a: Int = 255) {
+        val ug = UGraphics.getFromTessellator()
+        val angleDelta = Math.PI * 2 / edges
+        GL11.glLineWidth(5f)
+        ug.beginWithDefaultShader(UGraphics.DrawMode.LINE_STRIP, UGraphics.CommonVertexFormats.POSITION_COLOR)
+        repeat(edges) { idx ->
+            ug.pos(matrixStack, x - mc.renderManager.viewerPosX + radius * cos(idx * angleDelta), y - mc.renderManager.viewerPosY, z - mc.renderManager.viewerPosZ + radius * sin(idx * angleDelta)).color(r, g, b, a).endVertex()
+        }
+        ug.pos(matrixStack, x + radius - mc.renderManager.viewerPosX, y - mc.renderManager.viewerPosY, z - mc.renderManager.viewerPosZ).color(r, g, b, a).endVertex()
+        ug.drawDirect()
+    }
+
     fun getViewerPos(partialTicks: Float): Triple<Double, Double, Double> {
         val viewer = mc.renderViewEntity
         val viewerX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
@@ -709,6 +722,36 @@ object RenderUtil {
 
     fun getPartialTicks() =
         (mc as AccessorMinecraft).timer.renderPartialTicks
+
+    /**
+     * Helper method for fixRenderPos
+     */
+    fun getRenderX() : Double {
+        return (mc.renderManager as AccessorRenderManager).renderX
+    }
+
+    /**
+     * Helper method for fixRenderPos
+     */
+    fun getRenderY() : Double {
+        return (mc.renderManager as AccessorRenderManager).renderY
+    }
+
+    /**
+     * Helper method for fixRenderPos
+     */
+    fun getRenderZ() : Double {
+        return (mc.renderManager as AccessorRenderManager).renderZ
+    }
+
+    /**
+     * Method used to Gather event location parameters and return their interpolated counterparts.
+     *
+     * Working particularly well in RenderLivingEvent.Pre/Post<*>
+     */
+    fun fixRenderPos(x: Double, y: Double, z: Double, invert: Boolean = false) : Triple<Double, Double, Double> {
+        return Triple(x + getRenderX(), y + getRenderY(), z + getRenderZ())
+    }
 
     infix fun Slot.highlight(color: Color) {
         Gui.drawRect(
@@ -823,7 +866,7 @@ object RenderUtil {
         val leftAlign = element.scaleX < UResolution.scaledWidth / 2f
         val alignment =
             if (leftAlign) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
-        val xPos = if (leftAlign) 0f else element.scaleWidth
+        val xPos = if (leftAlign) 0f else element.width.toFloat()
         for ((i, str) in lines.withIndex()) {
             ScreenRenderer.fontRenderer.drawString(
                 str,
@@ -831,7 +874,7 @@ object RenderUtil {
                 (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                 CommonColors.WHITE,
                 alignment,
-                SmartFontRenderer.TextShadow.NORMAL
+                element.textShadow
             )
         }
     }

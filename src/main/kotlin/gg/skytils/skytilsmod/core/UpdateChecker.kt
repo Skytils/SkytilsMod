@@ -17,6 +17,7 @@
  */
 package gg.skytils.skytilsmod.core
 
+import gg.essential.universal.UDesktop
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.gui.RequestUpdateGui
@@ -38,7 +39,6 @@ import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion
-import java.awt.Desktop
 import java.io.File
 
 object UpdateChecker {
@@ -47,6 +47,9 @@ object UpdateChecker {
         get() = updateGetter.updateObj!!.assets.first { it.name.endsWith(".jar") }
     val updateDownloadURL: String
         get() = updateAsset.downloadUrl
+
+    val currentTag = Skytils.VERSION.substringBefore("-dev")
+    val currentVersion = SkytilsVersion(currentTag)
 
     fun getJarNameFromUrl(url: String): String {
         return url.split(Regex("/")).last()
@@ -90,12 +93,12 @@ object UpdateChecker {
                     if (!sipStatus.inputStream.use { it.bufferedReader().readText() }
                             .contains("System Integrity Protection status: disabled.")) {
                         println("SIP is NOT disabled, opening Finder.")
-                        Desktop.getDesktop().open(oldJar.parentFile)
+                        UDesktop.open(oldJar.parentFile)
                         return@Thread
                     }
                 }
                 println("Using runtime $runtime")
-                Runtime.getRuntime().exec("\"$runtime\" -jar \"${taskFile.absolutePath}\" \"${oldJar.absolutePath}\"")
+                Runtime.getRuntime().exec("\"$runtime\" -jar \"${taskFile.absolutePath}\" delete \"${oldJar.absolutePath}\"")
                 println("Successfully applied Skytils update.")
             } catch (ex: Throwable) {
                 println("Failed to apply Skytils Update.")
@@ -110,7 +113,7 @@ object UpdateChecker {
             val taskDir = File(File(Skytils.modDir, "updates"), "tasks")
             // TODO Make this dynamic and fetch latest one or something
             val url =
-                "https://github.com/Skytils/SkytilsMod-Data/releases/download/files/SkytilsInstaller-1.1.1.jar"
+                "https://github.com/Skytils/SkytilsMod-Data/releases/download/files/SkytilsInstaller-1.2.0.jar"
             val taskFile = File(taskDir, getJarNameFromUrl(url))
             if (taskDir.mkdirs() || withContext(Dispatchers.IO) {
                     taskFile.createNewFile()
@@ -164,9 +167,6 @@ object UpdateChecker {
                 else -> return println("Update Channel set as none")
             }
             val latestTag = latestRelease.tagName
-            val currentTag = Skytils.VERSION.substringBefore("-dev")
-
-            val currentVersion = SkytilsVersion(currentTag)
             val latestVersion = SkytilsVersion(latestTag.substringAfter("v"))
             if (currentVersion < latestVersion) {
                 updateObj = latestRelease
@@ -188,7 +188,7 @@ object UpdateChecker {
         val specialVersionType by lazy {
             val typeString = matched!!.groups["type"]?.value ?: return@lazy UpdateType.RELEASE
 
-            return@lazy UpdateType.values().find { typeString == it.prefix } ?: UpdateType.UNKNOWN
+            return@lazy UpdateType.entries.find { typeString == it.prefix } ?: UpdateType.UNKNOWN
         }
         val specialVersion by lazy {
             if (specialVersionType == UpdateType.RELEASE) return@lazy null

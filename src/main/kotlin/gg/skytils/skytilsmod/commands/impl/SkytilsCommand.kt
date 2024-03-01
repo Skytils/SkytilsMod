@@ -36,7 +36,7 @@ import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
 import gg.skytils.skytilsmod.features.impl.misc.Ping
 import gg.skytils.skytilsmod.features.impl.misc.PricePaid
-import gg.skytils.skytilsmod.features.impl.misc.SlayerFeatures
+import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.*
 import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
@@ -119,7 +119,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                             DataFetcher.reloadData().invokeOnCompletion {
                                 it?.run {
                                     UChat.chat("$failPrefix §cFailed to reload repository data due to a ${it::class.simpleName ?: "error"}: ${it.message}!")
-                                }?.ifNull {
+                                }.ifNull {
                                     UChat.chat("$prefix §bRepository data has been §freloaded§b successfully.")
                                 }
                             }
@@ -132,7 +132,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                             }.invokeOnCompletion {
                                 it?.run {
                                     UChat.chat("$failPrefix §cFailed to reload mayor data due to a ${it::class.simpleName ?: "error"}: ${it.message}!")
-                                }?.ifNull {
+                                }.ifNull {
                                     UChat.chat("$prefix §bMayor data has been §freloaded§b successfully.")
                                 }
                             }

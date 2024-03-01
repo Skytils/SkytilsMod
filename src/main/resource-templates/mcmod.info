@@ -1,0 +1,16 @@
+[
+{
+  "modid": "skytils",
+  "name": "Skytils",
+  "description": "",
+  "version": "{{ version }}",
+  "mcversion": "{{ mcversion }}",
+  "url": "https://github.com/Skytils/SkytilsMod",
+  "updateUrl": "https://github.com/Skytils/SkytilsMod/releases/latest",
+  "authorList": ["My-Name-Is-Jeff", "Sychic"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

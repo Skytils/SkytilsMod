@@ -37,6 +37,7 @@ public abstract class MixinItemArmor extends Item {
 
     @Inject(method = "getColorFromItemStack", at = @At("HEAD"), cancellable = true)
     private void replaceStackArmorColor(ItemStack stack, int renderPass, CallbackInfoReturnable<Integer> cir) {
+        if (renderPass > 0) return;
         ItemArmorHookKt.replaceArmorColor(stack, cir);
     }
 

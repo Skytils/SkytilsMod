@@ -74,12 +74,14 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         }
 
         val hasUnknown = Waypoints.categories.any { it.island == SkyblockIsland.Unknown }
-        islandDropdown = DropDown(SkyblockIsland.values().indexOfFirst {
-            SBInfo.mode == it.mode
-        }.run { if (this == -1) 0 else this },
-            SkyblockIsland.values()
+        islandDropdown = DropDown(
+            SkyblockIsland.entries.indexOfFirst {
+                SBInfo.mode == it.mode
+            }.coerceAtLeast(0),
+            SkyblockIsland.entries
                 .mapNotNull { if (it == SkyblockIsland.Unknown && !hasUnknown) null else it.displayName }
-        ).childOf(window)
+        )
+            .childOf(window)
             .constrain {
                 x = 5.pixels(true)
                 y = 5.percent()
@@ -169,7 +171,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     }
 
     private fun exportSelectedWaypoints() {
-        val island = SkyblockIsland.values()[islandDropdown.getValue()]
+        val island = SkyblockIsland.entries[islandDropdown.getValue()]
 
         // Convert the selected waypoints into an object that can be easily serialized
         val categories = categoryContainers.map { entry ->
@@ -211,7 +213,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         entries.clear()
         categoryContainers.clear()
         scrollComponent.clearChildren()
-        val island = SkyblockIsland.values()[selection]
+        val island = SkyblockIsland.entries[selection]
         Waypoints.categories.filter {
             it.island == island
         }.forEach {

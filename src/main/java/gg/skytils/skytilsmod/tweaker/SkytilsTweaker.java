@@ -33,8 +33,8 @@ public class SkytilsTweaker extends EssentialSetupTweaker {
 
     public SkytilsTweaker() throws Throwable {
         runStage("gg.skytils.skytilsmod.utils.SuperSecretSettings", "load");
-        boolean isFML = System.getSecurityManager().getClass().equals(FMLSecurityManager.class);
-        if (System.getProperty("skytils.noSecurityManager") == null && (isFML || System.getSecurityManager().getClass() == SecurityManager.class || System.getSecurityManager() == null)) {
+        boolean isFML = System.getSecurityManager() != null && System.getSecurityManager().getClass().equals(FMLSecurityManager.class);
+        if (System.getProperty("skytils.noSecurityManager") == null && (System.getSecurityManager() == null || isFML || System.getSecurityManager().getClass() == SecurityManager.class)) {
             System.out.println("Skytils is setting the security manager to prevent 'ghost windows'... Set the flag skytils.noSecurityManager to prevent this behavior.");
             overrideSecurityManager(isFML);
             runStage("gg.skytils.skytilsmod.tweaker.SkytilsSecurityManager", "overrideSecurityManager", isFML);

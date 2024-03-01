@@ -24,7 +24,7 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
@@ -70,14 +70,14 @@ object MasterMode7Features {
             }
         }
         if ((event.pos.y == 18 || event.pos.y == 19) && event.update.block === Blocks.air && event.old.block === Blocks.stone_slab) {
-            val dragon = WitherKingDragons.values().find { it.bottomChin == event.pos } ?: return
+            val dragon = WitherKingDragons.entries.find { it.bottomChin == event.pos } ?: return
             dragon.isDestroyed = true
         }
     }
 
     init {
-        TickTask(15, repeats = true) {
-            if (DungeonTimer.phase4ClearTime == -1L || DungeonTimer.scoreShownAt != -1L || mc.thePlayer == null) return@TickTask
+        tickTimer(15, repeats = true) {
+            if (DungeonTimer.phase4ClearTime == -1L || DungeonTimer.scoreShownAt != -1L || mc.thePlayer == null) return@tickTimer
             if (Skytils.config.witherKingDragonSlashAlert) {
                 if (glowstones.any { it.isVecInside(mc.thePlayer.positionVector) }) {
                     GuiManager.createTitle("Dimensional Slash!", 10)
@@ -95,21 +95,21 @@ object MasterMode7Features {
             val z = event.packet.func_149049_f() / 32.0
             if (x % 1 != 0.0 || y % 1 != 0.0 || z % 1 != 0.0) return
             val drag =
-                WitherKingDragons.values().find { it.blockPos.x == x.toInt() && it.blockPos.z == z.toInt() } ?: return
+                WitherKingDragons.entries.find { it.blockPos.x == x.toInt() && it.blockPos.z == z.toInt() } ?: return
             if (spawningDragons.add(drag)) {
                 printDevMessage("${drag.name} spawning $x $y $z", "witherkingdrags")
-                if (Skytils.config.witherKingDragonSpawnAlert) {
-                    UChat.chat("§c§lThe ${drag.chatColor}§l${drag.name} §c§ldragon is spawning!")
-                }
             }
         } else if (event.packet is S2APacketParticles) {
             event.packet.apply {
                 if (count != 20 || y != WitherKingDragons.particleYConstant || type != EnumParticleTypes.FLAME || xOffset != 2f || yOffset != 3f || zOffset != 2f || speed != 0f || !isLongDistance || x % 1 != 0.0 || z % 1 != 0.0) return
-                val owner = WitherKingDragons.values().find {
+                val owner = WitherKingDragons.entries.find {
                     it.particleLocation.x == x.toInt() && it.particleLocation.z == z.toInt()
                 } ?: return
                 if (owner !in dragonSpawnTimes) {
                     dragonSpawnTimes[owner] = System.currentTimeMillis() + 5000
+                    if (Skytils.config.witherKingDragonSpawnAlert) {
+                        UChat.chat("§c§lThe ${owner.chatColor}§l${owner.name} §c§ldragon is spawning!")
+                    }
                 }
             }
         }
@@ -118,7 +118,7 @@ object MasterMode7Features {
     fun onMobSpawned(entity: Entity) {
         if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon) {
             val type =
-                dragonMap[entity.entityId] ?: WitherKingDragons.values()
+                dragonMap[entity.entityId] ?: WitherKingDragons.entries
                     .minByOrNull { entity.getXZDistSq(it.blockPos) } ?: return
             (entity as ExtensionEntityLivingBase).skytilsHook.colorMultiplier = type.color
             (entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType = type
@@ -143,7 +143,7 @@ object MasterMode7Features {
         killedDragons.clear()
         dragonMap.clear()
         glowstones.clear()
-        WitherKingDragons.values().forEach { it.isDestroyed = false }
+        WitherKingDragons.entries.forEach { it.isDestroyed = false }
     }
 
     @SubscribeEvent
@@ -194,7 +194,7 @@ object MasterMode7Features {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (Skytils.config.showWitherKingStatueBox && DungeonTimer.phase4ClearTime != -1L) {
-            for (drag in WitherKingDragons.values()) {
+            for (drag in WitherKingDragons.entries) {
                 if (drag.isDestroyed) continue
                 RenderUtil.drawOutlinedBoundingBox(drag.bb, drag.color, 3.69f, event.partialTicks)
             }

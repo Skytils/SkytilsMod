@@ -45,38 +45,31 @@ object ArmorColorCommand : BaseCommand("armorcolor", listOf("armourcolour", "arm
             ArmorColor.armorColors.clear()
             PersistentSave.markDirty<ArmorColor>()
             UChat.chat("$successPrefix §aCleared all your custom armor colors!")
-        } else if (subcommand == "clear") {
+        } else if (subcommand == "clear" || subcommand == "set") {
             if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
             val item = player.heldItem
                 ?: throw WrongUsageException("You must hold a leather armor piece to use this command")
-            if (item.item !is ItemArmor) throw WrongUsageException("You must hold a leather armor piece to use this command")
-            if ((item.item as ItemArmor).armorMaterial != ItemArmor.ArmorMaterial.LEATHER) throw WrongUsageException("You must hold a leather armor piece to use this command")
+            if ((item.item as? ItemArmor)?.armorMaterial != ItemArmor.ArmorMaterial.LEATHER) throw WrongUsageException("You must hold a leather armor piece to use this command")
             val extraAttributes = ItemUtil.getExtraAttributes(item)
             if (extraAttributes == null || !extraAttributes.hasKey("uuid")) throw WrongUsageException("This item does not have a UUID!")
             val uuid = extraAttributes.getString("uuid")
-            if (ArmorColor.armorColors.containsKey(uuid)) {
-                ArmorColor.armorColors.remove(uuid)
+            if (subcommand == "set") {
+                if (args.size != 2) throw WrongUsageException("You must specify a valid hex color!")
+                val color: CustomColor = try {
+                    Utils.customColorFromString(args[1])
+                } catch (e: IllegalArgumentException) {
+                    throw SyntaxErrorException("$failPrefix §cUnable to get a color from inputted string.")
+                }
+                ArmorColor.armorColors[uuid] = color
                 PersistentSave.markDirty<ArmorColor>()
-                UChat.chat("$successPrefix §aCleared the custom color for your ${item.displayName}§a!")
-            } else UChat.chat("§cThat item doesn't have a custom color!")
-        } else if (subcommand == "set") {
-            if (!Utils.inSkyblock) throw WrongUsageException("You must be in Skyblock to use this command!")
-            val item = player.heldItem
-                ?: throw WrongUsageException("You must hold a leather armor piece to use this command")
-            if (item.item !is ItemArmor) throw WrongUsageException("You must hold a leather armor piece to use this command")
-            if ((item.item as ItemArmor).armorMaterial != ItemArmor.ArmorMaterial.LEATHER) throw WrongUsageException("You must hold a leather armor piece to use this command")
-            val extraAttributes = ItemUtil.getExtraAttributes(item)
-            if (extraAttributes == null || !extraAttributes.hasKey("uuid")) throw WrongUsageException("This item does not have a UUID!")
-            if (args.size != 2) throw WrongUsageException("You must specify a valid hex color!")
-            val uuid = extraAttributes.getString("uuid")
-            val color: CustomColor = try {
-                Utils.customColorFromString(args[1])
-            } catch (e: IllegalArgumentException) {
-                throw SyntaxErrorException("$failPrefix §cUnable to get a color from inputted string.")
+                UChat.chat("$successPrefix §aSet the color of your ${item.displayName}§a to ${args[1]}!")
+            } else {
+                if (ArmorColor.armorColors.containsKey(uuid)) {
+                    ArmorColor.armorColors.remove(uuid)
+                    PersistentSave.markDirty<ArmorColor>()
+                    UChat.chat("$successPrefix §aCleared the custom color for your ${item.displayName}§a!")
+                } else UChat.chat("§cThat item doesn't have a custom color!")
             }
-            ArmorColor.armorColors[uuid] = color
-            PersistentSave.markDirty<ArmorColor>()
-            UChat.chat("$successPrefix §aSet the color of your ${item.displayName}§a to ${args[1]}!")
         } else UChat.chat(getCommandUsage(player))
     }
 }

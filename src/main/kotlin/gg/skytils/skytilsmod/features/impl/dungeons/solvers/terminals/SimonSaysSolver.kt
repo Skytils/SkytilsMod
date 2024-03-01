@@ -19,17 +19,24 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
-import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
-import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.utils.RenderUtil
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.middleVec
 import net.minecraft.block.BlockButtonStone
+import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
+import net.minecraft.network.play.client.C07PacketPlayerDigging
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.network.play.server.S0BPacketAnimation
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
+import net.minecraft.util.MovingObjectPosition
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -41,43 +48,71 @@ object SimonSaysSolver {
     private var clickNeeded = 0
 
     @SubscribeEvent
+    fun onPacket(event: PacketEvent) {
+        if (Skytils.config.simonSaysSolver && Utils.inDungeons && clickInOrder.isNotEmpty() && clickNeeded < clickInOrder.size) {
+            if (event.packet is C08PacketPlayerBlockPlacement || event.packet is C07PacketPlayerDigging) {
+                val pos = when (event.packet) {
+                    is C07PacketPlayerDigging -> event.packet.position
+                    is C08PacketPlayerBlockPlacement -> event.packet.position
+                    else -> error("can't reach")
+                }.east()
+                if (pos.x == 111 && pos.y in 120..123 && pos.z in 92..95) {
+                    if (SuperSecretSettings.azooPuzzoo && clickInOrder.size == 3 && clickNeeded == 0 && pos == clickInOrder[1]) {
+                        clickNeeded += 2
+                    } else if (clickInOrder[clickNeeded] != pos) {
+                        if (Skytils.config.blockIncorrectTerminalClicks) event.isCanceled = true
+                    } else {
+                        clickNeeded++
+                    }
+                }
+            } else if (Skytils.config.predictSimonClicks && event.packet is S0BPacketAnimation && event.packet.animationType == 0) {
+                val entity = mc.theWorld.getEntityByID(event.packet.entityID) as? EntityOtherPlayerMP ?: return
+                if (entity.posX in 105.0..115.0 && entity.posY in 115.0..128.0 && entity.posZ in 87.0..100.0) {
+                    val rayCast = entity.rayTrace(5.0, RenderUtil.getPartialTicks())
+                    if (rayCast.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+                        val hitPos = rayCast.blockPos ?: return
+                        if (hitPos.x in 110..111 && hitPos.y in 120..123 && hitPos.z in 92..95) {
+                            clickNeeded++
+                            //UChat.chat("${Skytils.prefix} Registered teammate click on Simon Says. (Report on Discord if wrong.)")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onBlockChange(event: BlockChangeEvent) {
         val pos = event.pos
         val old = event.old
         val state = event.update
-        if (Utils.inDungeons) {
-            if (Skytils.config.simonSaysSolver && Utils.equalsOneOf(
-                    DungeonFeatures.dungeonFloor,
-                    "F7",
-                    "M7"
-                ) && DungeonTimer.phase2ClearTime != -1L && DungeonTimer.phase3ClearTime == -1L
-            ) {
-                if ((pos.y in 120..123) && pos.z in 92..95) {
-                    if (pos.x == 111) {
-                        //println("Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}")
-                        if (state.block === Blocks.sea_lantern) {
-                            if (!clickInOrder.contains(pos)) {
-                                clickInOrder.add(pos)
-                            }
-                        }
-                    } else if (pos.x == 110) {
-                        if (state.block === Blocks.air) {
-                            //println("Buttons on simon says were removed!")
-                            clickNeeded = 0
-                        } else if (state.block === Blocks.stone_button) {
-                            if (old.block === Blocks.stone_button) {
-                                if (state.getValue(BlockButtonStone.POWERED)) {
-                                    //println("Button on simon says was pressed")
-                                    clickNeeded++
-                                }
-                            }
+        if (Utils.inDungeons && Skytils.config.simonSaysSolver && TerminalFeatures.isInPhase3()) {
+            if ((pos.y in 120..123) && pos.z in 92..95) {
+                if (pos.x == 111) {
+                    //println("Block at $pos changed to ${state.block.localizedName} from ${old.block.localizedName}")
+                    if (state.block === Blocks.sea_lantern) {
+                        if (!clickInOrder.contains(pos)) {
+                            clickInOrder.add(pos)
                         }
                     }
-                } else if ((pos == startBtn && state.block === Blocks.stone_button && state.getValue(BlockButtonStone.POWERED)) || Funny.ticks == 180) {
-                    //println("Simon says was started")
-                    clickInOrder.clear()
-                    clickNeeded = 0
+                } else if (pos.x == 110) {
+                    if (state.block === Blocks.air) {
+                        //println("Buttons on simon says were removed!")
+                        clickNeeded = 0
+                        clickInOrder.clear()
+                    } /*else if (state.block === Blocks.stone_button) {
+                        if (old.block === Blocks.stone_button) {
+                            if (state.getValue(BlockButtonStone.POWERED)) {
+                                //println("Button on simon says was pressed")
+                                clickNeeded++
+                            }
+                        }
+                    }*/
                 }
+            } else if ((pos == startBtn && state.block === Blocks.stone_button && state.getValue(BlockButtonStone.POWERED)) || Funny.ticks == 180) {
+                //println("Simon says was started")
+                clickInOrder.clear()
+                clickNeeded = 0
             }
         }
     }
@@ -88,17 +123,32 @@ object SimonSaysSolver {
 
         if (Skytils.config.simonSaysSolver && clickNeeded < clickInOrder.size) {
             val matrixStack = UMatrixStack()
-            val pos = clickInOrder[clickNeeded].west()
-            val x = pos.x - viewerX
-            val y = pos.y - viewerY
-            val z = pos.z - viewerZ
-            GlStateManager.disableCull()
-            RenderUtil.drawFilledBoundingBox(
-                matrixStack,
-                AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
-                if (clickNeeded == clickInOrder.size - 1) Color.GREEN else Color.RED,
-                0.5f * Funny.alphaMult
+            RenderUtil.drawLabel(
+                startBtn.middleVec(),
+                "${clickNeeded}/${clickInOrder.size}",
+                Color.WHITE,
+                event.partialTicks,
+                matrixStack
             )
+
+            for (i in clickNeeded..<clickInOrder.size) {
+                val pos = clickInOrder[i]
+                val x = pos.x - viewerX
+                val y = pos.y - viewerY + .372
+                val z = pos.z - viewerZ + .308
+                val color = when (i) {
+                    clickNeeded -> Color.GREEN
+                    clickNeeded + 1 -> Color.YELLOW
+                    else -> Color.RED
+                }
+
+                RenderUtil.drawFilledBoundingBox(
+                    matrixStack,
+                    AxisAlignedBB(x, y, z, x - .13, y + .26, z + .382),
+                    color,
+                    0.5f * Funny.alphaMult
+                )
+            }
             GlStateManager.enableCull()
         }
     }

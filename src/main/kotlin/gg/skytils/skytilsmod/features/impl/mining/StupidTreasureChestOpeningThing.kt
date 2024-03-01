@@ -38,6 +38,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
 
 object StupidTreasureChestOpeningThing {
@@ -47,7 +48,7 @@ object StupidTreasureChestOpeningThing {
 
     var iLovePain: BlockPos? = null
 
-    val sendHelpPlease = hashMapOf<BlockPos, StupidChest>()
+    val sendHelpPlease = ConcurrentHashMap<BlockPos, StupidChest>()
 
     data class StupidChest(
         val pos: BlockPos,
@@ -101,17 +102,19 @@ object StupidTreasureChestOpeningThing {
         when (val packet = event.packet) {
             is S02PacketChat -> {
                 val formatted = packet.chatComponent.formattedText
-                if (formatted == "§r§aYou uncovered a treasure chest!§r") {
-                    lastFoundChest = System.currentTimeMillis()
-                    found++
-                } else if (iLovePain != null && Utils.equalsOneOf(
-                        formatted,
-                        "§r§6You have successfully picked the lock on this chest!",
-                        "§r§aThe remaining contents of this treasure chest were placed in your inventory"
-                    )
-                ) {
-                    sendHelpPlease.remove(iLovePain)
-                    iLovePain = null
+                if (packet.type != 2.toByte()) {
+                    if (formatted == "§r§aYou uncovered a treasure chest!§r") {
+                        lastFoundChest = System.currentTimeMillis()
+                        found++
+                    } else if (iLovePain != null && Utils.equalsOneOf(
+                            formatted,
+                            "§r§6You have successfully picked the lock on this chest!",
+                            "§r§aThe remaining contents of this treasure chest were placed in your inventory"
+                        )
+                    ) {
+                        sendHelpPlease.remove(iLovePain)
+                        iLovePain = null
+                    }
                 }
             }
             is S2APacketParticles -> {

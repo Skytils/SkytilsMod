@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.utils.SBInfo
+import gg.skytils.skytilsmod.utils.SkyblockIsland
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemBlock
@@ -33,7 +34,7 @@ object RandomStuff {
     @SubscribeEvent
     fun onPacket(event: PacketEvent.ReceiveEvent) {
         if (!Skytils.config.randomStuff || !Utils.inSkyblock) return
-        if (event.packet is S0EPacketSpawnObject && event.packet.type == 70 && ((DungeonTimer.phase1ClearTime != -1L && DungeonTimer.bossClearTime == -1L) || SBInfo.mode == "instanced")) {
+        if (event.packet is S0EPacketSpawnObject && event.packet.type == 70 && ((DungeonTimer.phase1ClearTime != -1L && DungeonTimer.bossClearTime == -1L) || SBInfo.mode == SkyblockIsland.KuudraHollow.mode)) {
             event.isCanceled = true
         }
     }

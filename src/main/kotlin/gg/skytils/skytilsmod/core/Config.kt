@@ -19,12 +19,14 @@ package gg.skytils.skytilsmod.core
 
 import gg.essential.api.EssentialAPI
 import gg.essential.elementa.utils.withAlpha
+import gg.essential.universal.UChat
 import gg.essential.universal.UDesktop
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.Category
 import gg.essential.vigilance.data.Property
 import gg.essential.vigilance.data.PropertyType
 import gg.essential.vigilance.data.SortingBehavior
+import gg.skytils.skytilsmod.Reference
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
@@ -32,6 +34,8 @@ import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.PotionNotificationsGui
 import gg.skytils.skytilsmod.gui.SpiritLeapNamesGui
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
+import gg.skytils.skytilsmod.utils.ModChecker
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ClientCommandHandler
@@ -43,7 +47,7 @@ import java.net.URI
 
 object Config : Vigilant(
     File("./config/skytils/config.toml"),
-    if (Utils.isBSMod) "BSMod" else "Skytils",
+    (if (Utils.isBSMod) "BSMod" else "Skytils") + " (${Reference.VERSION})",
     sortingBehavior = ConfigSorting
 ) {
     @Property(
@@ -169,13 +173,6 @@ object Config : Vigilant(
     var updateChannel = 2
 
     @Property(
-        type = PropertyType.SWITCH, name = "Blood Room Portal Timer",
-        description = "Displays time to portal on your HUD.",
-        category = "Dungeons", subcategory = "HUD"
-    )
-    var bloodPortalTimer = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Crypts Counter",
         description = "Shows the amount of crypts destroyed on your HUD.",
         category = "Dungeons", subcategory = "HUD"
@@ -225,6 +222,20 @@ object Config : Vigilant(
     var dungeonChestProfitIncludesEssence = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Highlight Unopened Croesus Chests",
+        description = "Highlight runs in Croesus based on how many more chests can be opened.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var croesusChestHighlight = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Opened Croesus Chests",
+        description = "Hide runs in Croesus if no more chests can be opened.",
+        category = "Dungeons", subcategory = "Miscellaneous"
+    )
+    var croesusHideOpened = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Map",
         description = "Displays the vanilla map on your screen using vanilla rendering code.",
         category = "Dungeons", subcategory = "Miscellaneous"
@@ -237,6 +248,26 @@ object Config : Vigilant(
         category = "Dungeons", subcategory = "Miscellaneous"
     )
     var noChildLeftBehind = false
+
+    @Property(
+        type = PropertyType.BUTTON, name = "Dungeon Sweat",
+        description = "Click if dungeon sweat???",
+        category = "Dungeons", subcategory = "Miscellaneous",
+        searchTags = ["predev", "pre-dev", "arrow", "tic tac toe", "solver", "device"]
+    )
+    fun openDungeonSweat() {
+        if (SuperSecretSettings.azooPuzzoo)
+            SuperSecretSettings.remove("azoopuzoo")
+        else
+            SuperSecretSettings.add("azoopuzzoo")
+        SuperSecretSettings.save()
+        if (ModChecker.canShowNotifications) {
+            EssentialAPI.getNotifications().push("Dungeon Sweat", "Dungeon Sweat mode ${SuperSecretSettings.azooPuzzoo}")
+        } else {
+            UChat.chat("${Skytils.prefix} §bDungeon Sweat mode ${SuperSecretSettings.azooPuzzoo}");
+        }
+        UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
+    }
 
     @Property(
         type = PropertyType.SWITCH, name = "Dungeon Timer",
@@ -390,6 +421,13 @@ object Config : Vigilant(
     var boxStarredMobs = false
 
     @Property(
+        type = PropertyType.COLOR, name = "Box Starred Mobs Color",
+        description = "Color of the bounding box for Starred Mobs.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var boxStarredMobsColor = Color(0, 255, 255, 255)
+
+    @Property(
         type = PropertyType.SWITCH, name = "Box Skeleton Masters",
         description = "Draws the bounding box for Skeleton Masters.",
         category = "Dungeons", subcategory = "Quality of Life"
@@ -425,6 +463,13 @@ object Config : Vigilant(
         max = 1000
     )
     var kismetRerollThreshold = 0
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Dungeon Secret Display",
+        description = "Shows the amount of dungeon secrets in the current room.",
+        category = "Dungeons", subcategory = "Quality of Life"
+    )
+    var dungeonSecretDisplay = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Ghost Leap Names",
@@ -713,6 +758,13 @@ object Config : Vigilant(
     var showNextBlaze = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Line to Next Blaze",
+        description = "Draws line to next blaze to shoot in Higher or Lower.",
+        category = "Dungeons", subcategory = "Solvers"
+    )
+    var lineToNextBlaze = false
+
+    @Property(
         type = PropertyType.COLOR, name = "Lowest Blaze Color",
         description = "Color used to highlight the lowest blaze in.",
         category = "Dungeons", subcategory = "Solvers"
@@ -732,6 +784,13 @@ object Config : Vigilant(
         category = "Dungeons", subcategory = "Solvers"
     )
     var nextBlazeColor = Color(255, 255, 0, 200)
+
+    @Property(
+        type = PropertyType.COLOR, name = "Line to Next Blaze Color",
+        description = "Color used to draw line to the next blaze in.",
+        category = "Dungeons", subcategory = "Solvers"
+    )
+    var lineToNextBlazeColor = Color(255, 255, 0, 200)
 
     @Property(
         type = PropertyType.SWITCH, name = "Boulder Solver",
@@ -875,6 +934,13 @@ object Config : Vigilant(
     var tankRadiusDisplayColor = Color(100, 255, 0, 50)
 
     @Property(
+        type = PropertyType.SWITCH, name = "Block Incorrect Terminal Clicks",
+        description = "Blocks incorrect clicks on terminals.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var blockIncorrectTerminalClicks = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Middle Click on Terminals",
         description = "Replaces left clicks while on terminals with middle clicks.",
         category = "Dungeons", subcategory = "Terminal Solvers"
@@ -943,6 +1009,13 @@ object Config : Vigilant(
     var alignmentTerminalSolver = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Predict Clicks for Alignment Solver",
+        description = "Predict the amount of clicks needed on the alignment device in Floor 7.\nHighly recommended for high latency.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var predictAlignmentClicks = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Shoot the Target Solver",
         description = "Shows all the shot blocks on the device in Floor 7.",
         category = "Dungeons", subcategory = "Terminal Solvers"
@@ -955,6 +1028,13 @@ object Config : Vigilant(
         category = "Dungeons", subcategory = "Terminal Solvers"
     )
     var simonSaysSolver = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Predict Clicks for Simon Says Solver",
+        description = "Attempts to register teammate clicks on Simon Says Solver.",
+        category = "Dungeons", subcategory = "Terminal Solvers"
+    )
+    var predictSimonClicks = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Display Jerry Perks",
@@ -1031,13 +1111,6 @@ object Config : Vigilant(
         searchTags = ["Griffin", "Diana", "Myth"]
     )
     var trackGaiaHits = false
-
-    /*    @Property(
-        type = PropertyType.SWITCH, name = "Hide Leftover Bleeds",
-        description = "Removes the bleeds text left behind when a player dies to a Minotaur.",
-        category = "Events", subcategory = "Mythological"
-    )*/
-    var removeLeftOverBleeds = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Track Mythological Creatures",
@@ -1148,11 +1221,11 @@ object Config : Vigilant(
     var talbotsTheodoliteHelper = false
 
     @Property(
-        type = PropertyType.TEXT, name = "Kuudra Auto-Reparty Player",
-        description = "Automatically performs a reparty upon joining a Kuudra bossfight. Leave this blank to disable.",
-        category = "Kuudra", subcategory = "Quality of Life"
+        type = PropertyType.SWITCH, name = "Hide Non-Nametag Armor Stands on Kuudra",
+        description = "Hides non nametag armor stands on Kuudra Island.",
+        category = "Kuudra", subcategory = "Performance"
     )
-    var kuudraAutoRepartyPlayer = ""
+    var kuudraHideNonNametags = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Dark Mode Mist",
@@ -1310,10 +1383,10 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Boss Bar Fix",
-        description = "Hides the Witherborn boss bars.",
+        description = "Attempts to stop boss bars from disappearing.",
         category = "Miscellaneous", subcategory = "Fixes"
     )
-    var bossBarFix = true
+    var bossBarFix = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Fix Falling Sand Rendering",
@@ -1422,7 +1495,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Prevent Placing Weapons",
-        description = "Stops the game from trying to place the Flower of Truth, Moody Grappleshot, Spirit Sceptre, and Weird Tuba items.",
+        description = "Stops the game from trying to place the Flower of Truth, Moody Grappleshot, Spirit Sceptre, Pumpkin Launcher and Weird Tuba items.",
         category = "Miscellaneous", subcategory = "Items"
     )
     var preventPlacingWeapons = false
@@ -1452,7 +1525,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Attribute Shard Abbreviation",
-        description = "Shows the abbreivated name of shards with only 1 enchantment.",
+        description = "Shows the abbreviated name of shards with only 1 enchantment.",
         category = "Miscellaneous", subcategory = "Items",
         searchTags = ["1.3.0-pre1"]
     )
@@ -1665,13 +1738,6 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Other"
     )
     var dupeTrackerOverlayColor = Color.BLACK.withAlpha(169)
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Mark 'Dirty' Items",
-        description = "Tries to track 'dirty' items on the Auction House.\nDirty items are items that are probably not legitimately obtained.\nThis will not catch every single dirty item.",
-        category = "Miscellaneous", subcategory = "Other"
-    )
-    var markDirtyItems = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Endstone Protector Spawn Timer",
@@ -2058,6 +2124,18 @@ object Config : Vigilant(
     var pressEnterToConfirmSignQuestion = false
 
     @Property(
+        type = PropertyType.BUTTON, name = "Protect Items",
+        description = "Prevents you from dropping, salvaging, or selling items that you have selected.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        searchTags = ["Lock", "Slot"]
+    )
+    fun protectItems() {
+        if (ModChecker.canShowNotifications) {
+            EssentialAPI.getNotifications().push("Protect Items Help", "Hold the item you'd like to protect, and then run /protectitem.", 5f)
+        } else UChat.chat("${Skytils.prefix} §bHold the item you'd like to protect, and then run /protectitem.")
+    }
+
+    @Property(
         type = PropertyType.TEXT, name = "Protect Items Above Value",
         description = "Prevents you from dropping, salvaging, or selling items worth more than this value. Based on Lowest BIN price.",
         category = "Miscellaneous", subcategory = "Quality of Life",
@@ -2165,19 +2243,40 @@ object Config : Vigilant(
     var lavaBobber = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Fishing Hook Age",
+        description = "Shows how long your fishing hook has been cast",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var fishingHookAge = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Tropy Fish Tracker",
+        description = "Tracks trophy fish caught.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var trophyFishTracker = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Trophy Fish Totals",
+        description = "Shows totals of each trophy fish.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var showTrophyFishTotals = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Total Trophy Fish",
+        description = "Shows the total of all trophy fish caught.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var showTotalTrophyFish = false
+
+    @Property(
         type = PropertyType.SELECTOR, name = "Autopet Message Hider",
         description = "Removes autopet messages from your chat.",
         category = "Pets", subcategory = "Quality of Life",
         options = ["Normal", "Hidden", "Separate GUI"]
     )
     var hideAutopetMessages = 0
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Hide Pet Nametags",
-        description = "Hides the nametags above pets.",
-        category = "Pets", subcategory = "Quality of Life"
-    )
-    var hidePetNametags = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Highlight Active Pet",
@@ -2206,6 +2305,13 @@ object Config : Vigilant(
         category = "Pets", subcategory = "Quality of Life"
     )
     var favoritePetColor = Color(0, 255, 255)
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Pet Item Confirmation",
+        description = "Requires a confirmation before using a pet item.",
+        category = "Pets", subcategory = "Quality of Life"
+    )
+    var petItemConfirmation = false
 
     @Property(
         type = PropertyType.DECIMAL_SLIDER, name = "Current Revenant RNG Meter",
@@ -2256,6 +2362,16 @@ object Config : Vigilant(
         hidden = true
     )
     var blazeRNG = 0f
+
+    @Property(
+        type = PropertyType.DECIMAL_SLIDER, name = "Current Bloodfiend RNG Meter",
+        description = "Internal value to store current Riftstalker Bloodfiend RNG meter",
+        category = "Slayer",
+        decimalPlaces = 1,
+        maxF = 100f,
+        hidden = true
+    )
+    var vampRNG = 0f
 
     @Property(
         type = PropertyType.SWITCH, name = "Click to Open Maddox Menu",
@@ -2482,6 +2598,20 @@ object Config : Vigilant(
         category = "Slayer", subcategory = "Inferno Demonlord"
     )
     var attunementDisplay = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Vampire Slayer One Shot Alert",
+        description = "Shows a title when you can one-shot the Vampire Slayer with Steak Stake",
+        category = "Slayer"
+    )
+    var oneShotAlert = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Twinclaw Alert",
+        description = "Shows a title when the Vampire Slayer is about to do a Twinclaw attack",
+        category = "Slayer"
+    )
+    var twinclawAlert = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Cooldown Sounds",
@@ -2902,6 +3032,7 @@ object Config : Vigilant(
         }
 
         addDependency("dungeonChestProfitIncludesEssence", "dungeonChestProfit")
+        addDependency("croesusHideOpened", "croesusChestHighlight")
         addDependency("kismetRerollThreshold", "dungeonChestProfit")
 
         addDependency("message270Score", "sendMessageOn270Score")
@@ -2915,9 +3046,11 @@ object Config : Vigilant(
         addDependency("highlightDoorOpener", "spiritLeapNames")
 
         addDependency("showNextBlaze", "blazeSolver")
+        addDependency("lineToNextBlaze", "showNextBlaze")
         addDependency("lowestBlazeColor", "blazeSolver")
         addDependency("highestBlazeColor", "blazeSolver")
         addDependency("nextBlazeColor", "showNextBlaze")
+        addDependency("lineToNextBlazeColor", "lineToNextBlaze")
         addDependency("teleportMazeSolverColor", "teleportMazeSolver")
         addDependency("ticTacToeSolverColor", "ticTacToeSolver")
         addDependency("clickInOrderFirst", "clickInOrderTerminalSolver")
@@ -2925,6 +3058,8 @@ object Config : Vigilant(
         addDependency("clickInOrderThird", "clickInOrderTerminalSolver")
         addDependency("changeToSameColorMode", "changeAllSameColorTerminalSolver")
         addDependency("lividFinderType", "findCorrectLivid")
+        addDependency("predictAlignmentClicks", "alignmentTerminalSolver")
+        addDependency("predictSimonClicks", "simonSaysSolver")
 
         listOf(
             "emptyBurrowColor",
@@ -2950,7 +3085,6 @@ object Config : Vigilant(
         ).forEach { propertyName -> addDependency(propertyName, "recolorSeraphBoss") }
 
         addDependency("powerOrbDuration", "powerOrbLock")
-        addDependency("markDirtyItems", "dupeTracker")
         addDependency("dupeTrackerOverlayColor", "dupeTracker")
 
         addDependency("containerSellValueMaxItems", "containerSellValue")
@@ -2958,10 +3092,13 @@ object Config : Vigilant(
 
         addDependency("assumeWitherImpact", "witherShieldCooldown")
 
+        addDependency("showTrophyFishTotals", "trophyFishTracker")
+        addDependency("showTotalTrophyFish", "trophyFishTracker")
+
         addDependency("shinyPigLocations", "shinyOrbWaypoints")
 
         registerListener("protectItemBINThreshold") { _: String ->
-            TickTask(1) {
+            tickTimer(1) {
                 val numeric = protectItemBINThreshold.replace(Regex("[^0-9]"), "")
                 protectItemBINThreshold = numeric.ifEmpty { "0" }
                 if (protectItemBINThreshold != "0") fetchLowestBINPrices = true
@@ -2969,8 +3106,13 @@ object Config : Vigilant(
             }
         }
 
-        registerListener("darkModeMist") { _: Boolean -> mc.renderGlobal.loadRenderers() }
-        registerListener("recolorCarpets") { _: Boolean -> mc.renderGlobal.loadRenderers() }
+        setOf(
+            "darkModeMist",
+            "gardenPlotCleanupHelper",
+            "recolorCarpets"
+        ).forEach { propertyName ->
+            registerListener(propertyName) { _: Boolean -> mc.renderGlobal.loadRenderers() }
+        }
 
         registerListener("itemRarityShape") { i: Int ->
             if (i == 4 && Loader.instance().hasReachedState(LoaderState.POSTINITIALIZATION)) {
@@ -2979,7 +3121,7 @@ object Config : Vigilant(
                     val loc = ResourceLocation("skytils:gui/customrarity.png")
                     mc.resourceManager.getResource(loc)
                 }.onFailure {
-                    TickTask(1) {
+                    tickTimer(1) {
                         if (itemRarityShape == 4) {
                             itemRarityShape = old
                             EssentialAPI.getNotifications()
@@ -3006,8 +3148,10 @@ object Config : Vigilant(
             val ver = UpdateChecker.SkytilsVersion(Skytils.config.lastLaunchedVersion)
             when {
                 !ver.isSafe || ver < UpdateChecker.SkytilsVersion("1.2-pre3") || Skytils.config.lastLaunchedVersion == "0" -> {
-                    if (GuiManager.GUISCALES["Crystal Hollows Map"] == 0.1f) {
-                        GuiManager.GUISCALES["Crystal Hollows Map"] = 1f
+                    if (GuiManager.elementMetadata["Crystal Hollows Map"]?.scale == 0.1f) {
+                        GuiManager.elementMetadata["Crystal Hollows Map"] = GuiManager.elementMetadata["Crystal Hollows Map"]!!.copy(
+                            scale = 1f
+                        )
                         PersistentSave.markDirty<GuiManager>()
                     }
                 }

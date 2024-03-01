@@ -16,24 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import dev.architectury.pack200.java.Pack200Adapter
 import net.fabricmc.loom.task.RemapJarTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm") version "1.8.22"
-    kotlin("plugin.serialization") version "1.8.22"
+    kotlin("jvm") version "1.9.21"
+    kotlin("plugin.serialization") version "1.9.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("gg.essential.loom") version "0.10.0.+"
-    id("dev.architectury.architectury-pack200") version "0.1.3"
-    id("io.github.juuxel.loom-quiltflower") version "1.10.0"
-    java
+    id("net.kyori.blossom") version "2.0.0"
+    id("io.github.juuxel.loom-vineflower") version "1.11.0"
+    id("gg.essential.loom") version "1.3.12"
+    id("gg.essential.defaults") version "0.3.0"
     idea
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
+
     signing
 }
 
-version = "1.6.0"
+version = "1.8.2"
 group = "gg.skytils"
 
 repositories {
@@ -44,14 +45,15 @@ repositories {
     maven("https://jitpack.io")
 }
 
-quiltflower {
-    quiltflowerVersion.set("1.9.0")
+vineflower {
+    toolVersion.set("1.9.3")
 }
 
 loom {
     silentMojangMappingsLicense()
-    launchConfigs {
+    runConfigs {
         getByName("client") {
+            isIdeConfigGenerated = true
             property("fml.coreMods.load", "gg.skytils.skytilsmod.tweaker.SkytilsLoadingPlugin")
             property("elementa.dev", "true")
             property("elementa.debug", "true")
@@ -63,22 +65,17 @@ loom {
             property("legacy.debugClassLoading", "true")
             property("legacy.debugClassLoadingSave", "true")
             property("legacy.debugClassLoadingFiner", "true")
-            arg("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
-            arg("--mixin", "mixins.skytils.json")
-        }
-    }
-    runConfigs {
-        getByName("client") {
-            isIdeConfigGenerated = true
+            programArgs("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
+            programArgs("--mixin", "mixins.skytils.json")
+            programArgs("--mixin", "mixins.skytils-events.json")
         }
         remove(getByName("server"))
     }
     forge {
-        pack200Provider.set(Pack200Adapter())
-        mixinConfig("mixins.skytils.json")
+        mixinConfig("mixins.skytils.json", "mixins.skytils-events.json")
     }
     mixin {
-        defaultRefmapName.set("mixins.skytils.refmap.json")
+        defaultRefmapName = "mixins.skytils.refmap.json"
     }
 }
 
@@ -91,25 +88,14 @@ val shadowMeMod: Configuration by configurations.creating {
 }
 
 dependencies {
-    minecraft("com.mojang:minecraft:1.8.9")
-    mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
-    forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
-
-    shadowMe("gg.essential:loader-launchwrapper:1.2.0")
-    implementation("gg.essential:essential-1.8.9-forge:12132+g6e2bf4dc5") {
+    shadowMe("gg.essential:loader-launchwrapper:1.2.1")
+    implementation("gg.essential:essential-1.8.9-forge:14616+g169bd9af6a") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
         exclude(module = "gson")
     }
 
-    shadowMeMod("com.github.Skytils:Hylin:3ad11efbc1") {
-        exclude(module = "kotlin-reflect")
-        exclude(module = "kotlin-stdlib-jdk8")
-        exclude(module = "kotlin-stdlib-jdk7")
-        exclude(module = "kotlin-stdlib")
-        exclude(module = "kotlinx-coroutines-core")
-    }
     shadowMeMod("com.github.Skytils:AsmHelper:91ecc2bd9c") {
         exclude(module = "kotlin-reflect")
         exclude(module = "kotlin-stdlib-jdk8")
@@ -119,10 +105,17 @@ dependencies {
     }
 
     shadowMe(platform(kotlin("bom")))
-    shadowMe(platform(ktor("bom", "2.2.4", addSuffix = false)))
+    shadowMe(platform(ktor("bom", "2.3.7", addSuffix = false)))
 
     shadowMe(ktor("serialization-kotlinx-json"))
     shadowMe(ktor("serialization-gson"))
+
+    shadowMe("org.jetbrains.kotlinx:kotlinx-serialization-json") {
+        version {
+            strictly("[1.5.1,)")
+            prefer("1.6.2")
+        }
+    }
 
     shadowMe(ktorClient("core"))
     shadowMe(ktorClient("cio"))
@@ -140,11 +133,11 @@ dependencies {
     shadowMe(ktorServer("host-common"))
     shadowMe(ktorServer("auth"))
 
+    shadowMe(project(":events"))
+    shadowMe(project(":hypixel-api:types"))
 
 
-
-    shadowMe("com.github.LlamaLad7:MixinExtras:0.1.1")
-    annotationProcessor("com.github.LlamaLad7:MixinExtras:0.1.1")
+    shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.2")!!)
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
 }
@@ -152,17 +145,20 @@ dependencies {
 sourceSets {
     main {
         output.setResourcesDir(file("${buildDir}/classes/kotlin/main"))
+        blossom {
+            javaSources {
+                property("version", project.version.toString())
+            }
+            resources {
+                property("version", project.version.toString())
+                property("mcversion", "1.8.9")
+            }
+        }
     }
 }
 
 tasks {
     processResources {
-        inputs.property("version", project.version)
-        inputs.property("mcversion", "1.8.9")
-
-        filesMatching("mcmod.info") {
-            expand(mapOf("version" to project.version, "mcversion" to "1.8.9"))
-        }
         dependsOn(compileJava)
     }
     named<Jar>("jar") {
@@ -173,7 +169,7 @@ tasks {
                     "FMLCorePlugin" to "gg.skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
                     "FMLCorePluginContainsFMLMod" to true,
                     "ForceLoadAsMod" to true,
-                    "MixinConfigs" to "mixins.skytils.json",
+                    "MixinConfigs" to "mixins.skytils.json,mixins.skytils-events.json",
                     "ModSide" to "CLIENT",
                     "ModType" to "FML",
                     "TweakClass" to "gg.skytils.skytilsmod.tweaker.SkytilsTweaker",
@@ -220,9 +216,16 @@ tasks {
             "META-INF/maven/**",
             "META-INF/versions/**",
             "META-INF/com.android.tools/**",
-            "fabric.mod.json"
+            "fabric.mod.json",
+            "/**/META-INF/services/io.ktor.serialization.kotlinx.KotlinxSerializationExtensionProvider"
         )
-        mergeServiceFiles()
+        mergeServiceFiles {
+            exclude("/**/META-INF/services/io.ktor.serialization.kotlinx.KotlinxSerializationExtensionProvider")
+        }
+    }
+    withType<AbstractArchiveTask> {
+        isPreserveFileTimestamps = false
+        isReproducibleFileOrder = true
     }
     withType<JavaCompile> {
         options.encoding = "UTF-8"
@@ -238,7 +241,7 @@ tasks {
                     "-Xbackend-threads=0",
                     /*"-Xuse-k2"*/
                 )
-            languageVersion = "1.7"
+            languageVersion = "1.9"
         }
         kotlinDaemonJvmArguments.set(
             listOf(

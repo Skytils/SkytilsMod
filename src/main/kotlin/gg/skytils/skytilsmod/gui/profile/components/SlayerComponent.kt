@@ -28,20 +28,20 @@ import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.State
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.vigilance.gui.VigilancePalette
+import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.skytilsmod.utils.NumberUtil
-import skytils.hylin.skyblock.Member
 
 class SlayerComponent(profileState: State<Member?>) : UIContainer() {
 
-    val slayers = profileState.map { it?.slayers }
-    val rev = slayers.map { it?.revenant }
-    val tara = slayers.map { it?.tarantula }
-    val sven = slayers.map { it?.sven }
-    val eman = slayers.map { it?.enderman }
+    val slayers = profileState.map { it?.slayer?.slayer_bosses }
+    val rev = slayers.map { it?.get("zombie") }
+    val tara = slayers.map { it?.get("spider") }
+    val sven = slayers.map { it?.get("wolf") }
+    val eman = slayers.map { it?.get("enderman") }
     val totalXp = rev.zip(tara).zip(sven.zip(eman)).map { stuff ->
         val (rev, tara) = stuff.first
         val (sven, eman) = stuff.second
-        0L + (rev?.xp ?: 0) + (tara?.xp ?: 0) + (sven?.xp ?: 0) + (eman?.xp ?: 0)
+        0L + (rev?.xp ?: 0.0) + (tara?.xp ?: 0.0) + (sven?.xp ?: 0.0) + (eman?.xp ?: 0.0)
     }
 
 

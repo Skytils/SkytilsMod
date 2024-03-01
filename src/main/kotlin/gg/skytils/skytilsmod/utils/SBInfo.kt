@@ -20,13 +20,12 @@ package gg.skytils.skytilsmod.utils
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.events.impl.LocrawReceivedEvent
+import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 import net.minecraft.client.gui.inventory.GuiChest
@@ -184,7 +183,8 @@ enum class SkyblockIsland(val displayName: String, val mode: String) {
     Hub("Hub", "hub"),
     DarkAuction("Dark Auction", "dark_auction"),
     JerryWorkshop("Jerry's Workshop", "winter"),
-    Instanced("Instanced", "instanced"),
+    KuudraHollow("Kuudra's Hollow", "kuudra"),
+    TheRift("The Rift", "rift"),
     Unknown("(Unknown)", "");
 
     object ModeSerializer : KSerializer<SkyblockIsland> {
@@ -192,7 +192,7 @@ enum class SkyblockIsland(val displayName: String, val mode: String) {
             PrimitiveSerialDescriptor("SkyblockIsland", PrimitiveKind.STRING)
 
         override fun deserialize(decoder: Decoder): SkyblockIsland =
-            decoder.decodeString().let { s -> values().firstOrNull { it.mode == s } ?: Unknown }
+            decoder.decodeString().let { s -> entries.firstOrNull { it.mode == s } ?: Unknown }
 
         override fun serialize(encoder: Encoder, value: SkyblockIsland) = encoder.encodeString(value.mode)
     }
@@ -206,7 +206,7 @@ enum class SkyblockIsland(val displayName: String, val mode: String) {
         override fun deserialize(decoder: Decoder): SkyblockIsland = decoder.decodeStructure(descriptor) {
             while (true) {
                 when (val index = decodeElementIndex(descriptor)) {
-                    1 -> return@decodeStructure SkyblockIsland.values()
+                    1 -> return@decodeStructure entries
                         .first { it.mode == decodeStringElement(descriptor, index) }
 
                     CompositeDecoder.DECODE_DONE -> break

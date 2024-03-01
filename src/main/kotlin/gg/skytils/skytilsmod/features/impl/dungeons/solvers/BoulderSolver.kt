@@ -23,7 +23,8 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.tickTimer
+import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -54,7 +55,14 @@ object BoulderSolver {
     private var job: Job? = null
 
     init {
-        TickTask(20, repeats = true, task = ::update)
+        tickTimer(20, repeats = true, task = ::update)
+    }
+
+    @SubscribeEvent
+    fun onPuzzleDiscovered(event: DungeonEvent.PuzzleEvent.Discovered) {
+        if (event.puzzle == "Boulder") {
+            update()
+        }
     }
 
     @SubscribeEvent
@@ -138,11 +146,11 @@ object BoulderSolver {
                 }
                 if (!foundBirch || !foundBarrier) return@launch
                 if (boulderChest == null || boulderFacing == null) {
+                    val playerX = mc.thePlayer.posX.toInt()
+                    val playerZ = mc.thePlayer.posZ.toInt()
+                    val xRange = playerX - 25..playerX + 25
+                    val zRange = playerZ - 25..playerZ + 25
                     findChest@ for (te in mc.theWorld.loadedTileEntityList) {
-                        val playerX = mc.thePlayer.posX.toInt()
-                        val playerZ = mc.thePlayer.posZ.toInt()
-                        val xRange = playerX - 25..playerX + 25
-                        val zRange = playerZ - 25..playerZ + 25
                         if (te.pos.y == 66 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
                         ) {
                             val potentialChestPos = te.pos

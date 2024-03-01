@@ -18,18 +18,23 @@
 
 package gg.skytils.skytilsmod.utils
 
+import gg.skytils.hypixel.types.player.Player
+import gg.skytils.hypixel.types.skyblock.Profile
+import gg.skytils.hypixel.types.util.Inventory
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.IntArraySerializer
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import net.minecraft.item.ItemStack
+import net.minecraft.nbt.CompressedStreamTools
 import net.minecraft.util.BlockPos
+import net.minecraftforge.common.util.Constants
 import java.awt.Color
 import java.util.*
-
-private typealias NonDashedUUID = String
-private typealias MobName = String
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 @Serializable
 sealed class HypixelResponse {
@@ -38,34 +43,36 @@ sealed class HypixelResponse {
 }
 
 @Serializable
-data class ProfileResponse(override val success: Boolean, val profile: SkyblockProfile) : HypixelResponse()
+data class TypesProfileResponse(
+    override val success: Boolean,
+    val profiles: List<Profile>? = null
+) : HypixelResponse()
 
 @Serializable
-data class SkyblockProfile(val members: Map<NonDashedUUID, ProfileMember>)
+data class PlayerResponse(override val success: Boolean, val player: Player?) : HypixelResponse()
 
-@Serializable
-data class ProfileMember(
-    @SerialName("slayer_bosses")
-    val slayerBosses: Map<MobName, SlayerBoss> = emptyMap(),
-)
+enum class DungeonClass {
+    ARCHER,
+    BERSERK,
+    MAGE,
+    HEALER,
+    TANK,
+    EMPTY;
 
-@Serializable
-data class SlayerBoss(
-    val xp: Long = 0L
-)
+    val className = name.toTitleCase()
+    val apiName = name.lowercase()
 
-@Serializable
-data class PetInfo(
-    val type: String,
-    val exp: Double,
-    val tier: String,
-    val active: Boolean = false,
-    val hideInfo: Boolean = false,
-    val heldItem: String? = null,
-    val candyUsed: Int = 0,
-    val skin: String? = null,
-    val uuid: String? = null
-)
+    override fun toString(): String {
+        return this.className
+    }
+
+    companion object {
+        fun getClassFromName(name: String): DungeonClass {
+            return name.lowercase().let { entries.find { c -> c.apiName == it } }
+                ?: throw IllegalArgumentException("No class could be found for the name $name")
+        }
+    }
+}
 
 @Serializable
 data class GithubRelease(
@@ -161,4 +168,21 @@ object UUIDAsString : KSerializer<UUID> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("UUID", PrimitiveKind.STRING)
     override fun deserialize(decoder: Decoder): UUID = UUID.fromString(decoder.decodeString().toDashedUUID())
     override fun serialize(encoder: Encoder, value: UUID) = encoder.encodeString(value.toString())
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+fun Inventory.toMCItems() =
+    data.let { data ->
+        if (data.isEmpty()) {
+            emptyList()
+        } else {
+            val list = CompressedStreamTools.readCompressed(Base64.decode(data).inputStream()).getTagList("i", Constants.NBT.TAG_COMPOUND)
+            (0 until list.tagCount()).map { idx ->
+                list.getCompoundTagAt(idx).takeUnless { it.hasNoTags() }?.let { ItemStack.loadItemStackFromNBT(it) }
+            }
+        }
+    }
+
+fun UUID.nonDashedString(): String {
+    return this.toString().replace("-", "")
 }

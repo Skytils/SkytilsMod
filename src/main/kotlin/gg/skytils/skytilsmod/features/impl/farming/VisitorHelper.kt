@@ -22,8 +22,8 @@ import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.features.impl.misc.ContainerSellValue
@@ -55,15 +55,15 @@ object VisitorHelper {
     }
 
     init {
-        TickTask(4, repeats = true) {
-            if (!Skytils.config.visitorOfferHelper) return@TickTask
+        tickTimer(4, repeats = true) {
+            if (!Skytils.config.visitorOfferHelper) return@tickTimer
 
             textLines.clear()
             totalItemCost = 0.0
 
-            if (!inGarden) return@TickTask
+            if (!inGarden) return@tickTimer
 
-            val container = (mc.currentScreen as? GuiChest)?.inventorySlots as? ContainerChest ?: return@TickTask
+            val container = (mc.currentScreen as? GuiChest)?.inventorySlots as? ContainerChest ?: return@tickTimer
             val chestName = container.lowerChestInventory.name
             val npcSummary: ItemStack? = container.getSlot(13).stack
             val acceptOffer: ItemStack? = container.getSlot(29).stack
@@ -73,18 +73,19 @@ object VisitorHelper {
 
 
                 textLines.add("§eRewards:")
-                lore.dropWhile {
-                    !rewardRegex.containsMatchIn(it)
-                }.takeWhile {
-                    rewardRegex.containsMatchIn(it)
-                }.map {
-                    rewardRegex.find(it)!!.groups["reward"]!!.value
-                }.forEach {
-                    textLines.add(it)
-                    copperRewardRegex.find(it)?.also {
-                        copper += it.groups["count"]!!.value.replace(",", "").toInt()
+
+                val rewardIndex = lore.indexOf("§7Rewards:")
+                if (rewardIndex == -1) return@tickTimer
+
+                lore.drop(rewardIndex + 1)
+                    .takeWhile { it != "" }
+                    .map { rewardRegex.find(it)?.groups?.get("reward")?.value ?: it.trim() }
+                    .forEach { line ->
+                        textLines.add(line)
+                        copperRewardRegex.find(line)?.also {
+                            copper += it.groups["count"]!!.value.replace(",", "").toInt()
+                        }
                     }
-                }
 
                 textLines.add("")
 
@@ -146,6 +147,7 @@ object VisitorHelper {
 
         override fun render() {
             // Rendering is handled in the BackgroundDrawnEvent to give the text proper lighting
+            textShadow_ = textShadow
         }
 
         override fun demoRender() {
@@ -156,7 +158,7 @@ object VisitorHelper {
             ).forEachIndexed { i, str ->
                 fr.drawString(
                     str, textPosX, (i * fr.FONT_HEIGHT).toFloat(),
-                    CommonColors.WHITE, alignment, SmartFontRenderer.TextShadow.NORMAL
+                    CommonColors.WHITE, alignment, textShadow
                 )
             }
         }
@@ -173,6 +175,7 @@ object VisitorHelper {
         }
     }
 
+    private var textShadow_ = SmartFontRenderer.TextShadow.NORMAL
     private fun drawLine(index: Int, str: String) {
         ScreenRenderer.fontRenderer.drawString(
             str,
@@ -180,7 +183,7 @@ object VisitorHelper {
             (index * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
             CommonColors.WHITE,
             VisitorHelperDisplay.alignment,
-            SmartFontRenderer.TextShadow.NORMAL
+            textShadow_
         )
     }
 

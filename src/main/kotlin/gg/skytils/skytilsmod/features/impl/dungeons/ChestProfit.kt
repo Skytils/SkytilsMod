@@ -20,21 +20,27 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
+import gg.skytils.skytilsmod.features.impl.misc.ItemFeatures
 import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
+import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 
 
 /**
@@ -46,6 +52,7 @@ object ChestProfit {
     private val element = DungeonChestProfitElement()
     private var rerollBypass = false
     private val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")
+    private val croesusChestRegex = Regex("^(Master Mode|The)? Catacombs - Floor (IV|V?I{0,3})$")
 
     @SubscribeEvent
     fun onGUIDrawnEvent(event: GuiContainerEvent.ForegroundDrawnEvent) {
@@ -53,77 +60,171 @@ object ChestProfit {
         if ((!Utils.inDungeons || DungeonTimer.scoreShownAt == -1L) && SBInfo.mode != SkyblockIsland.DungeonHub.mode) return
         if (event.container !is ContainerChest) return
         val inv = event.container.lowerChestInventory
+
+        if (event.chestName == "Croesus") {
+            DungeonChest.entries.forEach(DungeonChest::reset)
+            return
+        }
+
         if (event.chestName.endsWith(" Chest")) {
             val chestType = DungeonChest.getFromName(event.chestName) ?: return
             val openChest = inv.getStackInSlot(31) ?: return
             if (openChest.displayName == "§aOpen Reward Chest") {
-                for (unclean in ItemUtil.getItemLore(openChest)) {
-                    val line = unclean.stripControlCodes()
-                    if (line.contains("FREE")) {
-                        chestType.price = 0.0
-                        break
-                    } else if (line.contains(" Coins")) {
-                        chestType.price =
-                            line.substring(0, line.indexOf(" ")).replace(",".toRegex(), "").toDouble()
-                        break
-                    }
-                }
+                chestType.price = getChestPrice(ItemUtil.getItemLore(openChest))
                 chestType.value = 0.0
                 chestType.items.clear()
                 for (i in 9..17) {
-                    val lootSlot = inv.getStackInSlot(i)
+                    val lootSlot = inv.getStackInSlot(i) ?: continue
                     val identifier = AuctionData.getIdentifier(lootSlot)
-                    if (identifier != null) {
-                        val value = AuctionData.lowestBINs[identifier] ?: 0.0
-                        chestType.value += value
-                        chestType.items.add(DungeonChestLootItem(lootSlot, value))
-                    } else if (Skytils.config.dungeonChestProfitIncludesEssence) {
-                        val groups = essenceRegex.matchEntire(lootSlot.displayName)?.groups ?: continue
-                        val type = groups["type"]?.value?.uppercase() ?: continue
-                        val count = groups["count"]?.value?.toInt() ?: continue
-                        val value = (AuctionData.lowestBINs["ESSENCE_$type"] ?: 0.0) * count
-                        chestType.value += value
-                        chestType.items.add(DungeonChestLootItem(lootSlot, value))
+                    val value = if (identifier != null) {
+                        AuctionData.lowestBINs[identifier] ?: 0.0
+                    } else {
+                        getEssenceValue(lootSlot.displayName) ?: continue
                     }
+
+                    chestType.value += value
+                    chestType.items.add(DungeonChestLootItem(lootSlot, value))
                 }
             }
-            if (chestType.items.size > 0) {
+            drawChestProfit(chestType)
+        } else if (croesusChestRegex.matches(event.chestName)) {
+            for (i in 10..16) {
+                val openChest = inv.getStackInSlot(i) ?: continue
+                val chestType = DungeonChest.getFromName(openChest.displayName.stripControlCodes()) ?: continue
+                val lore = ItemUtil.getItemLore(openChest)
 
-                val leftAlign = element.scaleX < UResolution.scaledWidth / 2f
-                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                GlStateManager.color(1f, 1f, 1f, 1f)
-                GlStateManager.disableLighting()
-                var drawnLines = 1
-                val profit = chestType.profit
-                ScreenRenderer.fontRenderer.drawString(
-                    chestType.displayText + "§f: §" + (if (profit > 0) "a" else "c") + NumberUtil.nf.format(
-                        profit
-                    ),
-                    if (leftAlign) element.scaleX else element.scaleX + element.width,
-                    element.scaleY,
-                    chestType.displayColor,
-                    alignment,
-                    SmartFontRenderer.TextShadow.NORMAL
-                )
-                for (item in chestType.items) {
-                    val line = item.item.displayName + "§f: §a" + NumberUtil.nf.format(item.value)
-                    ScreenRenderer.fontRenderer.drawString(
-                        line,
-                        if (leftAlign) element.scaleX else element.scaleX + element.width,
-                        element.scaleY + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT,
-                        CommonColors.WHITE,
-                        alignment,
-                        SmartFontRenderer.TextShadow.NORMAL
-                    )
-                    drawnLines++
+                val contentIndex = lore.indexOf("§7Contents")
+                if (contentIndex == -1) continue
+
+                chestType.price = getChestPrice(lore)
+                chestType.value = 0.0
+                chestType.items.clear()
+
+                lore.drop(contentIndex + 1).takeWhile { it != "" }.forEach { drop ->
+                    val value = if (drop.contains("Essence")) {
+                        getEssenceValue(drop) ?: return@forEach
+                    } else {
+                        AuctionData.lowestBINs[(getIdFromName(drop))] ?: 0.0
+                    }
+                    chestType.value += value
                 }
+
+                chestType.items.add(DungeonChestLootItem(openChest, chestType.value))
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
+        if (!Skytils.config.croesusChestHighlight) return
+        if (SBInfo.mode != SkyblockIsland.DungeonHub.mode) return
+        if (event.container !is ContainerChest || event.slot.inventory == mc.thePlayer.inventory) return
+        val stack = event.slot.stack ?: return
+        if (stack.item == Items.skull) {
+            val name = stack.displayName
+            if (!(name == "§cThe Catacombs" || name == "§cMaster Mode Catacombs")) return
+            val lore = ItemUtil.getItemLore(stack)
+            event.slot highlight when {
+                lore.any { line -> line == "§aNo more Chests to open!" } -> {
+                    if (Skytils.config.croesusHideOpened) {
+                        event.isCanceled = true
+                        return
+                    } else Color(255, 0, 0, 100)
+                }
+                lore.any { line -> line == "§8No Chests Opened!" } -> Color(0, 255, 0, 100)
+                lore.any { line -> line.startsWith("§8Opened Chest: ") } -> Color(255, 255, 0, 100)
+                else -> return
+            }
+        }
+    }
+
+    private fun getChestPrice(lore: List<String>): Double {
+        lore.forEach {
+            val line = it.stripControlCodes()
+            if (line.contains("FREE")) {
+                return 0.0
+            }
+            if (line.contains(" Coins")) {
+                return line.substring(0, line.indexOf(" ")).replace(",", "").toDouble()
+            }
+        }
+        return 0.0
+    }
+
+    private fun getEssenceValue(text: String): Double? {
+        if (!Skytils.config.dungeonChestProfitIncludesEssence) return null
+        val groups = essenceRegex.matchEntire(text)?.groups ?: return null
+        val type = groups["type"]?.value?.uppercase() ?: return null
+        val count = groups["count"]?.value?.toInt() ?: return null
+        return (AuctionData.lowestBINs["ESSENCE_$type"] ?: 0.0) * count
+    }
+
+    private fun getIdFromName(name: String): String? {
+        return if (name.startsWith("§aEnchanted Book (")) {
+            val enchant = name.substring(name.indexOf("(") + 1, name.indexOf(")"))
+            return enchantNameToID(enchant)
+        } else {
+            val unformatted = name.stripControlCodes().replace("Shiny ", "")
+            ItemFeatures.itemIdToNameLookup.entries.find {
+                it.value == unformatted && !it.value.contains("STARRED")
+            }?.key
+        }
+    }
+
+    private fun enchantNameToID(enchant: String): String {
+        val enchantName = enchant.substringBeforeLast(" ")
+        val enchantId = if (enchantName.startsWith("§d§l")) {
+            val name = enchantName.stripControlCodes().uppercase().replace(" ", "_")
+            if (!name.contains("ULTIMATE_")) {
+                "ULTIMATE_$name"
+            } else name
+        } else {
+            enchantName.stripControlCodes().uppercase().replace(" ", "_")
+        }
+        val level = enchant.substringAfterLast(" ").stripControlCodes().let {
+            it.toIntOrNull() ?: it.romanToDecimal()
+        }
+        return "ENCHANTED_BOOK-$enchantId-$level"
+    }
+
+    private fun drawChestProfit(chest: DungeonChest) {
+        if (chest.items.size > 0) {
+            val leftAlign = element.scaleX < UResolution.scaledWidth / 2f
+            val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+            GlStateManager.color(1f, 1f, 1f, 1f)
+            GlStateManager.disableLighting()
+            var drawnLines = 1
+            val profit = chest.profit
+
+            ScreenRenderer.fontRenderer.drawString(
+                chest.displayText + "§f: §" + (if (profit > 0) "a" else "c") + NumberUtil.nf.format(
+                    profit
+                ),
+                if (leftAlign) element.scaleX else element.scaleX + element.width,
+                element.scaleY,
+                chest.displayColor,
+                alignment,
+                textShadow_
+            )
+
+            for (item in chest.items) {
+                val line = item.item.displayName + "§f: §a" + NumberUtil.nf.format(item.value)
+                ScreenRenderer.fontRenderer.drawString(
+                    line,
+                    if (leftAlign) element.scaleX else element.scaleX + element.width,
+                    element.scaleY + drawnLines * ScreenRenderer.fontRenderer.FONT_HEIGHT,
+                    CommonColors.WHITE,
+                    alignment,
+                    textShadow_
+                )
+                drawnLines++
             }
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        DungeonChest.values().forEach(DungeonChest::reset)
+        DungeonChest.entries.forEach(DungeonChest::reset)
         rerollBypass = false
     }
 
@@ -152,14 +253,11 @@ object ChestProfit {
     }
 
     private enum class DungeonChest(var displayText: String, var displayColor: CustomColor) {
-        WOOD("Wood Chest", CommonColors.BROWN), GOLD("Gold Chest", CommonColors.YELLOW), DIAMOND(
-            "Diamond Chest",
-            CommonColors.LIGHT_BLUE
-        ),
-        EMERALD("Emerald Chest", CommonColors.LIGHT_GREEN), OBSIDIAN(
-            "Obsidian Chest",
-            CommonColors.BLACK
-        ),
+        WOOD("Wood Chest", CommonColors.BROWN),
+        GOLD("Gold Chest", CommonColors.YELLOW),
+        DIAMOND("Diamond Chest", CommonColors.LIGHT_BLUE),
+        EMERALD("Emerald Chest", CommonColors.LIGHT_GREEN),
+        OBSIDIAN("Obsidian Chest", CommonColors.BLACK),
         BEDROCK("Bedrock Chest", CommonColors.LIGHT_GRAY);
 
         var price = 0.0
@@ -177,21 +275,23 @@ object ChestProfit {
         companion object {
             fun getFromName(name: String?): DungeonChest? {
                 if (name.isNullOrBlank()) return null
-                return values().find {
+                return entries.find {
                     it.displayText == name
                 }
             }
         }
     }
 
+    private var textShadow_ = SmartFontRenderer.TextShadow.NORMAL
     private class DungeonChestLootItem(var item: ItemStack, var value: Double)
     class DungeonChestProfitElement : GuiElement("Dungeon Chest Profit", x = 200, y = 120) {
         override fun render() {
             if (toggled && (Utils.inDungeons || SBInfo.mode == SkyblockIsland.DungeonHub.mode)) {
                 val leftAlign = scaleX < sr.scaledWidth / 2f
+                textShadow_ = textShadow
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()
-                DungeonChest.values().filter { it.items.isNotEmpty() }.forEachIndexed { i, chest ->
+                DungeonChest.entries.filter { it.items.isNotEmpty() }.forEachIndexed { i, chest ->
                     val profit = chest.value - chest.price
                     ScreenRenderer.fontRenderer.drawString(
                         "${chest.displayText}§f: §${(if (profit > 0) "a" else "c")}${NumberUtil.format(profit.toLong())}",
@@ -199,20 +299,20 @@ object ChestProfit {
                         (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         chest.displayColor,
                         if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT,
-                        SmartFontRenderer.TextShadow.NORMAL
+                        textShadow
                     )
                 }
             }
         }
 
         override fun demoRender() {
-            RenderUtil.drawAllInList(this, DungeonChest.values().map { "${it.displayText}: §a+300M" })
+            RenderUtil.drawAllInList(this, DungeonChest.entries.map { "${it.displayText}: §a+300M" })
         }
 
         override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * DungeonChest.values().size
+            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT * DungeonChest.entries.size
         override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("Obsidian Chest: 300M")
+            get() = ScreenRenderer.fontRenderer.getStringWidth("Obsidian Chest: +300M")
 
         override val toggled: Boolean
             get() = Skytils.config.dungeonChestProfit

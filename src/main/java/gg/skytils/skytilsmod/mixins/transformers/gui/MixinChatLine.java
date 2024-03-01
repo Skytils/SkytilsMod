@@ -23,10 +23,12 @@ import net.minecraft.client.gui.ChatLine;
 import net.minecraft.util.IChatComponent;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(ChatLine.class)
 public class MixinChatLine implements ExtensionChatLine {
 
+    @Unique
     private IChatComponent fullComponent = null;
 
     @NotNull

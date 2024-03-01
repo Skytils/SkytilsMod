@@ -23,6 +23,7 @@ import gg.essential.lib.caffeine.cache.Caffeine
 import gg.skytils.skytilsmod.Skytils.Companion.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.Serializable
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -32,11 +33,14 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.concurrent.fixedRateTimer
 
 
 object MojangUtil {
     private val uuidToUsername: Cache<UUID, String>
     private val usernameToUuid: Cache<String, UUID>
+    private val requestCount = AtomicInteger()
 
     init {
         Caffeine.newBuilder()
@@ -64,7 +68,7 @@ object MojangUtil {
     suspend fun getUUIDFromUsername(name: String): UUID? {
         val username = name.lowercase()
         return usernameToUuid.getIfPresent(username) ?: run {
-            client.get("https://api.mojang.com/users/profiles/minecraft/$username").let {
+            makeMojangRequest("https://api.minecraftservices.com/minecraft/profile/lookup/name/$username").let {
                 when (it.status) {
                     HttpStatusCode.OK -> {
                         val (id, _) = it.body<ProfileResponse>()
@@ -82,7 +86,7 @@ object MojangUtil {
 
     suspend fun getUsernameFromUUID(uuid: UUID): String? {
         return uuidToUsername.getIfPresent(uuid) ?: run {
-            client.get("https://api.mojang.com/user/profile/${uuid}").let {
+            makeMojangRequest("https://api.minecraftservices.com/minecraft/profile/lookup/${uuid}").let {
                 when (it.status) {
                     HttpStatusCode.OK -> {
                         val (_, name) = it.body<ProfileResponse>()
@@ -97,6 +101,23 @@ object MojangUtil {
                 }
             }
         }
+    }
+
+    init {
+        fixedRateTimer("Mojang-Fake-Requests-Insert", startAt = Date((System.currentTimeMillis() / 60000) * 60000 + 48000), period = 60_000L) {
+            requestCount.set(0)
+        }
+    }
+
+    /**
+     * @see <a href="https://bugs.mojang.com/browse/WEB-6830">WEB-6830</a>
+     */
+    private suspend fun makeMojangRequest(url: String): HttpResponse {
+        if (requestCount.incrementAndGet() % 6 == 0) {
+            client.get("https://api.minecraftservices.com/minecraft/profile/lookup/name/SlashSlayer?ts=${System.currentTimeMillis()}")
+            requestCount.getAndIncrement()
+        }
+        return client.get(url)
     }
 
     @Serializable

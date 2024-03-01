@@ -20,17 +20,20 @@ package gg.skytils.skytilsmod.features.impl.misc
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
+import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.events.impl.GuiRenderItemEvent
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
 import gg.skytils.skytilsmod.utils.*
@@ -41,6 +44,7 @@ import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.RenderUtil.renderRarity
+import gg.skytils.skytilsmod.utils.SkillUtils.level
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -82,7 +86,6 @@ import kotlin.math.pow
 
 object ItemFeatures {
 
-    private val candyPattern = Regex("§a\\((\\d+)/10\\) Pet Candy Used")
     private val headPattern =
         Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
 
@@ -143,7 +146,7 @@ object ItemFeatures {
     )
 
     init {
-        TickTask(4, repeats = true) {
+        tickTimer(4, repeats = true) {
             if (mc.thePlayer != null && Utils.inSkyblock) {
                 val held = mc.thePlayer.inventory.getCurrentItem()
                 if (Skytils.config.showItemRarity) {
@@ -188,7 +191,7 @@ object ItemFeatures {
         }
         if (event.container is ContainerChest) {
             val chestName = event.chestName
-            if (chestName.startsWithAny("Salvage", "Ender Chest") || Utils.equalsOneOf(
+            if (chestName.startsWithAny("Salvage", "Ender Chest") || equalsOneOf(
                     chestName,
                     "Ophelia",
                     "Trades"
@@ -226,7 +229,7 @@ object ItemFeatures {
                     }
                 }
             }
-            if (Skytils.config.combineHelper && Utils.equalsOneOf(
+            if (Skytils.config.combineHelper && equalsOneOf(
                     event.chestName,
                     "Anvil",
                     "Attribute Fusion"
@@ -425,12 +428,7 @@ object ItemFeatures {
             if (this is S2APacketParticles) {
                 if (type == EnumParticleTypes.EXPLOSION_LARGE && Skytils.config.hideImplosionParticles) {
                     if (isLongDistance && count == 8 && speed == 8f && xOffset == 0f && yOffset == 0f && zOffset == 0f) {
-                        val dist = (if (DungeonFeatures.hasBossSpawned && Utils.equalsOneOf(
-                                DungeonFeatures.dungeonFloor,
-                                "F7",
-                                "M7"
-                            )
-                        ) 4f else 11f).pow(2f)
+                        val dist = (if (DungeonFeatures.hasBossSpawned && dungeonFloorNumber == 7) 4f else 11f).pow(2f)
 
                         if (mc.theWorld.playerEntities.any {
                                 it.heldItem != null && it.uniqueID.version() == 4 && it.getDistanceSq(
@@ -459,7 +457,7 @@ object ItemFeatures {
                         it.startsWith("§aSelected: §")
                     }?.substringAfter("§aSelected: ") ?: "§cUnknown"
                 }
-                if (Utils.equalsOneOf(itemId, "SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) {
+                if (equalsOneOf(itemId, "SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) {
                     getItemLore(item).find {
                         it.startsWith("§7Internalized: ")
                     }?.substringAfter("§7Internalized: ")?.let { s ->
@@ -512,12 +510,17 @@ object ItemFeatures {
         if (event.entity !== mc.thePlayer) return
         val item = event.entityPlayer.heldItem
         val itemId = getSkyBlockItemID(item) ?: return
-        if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (Utils.equalsOneOf(
+        if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (equalsOneOf(
                 itemId,
                 "FLOWER_OF_TRUTH",
+                "BOUQUET_OF_LIES",
                 "MOODY_GRAPPLESHOT",
                 "BAT_WAND",
-                "WEIRD_TUBA"
+                "STARRED_BAT_WAND",
+                "WEIRD_TUBA",
+                "WEIRDER_TUBA",
+                "PUMPKIN_LAUNCHER",
+                "FIRE_FREEZE_STAFF"
             ))
         ) {
             val block = mc.theWorld.getBlockState(event.pos)
@@ -646,10 +649,14 @@ object ItemFeatures {
             }
         }
         if (Skytils.config.showPetCandies && item.item === Items.skull) {
-            lore?.forEach { line ->
-                candyPattern.find(line)?.let {
-                    stackTip = it.groups[1]!!.value
-                    return@forEach
+            val petInfoString = getExtraAttributes(item)?.getString("petInfo")
+            if (!petInfoString.isNullOrBlank()) {
+                val petInfo = json.decodeFromString<Pet>(petInfoString)
+                val level = petInfo.level
+                val maxLevel = if (petInfo.type == "GOLDEN_DRAGON") 200 else 100
+
+                if (petInfo.candyUsed > 0 && level != maxLevel) {
+                    stackTip = petInfo.candyUsed.toString()
                 }
             }
         }
@@ -671,7 +678,7 @@ object ItemFeatures {
     @SubscribeEvent
     fun onDrawContainerForeground(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!Skytils.config.combineHelper || !Utils.inSkyblock) return
-        if (event.container !is ContainerChest || !Utils.equalsOneOf(
+        if (event.container !is ContainerChest || !equalsOneOf(
                 event.chestName,
                 "Anvil",
                 "Attribute Fusion"
@@ -750,7 +757,7 @@ object ItemFeatures {
         return mc.theWorld.getBlockState(pos).block.material.isSolid && (1..2).all {
             val newPos = pos.up(it)
             val newBlock = mc.theWorld.getBlockState(newPos)
-            if (sideHit === EnumFacing.UP && (Utils.equalsOneOf(
+            if (sideHit === EnumFacing.UP && (equalsOneOf(
                     newBlock.block,
                     Blocks.fire,
                     Blocks.skull

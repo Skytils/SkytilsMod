@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.tweaker;
 
+import gg.essential.universal.UDesktop;
 import gg.skytils.skytilsmod.Reference;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -34,11 +35,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.Objects;
 
 import static gg.skytils.skytilsmod.tweaker.TweakerUtil.*;
 
 public class EssentialPlatformSetup {
-    private static final String[] dataURLCandidates = {System.getProperty("skytils.dataURL"), Reference.dataUrl, "https://skytilsmod-data.pages.dev/", "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/"};
+    private static final String[] dataURLCandidates = {System.getProperty("skytils.dataURL"), Reference.dataUrl, "https://skytilsmod-data.pages.dev/", "https://cdn.jsdelivr.net/gh/Skytils/SkytilsMod-Data@main/", "https://mirror.ghproxy.com/https://raw.githubusercontent.com/Skytils/SkytilsMod-Data/main/"};
 
     private static boolean trySetDataUrl(String url) {
         if (url == null) return false;
@@ -64,7 +66,7 @@ public class EssentialPlatformSetup {
                     System.out.println("Skytils is attempting to run keytool.");
                     Files.createDirectories(keyStoreLoc.getParent());
                     try (InputStream in = EssentialPlatformSetup.class.getResourceAsStream("/skytilscacerts.jks"); OutputStream os = Files.newOutputStream(keyStoreLoc)) {
-                        IOUtils.copy(in, os);
+                        IOUtils.copy(Objects.requireNonNull(in), os);
                     }
                     String os = System.getProperty("os.name", "unknown");
 
@@ -107,7 +109,7 @@ public class EssentialPlatformSetup {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         try {
-                            Desktop.getDesktop().browse(URI.create("https://skytils.gg"));
+                            UDesktop.browse(URI.create("https://skytils.gg"));
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
@@ -119,7 +121,7 @@ public class EssentialPlatformSetup {
                     @Override
                     public void mouseClicked(MouseEvent e) {
                         try {
-                            Desktop.getDesktop().open(new File("./mods"));
+                            UDesktop.open(new File("./mods"));
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
@@ -127,7 +129,7 @@ public class EssentialPlatformSetup {
                 });
 
                 showMessage("<html><p>" +
-                        "Your version of Skytils requires a<br>" +
+                        "Your version of Skytils (" + Reference.VERSION  + ") requires a<br>" +
                         "mandatory update before you can play!<br>" +
                         "Please download the latest version,<br>" +
                         "join the Discord for support.<br>" +

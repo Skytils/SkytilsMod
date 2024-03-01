@@ -31,14 +31,15 @@ import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
 import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.BossBarEvent
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -76,7 +77,7 @@ object MiningFeatures {
     private var inRaffle = false
     var lastTPLoc: BlockPos? = null
     var waypoints = hashMapOf<String, BlockPos>()
-    var deadCount = 0
+    var waypointDelayTicks = 0
     private val SBE_DSM_PATTERN =
         Regex("\\\$(?:SBECHWP\\b|DSMCHWP):(?<stringLocation>.*?)@-(?<x>-?\\d+),(?<y>-?\\d+),(?<z>-?\\d+)")
     private val xyzPattern =
@@ -116,7 +117,7 @@ object MiningFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type.toInt() == 2) return
+        if (!Utils.inSkyblock || event.type == 2.toByte()) return
         val formatted = event.message.formattedText
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.powerGhastPing) {
@@ -175,7 +176,7 @@ object MiningFeatures {
                     s
                 )
             }, null)
-            TickTask(50) {
+            tickTimer(50) {
                 if (solution != null) {
                     UChat.chat("$successPrefix §aFetchur needs: §2${solution}§a!")
                 } else {
@@ -209,7 +210,7 @@ object MiningFeatures {
                 val x = cleaned.groups["x"]!!.value
                 val y = cleaned.groups["y"]!!.value
                 val z = cleaned.groups["z"]!!.value
-                CrystalHollowsMap.Locations.values().find { it.cleanName == stringLocation }
+                CrystalHollowsMap.Locations.entries.find { it.cleanName == stringLocation }
                     ?.takeIf { !it.loc.exists() }?.let { loc ->
                         /**
                          * Sends the waypoints message except it suggests which one should be used based on
@@ -240,8 +241,8 @@ object MiningFeatures {
         ) {
             CrystalHollowsMap.Locations.KingYolkar.loc.set()
         }
-        if (formatted.startsWith("§r§cYou died")) {
-            deadCount =
+        if (formatted.startsWith("§r§f§r§c ☠")) {
+            waypointDelayTicks =
                 50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
             if (Skytils.config.crystalHollowDeathWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode && lastTPLoc != null) {
                 UChat.chat(
@@ -251,6 +252,8 @@ object MiningFeatures {
                     )
                 )
             }
+        } else if (unformatted.startsWith("Warp")) {
+            waypointDelayTicks = 50
         }
     }
 
@@ -258,7 +261,7 @@ object MiningFeatures {
         val message = UMessage(
             "$prefix §eFound coordinates in a chat message, click a button to set a waypoint.\n"
         )
-        for (loc in CrystalHollowsMap.Locations.values()) {
+        for (loc in CrystalHollowsMap.Locations.entries) {
             if (loc.loc.exists()) continue
             message.append(
                 UTextComponent("${loc.displayName.substring(0, 2)}[${loc.displayName}] ")
@@ -281,7 +284,7 @@ object MiningFeatures {
         if (event.slot.hasStack) {
             val item = event.slot.stack
             if (Skytils.config.highlightDisabledHOTMPerks && SBInfo.lastOpenContainerName == "Heart of the Mountain") {
-                if (ItemUtil.getItemLore(item).any { it == "§cDISABLED" }) {
+                if (ItemUtil.getItemLore(item).any { it == "§c§lDISABLED" }) {
                     event.slot highlight Color(255, 0, 0)
                 }
             }
@@ -340,7 +343,7 @@ object MiningFeatures {
         }
         if (Skytils.config.crystalHollowWaypoints && SBInfo.mode == SkyblockIsland.CrystalHollows.mode) {
             GlStateManager.disableDepth()
-            for (loc in CrystalHollowsMap.Locations.values()) {
+            for (loc in CrystalHollowsMap.Locations.entries) {
                 loc.loc.drawWaypoint(loc.cleanName, event.partialTicks, matrixStack)
             }
             RenderUtil.renderWaypointText("Crystal Nucleus", 513.5, 107.0, 513.5, event.partialTicks, matrixStack)
@@ -387,11 +390,11 @@ object MiningFeatures {
     fun onTick(event: ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START) return
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
-            && deadCount == 0 && mc.thePlayer != null
+            && waypointDelayTicks == 0 && mc.thePlayer != null
         ) {
             CrystalHollowsMap.Locations.cleanNameToLocation[SBInfo.location]?.loc?.set()
-        } else if (deadCount > 0)
-            deadCount--
+        } else if (waypointDelayTicks > 0)
+            waypointDelayTicks--
     }
 
     @SubscribeEvent
@@ -400,7 +403,7 @@ object MiningFeatures {
         lastJukebox = null
         raffleBox = null
         inRaffle = false
-        CrystalHollowsMap.Locations.values().forEach { it.loc.reset() }
+        CrystalHollowsMap.Locations.entries.forEach { it.loc.reset() }
         waypoints.clear()
     }
 
@@ -421,7 +424,7 @@ object MiningFeatures {
             val cleanName = displayName.stripControlCodes()
 
             companion object {
-                val cleanNameToLocation = values().associateBy { it.cleanName }
+                val cleanNameToLocation = entries.associateBy { it.cleanName }
             }
         }
 
@@ -434,7 +437,7 @@ object MiningFeatures {
                 stack.runWithGlobalState {
                     RenderUtil.renderTexture(mapLocation, 0, 0, 624, 624, false)
                     if (Skytils.config.crystalHollowMapPlaces) {
-                        Locations.values().forEach {
+                        Locations.entries.forEach {
                             it.loc.drawOnMap(it.size, it.color)
                         }
                     }

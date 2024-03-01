@@ -32,7 +32,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -47,13 +46,12 @@ object ThreeWeirdosSolver {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
+        if (event.type == 2.toByte()) return
         if (!Skytils.config.threeWeirdosSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Three Weirdos")) return
         val formatted = event.message.formattedText
-        if (formatted.startsWith("§a§lPUZZLE SOLVED!")) {
-            if (formatted.contains("wasn't fooled by ")) {
-                riddleNPC = null
-                riddleChest = null
-            }
+        if (formatted.startsWith("§a§lPUZZLE SOLVED!") && "wasn't fooled by " in formatted) {
+            riddleNPC = null
+            riddleChest = null
         }
         if (formatted.startsWith("§e[NPC] ")) {
             if (solutions.size == 0) {
@@ -67,35 +65,19 @@ object ThreeWeirdosSolver {
                 val npcName = formatted.substringAfter("§c").substringBefore("§f")
                 riddleNPC = npcName
                 UChat.chat("$prefix §a§l${npcName.stripControlCodes()} §2has the blessing.")
-            }
-        }
-    }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!Skytils.config.threeWeirdosSolver || !Utils.inDungeons || riddleNPC == null) return
-        if (riddleChest == null) {
-            val riddleLabel = mc.theWorld.getEntities(
-                EntityArmorStand::class.java
-            ) { entity: EntityArmorStand? ->
-                if (entity == null) return@getEntities false
-                if (!entity.hasCustomName()) return@getEntities false
-                entity.customNameTag.contains(riddleNPC!!)
-            }.firstOrNull()
-            if (riddleLabel != null) {
-                println("Chest Finder: Found Riddle NPC " + riddleLabel.customNameTag + " at " + riddleLabel.position)
-                val npcPos = riddleLabel.position
-                for (direction in EnumFacing.HORIZONTALS) {
-                    val potentialPos = npcPos.offset(direction)
-                    if (mc.theWorld.getBlockState(potentialPos).block === Blocks.chest) {
-                        riddleChest = potentialPos
-                        print("Correct position is at: $potentialPos")
-                        break
+                mc.theWorld?.loadedEntityList?.find {
+                    it is EntityArmorStand && riddleNPC!! in it.customNameTag
+                }?.let {
+                    riddleChest = EnumFacing.HORIZONTALS.map { dir -> it.position.offset(dir)  }.find {
+                        mc.theWorld?.getBlockState(it)?.block == Blocks.chest
                     }
+                    println("Riddle NPC ${it.customNameTag} @ ${it.position} w/ chest @ $riddleChest")
                 }
             }
         }
     }
+
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {

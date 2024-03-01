@@ -1,0 +1,10 @@
+{
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8",
+  "package": "gg.skytils.event.mixins",
+  "refmap": "mixins.skytils-events.refmap.json",
+  "client": [
+    "MixinMinecraft"
+  ],
+  "verbose": true
+}

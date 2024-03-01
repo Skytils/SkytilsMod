@@ -22,27 +22,32 @@ import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.lib.caffeine.cache.Caffeine
 import gg.essential.lib.caffeine.cache.Expiry
 import gg.essential.universal.UChat
+import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
-import gg.skytils.skytilsmod.core.TickTask
+import gg.skytils.skytilsmod.core.API
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
+import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorChatComponentText
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.addSuffix
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import kotlinx.coroutines.launch
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
+import net.minecraftforge.client.event.ClientChatReceivedEvent
+import net.minecraftforge.event.world.WorldEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import skytils.hylin.skyblock.Pet
-import skytils.hylin.skyblock.dungeons.DungeonClass
 
 object DungeonListener {
-
     val team = hashMapOf<String, DungeonTeammate>()
     val deads = hashSetOf<DungeonTeammate>()
     val missingPuzzles = hashSetOf<String>()
@@ -78,43 +83,86 @@ object DungeonListener {
 
     val partyCountPattern = Regex("§r {9}§r§b§lParty §r§f\\((?<count>[1-5])\\)§r")
     private val classPattern =
-        Regex("§r(?:§.)+(?:\\[.+] )?(?<name>\\w+?)(?:§.)* (?:§r(?:§[\\da-fklmno]){1,2}.+ )?§r§f\\(§r§d(?:(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)|§r§7EMPTY)§r§f\\)§r")
+        Regex("§r(?:§.)+(?:\\[.+] )?(?<name>\\w+?)(?:§.)* (?:§r(?:§[\\da-fklmno]){1,2}.+ )?§r§f\\(§r§d(?:(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)|§r§7EMPTY|§r§cDEAD)§r§f\\)§r")
     private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
+    private val deathRegex = Regex("§r§c ☠ §r§7(?:You were |(?:§.)+(?<username>\\w+)§r).* and became a ghost§r§7\\.§r")
+    private val reviveRegex = Regex("^§r§a ❣ §r§7(?:§.)+(?<username>\\w+)§r§a was revived")
+    private val secretsRegex = Regex("\\s*§7(?<secrets>\\d+)\\/(?<maxSecrets>\\d+) Secrets")
+
+    @SubscribeEvent
+    fun onWorldLoad(event: WorldEvent.Load) {
+        team.clear()
+        deads.clear()
+        missingPuzzles.clear()
+    }
 
     @SubscribeEvent
     fun onPacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inDungeons) return
         if (event.packet is S02PacketChat) {
-            if (event.packet.chatComponent.unformattedText.startsWith("Dungeon starts in 1 second.")) {
-                team.clear()
-                deads.clear()
-                missingPuzzles.clear()
-                TickTask(40) {
-                    getMembers()
-                }
-            } else if (event.packet.chatComponent.unformattedText.stripControlCodes()
-                    .trim() == "> EXTRA STATS <"
-            ) {
-                if (Skytils.config.dungeonDeathCounter) {
-                    TickTask(6) {
-                        UChat.chat("§c☠ §lDeaths:§r ${team.values.sumOf { it.deaths }}\n${
-                            team.values.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
-                                "  §c☠ ${it.playerName}:§r ${it.deaths}"
-                            }
-                        }"
-                        )
+            val text = event.packet.chatComponent.formattedText
+            if (event.packet.type == 2.toByte()) {
+                if (Skytils.config.dungeonSecretDisplay) {
+                    secretsRegex.find(text)?.destructured?.also { (secrets, maxSecrets) ->
+                        val sec = secrets.toInt()
+                        val max = maxSecrets.toInt().coerceAtLeast(sec)
+
+                        DungeonFeatures.DungeonSecretDisplay.secrets = sec
+                        DungeonFeatures.DungeonSecretDisplay.maxSecrets = max
+                    }.ifNull {
+                        DungeonFeatures.DungeonSecretDisplay.secrets = -1
+                        DungeonFeatures.DungeonSecretDisplay.maxSecrets = -1
                     }
                 }
-                if (Skytils.config.autoRepartyOnDungeonEnd) {
-                    RepartyCommand.processCommand(mc.thePlayer, emptyArray())
+
+            } else {
+                if (text.stripControlCodes()
+                        .trim() == "> EXTRA STATS <"
+                ) {
+                    if (Skytils.config.dungeonDeathCounter) {
+                        tickTimer(6) {
+                            UChat.chat("§c☠ §lDeaths:§r ${team.values.sumOf { it.deaths }}\n${
+                                team.values.filter { it.deaths > 0 }.sortedByDescending { it.deaths }.joinToString("\n") {
+                                    "  §c☠ ${it.playerName}:§r ${it.deaths}"
+                                }
+                            }"
+                            )
+                        }
+                    }
+                    if (Skytils.config.autoRepartyOnDungeonEnd) {
+                        RepartyCommand.processCommand(mc.thePlayer, emptyArray())
+                    }
+                } else if (text.startsWith("§r§c ☠ ") && text.endsWith(" and became a ghost§r§7.§r")) {
+                    val match = deathRegex.find(text) ?: return
+                    val username = match.groups["username"]?.value ?: mc.thePlayer.name
+                    val teammate = team[username] ?: return
+                    markDead(teammate)
+                } else if (text.startsWith("§r§a ❣ ")) {
+                    val match = reviveRegex.find(text) ?: return
+                    val username = match.groups["username"]!!.value
+                    val teammate = team[username] ?: return
+                    markRevived(teammate)
                 }
             }
         }
     }
 
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onChatLow(event: ClientChatReceivedEvent) {
+        if (Skytils.config.dungeonSecretDisplay && Utils.inDungeons && event.type == 2.toByte()) {
+            if (event.message is AccessorChatComponentText) {
+                (event.message as AccessorChatComponentText).text = (event.message as AccessorChatComponentText).text.replace(secretsRegex, "")
+            }
+            event.message.siblings.forEach {
+                if (it !is AccessorChatComponentText) return@forEach
+                it.text = it.text.replace(secretsRegex, "")
+            }
+        }
+    }
+
     init {
-        TickTask(4, repeats = true) {
-            if (!Utils.inDungeons) return@TickTask
+        tickTimer(4, repeats = true) {
+            if (!Utils.inDungeons) return@tickTimer
             val localMissingPuzzles = TabListUtils.tabEntries.mapNotNull {
                 val name = it.second
                 if (name.contains("✦")) {
@@ -128,136 +176,167 @@ object DungeonListener {
                 }
                 return@mapNotNull null
             }
-            missingPuzzles.clear()
-            missingPuzzles.addAll(localMissingPuzzles)
+            if (missingPuzzles.size != localMissingPuzzles.size || !missingPuzzles.containsAll(localMissingPuzzles)) {
+                val newPuzzles = localMissingPuzzles.filter { it !in missingPuzzles }
+                val completedPuzzles = missingPuzzles.filter { it !in localMissingPuzzles }
+                newPuzzles.forEach {
+                    DungeonEvent.PuzzleEvent.Discovered(it).postAndCatch()
+                }
+                completedPuzzles.forEach {
+                    DungeonEvent.PuzzleEvent.Completed(it).postAndCatch()
+                }
+                missingPuzzles.clear()
+                missingPuzzles.addAll(localMissingPuzzles)
+            }
         }
-        TickTask(2, repeats = true) {
-            if (Utils.inDungeons && DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500) {
+        tickTimer(2, repeats = true) {
+            if (Utils.inDungeons && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
                 val tabEntries = TabListUtils.tabEntries
-                for (teammate in team.values) {
-                    if (tabEntries.size <= teammate.tabEntryIndex) continue
-                    val entry = tabEntries[teammate.tabEntryIndex].second
-                    if (!entry.contains(teammate.playerName)) continue
-                    teammate.player = mc.theWorld.playerEntities.find {
-                        it.name == teammate.playerName && it.uniqueID.version() == 4
-                    }
-                    teammate.dead = entry.endsWith("§r§cDEAD§r§f)§r")
-                    if (teammate.dead) {
-                        if (deads.add(teammate)) {
-                            teammate.deaths++
-                            val totalDeaths = team.values.sumOf { it.deaths }
-                            val isFirstDeath = totalDeaths == 1
-
-                            @Suppress("LocalVariableName")
-                            val `silly~churl, billy~churl, silly~billy hilichurl` = if (isFirstDeath) {
-                                val hutaoIsCool = hutaoFans.getIfPresent(teammate.playerName) ?: false
-                                ScoreCalculation.firstDeathHadSpirit.set(hutaoIsCool)
-                                hutaoIsCool
-                            } else false
-                            printDevMessage(isFirstDeath.toString(), "spiritpet")
-                            printDevMessage(ScoreCalculation.firstDeathHadSpirit.toString(), "spiritpet")
-                            if (Skytils.config.dungeonDeathCounter) {
-                                TickTask(1) {
-                                    UChat.chat(
-                                        "§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${totalDeaths}§b total deaths.${
-                                            " §6(SPIRIT)".toStringIfTrue(
-                                                `silly~churl, billy~churl, silly~billy hilichurl`
-                                            )
-                                        }"
+                if (team.isEmpty() || (DungeonTimer.dungeonStartTime != -1L && team.values.any { it.dungeonClass == DungeonClass.EMPTY  })) {
+                    if (tabEntries.isNotEmpty() && tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
+                        printDevMessage("Parsing party", "dungeonlistener")
+                        val partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
+                        if (partyCount != null) {
+                            println("There are $partyCount members in this party")
+                            if (team.size != partyCount) {
+                                println("Clearing team as the party size has changed ${team.size} -> $partyCount")
+                                team.clear()
+                            }
+                            for (i in 0..<partyCount) {
+                                val pos = 1 + i * 4
+                                val text = tabEntries[pos].second
+                                val matcher = classPattern.find(text)
+                                if (matcher == null) {
+                                    println("Skipping over entry $text due to it not matching")
+                                    continue
+                                }
+                                val name = matcher.groups["name"]!!.value
+                                if (matcher.groups["class"] != null) {
+                                    val dungeonClass = matcher.groups["class"]!!.value
+                                    val classLevel = matcher.groups["lvl"]!!.value.romanToDecimal()
+                                    println("Parsed teammate $name, they are a $dungeonClass $classLevel")
+                                    team[name] =
+                                        DungeonTeammate(
+                                            name,
+                                            DungeonClass.getClassFromName(
+                                                dungeonClass
+                                            ), classLevel,
+                                            pos
+                                        )
+                                } else {
+                                    println("Parsed teammate $name with value EMPTY, $text")
+                                    team[name] = DungeonTeammate(
+                                        name,
+                                        DungeonClass.EMPTY, 0,
+                                        pos
                                     )
                                 }
                             }
+                            if (partyCount != team.size) {
+                                UChat.chat("$failPrefix §cSomething isn't right! I expected $partyCount members but only got ${team.size}")
+                            }
+
+                            if (DungeonTimer.dungeonStartTime != -1L && System.currentTimeMillis() - DungeonTimer.dungeonStartTime >= 2000 && team.values.any { it.dungeonClass == DungeonClass.EMPTY }) {
+                                UChat.chat("$failPrefix §cSomething isn't right! One or more of your party members has an empty class! Could the server be lagging?")
+                            }
+
+                            if (team.isNotEmpty()) {
+                                CooldownTracker.updateCooldownReduction()
+                                checkSpiritPet()
+                            }
+                        } else {
+                            println("Couldn't get party count")
                         }
                     } else {
-                        deads.remove(teammate)
+                        println("Couldn't get party text")
+                    }
+                } else {
+                    val self = team[mc.thePlayer.name]
+                    for (teammate in team.values) {
+                        if (tabEntries.size <= teammate.tabEntryIndex) continue
+                        val entry = tabEntries[teammate.tabEntryIndex].second
+                        if (!entry.contains(teammate.playerName)) continue
+                        teammate.player = mc.theWorld.playerEntities.find {
+                            it.name == teammate.playerName && it.uniqueID.version() == 4
+                        }
+                        if (self?.dead != true) {
+                            if (entry.endsWith("§r§cDEAD§r§f)§r")) markDead(teammate)
+                            else markRevived(teammate)
+                        }
                     }
                 }
             }
         }
     }
 
-    private fun getMembers() {
-        if (team.isNotEmpty() || !Utils.inDungeons) return
-        val tabEntries = TabListUtils.tabEntries
+    fun markDead(teammate: DungeonTeammate) {
+        if (deads.add(teammate)) {
+            val time = System.currentTimeMillis()
+            val lastDeath = teammate.lastLivingStateChange
+            if (lastDeath != null && time - lastDeath <= 1000) return
+            teammate.lastLivingStateChange = time
+            teammate.dead = true
+            teammate.deaths++
+            val totalDeaths = team.values.sumOf { it.deaths }
+            val isFirstDeath = totalDeaths == 1
 
-        if (tabEntries.isEmpty() || !tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
-            TickTask(5) {
-                getMembers()
-            }
-            return
-        }
-
-        val partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
-        if (partyCount == null) {
-            println("Couldn't get party count")
-            TickTask(5) {
-                getMembers()
-            }
-            return
-        }
-        println("There are $partyCount members in this party")
-        for (i in 0 until partyCount) {
-            val pos = 1 + i * 4
-            val text = tabEntries[pos].second
-            val matcher = classPattern.find(text)
-            if (matcher == null) {
-                println("Skipping over entry $text due to it not matching")
-                continue
-            }
-            val name = matcher.groups["name"]!!.value
-            if (matcher.groups["class"] != null) {
-                val dungeonClass = matcher.groups["class"]!!.value
-                val classLevel = matcher.groups["lvl"]!!.value.romanToDecimal()
-                println("Parsed teammate $name, they are a $dungeonClass $classLevel")
-                team[name] =
-                    DungeonTeammate(
-                        name,
-                        DungeonClass.getClassFromName(
-                            dungeonClass
-                        ), classLevel,
-                        pos
+            @Suppress("LocalVariableName")
+            val `silly~churl, billy~churl, silly~billy hilichurl` = if (isFirstDeath) {
+                val hutaoIsCool = hutaoFans.getIfPresent(teammate.playerName) ?: false
+                ScoreCalculation.firstDeathHadSpirit.set(hutaoIsCool)
+                hutaoIsCool
+            } else false
+            printDevMessage(isFirstDeath.toString(), "spiritpet")
+            printDevMessage(ScoreCalculation.firstDeathHadSpirit.toString(), "spiritpet")
+            if (Skytils.config.dungeonDeathCounter) {
+                tickTimer(1) {
+                    UChat.chat(
+                        "§bThis is §e${teammate.playerName}§b's §e${teammate.deaths.addSuffix()}§b death out of §e${totalDeaths}§b total tracked deaths.${
+                            " §6(SPIRIT)".toStringIfTrue(
+                                `silly~churl, billy~churl, silly~billy hilichurl`
+                            )
+                        }"
                     )
-            } else {
-                println("Parsed teammate $name with value EMPTY, $text")
-                team[name] = DungeonTeammate(
-                    name,
-                    DungeonClass.EMPTY, 0,
-                    pos
-                )
+                }
             }
         }
-        if (partyCount != team.size) {
-            UChat.chat("$failPrefix §cSomething isn't right! I expected $partyCount members but only got ${team.size}")
+    }
+
+    fun markRevived(teammate: DungeonTeammate) {
+        if (deads.remove(teammate)) {
+            teammate.dead = false
+            teammate.lastLivingStateChange = System.currentTimeMillis()
         }
-        if (team.values.any { it.dungeonClass == DungeonClass.EMPTY }) {
-            UChat.chat("$failPrefix §cSomething isn't right! One or more of your party members has an empty class! Could the server be lagging?")
+    }
+
+    fun markAllRevived() {
+        printDevMessage("${Skytils.prefix} §fdebug: marking all teammates as revived", "scorecalc")
+        deads.clear()
+        team.values.forEach {
+            it.dead = false
         }
-        CooldownTracker.updateCooldownReduction()
-        checkSpiritPet()
     }
 
     fun checkSpiritPet() {
-        if (Skytils.hylinAPI.key.isNotEmpty()) {
-            Skytils.IO.launch {
-                runCatching {
-                    for (teammate in team.values) {
-                        val name = teammate.playerName
-                        if (hutaoFans.getIfPresent(name) != null) continue
-                        val uuid = teammate.player?.uniqueID ?: MojangUtil.getUUIDFromUsername(name) ?: continue
-                        val profile = Skytils.hylinAPI.getLatestSkyblockProfileForMemberSync(
-                            uuid
-                        ) ?: continue
-                        hutaoFans[name] = profile.pets.any(Pet::isSpirit)
+        val teamCopy = team.values.toList()
+        Skytils.IO.launch {
+            runCatching {
+                for (teammate in teamCopy) {
+                    val name = teammate.playerName
+                    if (hutaoFans.getIfPresent(name) != null) continue
+                    val uuid = teammate.player?.uniqueID ?: MojangUtil.getUUIDFromUsername(name) ?: continue
+                    API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString())?.pets_data?.pets?.any(Pet::isSpirit)?.let {
+                        hutaoFans[name] = it
                     }
-                    printDevMessage(hutaoFans.asMap().toString(), "spiritpet")
-                }.onFailure {
-                    it.printStackTrace()
                 }
+                printDevMessage(hutaoFans.asMap().toString(), "spiritpet")
+            }.onFailure {
+                it.printStackTrace()
             }
         }
     }
 
-    class DungeonTeammate(
+    data class DungeonTeammate(
         val playerName: String,
         val dungeonClass: DungeonClass,
         val classLevel: Int,
@@ -266,6 +345,7 @@ object DungeonListener {
         var player: EntityPlayer? = null
         var dead = false
         var deaths = 0
+        var lastLivingStateChange: Long? = null
 
 
         fun canRender() = player != null && player!!.health > 0 && !dead

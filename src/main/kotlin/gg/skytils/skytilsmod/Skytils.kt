@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod
 
+import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
 import gg.skytils.skytilsmod.commands.impl.*
@@ -26,6 +27,8 @@ import gg.skytils.skytilsmod.commands.stats.impl.SlayerCommand
 import gg.skytils.skytilsmod.core.*
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
+import gg.skytils.skytilsmod.features.impl.crimson.KuudraFeatures
+import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
 import gg.skytils.skytilsmod.features.impl.dungeons.*
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.*
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*
@@ -43,6 +46,7 @@ import gg.skytils.skytilsmod.features.impl.mining.StupidTreasureChestOpeningThin
 import gg.skytils.skytilsmod.features.impl.misc.*
 import gg.skytils.skytilsmod.features.impl.overlays.AuctionPriceOverlay
 import gg.skytils.skytilsmod.features.impl.protectitems.ProtectItems
+import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures
 import gg.skytils.skytilsmod.features.impl.spidersden.RainTimer
 import gg.skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import gg.skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
@@ -55,6 +59,7 @@ import gg.skytils.skytilsmod.listeners.ChatListener
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.localapi.LocalAPI
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
+import gg.skytils.skytilsmod.mixins.hooks.util.MouseHelperHook
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiStreamUnavailable
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
@@ -96,20 +101,24 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import skytils.hylin.HylinAPI
 import sun.misc.Unsafe
 import java.io.File
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetAddress
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.abs
 
 @Mod(
     modid = Skytils.MOD_ID,
     name = Skytils.MOD_NAME,
     version = Skytils.VERSION,
     acceptedMinecraftVersions = "[1.8.9]",
-    clientSideOnly = true
+    clientSideOnly = true,
+    guiFactory = "gg.skytils.skytilsmod.core.ForgeGuiFactory"
 )
 class Skytils {
 
@@ -168,10 +177,6 @@ class Skytils {
 
         override val coroutineContext: CoroutineContext = dispatcher + SupervisorJob() + CoroutineName("Skytils")
 
-        val hylinAPI by lazy {
-            HylinAPI("", false, this, HylinConnectionHandler, "https://hypixel.skytils.gg")
-        }
-
         val deobfEnvironment by lazy {
             Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", false) as Boolean
         }
@@ -228,6 +233,8 @@ class Skytils {
         const val prefix = "§9§lSkytils §8»"
         const val successPrefix = "§a§lSkytils §8»"
         const val failPrefix = "§c§lSkytils §8»"
+
+        var trustClientTime = false
     }
 
     @Mod.EventHandler
@@ -252,7 +259,6 @@ class Skytils {
             MayorInfo,
             SBInfo,
             SoundQueue,
-            TickTask,
             UpdateChecker,
 
             AlignmentTaskSolver,
@@ -331,9 +337,11 @@ class Skytils {
             TicTacToeSolver,
             TreasureHunter,
             TriviaSolver,
+            TrophyFish,
             VisitorHelper,
             WaterBoardSolver,
-            Waypoints
+            Waypoints,
+            MouseHelperHook
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 
@@ -366,8 +374,10 @@ class Skytils {
         cch.registerCommand(FragBotCommand)
         cch.registerCommand(HollowWaypointCommand)
         cch.registerCommand(LimboCommand)
+        cch.registerCommand(OrderedWaypointCommand)
         cch.registerCommand(ScamCheckCommand)
         cch.registerCommand(SlayerCommand)
+        cch.registerCommand(TrophyFishCommand)
 
         if (!cch.commands.containsKey("armorcolor")) {
             cch.registerCommand(ArmorColorCommand)
@@ -394,6 +404,22 @@ class Skytils {
         if (config.overrideReparty || !cch.commands.containsKey("rp")) {
             cch.commandMap["rp"] = RepartyCommand
         }
+
+        if (UpdateChecker.currentVersion.specialVersionType != UpdateChecker.UpdateType.RELEASE && config.updateChannel == 2) {
+            if (ModChecker.canShowNotifications) {
+                EssentialAPI.getNotifications().push("Skytils Update Checker", "You are on a development version of Skytils. Click here to change your update channel to pre-release.") {
+                    onAction = {
+                        config.updateChannel = 1
+                        config.markDirty()
+                        EssentialAPI.getNotifications().push("Skytils Update Checker", "Your update channel has been changed to pre-release.", duration = 3f)
+                    }
+                }
+            } else {
+                UChat.chat("$prefix §fYou are on a development version of Skytils. Change your update channel to pre-release to get notified of new updates.")
+            }
+        }
+
+        checkSystemTime()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -439,7 +465,7 @@ class Skytils {
     }
 
     init {
-        TickTask(20, repeats = true) {
+        tickTimer(20, repeats = true) {
             if (mc.thePlayer != null) {
                 if (deobfEnvironment) {
                     if (DevTools.toggles.getOrDefault("forcehypixel", false)) Utils.isOnHypixel = true
@@ -458,6 +484,10 @@ class Skytils {
             !event.isLocal && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
                 ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
         }.onFailure { it.printStackTrace() }.getOrDefault(false)
+
+        IO.launch {
+            TrophyFish.loadFromApi()
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -552,9 +582,11 @@ class Skytils {
     @SubscribeEvent
     fun onGuiChange(event: GuiOpenEvent) {
         val old = mc.currentScreen
-        if (event.gui == null && config.reopenOptionsMenu) {
+        if (event.gui == null && old is OptionsGui && old.parent != null) {
+            displayScreen = old.parent
+        } else if (event.gui == null && config.reopenOptionsMenu) {
             if (old is ReopenableGUI || (old is AccessorSettingsGui && old.config is Config)) {
-                TickTask(1) {
+                tickTimer(1) {
                     if (mc.thePlayer?.openContainer == mc.thePlayer?.inventoryContainer)
                         displayScreen = OptionsGui()
                 }
@@ -563,6 +595,36 @@ class Skytils {
         if (old is AccessorGuiStreamUnavailable) {
             if (config.twitchFix && event.gui == null && !(Utils.inSkyblock && old.parentScreen is GuiGameOver)) {
                 event.gui = old.parentScreen
+            }
+        }
+    }
+
+    private fun checkSystemTime() {
+        IO.launch {
+            DatagramSocket().use { socket ->
+                val address = InetAddress.getByName("time.nist.gov")
+                val buffer = NtpMessage().toByteArray()
+                var packet = DatagramPacket(buffer, buffer.size, address, 123)
+                socket.send(packet)
+                packet = DatagramPacket(buffer, buffer.size)
+
+                val destinationTimestamp = NtpMessage.now()
+                val msg = NtpMessage(packet.data)
+
+                val localClockOffset =
+                    ((msg.receiveTimestamp - msg.originateTimestamp) +
+                            (msg.transmitTimestamp - destinationTimestamp)) / 2
+
+                println("Got local clock offset: $localClockOffset")
+                if (abs(localClockOffset) > 3) {
+                    if (ModChecker.canShowNotifications) {
+                        EssentialAPI.getNotifications().push("Skytils", "Your system time is inaccurate.", 3f)
+                    } else {
+                        UChat.chat("$prefix §fYour system time appears to be inaccurate. Please sync your system time to avoid issues with Skytils.")
+                    }
+                } else {
+                    trustClientTime = true
+                }
             }
         }
     }

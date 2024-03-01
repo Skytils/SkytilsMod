@@ -17,16 +17,21 @@
  */
 package gg.skytils.skytilsmod.core
 
+import gg.essential.elementa.ElementaVersion
+import gg.essential.elementa.components.Window
+import gg.essential.elementa.dsl.pixels
 import gg.essential.universal.UChat
+import gg.essential.universal.UMatrixStack
+import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.RenderHUDEvent
 import gg.skytils.skytilsmod.gui.LocationEditGui
 import gg.skytils.skytilsmod.utils.GlState
 import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.toasts.GuiToast
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
+import gg.skytils.skytilsmod.utils.toast.Toast
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -43,19 +48,21 @@ import java.io.Reader
 import java.io.Writer
 
 object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
-    val GUIPOSITIONS = hashMapOf<String, Pair<Float, Float>>()
-    val GUISCALES = hashMapOf<String, Float>()
     val elements = hashMapOf<Int, GuiElement>()
     private val names = hashMapOf<String, GuiElement>()
-
-    @JvmField
-    var toastGui = GuiToast(Minecraft.getMinecraft())
+    val elementMetadata = hashMapOf<String, GuiElementMetadata>()
 
     @JvmField
     var title: String? = null
     var subtitle: String? = null
     var titleDisplayTicks = 0
     var subtitleDisplayTicks = 0
+
+    private val gui = Window(ElementaVersion.V2)
+    private val toastQueue = ArrayDeque<Toast>()
+    private val maxToasts: Int
+        get() = ((UResolution.scaledHeight * 0.5) / 32).toInt()
+    private val takenSlots = sortedSetOf<Int>()
 
     private var counter = 0
     fun registerElement(e: GuiElement): Boolean {
@@ -70,25 +77,39 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
         }
     }
 
-    fun getByID(ID: Int): GuiElement? {
-        return elements[ID]
+    fun addToast(toast: Toast) {
+        val index = (0..<maxToasts).firstOrNull { it !in takenSlots }
+        if (index != null) {
+            gui.addChild(toast)
+            toast.constraints.y = (index * 32).pixels
+            takenSlots.add(index)
+            toast.animateBeforeHide {
+                takenSlots.remove(index)
+                toastQueue.removeFirstOrNull()?.let { newToast ->
+                    addToast(newToast)
+                }
+            }
+            toast.animateIn()
+        } else {
+            toastQueue.add(toast)
+        }
+    }
+
+    fun getByID(id: Int): GuiElement? {
+        return elements[id]
     }
 
     fun getByName(name: String?): GuiElement? {
         return names[name]
     }
 
-    fun searchElements(query: String): List<GuiElement> {
-        val results: MutableList<GuiElement> = ArrayList()
-        for ((key, value) in names) {
-            if (key.contains(query)) results.add(value)
-        }
-        return results
+    fun searchElements(query: String): Collection<GuiElement> {
+        return names.filter { it.key.contains(query) }.values
     }
 
     @SubscribeEvent
     fun renderPlayerInfo(event: RenderGameOverlayEvent.Post) {
-        if (Skytils.usingLabymod && Minecraft.getMinecraft().ingameGUI !is GuiIngameForge) return
+        if (Skytils.usingLabymod && mc.ingameGUI !is GuiIngameForge) return
         if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
         GlState.pushState()
         MinecraftForge.EVENT_BUS.post(RenderHUDEvent(event))
@@ -116,6 +137,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     fun onRenderHUD(event: RenderHUDEvent) {
         if (Minecraft.getMinecraft().currentScreen is LocationEditGui) return
         mc.mcProfiler.startSection("SkytilsHUD")
+        gui.draw(UMatrixStack.Compat.get())
         for ((_, element) in elements) {
             mc.mcProfiler.startSection(element.name)
             try {
@@ -157,7 +179,6 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
      * @author BiscuitDevelopment
      */
     private fun renderTitles(scaledResolution: ScaledResolution) {
-        val mc = Minecraft.getMinecraft()
         if (mc.theWorld == null || mc.thePlayer == null || !Utils.inSkyblock) {
             return
         }
@@ -207,37 +228,23 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
     }
 
     override fun read(reader: Reader) {
-        json.decodeFromString<Map<String, GuiElementLocation>>(reader.readText()).forEach { name, (x, y, scale) ->
-            val pos = x to y
-            GUIPOSITIONS[name] = pos
-            GUISCALES[name] = scale
-            getByName(name)?.let { element ->
-                element.setPos(x, y)
-                element.scale = scale
-            }
+        json.decodeFromString<Map<String, GuiElementMetadata>>(reader.readText()).forEach { (name, metadata) ->
+            elementMetadata[name] = metadata
+            getByName(name)?.applyMetadata(metadata)
         }
     }
 
     override fun write(writer: Writer) {
         names.entries.forEach { (n, e) ->
-            GUIPOSITIONS[n] = e.x to e.y
-            GUISCALES[n] = e.scale
+            elementMetadata[n] = e.asMetadata()
         }
-        writer.write(json.encodeToString(GUIPOSITIONS.entries.associate {
-            it.key to GuiElementLocation(
-                it.value.first,
-                it.value.second,
-                GUISCALES[it.key] ?: 1f
-            )
-        }))
+        writer.write(json.encodeToString(elementMetadata))
     }
 
     override fun setDefault(writer: Writer) {
         writer.write("{}")
     }
 
-    // this class sucks lol (why is there a thing called floatpair)
-    // was going to make guielement serializable but it's too much effort
     @Serializable
-    private data class GuiElementLocation(val x: Float, val y: Float, val scale: Float)
+    data class GuiElementMetadata(val x: Float, val y: Float, val scale: Float = 1f, val textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL)
 }

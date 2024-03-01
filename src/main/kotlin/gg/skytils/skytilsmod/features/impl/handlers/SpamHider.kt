@@ -31,15 +31,14 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.RegexAsString
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.startsWithAny
 import gg.skytils.skytilsmod.utils.stripControlCodes
-import gg.skytils.skytilsmod.utils.toasts.*
-import gg.skytils.skytilsmod.utils.toasts.BlessingToast.BlessingBuff
+import gg.skytils.skytilsmod.utils.toast.*
 import kotlinx.serialization.*
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.init.Blocks
 import net.minecraft.item.Item
@@ -183,7 +182,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
 
     private enum class Regexs(var pattern: Regex) {
         BLESSINGBUFF(Regex("(?<buff1>\\+[\\d,.%& \\+x]+) (?<symbol1>\\S{1,2})")),
-        BLESSINGGRANT(Regex("Grant.{1,2} you (.*) and (.*)\\.")),
+        BLESSINGGRANT(Regex("(?:Also g|G)rant.{1,2} you (.*) (?:and|&) (.*)\\.")),
         BLESSINGNAME(Regex("Blessing of (?<blessing>\\w+)")),
         BUILDINGTOOLS(Regex("(§eZapped §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUnzapped §r§c\\d+ §r§eblocks away!§r)|(§r§cYou may not Grand Architect that many blocks! \\(\\d+/\\d+\\)§r)|(§r§cYou have \\(\\d+/\\d+\\) of what you're attempting to place!§r)|(§eYou built §a\\d+ §eblocks! §a§lUNDO§r)|(§r§eUndid latest Grand Architect use of §r§c\\d+ §r§eblocks!§r)")),
         MANAUSED(Regex("(§b-\\d+ Mana \\(§6.+§b\\))")),
@@ -200,13 +199,13 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     fun onChatPacket(event: ReceiveEvent) {
         val packet = event.packet
         if (Utils.inSkyblock && packet is S0BPacketAnimation && packet.animationType == 0) {
-            val entity = mc.theWorld.getEntityByID(packet.entityID) ?: return
+            val entity = mc.theWorld?.getEntityByID(packet.entityID) ?: return
             if (entity !is EntityOtherPlayerMP) return
             if (entity.heldItem?.item != deadBush || entity.getDistanceSqToEntity(mc.thePlayer) > 4 * 4) return
             lastSpooked = System.currentTimeMillis()
         }
         if (packet !is S02PacketChat) return
-        if (packet.type.toInt() == 2) return
+        if (packet.type == 2.toByte()) return
         val unformatted = packet.chatComponent.unformattedText.stripControlCodes()
         val formatted = packet.chatComponent.formattedText
 
@@ -338,25 +337,23 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     }
                 }
 
-                Utils.inDungeons && unformatted.contains("Grant") -> {
+                Utils.inDungeons && unformatted.contains("rant") -> {
                     Regexs.BLESSINGGRANT.pattern.find(unformatted)?.let { match ->
                         when (Skytils.config.blessingHider) {
                             1 -> cancelChatPacket(event, false)
                             2 -> {
+                                // TODO: account for new format
                                 val buffs = match.groupValues.mapNotNull { blessingGroup ->
                                     Regexs.BLESSINGBUFF.pattern.matchEntire(blessingGroup)
                                 }.map { blessingBuffMatch ->
-                                    BlessingBuff(
+                                    BlessingToast.BlessingBuff(
                                         blessingBuffMatch.groups["buff1"]?.value ?: return@let,
                                         blessingBuffMatch.groups["symbol1"]?.value ?: return@let
                                     )
                                 }
-                                if (lastBlessingType != "") GuiManager.toastGui.add(
-                                    BlessingToast(
-                                        lastBlessingType,
-                                        buffs
-                                    )
-                                )
+                                if (lastBlessingType != "") {
+                                    GuiManager.addToast(BlessingToast(lastBlessingType, buffs))
+                                }
                                 cancelChatPacket(event, false)
                             }
                         }
@@ -376,12 +373,16 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.witherKeyHider == 2)
                         3 -> {
                             cancelChatPacket(event, false)
-                            if (unformatted.contains("was picked up")) {
-                                GuiManager.toastGui.add(KeyToast("wither", ""))
-                            } else {
-                                val player = formatted.substringBefore("§r§f §r§ehas")
-                                GuiManager.toastGui.add(KeyToast("wither", player))
-                            }
+                            GuiManager.addToast(
+                                KeyToast(
+                                    "wither",
+                                    if (unformatted.contains("was picked up")) {
+                                        ""
+                                    } else {
+                                        formatted.substring(0, formatted.indexOf("§r§f §r§ehas"))
+                                    }
+                                )
+                            )
                         }
                     }
                 }
@@ -397,12 +398,16 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.bloodKeyHider == 2)
                         3 -> {
                             cancelChatPacket(event, false)
-                            if (unformatted.contains("was picked up")) {
-                                GuiManager.toastGui.add(KeyToast("blood", ""))
-                            } else {
-                                val player = formatted.substring(0, formatted.indexOf("§r§f §r§ehas"))
-                                GuiManager.toastGui.add(KeyToast("blood", player))
-                            }
+                            GuiManager.addToast(
+                                KeyToast(
+                                    "blood",
+                                    if (unformatted.contains("was picked up")) {
+                                        ""
+                                    } else {
+                                        formatted.substring(0, formatted.indexOf("§r§f §r§ehas"))
+                                    }
+                                )
+                            )
                         }
                     }
                 }
@@ -420,7 +425,9 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         3 -> {
                             cancelChatPacket(event, false)
                             val username = mc.thePlayer.name
-                            if (formatted.contains(username)) GuiManager.toastGui.add(SuperboomToast())
+                            if (formatted.contains(username)) {
+                                GuiManager.addToast(SuperboomToast())
+                            }
                         }
                     }
                 }
@@ -432,7 +439,9 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         3 -> {
                             cancelChatPacket(event, false)
                             val username = mc.thePlayer.name
-                            if (formatted.contains(username)) GuiManager.toastGui.add(ReviveStoneToast())
+                            if (formatted.contains(username)) {
+                                GuiManager.addToast(ReviveStoneToast())
+                            }
                         }
                     }
                 }
@@ -443,9 +452,11 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.comboHider == 2)
                         3 -> {
                             if (unformatted.startsWith("Your Kill Combo has expired!")) {
-                                GuiManager.toastGui.add(ComboEndToast(unformatted))
+                                GuiManager.addToast(ComboToast("§r§c§lCombo Failed!", "§r§cYou reached ${unformatted.filter { it.isDigit() }}"))
                             } else {
-                                GuiManager.toastGui.add(ComboToast(formatted))
+                                ComboToast.fromString(formatted)?.let { toast ->
+                                    GuiManager.addToast(toast)
+                                }
                             }
                             cancelChatPacket(event, false)
                         }
@@ -628,10 +639,10 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     when (Skytils.config.autoRecombHider) {
                         1, 2 -> cancelChatPacket(event, Skytils.config.autoRecombHider == 2)
                         3 -> {
-                            RecombToast.pattern.find(formatted, formatted.indexOf(" "))?.let {
-                                GuiManager.toastGui.add(RecombToast(it.groupValues[1]))
-                            }
                             cancelChatPacket(event, false)
+                            RecombToast.pattern.find(formatted, formatted.indexOf(" "))?.let {
+                                GuiManager.addToast(RecombToast(it.groupValues[1]))
+                            }
                         }
                     }
                 }
@@ -714,7 +725,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         return false
     }
 
-    class SpamMessage(var message: String, var time: Long, var height: Double)
+    data class SpamMessage(var message: String, var time: Long, var height: Double)
     class SpamGuiElement : GuiElement("Spam Gui", scale = 1.0f, x = 0.65f, y = 0.925f) {
         /**
          * Based off of Soopyboo32's SoopyApis module
@@ -730,15 +741,16 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
             lastTimeRender = now
             var i = 0
             val reversed = spamMessages.asReversed()
+            val leftAlign = scaleX < sr.scaledWidth / 2f
             while (i in spamMessages.indices) {
                 val message = reversed[i]
-                val messageWidth = Minecraft.getMinecraft().fontRendererObj.getStringWidth(
-                    message.message.stripControlCodes()
+                val messageWidth = ScreenRenderer.fontRenderer.getStringWidth(
+                    message?.message?.stripControlCodes()
                 )
                 if (scaleY > sr.scaledHeight / 2f) {
-                    message.height = message.height + (i * 10 - message.height) * (animDiv * 5)
+                    message.height += (i * 10 - message.height) * (animDiv * 5)
                 } else if (scaleY < sr.scaledHeight / 2f) {
-                    message.height = message.height + (i * -10 - message.height) * (animDiv * 5)
+                    message.height += (i * -10 - message.height) * (animDiv * 5)
                 }
                 var animOnOff = 0.0
                 if (message.time < 500) {
@@ -749,26 +761,21 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 }
                 animOnOff *= 90.0
                 animOnOff += 90.0
-                animOnOff = animOnOff * Math.PI / 180
+                animOnOff *= Math.PI / 180
                 animOnOff = sin(animOnOff)
                 animOnOff *= -1.0
                 animOnOff += 1.0
-                val x = animOnOff * (messageWidth + 30) * if (scaleX < sr.scaledWidth / 2f) -1 else 1
+                val x = animOnOff * (messageWidth + 30) * if (leftAlign) -1 else 1
                 val y = -1 * message.height
-                val shadow: TextShadow = when (Skytils.config.spamShadow) {
-                    1 -> TextShadow.NONE
-                    2 -> TextShadow.OUTLINE
-                    else -> TextShadow.NORMAL
-                }
                 val alignment =
-                    if (scaleX < sr.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
+                    if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
                 ScreenRenderer.fontRenderer.drawString(
                     message.message,
-                    (if (scaleX < sr.scaledWidth / 2f) x else x + width).toFloat(),
+                    (if (leftAlign) x else x + width).toFloat(),
                     y.toFloat(),
                     CommonColors.WHITE,
                     alignment,
-                    shadow
+                    textShadow
                 )
                 if (message.time > 4000) {
                     spamMessages.remove(message)
@@ -782,11 +789,6 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         override fun demoRender() {
             val messageWidth =
                 ScreenRenderer.fontRenderer.getStringWidth("§r§7Your Implosion hit §r§c3 §r§7enemies for §r§c1,000,000.0 §r§7damage.§r".stripControlCodes())
-            val shadow: TextShadow = when (Skytils.config.spamShadow) {
-                1 -> TextShadow.NONE
-                2 -> TextShadow.OUTLINE
-                else -> TextShadow.NORMAL
-            }
             val x = (sin(90 * Math.PI / 180) * -1 + 1) * (messageWidth + 30)
             val y = 0.0
             ScreenRenderer.fontRenderer.drawString(
@@ -795,7 +797,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                 y.toFloat(),
                 CommonColors.WHITE,
                 TextAlignment.LEFT_RIGHT,
-                shadow
+                textShadow
             )
         }
 
@@ -823,8 +825,8 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         if (addToSpam) newMessage(event.packet.chatComponent.formattedText)
     }
 
-    private fun newMessage(message: String) {
-        spamMessages.add(SpamMessage(message, 0, 0.0))
+    private fun newMessage(message: String?) {
+        spamMessages.add(SpamMessage(message ?: return, 0, 0.0))
     }
 
     init {

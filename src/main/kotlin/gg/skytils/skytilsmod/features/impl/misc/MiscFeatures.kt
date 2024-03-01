@@ -19,16 +19,19 @@ package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
+import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
+import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
-import gg.skytils.skytilsmod.core.TickTask
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.*
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntityArmorstand
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
@@ -40,8 +43,8 @@ import gg.skytils.skytilsmod.utils.RenderUtil.renderItem
 import gg.skytils.skytilsmod.utils.RenderUtil.renderTexture
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.block.BlockEndPortalFrame
 import net.minecraft.client.Minecraft
@@ -51,10 +54,12 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.boss.IBossDisplayData
 import net.minecraft.entity.effect.EntityLightningBolt
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityFallingBlock
 import net.minecraft.entity.item.EntityItem
+import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.init.Blocks
@@ -70,10 +75,12 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderBlockOverlayEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.living.EnderTeleportEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.Loader
+import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -90,9 +97,13 @@ object MiscFeatures {
     private var blockZapperUses = 0
     private val cheapCoins = setOf(
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTM4MDcxNzIxY2M1YjRjZDQwNmNlNDMxYTEzZjg2MDgzYTg5NzNlMTA2NGQyZjg4OTc4Njk5MzBlZTZlNTIzNyJ9fX0=",
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGZhMDg3ZWI3NmU3Njg3YTgxZTRlZjgxYTdlNjc3MjY0OTk5MGY2MTY3Y2ViMGY3NTBhNGM1ZGViNmM0ZmJhZCJ9fX0="
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGZhMDg3ZWI3NmU3Njg3YTgxZTRlZjgxYTdlNjc3MjY0OTk5MGY2MTY3Y2ViMGY3NTBhNGM1ZGViNmM0ZmJhZCJ9fX0=",
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTZjM2UzMWNmYzY2NzMzMjc1YzQyZmNmYjVkOWE0NDM0MmQ2NDNiNTVjZDE0YzljNzdkMjczYTIzNTIifX19",
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvY2RlZTYyMWViODJiMGRhYjQxNjYzMzBkMWRhMDI3YmEyYWMxMzI0NmE0YzFlN2Q1MTc0ZjYwNWZkZGYxMGExMCJ9fX0=",
+        "ewogICJ0aW1lc3RhbXAiIDogMTU5ODg0NzA4MjYxMywKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNzQwZDZlMzYyYmM3ZWVlNGY5MTFkYmQwNDQ2MzA3ZTc0NThkMTA1MGQwOWFlZTUzOGViY2IwMjczY2Y3NTc0MiIKICAgIH0KICB9Cn0=",
     )
     private val hubSpawnPoint = BlockPos(-2, 70, -69)
+    private val bestiaryTitleRegex = Regex("(?:\\(\\d+/\\d+\\) )?(?:Bestiary ➜ (?!Fishing)|Fishing ➜ )|Search Results")
 
     init {
         GolemSpawnTimerElement()
@@ -136,7 +147,7 @@ object MiscFeatures {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inSkyblock || event.type == 2.toByte()) return
         val unformatted = event.message.unformattedText.stripControlCodes().trim()
         val formatted = event.message.formattedText
         if (formatted.startsWith("§r§cYou died") && Skytils.config.preventMovingOnDeath) {
@@ -224,7 +235,9 @@ object MiscFeatures {
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!Utils.inSkyblock) return
-        if (Skytils.config.hideDyingMobs && event.entity is EntityLivingBase && (event.entity.health <= 0 || event.entity.isDead)) {
+        if (Skytils.config.bossBarFix && event.entity is IBossDisplayData && event.entity.isInvisible && event.entity.hasCustomName()) {
+            event.result = Event.Result.ALLOW
+        } else if (Skytils.config.hideDyingMobs && event.entity is EntityLivingBase && (event.entity.health <= 0 || event.entity.isDead)) {
             event.isCanceled = true
         } else if (event.entity is EntityFallingBlock) {
             val entity = event.entity
@@ -252,6 +265,7 @@ object MiscFeatures {
             }
         } else if (Skytils.deobfEnvironment && DevTools.getToggle("invis")) {
             event.entity.isInvisible = false
+            (event.entity as? AccessorEntityArmorstand)?.invokeSetShowArms(true)
         }
     }
 
@@ -280,7 +294,7 @@ object MiscFeatures {
     fun onJoin(event: EntityJoinWorldEvent) {
         if (!Utils.inSkyblock || mc.thePlayer == null || mc.theWorld == null) return
         if (event.entity is EntityArmorStand) {
-            TickTask(5) {
+            tickTimer(5) {
                 val entity = event.entity as EntityArmorStand
                 val headSlot = entity.getCurrentArmor(3)
                 if (Skytils.config.trickOrTreatChestAlert && mc.thePlayer != null && headSlot != null && headSlot.item === Items.skull && headSlot.hasTagCompound() && entity.getDistanceSqToEntity(
@@ -440,9 +454,9 @@ object MiscFeatures {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
 
         if (Skytils.config.playersInRangeDisplay) {
-            inRangePlayerCount = mc.theWorld.playerEntities.filterIsInstance<EntityOtherPlayerMP>().count {
-                it.uniqueID.version() == 4 && it.getDistanceSqToEntity(mc.thePlayer) <= 30 * 30
-            }
+            inRangePlayerCount = (mc.theWorld.playerEntities.filterIsInstance<EntityOtherPlayerMP>().count {
+                (it.uniqueID.version() == 4 || it.uniqueID.version() == 1) && it.getDistanceSqToEntity(mc.thePlayer) <= 30 * 30 // Nicked players have uuid v1, Watchdog has uuid v4
+            } - 1).coerceAtLeast(0) // The -1 is to remove watchdog from the list
         }
         if (Skytils.config.summoningEyeDisplay && SBInfo.mode == SkyblockIsland.TheEnd.mode) {
             placedEyes = PlacedSummoningEyeDisplay.SUMMONING_EYE_FRAMES.count {
@@ -462,11 +476,7 @@ object MiscFeatures {
         val c = mc.thePlayer.openContainer
         if (c is ContainerChest) {
             val name = c.lowerChestInventory.name
-            if (Skytils.config.showBestiaryLevel && name.startsWithAny(
-                    "Bestiary ➜ ",
-                    "Search Results"
-                ) && item.item != Item.getItemFromBlock(Blocks.stained_glass_pane)
-            ) {
+            if (Skytils.config.showBestiaryLevel && bestiaryTitleRegex in name) {
                 val arrowSlot = c.inventorySlots.getOrNull(48)?.stack
                 if (arrowSlot != null && arrowSlot.item == Items.arrow && ItemUtil.getItemLore(item)
                         .lastOrNull() == "§eClick to view!"
@@ -505,6 +515,17 @@ object MiscFeatures {
         }
     }
 
+    @SubscribeEvent
+    fun renderFishingHookAge(event: RenderWorldLastEvent) {
+        if (Utils.inSkyblock && Config.fishingHookAge) {
+            mc.theWorld?.getEntities(EntityFishHook::class.java) { entity ->
+                mc.thePlayer == entity?.angler
+            }?.filterNotNull()?.forEach { entity ->
+                RenderUtil.drawLabel(entity.positionVector.addVector(0.0, 0.5, 0.0), "%.2fs".format(entity.ticksExisted / 20.0), Color.WHITE, event.partialTicks, UMatrixStack.Compat.get())
+            }
+        }
+    }
+
     class GolemSpawnTimerElement : GuiElement("Endstone Protector Spawn Timer", x = 150, y = 20) {
         override fun render() {
             val player = mc.thePlayer
@@ -520,7 +541,7 @@ object MiscFeatures {
                     0f,
                     CommonColors.WHITE,
                     alignment,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -532,7 +553,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.WHITE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -559,7 +580,7 @@ object MiscFeatures {
                     5f,
                     CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -572,7 +593,7 @@ object MiscFeatures {
                 5f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -601,7 +622,7 @@ object MiscFeatures {
                     5f,
                     CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -614,7 +635,7 @@ object MiscFeatures {
                 5f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -658,7 +679,7 @@ object MiscFeatures {
                         0f,
                         CommonColors.RED,
                         TextAlignment.LEFT_RIGHT,
-                        TextShadow.NORMAL
+                        textShadow
                     )
                     return
                 }
@@ -670,7 +691,7 @@ object MiscFeatures {
                     0f,
                     CommonColors.ORANGE,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
             }
         }
@@ -685,7 +706,7 @@ object MiscFeatures {
                     0f,
                     CommonColors.RED,
                     TextAlignment.LEFT_RIGHT,
-                    TextShadow.NORMAL
+                    textShadow
                 )
                 return
             }
@@ -695,7 +716,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.ORANGE,
                 TextAlignment.LEFT_RIGHT,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -724,7 +745,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.WHITE,
                 TextAlignment.MIDDLE,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 
@@ -753,7 +774,7 @@ object MiscFeatures {
                 0f,
                 CommonColors.WHITE,
                 TextAlignment.MIDDLE,
-                TextShadow.NORMAL
+                textShadow
             )
         }
 

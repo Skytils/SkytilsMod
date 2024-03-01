@@ -20,14 +20,33 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.startsWithAny
+import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object TerminalFeatures {
+
+    fun isInPhase3(): Boolean {
+        return (SuperSecretSettings.azooPuzzoo || DungeonTimer.phase2ClearTime != -1L) && DungeonTimer.terminalClearTime == -1L && dungeonFloorNumber == 7
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    fun onSlotClickHigh(event: SlotClickEvent) {
+        if (!Utils.inDungeons || !Skytils.config.blockIncorrectTerminalClicks || event.container !is ContainerChest) return
+        if (event.chestName == "Correct all the panes!") {
+            if (event.slot?.stack?.displayName?.stripControlCodes()?.startsWith("On") == true) {
+                event.isCanceled = true
+            }
+        }
+    }
+
     @SubscribeEvent
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inDungeons) return
@@ -64,7 +83,7 @@ object TerminalFeatures {
         if (chest is ContainerChest) {
             val inv = chest.lowerChestInventory
             val chestName = inv.displayName.unformattedText
-            if (chestName == "Navigate the maze!" || chestName == "Correct all the panes!") {
+            if (chestName == "Click the button on time!" || chestName == "Correct all the panes!") {
                 event.toolTip.clear()
             }
         }
