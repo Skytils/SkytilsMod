@@ -20,44 +20,43 @@ package gg.skytils.skytilsmod.features.impl.events
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.network.play.server.S02PacketChat
+import net.minecraft.entity.passive.EntityPig
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.event.entity.player.AttackEntityEvent
+import net.minecraftforge.event.entity.player.EntityInteractEvent
 import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
-import java.util.concurrent.CopyOnWriteArrayList
 
 object TechnoMayor {
-    private val orbLocations = CopyOnWriteArrayList<Vec3>()
+    private val shinyPigs = HashMap<Vec3, EntityPig?>()
+    private var latestPig: EntityPig? = null
 
     @SubscribeEvent
     fun onRenderSpecialLivingPre(event: RenderLivingEvent.Specials.Pre<EntityLivingBase?>) {
         if (!Utils.inSkyblock) return
         val e = event.entity
-        if (e !is EntityArmorStand || !e.hasCustomName() || e.isDead) return
-        if (e.customNameTag != "§6§lSHINY ORB") return
+        if (!e.isValidPigLabel()) return
         val pos = e.position
         mc.theWorld.getEntitiesWithinAABBExcludingEntity(
             e,
             AxisAlignedBB(pos, BlockPos(pos.x + 1, pos.y + 1, pos.z + 1))
         ).find {
-            if (it is EntityArmorStand && it.hasCustomName() && it.getCustomNameTag().contains(mc.thePlayer.name)) {
-                it.worldObj.removeEntity(it)
-                e.worldObj.removeEntity(e)
-                orbLocations.add(Vec3(pos.x + 0.5, (pos.y - 2).toDouble(), pos.z + 0.5))
-                return@find true
-            }
-            return@find false
+            it is EntityArmorStand && mc.thePlayer.name in it.customNameTag
+        }?.let {
+            it.worldObj.removeEntity(it)
+            e.worldObj.removeEntity(e)
+            shinyPigs.putIfAbsent(Vec3(pos.x + 0.5, (pos.y - 2).toDouble(), pos.z + 0.5), latestPig)
+            latestPig = null
         }
     }
 
@@ -67,15 +66,21 @@ object TechnoMayor {
         if (SBInfo.mode != SkyblockIsland.Hub.mode && SBInfo.mode != SkyblockIsland.FarmingIsland.mode) return
         if (!Skytils.config.shinyOrbWaypoints) return
 
+        shinyPigs.values.removeAll { it?.isDead != false }
+
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()
-        for (orb in orbLocations) {
+        GlState.pushState()
+        for (entry in shinyPigs) {
+            val orb = entry.key
+            val pig = entry.value
             val x = orb.xCoord - viewerX
             val y = orb.yCoord - viewerY
             val z = orb.zCoord - viewerZ
             val distSq = x * x + y * y + z * z
             GlStateManager.disableCull()
             GlStateManager.disableTexture2D()
+
             if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y, z, Color(114, 245, 82).rgb, 0.75f, event.partialTicks)
             GlStateManager.disableDepth()
             RenderUtil.renderWaypointText(
@@ -86,32 +91,56 @@ object TechnoMayor {
                 event.partialTicks,
                 matrixStack
             )
-            GlStateManager.disableLighting()
-            GlStateManager.enableTexture2D()
-            GlStateManager.enableDepth()
-            GlStateManager.enableCull()
+            if (Skytils.config.shinyPigLocations) {
+                if (pig != null) {
+                    RenderUtil.renderWaypointText(
+                        "Pig",
+                        pig.posX,
+                        pig.posY + 0.5,
+                        pig.posZ,
+                        event.partialTicks,
+                        matrixStack
+                    )
+                    RenderUtil.draw3DLine(
+                        Vec3(pig.posX, pig.posY + 0.5, pig.posZ), Vec3(orb.x, orb.y + 1.5, orb.z),
+                        1, Color.RED, event.partialTicks, matrixStack
+                    )
+                    RenderUtil.drawOutlinedBoundingBox(pig.entityBoundingBox, Color.RED, 1f, event.partialTicks)
+                }
+            }
         }
+        GlState.popState()
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-    fun onChatPacket(event: ReceiveEvent) {
-        if (event.packet !is S02PacketChat) return
-        val packet = event.packet
-        if (packet.type == 2.toByte()) return
-        val unformatted = packet.chatComponent.unformattedText.stripControlCodes()
-        if (unformatted == "Your Shiny Orb and associated pig expired and disappeared." || unformatted == "SHINY! The orb is charged! Click on it for loot!") {
-            orbLocations.removeIf { pos: Vec3 ->
-                mc.thePlayer.position.distanceSq(
-                    pos.xCoord,
-                    pos.yCoord,
-                    pos.zCoord
-                ) < 7 * 7
-            }
+    @SubscribeEvent
+    fun onEntityInteract(event: EntityInteractEvent) {
+        if (!Utils.inSkyblock) return
+        checkPig(event.target as? EntityPig ?: return)
+    }
+
+    @SubscribeEvent
+    fun onEntityAttack(event: AttackEntityEvent) {
+        if (!Utils.inSkyblock) return
+        checkPig(event.target as? EntityPig ?: return)
+    }
+
+    fun checkPig(entity: EntityPig) {
+        if (mc.theWorld.getEntitiesWithinAABBExcludingEntity(
+            entity,
+            AxisAlignedBB(
+                BlockPos(entity.posX - 1, entity.posY, entity.posZ - 1),
+                BlockPos(entity.posX + 1, entity.posY + 2, entity.posZ + 1)
+            )
+        ).any { it.isValidPigLabel() }) {
+            latestPig = entity
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        orbLocations.clear()
+        shinyPigs.clear()
+        latestPig = null
     }
+
+    private fun Entity.isValidPigLabel() = this is EntityArmorStand && !isDead && customNameTag == "§6§lSHINY PIG"
 }

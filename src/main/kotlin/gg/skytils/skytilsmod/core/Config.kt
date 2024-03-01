@@ -264,7 +264,7 @@ object Config : Vigilant(
         if (ModChecker.canShowNotifications) {
             EssentialAPI.getNotifications().push("Dungeon Sweat", "Dungeon Sweat mode ${SuperSecretSettings.azooPuzzoo}")
         } else {
-            UChat.chat("${Skytils.prefix} §bDungeon Sweat mode ${SuperSecretSettings.azooPuzzoo}");
+            UChat.chat("${Skytils.prefix} §bDungeon Sweat mode ${SuperSecretSettings.azooPuzzoo}")
         }
         UDesktop.browse(URI.create("https://l.skytils.gg/dungeonsweatsonly"))
     }
@@ -1131,9 +1131,18 @@ object Config : Vigilant(
     @Property(
         type = PropertyType.SWITCH, name = "Show Shiny Orb Waypoints",
         description = "Creates a waypoint of where your shiny orbs are",
-        category = "Events", subcategory = "Technoblade"
+        category = "Events", subcategory = "Technoblade",
+        searchTags = ["Pig"]
     )
     var shinyOrbWaypoints = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Shiny Pig Locations",
+        description = "Shows the location of the pig and draws a line to its orb.",
+        category = "Events", subcategory = "Technoblade",
+        searchTags = ["Pig"]
+    )
+    var shinyPigLocations = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Plot Cleanup Helper",
@@ -3086,6 +3095,8 @@ object Config : Vigilant(
 
         addDependency("showTrophyFishTotals", "trophyFishTracker")
         addDependency("showTotalTrophyFish", "trophyFishTracker")
+
+        addDependency("shinyPigLocations", "shinyOrbWaypoints")
 
         registerListener("protectItemBINThreshold") { _: String ->
             tickTimer(1) {
