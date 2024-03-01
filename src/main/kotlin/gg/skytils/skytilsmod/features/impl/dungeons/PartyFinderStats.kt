@@ -124,8 +124,8 @@ object PartyFinderStats {
                                     activePet.type.splitToWords()
                                 }"
                             ).setHoverText(
-                                "§b" + (activePet.heldItem?.lowercase()?.replace("pet_item_", "")?.splitToWords()
-                                    ?: "§cNo Pet Item")
+                                "§b${activePet.heldItem?.lowercase()?.replace("pet_item_", "")?.splitToWords()
+                                    ?: "§cNo Pet Item"}"
                             )
                         )
                     } ?: component.append("§cNo Pet Equipped!")

@@ -27,6 +27,7 @@ import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
+import gg.essential.universal.UDesktop
 import gg.essential.universal.UKeyboard
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.gui.components.SimpleButton
@@ -35,7 +36,6 @@ import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.openGUI
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
-import java.awt.Desktop
 import java.net.URI
 
 class OptionsGui(val parent: GuiScreen? = null) :
@@ -135,7 +135,7 @@ class OptionsGui(val parent: GuiScreen? = null) :
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
-            Desktop.getDesktop().open(Skytils.modDir)
+            UDesktop.open(Skytils.modDir)
         }
         SimpleButton("Open Web Editor").childOf(window).constrain {
             x = CenterConstraint()
@@ -143,7 +143,7 @@ class OptionsGui(val parent: GuiScreen? = null) :
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
-            Desktop.getDesktop().browse(URI("https://editor.skytils.gg/"))
+            UDesktop.browse(URI("https://editor.skytils.gg/"))
         }
         SimpleButton("Discord").childOf(window).constrain {
             x = basicXConstraint { window.getWidth() - this.getWidth() - 3 }
@@ -152,7 +152,7 @@ class OptionsGui(val parent: GuiScreen? = null) :
             height = RelativeConstraint(0.05f)
         }.onMouseClick {
             runCatching {
-                Desktop.getDesktop().browse(URI("https://discord.gg/skytils"))
+                UDesktop.browse(URI("https://discord.gg/skytils"))
             }
         }
         SimpleButton("GitHub").childOf(window).constrain {
@@ -162,7 +162,7 @@ class OptionsGui(val parent: GuiScreen? = null) :
             height = RelativeConstraint(0.05f)
         }.onMouseClick {
             runCatching {
-                Desktop.getDesktop().browse(URI("https://github.com/Skytils/SkytilsMod"))
+                UDesktop.browse(URI("https://github.com/Skytils/SkytilsMod"))
             }
         }
         animate()

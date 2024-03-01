@@ -25,6 +25,9 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 
 abstract class ItemProtectStrategy {
+
+    val name = this::class.simpleName
+
     abstract fun worthProtecting(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean
     abstract val isToggled: Boolean
 
@@ -37,8 +40,8 @@ abstract class ItemProtectStrategy {
             return STRATEGIES.any { it.isToggled }
         }
 
-        fun isAnyWorth(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): Boolean {
-            return STRATEGIES.any { it.isToggled && it.worthProtecting(item, extraAttr, type) }
+        fun findValidStrategy(item: ItemStack, extraAttr: NBTTagCompound?, type: ProtectType): ItemProtectStrategy? {
+            return STRATEGIES.find { it.isToggled && it.worthProtecting(item, extraAttr, type) }
         }
     }
 

@@ -30,21 +30,26 @@ import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.UUID
 
 object TrophyFish {
     private val trophyFish = mutableMapOf<String, Fish>()
-    private val trophyFishRegex = Regex("TROPHY FISH! You caught an? (\\w+) (BRONZE|SILVER|GOLD|DIAMOND)\\.")
+    private val trophyFishRegex = Regex("TROPHY FISH! You caught an? ([\\w ]+) (BRONZE|SILVER|GOLD|DIAMOND)\\.")
 
 
     init {
         Skytils.guiManager.registerElement(TrophyFishDisplay())
     }
 
-    fun loadFromApi() {
+    suspend fun loadFromApi() {
         trophyFish.clear()
-        val trophyFishData = API.getSelectedSkyblockProfileSync(UPlayer.getUUID())?.members?.get(UPlayer.getUUID().nonDashedString())?.trophy_fish
-        trophyFishData?.fish_count?.forEach { (fish, data) ->
-            trophyFish[fish] = Fish(data.bronze, data.silver, data.gold, data.diamond)
+        trophyFish.putAll(getTrophyFishData(UPlayer.getUUID()) ?: return)
+    }
+
+    suspend fun getTrophyFishData(uuid: UUID): Map<String, Fish>? {
+        val trophyFishData = API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString())?.trophy_fish
+        return trophyFishData?.fish_count?.entries?.associate { (fish, data) ->
+            fish to Fish(data.bronze, data.silver, data.gold, data.diamond)
         }
     }
 
@@ -70,14 +75,32 @@ object TrophyFish {
         }
     }
 
-    fun generateTrophyFishList(total: Boolean = false) =
-        trophyFish.entries.sortedBy { (fish, _) -> TrophyFish.entries.indexOfFirst { it.name == fish } }.mapNotNull { (fish, data) ->
-            val name = TrophyFish.entries.find { it.name == fish }?.formattedName ?: return@mapNotNull null
-            name + (if (total) " ${ChatColor.DARK_AQUA}[${ChatColor.LIGHT_PURPLE}${data.total}${ChatColor.DARK_AQUA}] " else " ${ChatColor.DARK_AQUA}» ") +
-                    "${ChatColor.DARK_GRAY}${data.bronze}${ChatColor.DARK_AQUA}-" +
-                    "${ChatColor.GRAY}${data.silver}${ChatColor.DARK_AQUA}-" +
-                    "${ChatColor.GOLD}${data.gold}${ChatColor.DARK_AQUA}-" +
-                    "${ChatColor.AQUA}${data.diamond}"
+    fun generateLocalTrophyFishList(total: Boolean = false) =
+        generateTrophyFishList(trophyFish, total)
+
+    fun generateTrophyFishList(data: Map<String, Fish>, total: Boolean = false) =
+        data.entries
+            .mapNotNull { (fish, data) -> (TrophyFish.entries.find { it.name == fish } ?: return@mapNotNull null) to data }
+            .sortedBy { (type, _) -> TrophyFish.entries.indexOf(type) }
+            .map { (type, data) ->
+                type.formattedName +
+                        if (total) {
+                            " ${ChatColor.DARK_AQUA}[${ChatColor.LIGHT_PURPLE}${data.total}${ChatColor.DARK_AQUA}] "
+                        } else {
+                            " ${ChatColor.DARK_AQUA}» "
+                        } +
+                        "${ChatColor.DARK_GRAY}${data.bronze}${ChatColor.DARK_AQUA}-" +
+                        "${ChatColor.GRAY}${data.silver}${ChatColor.DARK_AQUA}-" +
+                        "${ChatColor.GOLD}${data.gold}${ChatColor.DARK_AQUA}-" +
+                        "${ChatColor.AQUA}${data.diamond}"
+        }
+
+    fun generateLocalTotalTrophyFish() =
+        generateTotalTrophyFish(trophyFish)
+
+    fun generateTotalTrophyFish(data: Map<String, Fish>) =
+        "${ChatColor.LIGHT_PURPLE}Total ${ChatColor.DARK_AQUA}» ${ChatColor.LIGHT_PURPLE}" + data.values.fold(0) { acc, fish ->
+            acc + fish.total
         }
 
     class Fish(var bronze: Int = 0, var silver: Int = 0, var gold: Int = 0, var diamond: Int = 0) {
@@ -113,7 +136,7 @@ object TrophyFish {
         val alignment = if (scaleX > sr.scaledWidth / 2f) SmartFontRenderer.TextAlignment.RIGHT_LEFT else SmartFontRenderer.TextAlignment.LEFT_RIGHT
         override fun render() {
             if (!toggled || !Utils.inSkyblock || SBInfo.mode != SkyblockIsland.CrimsonIsle.mode) return
-            generateTrophyFishList(Config.showTrophyFishTotals).forEachIndexed { idx, str ->
+            generateLocalTrophyFishList(Config.showTrophyFishTotals).forEachIndexed { idx, str ->
                 fr.drawString(
                     str,
                     0f,
@@ -125,9 +148,7 @@ object TrophyFish {
             }
             if (Config.showTotalTrophyFish) {
                 fr.drawString(
-                    "${ChatColor.LIGHT_PURPLE}Total ${ChatColor.DARK_AQUA}» ${ChatColor.LIGHT_PURPLE}" + trophyFish.values.fold(0) { acc, e ->
-                        acc + e.total
-                    },
+                    generateLocalTotalTrophyFish(),
                     0f,
                     (trophyFish.size * fr.FONT_HEIGHT).toFloat(),
                     CommonColors.WHITE,
