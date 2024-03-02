@@ -90,49 +90,6 @@ object CataclysmicMapConfig : Vigilant(File("./config/skytils/cataclysmicmap/con
     var mapVanillaMarker = false
 
     @Property(
-        name = "Reset Map Position",
-        type = PropertyType.BUTTON,
-        category = "Map",
-        subcategory = "Size",
-        placeholder = "Reset"
-    )
-    fun resetMapLocation() {
-        mapX = 10
-        mapY = 10
-    }
-
-    @Property(
-        name = "Map X",
-        type = PropertyType.NUMBER,
-        category = "Map",
-        subcategory = "Size",
-        hidden = true
-    )
-    var mapX = 10
-
-    @Property(
-        name = "Map Y",
-        type = PropertyType.NUMBER,
-        category = "Map",
-        subcategory = "Size",
-        hidden = true
-    )
-    var mapY = 10
-
-    @Property(
-        name = "Map Size",
-        type = PropertyType.DECIMAL_SLIDER,
-        description = "Scale of entire map.",
-        category = "Map",
-        subcategory = "Size",
-        minF = 0.1f,
-        maxF = 4f,
-        decimalPlaces = 2,
-        hidden = true
-    )
-    var mapScale = 1.25f
-
-    @Property(
         name = "Map Text Scale",
         type = PropertyType.DECIMAL_SLIDER,
         description = "Scale of room names and secret counts relative to map size.",

@@ -24,7 +24,6 @@ import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonInfo
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonMap
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonScan
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.MapUpdate
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
@@ -92,13 +91,13 @@ object CataclysmicMap {
         var dynamicRotation = 0f
 
         private fun setupRotate() {
-            val scale = ScaledResolution(mc).scaleFactor
+            val mcScale = ScaledResolution(mc).scaleFactor
             GL11.glEnable(GL11.GL_SCISSOR_TEST)
             GL11.glScissor(
-                (CataclysmicMapConfig.mapX * scale),
-                (mc.displayHeight - CataclysmicMapConfig.mapY * scale - 128 * scale * CataclysmicMapConfig.mapScale).toInt(),
-                (128 * scale * CataclysmicMapConfig.mapScale).toInt(),
-                (128 * scale * CataclysmicMapConfig.mapScale).toInt()
+                (scaleX * mcScale).toInt(),
+                (mc.displayHeight - scaleY * mcScale - 128 * mcScale * scale).toInt(),
+                (128 * mcScale * scale).toInt(),
+                (128 * mcScale * scale).toInt()
             )
             GlStateManager.translate(64.0, 64.0, 0.0)
             GlStateManager.rotate(-mc.thePlayer.rotationYaw + 180f, 0f, 0f, 1f)
