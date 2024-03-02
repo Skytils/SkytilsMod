@@ -21,6 +21,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonInfo
@@ -286,6 +287,7 @@ object CataclysmicMap {
 
         override fun render() {
             if (!toggled || SBInfo.mode != SkyblockIsland.Dungeon.mode || mc.thePlayer == null || mc.theWorld == null) return
+            if (CataclysmicMapConfig.mapHideInBoss && DungeonTimer.bossEntryTime != -1L) return
             mc.mcProfiler.startSection("border")
 
             RenderUtils.renderRect(
