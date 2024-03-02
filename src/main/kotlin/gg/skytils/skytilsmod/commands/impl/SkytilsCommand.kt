@@ -32,7 +32,7 @@ import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.UpdateChecker
 import gg.skytils.skytilsmod.features.impl.dungeons.PartyFinderStats
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.DungeonMap
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMap
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonScan
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.ScanUtils
 import gg.skytils.skytilsmod.features.impl.events.GriffinBurrows
@@ -323,7 +323,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 when (args[1].lowercase()) {
                     // Scans the dungeon
                     "scan" -> {
-                        DungeonMap.reset()
+                        CataclysmicMap.reset()
                         DungeonScan.scan()
                     }
                     // Copies room data or room core to clipboard

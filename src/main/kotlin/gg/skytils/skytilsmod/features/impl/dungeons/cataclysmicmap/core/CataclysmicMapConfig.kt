@@ -228,14 +228,6 @@ object CataclysmicMapConfig : Vigilant(File("./config/skytils/cataclysmicmap/con
     var mapCheckmark = 1
 
     @Property(
-        name = "Darken Multiplier",
-        type = PropertyType.PERCENT_SLIDER,
-        description = "How much to darken undiscovered rooms",
-        category = "Colors"
-    )
-    var mapDarkenPercent = 0.4f
-
-    @Property(
         name = "Blood Door",
         type = PropertyType.COLOR,
         category = "Colors",
@@ -279,6 +271,15 @@ object CataclysmicMapConfig : Vigilant(File("./config/skytils/cataclysmicmap/con
         allowAlpha = true
     )
     var colorOpenWitherDoor = Color(92, 52, 14)
+
+    @Property(
+        name = "Loaded Door",
+        type = PropertyType.COLOR,
+        category = "Colors",
+        subcategory = "Doors",
+        allowAlpha = true
+    )
+    var colorLoadedDoor = Color(65, 65, 65)
 
     @Property(
         name = "Blood Room",
@@ -351,6 +352,15 @@ object CataclysmicMapConfig : Vigilant(File("./config/skytils/cataclysmicmap/con
         allowAlpha = true
     )
     var colorTrap = Color(216, 127, 51)
+
+    @Property(
+        name = "Loaded Room",
+        type = PropertyType.COLOR,
+        category = "Colors",
+        subcategory = "Rooms",
+        allowAlpha = true
+    )
+    var colorLoaded = Color(65, 65, 65)
 
     init {
         initialize()

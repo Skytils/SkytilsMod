@@ -25,10 +25,13 @@ class Door(override val x: Int, override val z: Int, var type: DoorType) : Tile 
     var opened = false
     override var state: RoomState = RoomState.UNDISCOVERED
     override val color: Color
-        get() = when (this.type) {
-            DoorType.BLOOD -> CataclysmicMapConfig.colorBloodDoor
-            DoorType.ENTRANCE -> CataclysmicMapConfig.colorEntranceDoor
-            DoorType.WITHER -> if (opened) CataclysmicMapConfig.colorOpenWitherDoor else CataclysmicMapConfig.colorWitherDoor
-            else -> CataclysmicMapConfig.colorRoomDoor
+        get() {
+            return if (state == RoomState.LOADED) CataclysmicMapConfig.colorLoadedDoor
+            else when (this.type) {
+                DoorType.BLOOD -> CataclysmicMapConfig.colorBloodDoor
+                DoorType.ENTRANCE -> CataclysmicMapConfig.colorEntranceDoor
+                DoorType.WITHER -> if (opened) CataclysmicMapConfig.colorOpenWitherDoor else CataclysmicMapConfig.colorWitherDoor
+                else -> CataclysmicMapConfig.colorRoomDoor
+            }
         }
 }

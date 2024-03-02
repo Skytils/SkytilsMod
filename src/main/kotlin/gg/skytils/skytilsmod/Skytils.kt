@@ -31,7 +31,7 @@ import gg.skytils.skytilsmod.features.impl.crimson.KuudraChestProfit
 import gg.skytils.skytilsmod.features.impl.crimson.KuudraFeatures
 import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
 import gg.skytils.skytilsmod.features.impl.dungeons.*
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.DungeonMap
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMap
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.*
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*
@@ -287,7 +287,7 @@ class Skytils {
             CustomNotifications,
             DamageSplash,
             DungeonFeatures,
-            DungeonMap,
+            CataclysmicMap,
             DungeonTimer,
             DupeTracker,
             EnchantNames,

@@ -24,6 +24,7 @@ import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonInfo
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonMap
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonScan
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.MapUpdate
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
@@ -44,9 +45,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import org.lwjgl.opengl.GL11
 import java.awt.Color
-import kotlin.math.roundToInt
 
-object DungeonMap {
+object CataclysmicMap {
 
     fun reset() {
         DungeonInfo.reset()
@@ -80,7 +80,7 @@ object DungeonMap {
         DungeonScan.hasScanned = false
     }
 
-    object CataclysmicMap : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
+    object CataclysmicMapRender : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
         private val neuGreen = ResourceLocation("skytils", "cataclysmicmap/neu/green_check.png")
         private val neuWhite = ResourceLocation("skytils", "cataclysmicmap/neu/white_check.png")
@@ -123,7 +123,7 @@ object DungeonMap {
             for (y in 0..10) {
                 for (x in 0..10) {
                     val tile = DungeonInfo.dungeonList[y * 11 + x]
-                    if (tile is Unknown) continue
+                    if (tile is Unknown || tile.state == RoomState.UNDISCOVERED) continue
 
                     val xOffset = (x shr 1) * (MapUtils.mapRoomSize + connectorSize)
                     val yOffset = (y shr 1) * (MapUtils.mapRoomSize + connectorSize)
@@ -131,32 +131,30 @@ object DungeonMap {
                     val xEven = x and 1 == 0
                     val yEven = y and 1 == 0
 
-                    if (tile.state != RoomState.UNDISCOVERED) {
-                        when {
-                            xEven && yEven -> if (tile is Room) {
-                                RenderUtils.renderRect(
-                                    xOffset.toDouble(),
-                                    yOffset.toDouble(),
-                                    MapUtils.mapRoomSize.toDouble(),
-                                    MapUtils.mapRoomSize.toDouble(),
-                                    tile.color
-                                )
-                            }
-
-                            !xEven && !yEven -> {
-                                RenderUtils.renderRect(
-                                    xOffset.toDouble(),
-                                    yOffset.toDouble(),
-                                    (MapUtils.mapRoomSize + connectorSize).toDouble(),
-                                    (MapUtils.mapRoomSize + connectorSize).toDouble(),
-                                    tile.color
-                                )
-                            }
-
-                            else -> drawRoomConnector(
-                                xOffset, yOffset, connectorSize, tile is Door, !xEven, tile.color
+                    when {
+                        xEven && yEven -> if (tile is Room) {
+                            RenderUtils.renderRect(
+                                xOffset.toDouble(),
+                                yOffset.toDouble(),
+                                MapUtils.mapRoomSize.toDouble(),
+                                MapUtils.mapRoomSize.toDouble(),
+                                tile.color
                             )
                         }
+
+                        !xEven && !yEven -> {
+                            RenderUtils.renderRect(
+                                xOffset.toDouble(),
+                                yOffset.toDouble(),
+                                (MapUtils.mapRoomSize + connectorSize).toDouble(),
+                                (MapUtils.mapRoomSize + connectorSize).toDouble(),
+                                tile.color
+                            )
+                        }
+
+                        else -> drawRoomConnector(
+                            xOffset, yOffset, connectorSize, tile is Door, !xEven, tile.color
+                        )
                     }
                 }
             }
@@ -174,7 +172,7 @@ object DungeonMap {
             }
 
             DungeonInfo.uniqueRooms.forEach { (room, pos) ->
-                if (room.state == RoomState.UNDISCOVERED) return@forEach
+                if (room.state == RoomState.UNDISCOVERED || room.state == RoomState.LOADED) return@forEach
                 val xOffset = (pos.first shr 1) * (MapUtils.mapRoomSize + connectorSize)
                 val yOffset = (pos.second shr 1) * (MapUtils.mapRoomSize + connectorSize)
 
@@ -351,6 +349,6 @@ object DungeonMap {
     }
 
     init {
-        CataclysmicMap
+        CataclysmicMapRender
     }
 }

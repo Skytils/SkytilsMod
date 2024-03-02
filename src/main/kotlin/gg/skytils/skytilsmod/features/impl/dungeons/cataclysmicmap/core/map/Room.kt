@@ -28,14 +28,17 @@ class Room(override val x: Int, override val z: Int, var data: RoomData) : Tile 
     var isSeparator = false
     override var state: RoomState = RoomState.UNDISCOVERED
     override val color: Color
-        get() = when (data.type) {
-            RoomType.BLOOD -> CataclysmicMapConfig.colorBlood
-            RoomType.CHAMPION -> CataclysmicMapConfig.colorMiniboss
-            RoomType.ENTRANCE -> CataclysmicMapConfig.colorEntrance
-            RoomType.FAIRY -> CataclysmicMapConfig.colorFairy
-            RoomType.PUZZLE -> CataclysmicMapConfig.colorPuzzle
-            RoomType.RARE -> CataclysmicMapConfig.colorRare
-            RoomType.TRAP -> CataclysmicMapConfig.colorTrap
-            else -> CataclysmicMapConfig.colorRoom
+        get() {
+            return if (state == RoomState.LOADED) CataclysmicMapConfig.colorLoaded
+            else when (data.type) {
+                RoomType.BLOOD -> CataclysmicMapConfig.colorBlood
+                RoomType.CHAMPION -> CataclysmicMapConfig.colorMiniboss
+                RoomType.ENTRANCE -> CataclysmicMapConfig.colorEntrance
+                RoomType.FAIRY -> CataclysmicMapConfig.colorFairy
+                RoomType.PUZZLE -> CataclysmicMapConfig.colorPuzzle
+                RoomType.RARE -> CataclysmicMapConfig.colorRare
+                RoomType.TRAP -> CataclysmicMapConfig.colorTrap
+                else -> CataclysmicMapConfig.colorRoom
+            }
         }
 }

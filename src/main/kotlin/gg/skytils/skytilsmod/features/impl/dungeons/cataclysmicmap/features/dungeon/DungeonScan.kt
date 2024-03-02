@@ -21,7 +21,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dun
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonScan.scan
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.DungeonMap
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMap
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
@@ -107,7 +107,7 @@ object DungeonScan {
                         DungeonInfo.cryptCount += data.crypts
                         DungeonInfo.secretCount += data.secrets
                         when (data.type) {
-                            RoomType.ENTRANCE -> DungeonMap.CataclysmicMap.dynamicRotation = when {
+                            RoomType.ENTRANCE -> CataclysmicMap.CataclysmicMapRender.dynamicRotation = when {
                                 row == 0 -> 180f
                                 column == 0 -> -90f
                                 column > row -> 90f

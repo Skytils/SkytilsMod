@@ -19,7 +19,7 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.DungeonMap
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMap
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapPlayer
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonScan
@@ -108,7 +108,7 @@ object RenderUtils {
         if (CataclysmicMapConfig.mapRotate) {
             GlStateManager.rotate(mc.thePlayer.rotationYaw + 180f, 0f, 0f, 1f)
         } else if (CataclysmicMapConfig.mapDynamicRotate) {
-            GlStateManager.rotate(-DungeonMap.CataclysmicMap.dynamicRotation, 0f, 0f, 1f)
+            GlStateManager.rotate(-CataclysmicMap.CataclysmicMapRender.dynamicRotation, 0f, 0f, 1f)
         }
 
         val fontHeight = mc.fontRendererObj.FONT_HEIGHT + 1
@@ -125,7 +125,7 @@ object RenderUtils {
         }
 
         if (CataclysmicMapConfig.mapDynamicRotate) {
-            GlStateManager.rotate(DungeonMap.CataclysmicMap.dynamicRotation, 0f, 0f, 1f)
+            GlStateManager.rotate(CataclysmicMap.CataclysmicMapRender.dynamicRotation, 0f, 0f, 1f)
         }
 
         GlStateManager.popMatrix()

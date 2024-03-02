@@ -27,7 +27,7 @@ enum class RoomType {
             74 -> CHAMPION
             30 -> ENTRANCE
             82 -> FAIRY
-            63 -> NORMAL
+            63, 85 -> NORMAL
             66 -> PUZZLE
             62 -> TRAP
             else -> null
