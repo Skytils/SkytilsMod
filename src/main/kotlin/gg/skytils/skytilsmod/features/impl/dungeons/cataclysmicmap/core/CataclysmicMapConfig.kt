@@ -323,6 +323,60 @@ object CataclysmicMapConfig : Vigilant(
     )
     var colorLoaded = Color(65, 65, 65)
 
+
+    @Property(
+        name = "Box Wither Doors",
+        description = "Boxes unopened wither doors.",
+        type = PropertyType.SWITCH,
+        category = "Other Features",
+        subcategory = "Wither Door",
+    )
+    var boxWitherDoors = false
+
+    @Property(
+        name = "No Key Color",
+        type = PropertyType.COLOR,
+        category = "Other Features",
+        subcategory = "Wither Door",
+        allowAlpha = true
+    )
+    var witherDoorNoKeyColor = Color(255, 0, 0)
+
+    @Property(
+        name = "Has Key Color",
+        type = PropertyType.COLOR,
+        category = "Other Features",
+        subcategory = "Wither Door",
+        allowAlpha = true
+    )
+    var witherDoorKeyColor = Color(0, 255, 0)
+
+    @Property(
+        name = "Door Outline Width",
+        type = PropertyType.DECIMAL_SLIDER,
+        category = "Other Features",
+        subcategory = "Wither Door",
+        minF = 1f,
+        maxF = 10f
+    )
+    var witherDoorOutlineWidth = 3f
+
+    @Property(
+        name = "Door Outline Opacity",
+        type = PropertyType.PERCENT_SLIDER,
+        category = "Other Features",
+        subcategory = "Wither Door"
+    )
+    var witherDoorOutline = 1f
+
+    @Property(
+        name = "Door Fill Opacity",
+        type = PropertyType.PERCENT_SLIDER,
+        category = "Other Features",
+        subcategory = "Wither Door"
+    )
+    var witherDoorFill = 0.25f
+
     init {
         initialize()
         setCategoryDescription(
@@ -333,7 +387,7 @@ object CataclysmicMapConfig : Vigilant(
     private object CategorySorting : SortingBehavior() {
 
         private val configCategories = listOf(
-            "Map", "Rooms", "Colors"
+            "Map", "Rooms", "Colors", "Other Features"
         )
 
         private val configSubcategories = listOf(

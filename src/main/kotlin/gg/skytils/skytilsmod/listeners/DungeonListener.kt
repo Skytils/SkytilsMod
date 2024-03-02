@@ -37,6 +37,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapPlayer
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
+import gg.skytils.skytilsmod.features.impl.handlers.SpiritLeap
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorChatComponentText
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.addSuffix
@@ -91,6 +92,9 @@ object DungeonListener {
     private val deathRegex = Regex("§r§c ☠ §r§7(?:You were |(?:§.)+(?<username>\\w+)§r).* and became a ghost§r§7\\.§r")
     private val reviveRegex = Regex("^§r§a ❣ §r§7(?:§.)+(?<username>\\w+)§r§a was revived")
     private val secretsRegex = Regex("\\s*§7(?<secrets>\\d+)\\/(?<maxSecrets>\\d+) Secrets")
+    private val keyPickupRegex = Regex("§r§e§lRIGHT CLICK §r§7on §r§7.+?§r§7 to open it\\. This key can only be used to open §r§a(?<num>\\d+)§r§7 door!§r")
+    private val witherDoorOpenedRegex = Regex("^(?:\\[.+?] )?(?<name>\\w+) opened a WITHER door!$")
+    private const val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Load) {
@@ -104,6 +108,7 @@ object DungeonListener {
         if (!Utils.inDungeons) return
         if (event.packet is S02PacketChat) {
             val text = event.packet.chatComponent.formattedText
+            val unformatted = text.stripControlCodes()
             if (event.packet.type == 2.toByte()) {
                 if (Skytils.config.dungeonSecretDisplay) {
                     secretsRegex.find(text)?.destructured?.also { (secrets, maxSecrets) ->
@@ -145,6 +150,19 @@ object DungeonListener {
                     val username = match.groups["username"]!!.value
                     val teammate = team[username] ?: return
                     markRevived(teammate)
+                } else if (text == bloodOpenedString) {
+                    SpiritLeap.doorOpener = null
+                    DungeonInfo.keys--
+                } else {
+                    witherDoorOpenedRegex.find(unformatted)?.destructured?.let { (name) ->
+                        SpiritLeap.doorOpener = name
+
+                        DungeonInfo.keys--
+                    }
+
+                    keyPickupRegex.find(text)?.destructured?.let { (num) ->
+                        DungeonInfo.keys += num.toInt()
+                    }
                 }
             }
         }
