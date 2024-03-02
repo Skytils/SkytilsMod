@@ -249,9 +249,10 @@ object QuiverStuff {
             val volume = packet.volume
 
             if (sound == "random.bow" && volume == 1f && arrowCount > 0 && Skytils.mc.thePlayer.heldItem.item == Items.bow) {
-                val armor = (3 downTo 0).mapNotNull { Skytils.mc.thePlayer.getCurrentArmor(it) }
+                val consumesArrow = Skytils.mc.thePlayer.getCurrentArmor(2)?.displayName?.contains("Skeleton Master Chestplate")?.not() ?: true
                 val extraAttr = ItemUtil.getExtraAttributes(Skytils.mc.thePlayer.heldItem)
-                if (!armor.any { it.displayName.contains("Skeleton Master") } && extraAttr != null) {
+
+                if (consumesArrow && extraAttr != null) {
                     val level = when {
                         Skytils.mc.thePlayer.isSneaking -> 0
                         else -> extraAttr.getCompoundTag("enchantments")?.getInteger("infinite_quiver")?.times(3) ?: 0
