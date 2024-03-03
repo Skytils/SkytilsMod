@@ -23,9 +23,11 @@ import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.Cataclys
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapElement
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapPlayer
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
+import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.bindColor
+import gg.skytils.skytilsmod.utils.ifNull
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -135,21 +137,30 @@ object RenderUtils {
         GlStateManager.pushMatrix()
         try {
             // Translates to the player's location which is updated every tick.
-            if (player.isPlayer || name == mc.thePlayer.name) {
+            if (player.isOurMarker || name == mc.thePlayer.name) {
                 GlStateManager.translate(
                     (mc.thePlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first,
                     (mc.thePlayer.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second,
                     0.0
                 )
             } else {
-                GlStateManager.translate(player.mapX.toFloat(), player.mapZ.toFloat(), 0f)
+                player.teammate.player?.let { entityPlayer ->
+                    // If the player is loaded in our view, use that location instead (more precise)
+                    GlStateManager.translate(
+                        (entityPlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first,
+                        (entityPlayer.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second,
+                        0.0
+                    )
+                }.ifNull {
+                    GlStateManager.translate(player.mapX.toFloat(), player.mapZ.toFloat(), 0f)
+                }
             }
 
             // Apply head rotation and scaling
             GlStateManager.rotate(player.yaw + 180f, 0f, 0f, 1f)
             GlStateManager.scale(CataclysmicMapConfig.playerHeadScale, CataclysmicMapConfig.playerHeadScale, 1f)
 
-            if (CataclysmicMapConfig.mapVanillaMarker && (player.isPlayer || name == mc.thePlayer.name)) {
+            if (CataclysmicMapConfig.mapVanillaMarker && (player.isOurMarker || name == mc.thePlayer.name)) {
                 GlStateManager.rotate(180f, 0f, 0f, 1f)
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 mc.textureManager.bindTexture(mapIcons)

@@ -41,12 +41,12 @@ object MapUpdater {
         DungeonListener.team.forEach { (name, team) ->
             val player = team.mapPlayer
             decor.entries.find { (icon, _) -> icon == player.icon }?.let { (_, vec4b) ->
-                player.isPlayer = vec4b.func_176110_a().toInt() == 1
+                player.isOurMarker = vec4b.func_176110_a().toInt() == 1
                 player.mapX = vec4b.mapX
                 player.mapZ = vec4b.mapZ
                 player.yaw = vec4b.yaw
             }
-            if (player.isPlayer || name == mc.thePlayer.name) {
+            if (player.isOurMarker || name == mc.thePlayer.name) {
                 player.yaw = mc.thePlayer.rotationYaw
                 player.mapX =
                     ((mc.thePlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first).roundToInt()
