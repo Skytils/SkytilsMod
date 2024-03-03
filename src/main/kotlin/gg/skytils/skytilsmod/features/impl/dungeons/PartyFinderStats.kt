@@ -136,7 +136,7 @@ object PartyFinderStats {
 
                     val allItems = profileData.inventory.inventory.toMCItems() +
                             profileData.inventory.ender_chest.toMCItems() +
-                            profileData.inventory.backpacks.map { it.value.toMCItems() }.flatten()
+                            profileData.inventory.backpacks.flatMap { it.value.toMCItems() }
 
                     allItems.mapNotNull { ItemUtil.getExtraAttributes(it) }
                         .associateWith { ItemUtil.getSkyBlockItemID(it) }.let { (extraAttribs, itemIds) ->
