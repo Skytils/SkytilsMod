@@ -33,7 +33,9 @@ import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.UpdateChecker
 import gg.skytils.skytilsmod.features.impl.dungeons.PartyFinderStats
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMap
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.ScanUtils
 import gg.skytils.skytilsmod.features.impl.events.GriffinBurrows
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
@@ -54,6 +56,7 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ChatComponentText
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -320,7 +323,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             }
 
             "cataclysmicmap", "dungeonmap" -> {
-                when (args[1].lowercase()) {
+                when (args.getOrNull(1)?.lowercase()) {
                     // Scans the dungeon
                     "scan" -> {
                         CataclysmicMap.reset()
@@ -338,8 +341,17 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                             UChat.chat("$successPrefix §aExisting room data not found. Copied room core to clipboard.")
                         }
                     }
+                    "mapdata" -> {
+                        val data = MapUtils.getMapData()
+                        if (data != null) {
+                            GuiScreen.setClipboardString(data.colors.contentToString())
+                            UChat.chat("$successPrefix §aCopied map data to clipboard.")
+                        } else {
+                            UChat.chat("$failPrefix §cMap data not found.")
+                        }
+                    }
                     else -> {
-                        UChat.chat("$failPrefix §cUse either scan or roomdata subcommands.")
+                        Skytils.displayScreen = CataclysmicMapConfig.gui()
                     }
                 }
             }
