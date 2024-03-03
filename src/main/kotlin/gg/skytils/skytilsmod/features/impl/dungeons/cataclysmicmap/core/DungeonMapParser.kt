@@ -90,7 +90,7 @@ class DungeonMapParser(mapColors: ByteArray) {
 
                     34 -> RoomState.CLEARED
 
-                    85, 119 -> RoomState.LOADED
+                    85, 119 -> RoomState.UNOPENED
 
                     else -> RoomState.DISCOVERED
                 }
@@ -99,7 +99,7 @@ class DungeonMapParser(mapColors: ByteArray) {
             if (sideColor == 0) {
                 val type = DoorType.fromMapColor(centerColor) ?: return Unknown(worldX, worldZ)
                 Door(worldX, worldZ, type).apply {
-                    state = if (centerColor == 85) RoomState.LOADED else RoomState.DISCOVERED
+                    state = if (centerColor == 85) RoomState.UNOPENED else RoomState.DISCOVERED
                 }
             } else {
                 val type = RoomType.fromMapColor(sideColor) ?: return Unknown(worldX, worldZ)

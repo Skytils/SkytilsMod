@@ -153,7 +153,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                 }
             }
 
-            if (room.state == RoomState.LOADED) return@forEach
+            if (room.state == RoomState.UNOPENED) return@forEach
 
             val color = if (CataclysmicMapConfig.mapColorText) when (room.state) {
                 RoomState.GREEN -> 0x55ff55
@@ -206,7 +206,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                 RoomState.CLEARED -> defaultWhite
                 RoomState.GREEN -> defaultGreen
                 RoomState.FAILED -> defaultCross
-                RoomState.LOADED -> defaultQuestion
+                RoomState.UNOPENED -> defaultQuestion
                 else -> null
             }
 
@@ -214,7 +214,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                 RoomState.CLEARED -> neuWhite
                 RoomState.GREEN -> neuGreen
                 RoomState.FAILED -> neuCross
-                RoomState.LOADED -> neuQuestion
+                RoomState.UNOPENED -> neuQuestion
                 else -> null
             }
 

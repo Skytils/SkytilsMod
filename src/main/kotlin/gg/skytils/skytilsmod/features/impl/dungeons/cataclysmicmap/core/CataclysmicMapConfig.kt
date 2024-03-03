@@ -234,13 +234,13 @@ object CataclysmicMapConfig : Vigilant(
     var colorOpenWitherDoor = Color(92, 52, 14)
 
     @Property(
-        name = "Loaded Door",
+        name = "Unopened Door",
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Doors",
         allowAlpha = true
     )
-    var colorLoadedDoor = Color(65, 65, 65)
+    var colorUnopenedDoor = Color(65, 65, 65)
 
     @Property(
         name = "Blood Room",
@@ -315,13 +315,13 @@ object CataclysmicMapConfig : Vigilant(
     var colorTrap = Color(216, 127, 51)
 
     @Property(
-        name = "Loaded Room",
+        name = "Unopened Room",
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Rooms",
         allowAlpha = true
     )
-    var colorLoaded = Color(65, 65, 65)
+    var colorUnopened = Color(65, 65, 65)
 
 
     @Property(
