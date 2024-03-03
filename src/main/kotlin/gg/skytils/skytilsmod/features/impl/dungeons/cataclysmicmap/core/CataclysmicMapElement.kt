@@ -44,9 +44,11 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
     private val neuGreen = ResourceLocation("skytils", "cataclysmicmap/neu/green_check.png")
     private val neuWhite = ResourceLocation("skytils", "cataclysmicmap/neu/white_check.png")
     private val neuCross = ResourceLocation("skytils", "cataclysmicmap/neu/cross.png")
+    private val neuQuestion = ResourceLocation("skytils", "cataclysmicmap/neu/question.png")
     private val defaultGreen = ResourceLocation("skytils", "cataclysmicmap/default/green_check.png")
     private val defaultWhite = ResourceLocation("skytils", "cataclysmicmap/default/white_check.png")
     private val defaultCross = ResourceLocation("skytils", "cataclysmicmap/default/cross.png")
+    private val defaultQuestion = ResourceLocation("skytils", "cataclysmicmap/default/question.png")
 
     var dynamicRotation = 0f
 
@@ -131,7 +133,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         }
 
         DungeonInfo.uniqueRooms.forEach { (room, pos) ->
-            if (room.state == RoomState.UNDISCOVERED || room.state == RoomState.LOADED) return@forEach
+            if (room.state == RoomState.UNDISCOVERED) return@forEach
             val xOffset = (pos.first shr 1) * (MapUtils.mapRoomSize + connectorSize)
             val yOffset = (pos.second shr 1) * (MapUtils.mapRoomSize + connectorSize)
 
@@ -150,6 +152,8 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                     //GlStateManager.disableAlpha()
                 }
             }
+
+            if (room.state == RoomState.LOADED) return@forEach
 
             val color = if (CataclysmicMapConfig.mapColorText) when (room.state) {
                 RoomState.GREEN -> 0x55ff55
@@ -202,6 +206,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                 RoomState.CLEARED -> defaultWhite
                 RoomState.GREEN -> defaultGreen
                 RoomState.FAILED -> defaultCross
+                RoomState.LOADED -> defaultQuestion
                 else -> null
             }
 
@@ -209,6 +214,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                 RoomState.CLEARED -> neuWhite
                 RoomState.GREEN -> neuGreen
                 RoomState.FAILED -> neuCross
+                RoomState.LOADED -> neuQuestion
                 else -> null
             }
 

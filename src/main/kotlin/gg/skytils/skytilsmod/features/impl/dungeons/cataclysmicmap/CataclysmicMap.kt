@@ -21,6 +21,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
+import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapElement
@@ -50,7 +51,7 @@ object CataclysmicMap {
 
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons) return
+        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null) return
 
         if (!MapUtils.calibrated) {
             MapUtils.calibrated = MapUtils.calibrateMap()
