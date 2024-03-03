@@ -300,7 +300,6 @@ object SkillUtils {
 
             levels.reduceIndexed { index, acc, i ->
                 if (exp < acc) return index - 1
-                println(acc + i)
                 acc + i
             }
             return maxLevel

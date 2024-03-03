@@ -49,7 +49,7 @@ data class TypesProfileResponse(
 ) : HypixelResponse()
 
 @Serializable
-data class PlayerResponse(override val success: Boolean, val player: Player?) : HypixelResponse()
+data class PlayerResponse(override val success: Boolean, val player: Player? = null) : HypixelResponse()
 
 enum class DungeonClass {
     ARCHER,

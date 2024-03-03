@@ -31,6 +31,7 @@ import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.UpdateChecker
+import gg.skytils.skytilsmod.features.impl.dungeons.PartyFinderStats
 import gg.skytils.skytilsmod.features.impl.events.GriffinBurrows
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
@@ -84,6 +85,12 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                         .dayOfMonth) % MiningFeatures.fetchurItems.size]
                 )
             )
+
+            "stats" -> if (args.size == 1) {
+                UChat.chat("$prefix §b/skytils stats <player>")
+            } else {
+                PartyFinderStats.printStats(args[1], false)
+            }
 
             "griffin" -> if (args.size == 1) {
                 UChat.chat("$prefix §b/skytils griffin <refresh>")
@@ -179,6 +186,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                         #  §3/glintcustomize color <set/clear/clearall> §l➡ §bChange the enchantment glint color for an item.
                         # §9§l➜ Miscellaneous:
                         #  §3/reparty §l➡ §bDisbands and re-invites everyone in your party. §7(Alias: §f/rp§7)
+                        #  §3/skytils stats <player> §l➡ §bShows the Dungeon statistics of a player (Identical to the Party Finder Stats feature).
                         #  §3/skytilscata <player> §l➡ §bShows information about a player's Catacombs statistics.
                         #  §3/skytilsslayer <player> §l➡ §bShows information about a player's Slayer statistics.
                         #  §3/trackcooldown <length> <ability name> §l➡ §bTracks the cooldown of the specified ability.
