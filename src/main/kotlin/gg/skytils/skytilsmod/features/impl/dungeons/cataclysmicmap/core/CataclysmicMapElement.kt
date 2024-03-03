@@ -138,7 +138,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
             if (CataclysmicMapConfig.mapCheckmark != 0 && CataclysmicMapConfig.mapRoomSecrets != 2) {
                 getCheckmark(room.state, CataclysmicMapConfig.mapCheckmark)?.let {
                     GlStateManager.enableAlpha()
-                    GlStateManager.color(255f, 255f, 255f, 255f)
+                    GlStateManager.color(1f, 1f, 1f, 1f)
                     mc.textureManager.bindTexture(it)
 
                     RenderUtils.drawTexturedQuad(
@@ -147,7 +147,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                         checkmarkSize,
                         checkmarkSize
                     )
-                    GlStateManager.disableAlpha()
+                    //GlStateManager.disableAlpha()
                 }
             }
 
