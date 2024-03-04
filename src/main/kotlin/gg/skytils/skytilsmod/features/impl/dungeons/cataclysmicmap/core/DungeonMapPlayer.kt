@@ -30,8 +30,7 @@ data class DungeonMapPlayer(val teammate: DungeonListener.DungeonTeammate, val s
 
     /** Has information from player entity been loaded */
     var playerLoaded = false
-    val icon
-        get() = "icon-${((teammate.tabEntryIndex - 1 / 4) - 1) % DungeonListener.team.size}"
+    var icon = ""
     var renderHat = false
     var uuid = ""
     var isOurMarker = false

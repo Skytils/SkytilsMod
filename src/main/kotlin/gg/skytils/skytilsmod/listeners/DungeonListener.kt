@@ -254,6 +254,8 @@ object DungeonListener {
                                         entry.locationSkin
                                     )
                                 }
+
+                                team[name]?.mapPlayer?.icon = "icon-${(i + (partyCount-1)) % (partyCount)}}"
                             }
                             if (partyCount != team.size) {
                                 UChat.chat("$failPrefix §cSomething isn't right! I expected $partyCount members but only got ${team.size}")
@@ -287,6 +289,18 @@ object DungeonListener {
                             else markRevived(teammate)
                         }
                     }
+
+                    val alives = team.values.filterNot {
+                        it.dead || it == self || it in deads
+                    }.sortedBy {
+                        it.tabEntryIndex
+                    }
+
+                    alives.forEachIndexed { i, teammate ->
+                        teammate.mapPlayer.icon = "icon-$i"
+                        printDevMessage("Setting icon for ${teammate.playerName} to icon-$i", "dungeonlistener")
+                    }
+                    self?.mapPlayer?.icon = "icon-${alives.size}"
                 }
             }
         }
