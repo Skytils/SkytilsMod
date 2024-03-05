@@ -19,10 +19,10 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMap
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapElement
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapPlayer
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonScan
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.bindColor
@@ -108,7 +108,7 @@ object RenderUtils {
         if (CataclysmicMapConfig.mapRotate) {
             GlStateManager.rotate(mc.thePlayer.rotationYaw + 180f, 0f, 0f, 1f)
         } else if (CataclysmicMapConfig.mapDynamicRotate) {
-            GlStateManager.rotate(-CataclysmicMap.CataclysmicMapRender.dynamicRotation, 0f, 0f, 1f)
+            GlStateManager.rotate(-CataclysmicMapElement.dynamicRotation, 0f, 0f, 1f)
         }
 
         val fontHeight = mc.fontRendererObj.FONT_HEIGHT + 1
@@ -125,7 +125,7 @@ object RenderUtils {
         }
 
         if (CataclysmicMapConfig.mapDynamicRotate) {
-            GlStateManager.rotate(CataclysmicMap.CataclysmicMapRender.dynamicRotation, 0f, 0f, 1f)
+            GlStateManager.rotate(CataclysmicMapElement.dynamicRotation, 0f, 0f, 1f)
         }
 
         GlStateManager.popMatrix()
@@ -137,8 +137,8 @@ object RenderUtils {
             // Translates to the player's location which is updated every tick.
             if (player.isPlayer || name == mc.thePlayer.name) {
                 GlStateManager.translate(
-                    (mc.thePlayer.posX - DungeonScan.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first,
-                    (mc.thePlayer.posZ - DungeonScan.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second,
+                    (mc.thePlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first,
+                    (mc.thePlayer.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second,
                     0.0
                 )
             } else {

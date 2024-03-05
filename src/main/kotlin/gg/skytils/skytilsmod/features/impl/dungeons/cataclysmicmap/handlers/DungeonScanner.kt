@@ -16,20 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon
+package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers
 
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonScan.scan
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMap
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapElement
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner.scan
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.ScanUtils
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 
 /**
  * Handles everything related to scanning the dungeon. Running [scan] will update the instance of [DungeonInfo].
  */
-object DungeonScan {
+object DungeonScanner {
 
     /**
      * The size of each dungeon room in blocks.
@@ -107,7 +108,7 @@ object DungeonScan {
                         DungeonInfo.cryptCount += data.crypts
                         DungeonInfo.secretCount += data.secrets
                         when (data.type) {
-                            RoomType.ENTRANCE -> CataclysmicMap.CataclysmicMapRender.dynamicRotation = when {
+                            RoomType.ENTRANCE -> CataclysmicMapElement.dynamicRotation = when {
                                 row == 0 -> 180f
                                 column == 0 -> -90f
                                 column > row -> 90f

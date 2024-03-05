@@ -33,8 +33,8 @@ import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.UpdateChecker
 import gg.skytils.skytilsmod.features.impl.dungeons.PartyFinderStats
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMap
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonScan
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.ScanUtils
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.ScanUtils
 import gg.skytils.skytilsmod.features.impl.events.GriffinBurrows
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
@@ -324,11 +324,11 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     // Scans the dungeon
                     "scan" -> {
                         CataclysmicMap.reset()
-                        DungeonScan.scan()
+                        DungeonScanner.scan()
                     }
                     // Copies room data or room core to clipboard
                     "roomdata" -> {
-                        val pos = ScanUtils.getRoomCentre(mc.thePlayer.posX.toInt(), mc.thePlayer.posZ.toInt())
+                        val pos = ScanUtils.getRoomCenter(mc.thePlayer.posX.toInt(), mc.thePlayer.posZ.toInt())
                         val data = ScanUtils.getRoomData(pos.first, pos.second)
                         if (data != null) {
                             GuiScreen.setClipboardString(data.toString())

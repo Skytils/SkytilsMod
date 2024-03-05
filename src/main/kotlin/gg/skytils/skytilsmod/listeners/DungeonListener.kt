@@ -35,6 +35,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapPlayer
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorChatComponentText
 import gg.skytils.skytilsmod.utils.*

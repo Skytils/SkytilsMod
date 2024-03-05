@@ -18,9 +18,9 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils
 
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonScan
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.item.ItemMap
 import net.minecraft.util.Vec4b
@@ -53,7 +53,7 @@ object MapUtils {
      */
     fun calibrateMap(): Boolean {
         val (start, size) = findEntranceCorner()
-        if (Utils.equalsOneOf(size , 16, 18)) {
+        if (Utils.equalsOneOf(size, 16, 18)) {
             mapRoomSize = size
             startCorner = when (DungeonFeatures.dungeonFloorNumber) {
                 0 -> Pair(22, 22)
@@ -65,7 +65,7 @@ object MapUtils {
                     Pair(startX % (mapRoomSize + 4), startZ % (mapRoomSize + 4))
                 }
             }
-            coordMultiplier = (mapRoomSize + 4.0) / DungeonScan.roomSize
+            coordMultiplier = (mapRoomSize + 4.0) / DungeonScanner.roomSize
             return true
         }
         return false
@@ -78,7 +78,7 @@ object MapUtils {
         var start = 0
         var currLength = 0
         getMapData()?.colors?.forEachIndexed { index, byte ->
-            if (byte.toInt() == 30) {
+            if (byte == 30.toByte()) {
                 if (currLength == 0) start = index
                 currLength++
             } else {

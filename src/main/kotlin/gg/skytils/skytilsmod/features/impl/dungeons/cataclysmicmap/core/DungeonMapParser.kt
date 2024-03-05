@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon
+package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core
 
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.RoomData
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
 
-class DungeonMap(mapColors: ByteArray) {
+class DungeonMapParser(mapColors: ByteArray) {
     private var centerColors: ByteArray = ByteArray(121)
     private var sideColors: ByteArray = ByteArray(121)
 
@@ -62,8 +62,8 @@ class DungeonMap(mapColors: ByteArray) {
     fun getTile(arrayX: Int, arrayY: Int): Tile {
         val index = arrayY * 11 + arrayX
         if (index >= 121) return Unknown(0, 0)
-        val xPos = DungeonScan.startX + arrayX * (DungeonScan.roomSize shr 1)
-        val zPos = DungeonScan.startZ + arrayY * (DungeonScan.roomSize shr 1)
+        val xPos = DungeonScanner.startX + arrayX * (DungeonScanner.roomSize shr 1)
+        val zPos = DungeonScanner.startZ + arrayY * (DungeonScanner.roomSize shr 1)
         return scanTile(arrayX, arrayY, xPos, zPos)
     }
 

@@ -19,7 +19,6 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map
 
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.RoomData
 import java.awt.Color
 
 class Room(override val x: Int, override val z: Int, var data: RoomData) : Tile {

@@ -16,12 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon
+package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils
 
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.RoomData
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Room
 import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Room
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.RoomData
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
 import gg.skytils.skytilsmod.utils.Utils
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
@@ -48,15 +50,15 @@ object ScanUtils {
         return roomList.find { hash in it.cores }
     }
 
-    fun getRoomCentre(posX: Int, posZ: Int): Pair<Int, Int> {
-        val roomX = ((posX - DungeonScan.startX) / 32f).roundToInt()
-        val roomZ = ((posZ - DungeonScan.startZ) / 32f).roundToInt()
-        return (roomX * 32 + DungeonScan.startX) to (roomZ * 32 + DungeonScan.startZ)
+    fun getRoomCenter(posX: Int, posZ: Int): Pair<Int, Int> {
+        val roomX = ((posX - DungeonScanner.startX) / 32f).roundToInt()
+        val roomZ = ((posZ - DungeonScanner.startZ) / 32f).roundToInt()
+        return (roomX * 32 + DungeonScanner.startX) to (roomZ * 32 + DungeonScanner.startZ)
     }
 
     fun getRoomFromPos(pos: BlockPos): Room? {
-        val x = ((pos.x - DungeonScan.startX + 15) shr 5)
-        val z = ((pos.z - DungeonScan.startZ + 15) shr 5)
+        val x = ((pos.x - DungeonScanner.startX + 15) shr 5)
+        val z = ((pos.z - DungeonScanner.startZ + 15) shr 5)
         val room = DungeonInfo.dungeonList.getOrNull(x * 2 + z * 22)
         return if (room is Room) room else null
     }

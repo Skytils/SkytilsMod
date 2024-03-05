@@ -16,9 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core
+package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map
 
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.RoomType
 import kotlinx.serialization.Serializable
 
 @Serializable

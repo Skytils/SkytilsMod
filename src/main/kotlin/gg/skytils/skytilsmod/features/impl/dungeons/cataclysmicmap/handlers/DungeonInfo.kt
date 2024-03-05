@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon
+package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers
 
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Puzzle
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Room
@@ -34,10 +34,9 @@ object DungeonInfo {
     var witherDoors = 0
     var cryptCount = 0
     var secretCount = 0
-    var mimicFound = false
 
-    var startTime = 0L
     var keys = 0
+
     fun reset() {
         dungeonList.fill(Unknown(0, 0))
         roomCount = 0
@@ -48,9 +47,7 @@ object DungeonInfo {
         witherDoors = 0
         cryptCount = 0
         secretCount = 0
-        mimicFound = false
 
-        startTime = 0L
         keys = 0
     }
 }

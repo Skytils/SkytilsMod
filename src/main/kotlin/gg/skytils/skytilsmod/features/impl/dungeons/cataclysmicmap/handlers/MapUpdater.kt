@@ -16,26 +16,25 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon
+package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers
 
+import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapParser
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Door
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.DoorType
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Unknown
-import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils.mapX
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils.mapZ
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils.yaw
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.Utils
-import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
-import net.minecraft.util.StringUtils
 import kotlin.math.roundToInt
 
-object MapUpdate {
-    fun updatePlayers(tabEntries: List<Pair<NetworkPlayerInfo, String>>) {
+object MapUpdater {
+    fun updatePlayers() {
         if (DungeonListener.team.isEmpty()) return
 
         val decor = MapUtils.getMapData()?.mapDecorations ?: return
@@ -50,15 +49,15 @@ object MapUpdate {
             if (player.isPlayer || name == mc.thePlayer.name) {
                 player.yaw = mc.thePlayer.rotationYaw
                 player.mapX =
-                    ((mc.thePlayer.posX - DungeonScan.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first).roundToInt()
+                    ((mc.thePlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first).roundToInt()
                 player.mapZ =
-                    ((mc.thePlayer.posZ - DungeonScan.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second).roundToInt()
+                    ((mc.thePlayer.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second).roundToInt()
             }
         }
     }
 
     fun updateRooms() {
-        val map = DungeonMap(MapUtils.getMapData()?.colors ?: return)
+        val map = DungeonMapParser(MapUtils.getMapData()?.colors ?: return)
 
         for (x in 0..10) {
             for (z in 0..10) {
