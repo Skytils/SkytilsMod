@@ -40,7 +40,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 
 /**
- * Modified version of [gg.skytils.skytilsmod.features.impl.dungeons.ChestProfit]
+ * Modified version of [gg.skytils.skytilsmod.features.impl.dungeons.DungeonChestProfit]
  */
 object KuudraChestProfit {
     private val element = KuudraChestProfitElement()

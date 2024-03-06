@@ -23,7 +23,6 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.features.impl.crimson.KuudraChestProfit
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.features.impl.misc.ItemFeatures
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
@@ -50,7 +49,7 @@ import java.awt.Color
  * Licensed under GNU GPL v3, with permission given from author
  * @author Quantizr
  */
-object ChestProfit {
+object DungeonChestProfit {
     private val element = DungeonChestProfitElement()
     private var rerollBypass = false
     private val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")

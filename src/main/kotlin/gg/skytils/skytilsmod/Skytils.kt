@@ -275,7 +275,7 @@ class Skytils {
             BoulderSolver,
             ChatTabs,
             ChangeAllToSameColorSolver,
-            ChestProfit,
+            DungeonChestProfit,
             ClickInOrderSolver,
             CreeperSolver,
             CommandAliases,
