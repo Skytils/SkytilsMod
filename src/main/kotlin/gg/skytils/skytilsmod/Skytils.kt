@@ -31,6 +31,8 @@ import gg.skytils.skytilsmod.features.impl.crimson.KuudraChestProfit
 import gg.skytils.skytilsmod.features.impl.crimson.KuudraFeatures
 import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
 import gg.skytils.skytilsmod.features.impl.dungeons.*
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.DungeonMap
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.*
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*
 import gg.skytils.skytilsmod.features.impl.events.GriffinBurrows
@@ -249,6 +251,7 @@ class Skytils {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
         config.init()
+        CataclysmicMapConfig
         UpdateChecker.downloadDeleteTask()
 
         arrayOf(

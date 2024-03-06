@@ -30,6 +30,7 @@ import gg.skytils.skytilsmod.Reference
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.PotionNotificationsGui
 import gg.skytils.skytilsmod.gui.SpiritLeapNamesGui
@@ -243,11 +244,13 @@ object Config : Vigilant(
     var croesusHideOpened = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Dungeon Map",
-        description = "Displays the vanilla map on your screen using vanilla rendering code.",
+        type = PropertyType.BUTTON, name = "Dungeon Map (CataclysmicMap)",
+        description = "Displays the dungeon map on your screen.",
         category = "Dungeons", subcategory = "Miscellaneous"
     )
-    var dungeonTrashMap = false
+    fun openCataclysmicMapConfig() {
+        Skytils.displayScreen = CataclysmicMapConfig.gui()
+    }
 
     @Property(
         type = PropertyType.SWITCH, name = "Dungeon Start Confirmation",

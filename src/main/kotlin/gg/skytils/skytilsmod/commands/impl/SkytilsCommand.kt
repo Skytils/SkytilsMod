@@ -32,6 +32,9 @@ import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.UpdateChecker
 import gg.skytils.skytilsmod.features.impl.dungeons.PartyFinderStats
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.DungeonMap
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.DungeonScan
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.features.dungeon.ScanUtils
 import gg.skytils.skytilsmod.features.impl.events.GriffinBurrows
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
@@ -48,6 +51,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.client.gui.GuiScreen
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.ChatComponentText
@@ -313,6 +317,31 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     ?: return UChat.chat("$failPrefix §cThat element was not found!")
                 element.setPos(0.5f, 0.5f)
                 element.scale = 1f
+            }
+
+            "cataclysmicmap", "dungeonmap" -> {
+                when (args[1].lowercase()) {
+                    // Scans the dungeon
+                    "scan" -> {
+                        DungeonMap.reset()
+                        DungeonScan.scan()
+                    }
+                    // Copies room data or room core to clipboard
+                    "roomdata" -> {
+                        val pos = ScanUtils.getRoomCentre(mc.thePlayer.posX.toInt(), mc.thePlayer.posZ.toInt())
+                        val data = ScanUtils.getRoomData(pos.first, pos.second)
+                        if (data != null) {
+                            GuiScreen.setClipboardString(data.toString())
+                            UChat.chat("$successPrefix §aCopied room data to clipboard.")
+                        } else {
+                            GuiScreen.setClipboardString(ScanUtils.getCore(pos.first, pos.second).toString())
+                            UChat.chat("$successPrefix §aExisting room data not found. Copied room core to clipboard.")
+                        }
+                    }
+                    else -> {
+                        UChat.chat("$failPrefix §cUse either scan or roomdata subcommands.")
+                    }
+                }
             }
 
             else -> UChat.chat("$failPrefix §cThis command doesn't exist!\n §cUse §f/skytils help§c for a full list of commands")

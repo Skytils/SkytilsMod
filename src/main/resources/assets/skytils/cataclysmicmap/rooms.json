@@ -1,0 +1,1300 @@
+[
+  {
+    "name": "Admin",
+    "type": "NORMAL",
+    "cores": [
+      -1989372370
+    ],
+    "crypts": 34
+  },
+  {
+    "name": "Altar",
+    "type": "NORMAL",
+    "cores": [
+      1823952110,
+      1004879775,
+      -1690727070
+    ],
+    "crypts": 3,
+    "secrets": 6
+  },
+  {
+    "name": "Andesite",
+    "type": "NORMAL",
+    "cores": [
+      -673246822
+    ],
+    "secrets": 2
+  },
+  {
+    "name": "Archway",
+    "type": "NORMAL",
+    "cores": [
+      -1447684689,
+      1440798119
+    ],
+    "crypts": 4,
+    "secrets": 3
+  },
+  {
+    "name": "Arrow Trap",
+    "type": "NORMAL",
+    "cores": [
+      332584803
+    ],
+    "crypts": 1,
+    "secrets": 1
+  },
+  {
+    "name": "Atlas",
+    "type": "NORMAL",
+    "cores": [
+      -685489527,
+      745093020,
+      308515062,
+      -38388847
+    ],
+    "crypts": 5,
+    "secrets": 6
+  },
+  {
+    "name": "Balcony",
+    "type": "NORMAL",
+    "cores": [
+      1989395652,
+      559495102
+    ],
+    "secrets": 4
+  },
+  {
+    "name": "Banners",
+    "type": "NORMAL",
+    "cores": [
+      -667603340
+    ],
+    "crypts": 1,
+    "secrets": 1
+  },
+  {
+    "name": "Basement",
+    "type": "NORMAL",
+    "cores": [
+      -204678789
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Beams",
+    "type": "NORMAL",
+    "cores": [
+      -2082251638
+    ],
+    "crypts": 2,
+    "secrets": 2
+  },
+  {
+    "name": "Big Red Flag",
+    "type": "NORMAL",
+    "cores": [
+      -1265317780
+    ],
+    "crypts": 1,
+    "secrets": 2
+  },
+  {
+    "name": "Black Flag",
+    "type": "NORMAL",
+    "cores": [
+      153580070
+    ],
+    "crypts": 1,
+    "secrets": 3
+  },
+  {
+    "name": "Blood",
+    "type": "BLOOD",
+    "cores": [
+      -2130054003
+    ]
+  },
+  {
+    "name": "Blue Skulls",
+    "type": "NORMAL",
+    "cores": [
+      -999204041
+    ],
+    "crypts": 4,
+    "secrets": 1
+  },
+  {
+    "name": "Bomb Defuse",
+    "type": "PUZZLE",
+    "cores": [
+      86014075
+    ]
+  },
+  {
+    "name": "Boulder",
+    "type": "PUZZLE",
+    "cores": [
+      -671152674,
+      307825200
+    ]
+  },
+  {
+    "name": "Bridges",
+    "type": "NORMAL",
+    "cores": [
+      -1604951086,
+      -1989950542
+    ],
+    "crypts": 6,
+    "secrets": 6
+  },
+  {
+    "name": "Buttons",
+    "type": "NORMAL",
+    "cores": [
+      -1359302282,
+      160943502,
+      823430452,
+      2123177620
+    ],
+    "crypts": 21,
+    "secrets": 5,
+    "trappedChests": 1
+  },
+  {
+    "name": "Cage",
+    "type": "NORMAL",
+    "cores": [
+      272954274
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Cages",
+    "type": "NORMAL",
+    "cores": [
+      -316384390
+    ],
+    "secrets": 2
+  },
+  {
+    "name": "Carpets",
+    "type": "NORMAL",
+    "cores": [
+      988444684,
+      1890757664,
+      1186348038,
+      -1160833644
+    ],
+    "crypts": 3,
+    "secrets": 1
+  },
+  {
+    "name": "Cathedral",
+    "type": "NORMAL",
+    "cores": [
+      -2043617055,
+      789869846,
+      -1212586959,
+      1956475445
+    ],
+    "crypts": 5,
+    "secrets": 8
+  },
+  {
+    "name": "Catwalk",
+    "type": "NORMAL",
+    "cores": [
+      1600132124,
+      -1010346133,
+      -1694830065
+    ],
+    "crypts": 5,
+    "secrets": 6
+  },
+  {
+    "name": "Cell",
+    "type": "NORMAL",
+    "cores": [
+      1751890846
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Chains",
+    "type": "NORMAL",
+    "cores": [
+      113272043
+    ],
+    "secrets": 2
+  },
+  {
+    "name": "Chambers",
+    "type": "NORMAL",
+    "cores": [
+      1756685113,
+      368708000,
+      252800591
+    ],
+    "crypts": 6,
+    "secrets": 5
+  },
+  {
+    "name": "Cobble Wall Pillar",
+    "type": "NORMAL",
+    "cores": [
+      259238824
+    ],
+    "crypts": 1,
+    "secrets": 2
+  },
+  {
+    "name": "Creeper Beams",
+    "type": "PUZZLE",
+    "cores": [
+      -755321869,
+      573221447
+    ]
+  },
+  {
+    "name": "Criss-Cross",
+    "type": "NORMAL",
+    "cores": [
+      650161016,
+      1002362494
+    ],
+    "crypts": 6,
+    "secrets": 1
+  },
+  {
+    "name": "Crypt",
+    "type": "NORMAL",
+    "cores": [
+      -845911506,
+      331494915
+    ],
+    "crypts": 2,
+    "secrets": 5
+  },
+  {
+    "name": "Deathmite",
+    "type": "NORMAL",
+    "cores": [
+      -233562612,
+      -1901273450,
+      -1408070175
+    ],
+    "crypts": 4,
+    "secrets": 6
+  },
+  {
+    "name": "Default",
+    "type": "CHAMPION",
+    "cores": [
+      652570347,
+      1956609103
+    ]
+  },
+  {
+    "name": "Diagonal",
+    "type": "NORMAL",
+    "cores": [
+      2147431657,
+      1144217017,
+      -464769223
+    ],
+    "crypts": 3,
+    "secrets": 4
+  },
+  {
+    "name": "Dino Site",
+    "type": "NORMAL",
+    "cores": [
+      -1113939414,
+      -1425445617,
+      -609789679
+    ],
+    "crypts": 4,
+    "secrets": 4
+  },
+  {
+    "name": "Dip",
+    "type": "NORMAL",
+    "cores": [
+      -1691958814
+    ],
+    "crypts": 3,
+    "secrets": 2
+  },
+  {
+    "name": "Dome",
+    "type": "NORMAL",
+    "cores": [
+      462413746
+    ],
+    "crypts": 2,
+    "secrets": 2
+  },
+  {
+    "name": "Doors",
+    "type": "NORMAL",
+    "cores": [
+      164990589,
+      1033794268
+    ],
+    "crypts": 7,
+    "secrets": 5
+  },
+  {
+    "name": "Double Diamond",
+    "type": "NORMAL",
+    "cores": [
+      1308341800
+    ],
+    "secrets": 3
+  },
+  {
+    "name": "Dragon",
+    "type": "CHAMPION",
+    "cores": [
+      84632407
+    ]
+  },
+  {
+    "name": "Drop",
+    "type": "NORMAL",
+    "cores": [
+      -615308028
+    ],
+    "crypts": 6,
+    "secrets": 2
+  },
+  {
+    "name": "Dueces",
+    "type": "NORMAL",
+    "cores": [
+      1046920372
+    ],
+    "crypts": 6,
+    "secrets": 3,
+    "trappedChests": 1
+  },
+  {
+    "name": "Duncan",
+    "type": "NORMAL",
+    "cores": [
+      544418695
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "End",
+    "type": "NORMAL",
+    "cores": [
+      -1897192562
+    ],
+    "crypts": 1,
+    "secrets": 2
+  },
+  {
+    "name": "Entrance",
+    "type": "ENTRANCE",
+    "cores": [
+      274652966,
+      -1092072828,
+      1913969999
+    ]
+  },
+  {
+    "name": "Fairy",
+    "type": "FAIRY",
+    "cores": [
+      1484567748
+    ]
+  },
+  {
+    "name": "Flags",
+    "type": "NORMAL",
+    "cores": [
+      -1267948931,
+      284566079,
+      1157102457,
+      67929126
+    ],
+    "crypts": 8,
+    "secrets": 7
+  },
+  {
+    "name": "Gold",
+    "type": "NORMAL",
+    "cores": [
+      -1035453872,
+      1451614295
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Golden Oasis",
+    "type": "NORMAL",
+    "cores": [
+      -1666473430
+    ],
+    "crypts": 1,
+    "secrets": 1
+  },
+  {
+    "name": "Grand Library",
+    "type": "NORMAL",
+    "cores": [
+      749593273,
+      1348435369
+    ],
+    "crypts": 2,
+    "secrets": 4
+  },
+  {
+    "name": "Granite",
+    "type": "NORMAL",
+    "cores": [
+      -456244067
+    ],
+    "secrets": 2
+  },
+  {
+    "name": "Grass Ruin",
+    "type": "NORMAL",
+    "cores": [
+      568565222,
+      -786211724
+    ],
+    "crypts": 4,
+    "secrets": 3
+  },
+  {
+    "name": "Gravel",
+    "type": "NORMAL",
+    "cores": [
+      841898152,
+      1127962661,
+      4304131
+    ],
+    "crypts": 2,
+    "secrets": 6
+  },
+  {
+    "name": "Hall",
+    "type": "NORMAL",
+    "cores": [
+      -2131538192
+    ]
+  },
+  {
+    "name": "Hallway",
+    "type": "NORMAL",
+    "cores": [
+      -402028497,
+      351544339,
+      -1723662179,
+      -1644671806
+    ],
+    "crypts": 1,
+    "secrets": 3
+  },
+  {
+    "name": "Higher Blaze",
+    "type": "PUZZLE",
+    "cores": [
+      1103121487,
+      23134049,
+      -243302881
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Ice Fill",
+    "type": "PUZZLE",
+    "cores": [
+      2051424561,
+      884728242,
+      1262122263
+    ]
+  },
+  {
+    "name": "Ice Path",
+    "type": "PUZZLE",
+    "cores": [
+      1073658098
+    ]
+  },
+  {
+    "name": "Jumping Skulls",
+    "type": "NORMAL",
+    "cores": [
+      -1496765468
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "King Midas",
+    "type": "CHAMPION",
+    "cores": [
+      -1678546839
+    ],
+    "crypts": 1
+  },
+  {
+    "name": "Knight",
+    "type": "NORMAL",
+    "cores": [
+      -1746428299
+    ],
+    "secrets": 3
+  },
+  {
+    "name": "Lava Pit",
+    "type": "RARE",
+    "cores": [
+      -1519947323
+    ],
+    "secrets": 3
+  },
+  {
+    "name": "Lava Ravine",
+    "type": "NORMAL",
+    "cores": [
+      -2040489612,
+      -294054018,
+      -2053308786
+    ],
+    "crypts": 4,
+    "secrets": 6
+  },
+  {
+    "name": "Layers",
+    "type": "NORMAL",
+    "cores": [
+      1516049261,
+      820948152,
+      456930870,
+      -1910037748
+    ],
+    "secrets": 8
+  },
+  {
+    "name": "Leaves",
+    "type": "NORMAL",
+    "cores": [
+      -1967474423
+    ],
+    "crypts": 1,
+    "secrets": 1
+  },
+  {
+    "name": "Locked Away",
+    "type": "NORMAL",
+    "cores": [
+      754378401
+    ],
+    "crypts": 1,
+    "secrets": 1
+  },
+  {
+    "name": "Logs",
+    "type": "NORMAL",
+    "cores": [
+      -1803705489
+    ],
+    "secrets": 4
+  },
+  {
+    "name": "Long Hall",
+    "type": "NORMAL",
+    "cores": [
+      -872480083
+    ],
+    "crypts": 3,
+    "secrets": 3
+  },
+  {
+    "name": "Lots Of Floors",
+    "type": "NORMAL",
+    "cores": [
+      1449723216
+    ],
+    "crypts": 1,
+    "secrets": 3
+  },
+  {
+    "name": "Lower Blaze",
+    "type": "PUZZLE",
+    "cores": [
+      -1092103153,
+      -2027662369,
+      -1141175903
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Mage",
+    "type": "NORMAL",
+    "cores": [
+      -338946136,
+      1089356068
+    ],
+    "secrets": 4
+  },
+  {
+    "name": "Market",
+    "type": "NORMAL",
+    "cores": [
+      270637140,
+      -402574914,
+      -880417926
+    ],
+    "crypts": 4,
+    "secrets": 5
+  },
+  {
+    "name": "Melon",
+    "type": "NORMAL",
+    "cores": [
+      -325025964,
+      1964904676,
+      158528145
+    ],
+    "crypts": 4,
+    "secrets": 7
+  },
+  {
+    "name": "Mines",
+    "type": "NORMAL",
+    "cores": [
+      -361911912,
+      -39488099,
+      1363618678,
+      1227315161
+    ],
+    "crypts": 11,
+    "secrets": 10
+  },
+  {
+    "name": "Mini Rails",
+    "type": "RARE",
+    "cores": [
+      256380076
+    ],
+    "crypts": 3,
+    "secrets": 4
+  },
+  {
+    "name": "Mirror",
+    "type": "NORMAL",
+    "cores": [
+      -1823353629
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Mossy",
+    "type": "NORMAL",
+    "cores": [
+      -1169615458,
+      1432034198,
+      1896208123
+    ],
+    "crypts": 2,
+    "secrets": 4
+  },
+  {
+    "name": "Multicolored",
+    "type": "NORMAL",
+    "cores": [
+      -671539463
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Mural",
+    "type": "NORMAL",
+    "cores": [
+      -1027066030
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Museum",
+    "type": "NORMAL",
+    "cores": [
+      -1957538226,
+      -2121384577,
+      -1797804860,
+      1514395908
+    ],
+    "crypts": 4,
+    "secrets": 5
+  },
+  {
+    "name": "Mushroom",
+    "type": "NORMAL",
+    "cores": [
+      1073109158
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "New Trap",
+    "type": "TRAP",
+    "cores": [
+      -1358669872,
+      -1989128497
+    ],
+    "crypts": 1,
+    "secrets": 3,
+    "trappedChests": 1
+  },
+  {
+    "name": "Old Trap",
+    "type": "TRAP",
+    "cores": [
+      1128554492
+    ],
+    "crypts": 2,
+    "secrets": 4
+  },
+  {
+    "name": "Overgrown",
+    "type": "NORMAL",
+    "cores": [
+      1858897577
+    ],
+    "secrets": 3
+  },
+  {
+    "name": "Overgrown Chains",
+    "type": "NORMAL",
+    "cores": [
+      1077887433
+    ],
+    "crypts": 1,
+    "secrets": 2
+  },
+  {
+    "name": "Painting",
+    "type": "NORMAL",
+    "cores": [
+      474745227
+    ],
+    "secrets": 2
+  },
+  {
+    "name": "Pedestal",
+    "type": "NORMAL",
+    "cores": [
+      -1346033867,
+      281551136
+    ],
+    "crypts": 1,
+    "secrets": 5
+  },
+  {
+    "name": "Perch",
+    "type": "NORMAL",
+    "cores": [
+      27598620
+    ],
+    "crypts": 1,
+    "secrets": 2
+  },
+  {
+    "name": "Pipes",
+    "type": "NORMAL",
+    "cores": [
+      952529534,
+      -901820944,
+      -664950032,
+      -1205767926
+    ],
+    "crypts": 9,
+    "secrets": 7
+  },
+  {
+    "name": "Pirate",
+    "type": "NORMAL",
+    "cores": [
+      -1175423677,
+      1942933815,
+      2002468229
+    ],
+    "crypts": 2,
+    "secrets": 6
+  },
+  {
+    "name": "Pit",
+    "type": "NORMAL",
+    "cores": [
+      -1862968316,
+      -258250108,
+      265221970,
+      430079089
+    ],
+    "crypts": 4,
+    "secrets": 5
+  },
+  {
+    "name": "Pressure Plates",
+    "type": "NORMAL",
+    "cores": [
+      1172966775,
+      681797038
+    ],
+    "crypts": 6,
+    "secrets": 6
+  },
+  {
+    "name": "Prison Cell",
+    "type": "NORMAL",
+    "cores": [
+      1172045122
+    ],
+    "crypts": 1,
+    "secrets": 1
+  },
+  {
+    "name": "Purple Flags",
+    "type": "NORMAL",
+    "cores": [
+      887024382,
+      701310376
+    ],
+    "crypts": 7,
+    "secrets": 5
+  },
+  {
+    "name": "Quad Lava",
+    "type": "NORMAL",
+    "cores": [
+      52900193
+    ],
+    "secrets": 2
+  },
+  {
+    "name": "Quartz Knight",
+    "type": "NORMAL",
+    "cores": [
+      -1639566599,
+      153753389,
+      -129760550,
+      -742870398
+    ],
+    "crypts": 9,
+    "secrets": 7
+  },
+  {
+    "name": "Quiz",
+    "type": "PUZZLE",
+    "cores": [
+      1928619293
+    ]
+  },
+  {
+    "name": "Raccoon",
+    "type": "NORMAL",
+    "cores": [
+      497881745
+    ],
+    "crypts": 2,
+    "secrets": 4
+  },
+  {
+    "name": "Rail Track",
+    "type": "RARE",
+    "cores": [
+      -701175845
+    ],
+    "crypts": 3,
+    "secrets": 3
+  },
+  {
+    "name": "Rails",
+    "type": "NORMAL",
+    "cores": [
+      526587049,
+      -214948895,
+      -1778261714,
+      1937419120
+    ],
+    "crypts": 1,
+    "secrets": 9
+  },
+  {
+    "name": "Rare Overgrown",
+    "type": "RARE",
+    "cores": [
+      -1643528240
+    ],
+    "secrets": 3
+  },
+  {
+    "name": "Rare Pillars",
+    "type": "RARE",
+    "cores": [
+      1216268340
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Red Blue",
+    "type": "NORMAL",
+    "cores": [
+      1011477602,
+      1607395895,
+      -1794981292
+    ],
+    "crypts": 1,
+    "secrets": 4
+  },
+  {
+    "name": "Red Green",
+    "type": "NORMAL",
+    "cores": [
+      -1085327384
+    ],
+    "crypts": 2,
+    "secrets": 3
+  },
+  {
+    "name": "Redstone Crypt",
+    "type": "NORMAL",
+    "cores": [
+      -1054702517,
+      127199896
+    ],
+    "secrets": 3
+  },
+  {
+    "name": "Redstone Key",
+    "type": "NORMAL",
+    "cores": [
+      348655632
+    ],
+    "crypts": 4,
+    "secrets": 3,
+    "trappedChests": 1
+  },
+  {
+    "name": "Redstone Warrior",
+    "type": "NORMAL",
+    "cores": [
+      1313090868,
+      1819727964
+    ],
+    "crypts": 4,
+    "secrets": 3
+  },
+  {
+    "name": "Ritual",
+    "type": "NORMAL",
+    "cores": [
+      758637731
+    ],
+    "crypts": 1,
+    "secrets": 3
+  },
+  {
+    "name": "Sand Dragon",
+    "type": "RARE",
+    "cores": [
+      -1497998508
+    ],
+    "crypts": 1,
+    "secrets": 1
+  },
+  {
+    "name": "Sarcophagus",
+    "type": "NORMAL",
+    "cores": [
+      1986002687
+    ],
+    "crypts": 1,
+    "secrets": 3
+  },
+  {
+    "name": "Scaffolding",
+    "type": "NORMAL",
+    "cores": [
+      2091387826
+    ],
+    "secrets": 2
+  },
+  {
+    "name": "Shadow Assassin",
+    "type": "CHAMPION",
+    "cores": [
+      -430117371
+    ],
+    "crypts": 2
+  },
+  {
+    "name": "Silver Sword",
+    "type": "NORMAL",
+    "cores": [
+      -224496952
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Skull",
+    "type": "NORMAL",
+    "cores": [
+      -46929855,
+      1667732153
+    ],
+    "secrets": 2
+  },
+  {
+    "name": "Slabs",
+    "type": "NORMAL",
+    "cores": [
+      -1811244478
+    ],
+    "crypts": 2,
+    "secrets": 2
+  },
+  {
+    "name": "Slime",
+    "type": "NORMAL",
+    "cores": [
+      1203689085,
+      611794931,
+      -1050545277
+    ],
+    "crypts": 1,
+    "secrets": 5,
+    "trappedChests": 1
+  },
+  {
+    "name": "Sloth",
+    "type": "NORMAL",
+    "cores": [
+      -1390729196
+    ],
+    "crypts": 1,
+    "secrets": 1
+  },
+  {
+    "name": "Small Stairs",
+    "type": "NORMAL",
+    "cores": [
+      -1250912300
+    ],
+    "crypts": 1,
+    "secrets": 2
+  },
+  {
+    "name": "Small Waterfall",
+    "type": "NORMAL",
+    "cores": [
+      -1682285647
+    ],
+    "crypts": 5,
+    "secrets": 2
+  },
+  {
+    "name": "Spider",
+    "type": "NORMAL",
+    "cores": [
+      365045229,
+      -1361285742,
+      1778566373
+    ],
+    "crypts": 3,
+    "secrets": 9
+  },
+  {
+    "name": "Spikes",
+    "type": "NORMAL",
+    "cores": [
+      881396995
+    ],
+    "crypts": 2,
+    "secrets": 3
+  },
+  {
+    "name": "Staircase",
+    "type": "NORMAL",
+    "cores": [
+      1386509425
+    ],
+    "crypts": 2,
+    "secrets": 3
+  },
+  {
+    "name": "Stairs",
+    "type": "NORMAL",
+    "cores": [
+      -330702540,
+      -283979980,
+      -697693183,
+      606731747
+    ],
+    "crypts": 1,
+    "secrets": 4
+  },
+  {
+    "name": "Steps",
+    "type": "NORMAL",
+    "cores": [
+      1350621298
+    ],
+    "crypts": 1,
+    "secrets": 1
+  },
+  {
+    "name": "Stone Window",
+    "type": "RARE",
+    "cores": [
+      477318192
+    ],
+    "crypts": 1,
+    "secrets": 2
+  },
+  {
+    "name": "Supertall",
+    "type": "NORMAL",
+    "cores": [
+      1522346451,
+      -1376632689,
+      291711773,
+      -46683467
+    ],
+    "crypts": 6,
+    "secrets": 6
+  },
+  {
+    "name": "Teleport Maze",
+    "type": "PUZZLE",
+    "cores": [
+      487124604,
+      2089453469
+    ]
+  },
+  {
+    "name": "Temple",
+    "type": "NORMAL",
+    "cores": [
+      1663174337,
+      1480555517
+    ],
+    "secrets": 3
+  },
+  {
+    "name": "Three Floors",
+    "type": "RARE",
+    "cores": [
+      633179672
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Three Weirdos",
+    "type": "PUZZLE",
+    "cores": [
+      -476788643
+    ]
+  },
+  {
+    "name": "Tic Tac Toe",
+    "type": "PUZZLE",
+    "cores": [
+      1958698161
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Tombstone",
+    "type": "RARE",
+    "cores": [
+      1965783806
+    ],
+    "secrets": 2
+  },
+  {
+    "name": "Tomioka",
+    "type": "NORMAL",
+    "cores": [
+      -195263543
+    ]
+  },
+  {
+    "name": "Vinny 8 Ball",
+    "type": "RARE",
+    "cores": [
+      -1169880205
+    ],
+    "secrets": 1
+  },
+  {
+    "name": "Water",
+    "type": "NORMAL",
+    "cores": [
+      -1849552977
+    ],
+    "secrets": 2
+  },
+  {
+    "name": "Water Board",
+    "type": "PUZZLE",
+    "cores": [
+      -109725212,
+      -353291158
+    ]
+  },
+  {
+    "name": "Waterfall",
+    "type": "NORMAL",
+    "cores": [
+      740310812,
+      82232284,
+      1379043687,
+      -1971268623
+    ],
+    "crypts": 3,
+    "secrets": 8
+  },
+  {
+    "name": "Well",
+    "type": "NORMAL",
+    "cores": [
+      196766004,
+      718434953,
+      1955671195
+    ],
+    "crypts": 5,
+    "secrets": 7
+  },
+  {
+    "name": "Withermancer",
+    "type": "NORMAL",
+    "cores": [
+      -499989468,
+      -406356904,
+      -1645219026
+    ],
+    "crypts": 6,
+    "secrets": 4
+  },
+  {
+    "name": "Wizard",
+    "type": "NORMAL",
+    "cores": [
+      -23510667,
+      1958624830,
+      735485465
+    ],
+    "crypts": 8,
+    "secrets": 4
+  }
+]

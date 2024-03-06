@@ -34,6 +34,7 @@ import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapPlayer
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorChatComponentText
 import gg.skytils.skytilsmod.utils.*
@@ -42,6 +43,7 @@ import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import kotlinx.coroutines.launch
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -204,7 +206,7 @@ object DungeonListener {
                             }
                             for (i in 0..<partyCount) {
                                 val pos = 1 + i * 4
-                                val text = tabEntries[pos].second
+                                val (entry, text) = tabEntries[pos]
                                 val matcher = classPattern.find(text)
                                 if (matcher == null) {
                                     println("Skipping over entry $text due to it not matching")
@@ -221,14 +223,16 @@ object DungeonListener {
                                             DungeonClass.getClassFromName(
                                                 dungeonClass
                                             ), classLevel,
-                                            pos
+                                            pos,
+                                            entry.locationSkin
                                         )
                                 } else {
                                     println("Parsed teammate $name with value EMPTY, $text")
                                     team[name] = DungeonTeammate(
                                         name,
                                         DungeonClass.EMPTY, 0,
-                                        pos
+                                        pos,
+                                        entry.locationSkin
                                     )
                                 }
                             }
@@ -340,13 +344,21 @@ object DungeonListener {
         val playerName: String,
         val dungeonClass: DungeonClass,
         val classLevel: Int,
-        val tabEntryIndex: Int
+        val tabEntryIndex: Int,
+        val skin: ResourceLocation
     ) {
         var player: EntityPlayer? = null
+            set(value) {
+                field = value
+                if (value != null) {
+                    mapPlayer.setData(value)
+                }
+            }
         var dead = false
         var deaths = 0
         var lastLivingStateChange: Long? = null
 
+        val mapPlayer = DungeonMapPlayer(this, skin)
 
         fun canRender() = player != null && player!!.health > 0 && !dead
     }
