@@ -1250,6 +1250,13 @@ object Config : Vigilant(
     var kuudraChestProfitIncludesEssence = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Kuudra Chest Profit Subtracts Key",
+        description = "Deduct the estimated cost of the Kuudra key used to open the Paid Chest.\nNPC discounts and soulbound items are not accounted for.",
+        category = "Kuudra", subcategory = "Price Checking"
+    )
+    var kuudraChestProfitCountsKey = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dark Mode Mist",
         description = "Replaces colors in The Mist with darker variants.",
         category = "Mining", subcategory = "Quality of Life"

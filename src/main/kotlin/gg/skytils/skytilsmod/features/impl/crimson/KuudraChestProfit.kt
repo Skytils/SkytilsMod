@@ -56,10 +56,16 @@ object KuudraChestProfit {
             val openChest = inv.getStackInSlot(31) ?: return
             if (openChest.displayName == "§aOpen Reward Chest" && chestType.items.isEmpty()) {
                 runCatching {
-                    chestType.keyNeeded = getKeyNeeded(ItemUtil.getItemLore(openChest))
+                    val key = getKeyNeeded(ItemUtil.getItemLore(openChest))
+                    chestType.keyNeeded = key
                     for (i in 9..17) {
                         val lootSlot = inv.getStackInSlot(i) ?: continue
                         chestType.addItem(lootSlot)
+                    }
+                    if (key != null && Skytils.config.kuudraChestProfitCountsKey) {
+                        val keyCost = key.getPrice(KuudraFeatures.myFaction ?: error("Failed to get Crimson Faction"))
+                        chestType.items.add(KuudraChestLootItem(1, key.displayName, -keyCost))
+                        chestType.value -= keyCost
                     }
                 }
             }
@@ -97,11 +103,10 @@ object KuudraChestProfit {
             GlStateManager.color(1f, 1f, 1f, 1f)
             GlStateManager.disableLighting()
             var drawnLines = 1
-            val profit = chest.profit
 
             ScreenRenderer.fontRenderer.drawString(
-                chest.displayText + "§f: §" + (if (profit > 0) "a" else "c") + NumberUtil.nf.format(
-                    profit
+                chest.displayText + "§f: §" + (if (chest.value > 0) "a" else "c") + NumberUtil.nf.format(
+                    chest.value
                 ),
                 if (leftAlign) element.scaleX else element.scaleX + element.width,
                 element.scaleY,
@@ -145,8 +150,6 @@ object KuudraChestProfit {
         var keyNeeded: KuudraKey? = null
         var value = 0.0
         val items = ArrayList<KuudraChestLootItem>(3)
-        val profit
-            get() = value - (keyNeeded?.getPrice(KuudraFeatures.myFaction ?: error("Failed to get Crimson Faction")) ?: 0.0)
 
         fun reset() {
             keyNeeded = null
@@ -192,9 +195,8 @@ object KuudraChestProfit {
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.disableLighting()
                 KuudraChest.entries.filter { it.items.isNotEmpty() }.forEachIndexed { i, chest ->
-                    val profit = chest.profit
                     ScreenRenderer.fontRenderer.drawString(
-                        "${chest.displayText}§f: §${(if (profit > 0) "a" else "c")}${NumberUtil.format(profit.toLong())}",
+                        "${chest.displayText}§f: §${(if (chest.value > 0) "a" else "c")}${NumberUtil.format(chest.value.toLong())}",
                         if (leftAlign) 0f else width.toFloat(),
                         (i * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
                         chest.displayColor,
