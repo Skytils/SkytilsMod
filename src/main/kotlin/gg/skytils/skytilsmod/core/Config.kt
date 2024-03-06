@@ -1236,6 +1236,20 @@ object Config : Vigilant(
     var kuudraHideNonNametags = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Kuudra Chest Profit",
+        description = "Shows the estimated profit for items from chests in Kuudra.\nYou authorize Skytils to send your chest data to a third party.",
+        category = "Kuudra", subcategory = "Price Checking"
+    )
+    var kuudraChestProfit = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Kuudra Chest Profit Includes Essence",
+        description = "Include essence when calculating Kuudra Chest Profit.",
+        category = "Kuudra", subcategory = "Price Checking"
+    )
+    var kuudraChestProfitIncludesEssence = true
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dark Mode Mist",
         description = "Replaces colors in The Mist with darker variants.",
         category = "Mining", subcategory = "Quality of Life"
@@ -3031,7 +3045,8 @@ object Config : Vigilant(
             "protectItemBINThreshold",
             "containerSellValue",
             "visitorOfferHelper",
-            "showCoinsPerCopper"
+            "showCoinsPerCopper",
+            "kuudraChestProfit"
         ).forEach { propertyName ->
             addDependency(propertyName, "fetchLowestBINPrices")
             registerListener(propertyName) { prop: Any ->
@@ -3042,6 +3057,8 @@ object Config : Vigilant(
         addDependency("dungeonChestProfitIncludesEssence", "dungeonChestProfit")
         addDependency("croesusHideOpened", "croesusChestHighlight")
         addDependency("kismetRerollThreshold", "dungeonChestProfit")
+
+        addDependency("kuudraChestProfitIncludesEssence", "kuudraChestProfit")
 
         addDependency("message270Score", "sendMessageOn270Score")
         addDependency("messageTitle270Score", "createTitleOn270Score")
