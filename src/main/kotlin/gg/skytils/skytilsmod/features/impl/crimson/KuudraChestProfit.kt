@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.IO
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -62,7 +63,10 @@ object KuudraChestProfit {
                     }
                 }
             }
+            GlStateManager.pushMatrix()
+            GlStateManager.translate((-(event.gui as AccessorGuiContainer).guiLeft).toDouble(), -event.gui.guiTop.toDouble(), 299.0)
             drawChestProfit(chestType)
+            GlStateManager.popMatrix()
         }
     }
 
