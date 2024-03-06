@@ -111,7 +111,7 @@ object KuudraChestProfit {
             )
 
             for (item in chest.items) {
-                val line = item.item.displayName + "§f: §a" + NumberUtil.nf.format(item.value)
+                val line = "§8${item.stackSize} §r".toStringIfTrue(item.stackSize > 1) + item.displayText + "§f: §a" + NumberUtil.nf.format(item.value)
                 ScreenRenderer.fontRenderer.drawString(
                     line,
                     if (leftAlign) element.scaleX else element.scaleX + element.width,
@@ -166,7 +166,7 @@ object KuudraChestProfit {
                 } else {
                     AuctionData.lowestBINs[identifier] ?: 0.0
                 }
-                items.add(KuudraChestLootItem(item, itemValue))
+                items.add(KuudraChestLootItem(item.stackSize, item.displayName, itemValue))
 
                 value += itemValue
             }
@@ -183,7 +183,7 @@ object KuudraChestProfit {
     }
 
     private var textShadow_ = SmartFontRenderer.TextShadow.NORMAL
-    private class KuudraChestLootItem(var item: ItemStack, var value: Double)
+    private class KuudraChestLootItem(var stackSize: Int, var displayText: String, var value: Double)
     class KuudraChestProfitElement : GuiElement("Kuudra Chest Profit", x = 200, y = 120) {
         override fun render() {
             if (toggled && SBInfo.mode == SkyblockIsland.KuudraHollow.mode) {
@@ -237,7 +237,6 @@ object KuudraChestProfit {
         // treat NPC discounts as negligible
         fun getPrice(faction: CrimsonFaction): Double {
             val keyMaterialCost = AuctionData.lowestBINs[faction.keyMaterial] ?: 0.0
-            val starPrice = AuctionData.lowestBINs[""]
 
             return coinCost + keyMaterialCost * materialCost
         }
