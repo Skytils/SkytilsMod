@@ -147,7 +147,8 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
             val color = if (CataclysmicMapConfig.mapColorText) when (room.state) {
                 RoomState.GREEN -> 0x55ff55
-                RoomState.CLEARED, RoomState.FAILED -> 0xffffff
+                RoomState.CLEARED -> 0xffffff
+                RoomState.FAILED -> 0xff0000
                 else -> 0xaaaaaa
             } else 0xffffff
             val secretCount = room.data.secrets
