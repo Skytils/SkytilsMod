@@ -234,6 +234,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
     }
 
     private fun renderPlayerHeads() {
+        if (DungeonTimer.bossEntryTime != -1L) return
         DungeonListener.team.forEach { (name, teammate) ->
             if (!teammate.dead) {
                 RenderUtils.drawPlayerHead(name, teammate.mapPlayer)

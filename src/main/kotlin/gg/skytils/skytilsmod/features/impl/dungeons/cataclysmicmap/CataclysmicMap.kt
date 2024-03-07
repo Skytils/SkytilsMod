@@ -57,7 +57,7 @@ object CataclysmicMap {
             MapUtils.calibrated = MapUtils.calibrateMap()
         }
 
-        if (DungeonTimer.scoreShownAt == -1L) {
+        if (DungeonTimer.scoreShownAt == -1L && DungeonTimer.bossEntryTime == -1L) {
             MapUpdater.updateRooms()
             MapUpdater.updatePlayers()
         }
