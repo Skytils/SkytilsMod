@@ -495,7 +495,6 @@ class Skytils {
 
         IO.launch {
             TrophyFish.loadFromApi()
-            QuiverStuff.loadFromApi()
         }
     }
 
