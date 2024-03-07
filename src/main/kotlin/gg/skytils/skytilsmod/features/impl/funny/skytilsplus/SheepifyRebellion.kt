@@ -77,7 +77,7 @@ object SheepifyRebellion {
 
     @SubscribeEvent
     fun playerSpawn(event: EntityJoinWorldEvent) {
-        if (event.entity !is AbstractClientPlayer || event.entity.uniqueID.version() != 2) return
+        if (event.entity !is AbstractClientPlayer || event.entity.uniqueID.version() == 2) return
 
         if (Utils.inSkyblock) {
             checkForFakeModel(event.entity as AbstractClientPlayer)
