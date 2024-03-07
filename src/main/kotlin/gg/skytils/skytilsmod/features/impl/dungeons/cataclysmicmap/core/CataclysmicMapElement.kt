@@ -80,6 +80,10 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         GlStateManager.translate(MapUtils.startCorner.first.toFloat(), MapUtils.startCorner.second.toFloat(), 0f)
 
         val connectorSize = MapUtils.mapRoomSize shr 2
+        val checkmarkSize = when (CataclysmicMapConfig.mapCheckmark) {
+            1 -> 8.0 // default
+            else -> 10.0 // neu
+        }
 
         for (y in 0..10) {
             for (x in 0..10) {
@@ -117,6 +121,10 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                         xOffset, yOffset, connectorSize, tile is Door, !xEven, tile.color
                     )
                 }
+
+                if (tile is Room && tile.state == RoomState.UNOPENED && CataclysmicMapConfig.mapCheckmark != 0) {
+                    drawCheckmark(tile, xOffset, yOffset, checkmarkSize)
+                }
             }
         }
         GlStateManager.popMatrix()
@@ -146,7 +154,9 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
             val roomType = room.data.type
             val hasSecrets = secretCount > 0
 
-            if (CataclysmicMapConfig.mapRoomSecrets == 2 && hasSecrets && room.state != RoomState.UNOPENED) {
+            if (room.state == RoomState.UNOPENED) return@forEach
+
+            if (CataclysmicMapConfig.mapRoomSecrets == 2 && hasSecrets) {
                 GlStateManager.pushMatrix()
                 GlStateManager.translate(
                     xOffset + (MapUtils.mapRoomSize shr 1).toFloat(),
@@ -157,21 +167,8 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                 RenderUtils.renderCenteredText(listOf(secretCount.toString()), 0, 0, color)
                 GlStateManager.popMatrix()
             } else if (CataclysmicMapConfig.mapCheckmark != 0) {
-                getCheckmark(room.state, CataclysmicMapConfig.mapCheckmark)?.let {
-                    GlStateManager.enableAlpha()
-                    GlStateManager.color(1f, 1f, 1f, 1f)
-                    mc.textureManager.bindTexture(it)
-
-                    RenderUtils.drawTexturedQuad(
-                        xOffset + (MapUtils.mapRoomSize - checkmarkSize) / 2,
-                        yOffset + (MapUtils.mapRoomSize - checkmarkSize) / 2,
-                        checkmarkSize,
-                        checkmarkSize
-                    )
-                }
+                drawCheckmark(room, xOffset, yOffset, checkmarkSize)
             }
-
-            if (room.state == RoomState.UNOPENED) return@forEach
 
             val name = mutableListOf<String>()
 
@@ -219,6 +216,20 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
             }
 
             else -> null
+        }
+    }
+
+    private fun drawCheckmark(tile: Tile, xOffset: Int, yOffset: Int, checkmarkSize: Double) {
+        getCheckmark(tile.state, CataclysmicMapConfig.mapCheckmark)?.let {
+            GlStateManager.enableAlpha()
+            GlStateManager.color(1f, 1f, 1f, 1f)
+            mc.textureManager.bindTexture(it)
+            RenderUtils.drawTexturedQuad(
+                xOffset + (MapUtils.mapRoomSize - checkmarkSize) / 2,
+                yOffset + (MapUtils.mapRoomSize - checkmarkSize) / 2,
+                checkmarkSize,
+                checkmarkSize
+            )
         }
     }
 
