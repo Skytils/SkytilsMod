@@ -59,7 +59,7 @@ object CreeperSolver {
             }?.firstOrNull()
         } else if (solutionPairs.isEmpty()) {
             val creeper = this.creeper!!.entityBoundingBox
-            val validBox = creeper.expand(0.5, 0.75, 0.5)
+            val validBox = creeper.expand(0.5, 0.5, 0.5).offset(0.0, 77 - creeper.minY, 0.0)
 
             val roomBB = creeper.expand(14.0, 10.0, 13.0)
             val candidates = BlockPos.getAllInBox(BlockPos(roomBB.minVec), BlockPos(roomBB.maxVec)).filter {
