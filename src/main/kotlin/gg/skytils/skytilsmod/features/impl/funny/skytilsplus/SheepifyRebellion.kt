@@ -29,6 +29,7 @@ import gg.skytils.skytilsmod.utils.ReflectionHelper.getFieldHelper
 import gg.skytils.skytilsmod.utils.ReflectionHelper.getMethodHelper
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.hasMoved
 import kotlinx.serialization.Serializable
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.client.entity.EntityPlayerSP
@@ -187,7 +188,6 @@ object SheepifyRebellion {
         entity.deathTime = originalEntity.deathTime
         entity.arrowCountInEntity = originalEntity.arrowCountInEntity
         entity.isSprinting = originalEntity.isSprinting
-        entity.isSneaking = originalEntity.isSneaking
         entity.isInvisible = originalEntity.isInvisible
 
         if (entity.inventory.size >= originalEntity.inventory.size) {
@@ -198,6 +198,12 @@ object SheepifyRebellion {
 
         if (originalEntity.isChild && entity is EntityAgeable) {
             entity.growingAge = -1
+        }
+
+        if (entity is EntityTameable) {
+            entity.isSitting = originalEntity.isSneaking && !originalEntity.hasMoved
+        } else {
+            entity.isSneaking = originalEntity.isSneaking
         }
 
         entity.ticksExisted = originalEntity.ticksExisted
