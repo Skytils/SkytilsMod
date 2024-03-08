@@ -105,7 +105,7 @@ dependencies {
     }
 
     shadowMe(platform(kotlin("bom")))
-    shadowMe(platform(ktor("bom", "2.3.7", addSuffix = false)))
+    shadowMe(platform(ktor("bom", "2.3.9", addSuffix = false)))
 
     shadowMe(ktor("serialization-kotlinx-json"))
     shadowMe(ktor("serialization-gson"))
@@ -216,12 +216,9 @@ tasks {
             "META-INF/maven/**",
             "META-INF/versions/**",
             "META-INF/com.android.tools/**",
-            "fabric.mod.json",
-            "/**/META-INF/services/io.ktor.serialization.kotlinx.KotlinxSerializationExtensionProvider"
+            "fabric.mod.json"
         )
-        mergeServiceFiles {
-            exclude("/**/META-INF/services/io.ktor.serialization.kotlinx.KotlinxSerializationExtensionProvider")
-        }
+        mergeServiceFiles()
     }
     withType<AbstractArchiveTask> {
         isPreserveFileTimestamps = false
