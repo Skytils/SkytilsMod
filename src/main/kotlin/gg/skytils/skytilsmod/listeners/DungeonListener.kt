@@ -211,69 +211,73 @@ object DungeonListener {
             }
         }
         tickTimer(2, repeats = true) {
-            if (Utils.inDungeons && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
+            if (Utils.inDungeons && mc.thePlayer != null && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
                 val tabEntries = TabListUtils.tabEntries
-                if (team.isEmpty() || (DungeonTimer.dungeonStartTime != -1L && team.values.any { it.dungeonClass == DungeonClass.EMPTY  })) {
-                    if (tabEntries.isNotEmpty() && tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
-                        printDevMessage("Parsing party", "dungeonlistener")
-                        val partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
-                        if (partyCount != null) {
-                            println("There are $partyCount members in this party")
-                            if (team.size != partyCount) {
-                                println("Clearing team as the party size has changed ${team.size} -> $partyCount")
-                                team.clear()
-                            }
-                            for (i in 0..<partyCount) {
-                                val pos = 1 + i * 4
-                                val (entry, text) = tabEntries[pos]
-                                val matcher = classPattern.find(text)
-                                if (matcher == null) {
-                                    println("Skipping over entry $text due to it not matching")
-                                    continue
-                                }
-                                val name = matcher.groups["name"]!!.value
-                                if (matcher.groups["class"] != null) {
-                                    val dungeonClass = matcher.groups["class"]!!.value
-                                    val classLevel = matcher.groups["lvl"]!!.value.romanToDecimal()
-                                    println("Parsed teammate $name, they are a $dungeonClass $classLevel")
-                                    team[name] =
-                                        DungeonTeammate(
-                                            name,
-                                            DungeonClass.getClassFromName(
-                                                dungeonClass
-                                            ), classLevel,
-                                            pos,
-                                            entry.locationSkin
-                                        )
-                                } else {
-                                    println("Parsed teammate $name with value EMPTY, $text")
-                                    team[name] = DungeonTeammate(
-                                        name,
-                                        DungeonClass.EMPTY, 0,
-                                        pos,
-                                        entry.locationSkin
-                                    )
-                                }
+                var partyCount: Int? = null
+                var recomputeFlag = team.isEmpty()
 
-                                team[name]?.mapPlayer?.icon = "icon-${(i + (partyCount-1)) % (partyCount)}}"
-                            }
-                            if (partyCount != team.size) {
-                                UChat.chat("$failPrefix §cSomething isn't right! I expected $partyCount members but only got ${team.size}")
-                            }
-
-                            if (DungeonTimer.dungeonStartTime != -1L && System.currentTimeMillis() - DungeonTimer.dungeonStartTime >= 2000 && team.values.any { it.dungeonClass == DungeonClass.EMPTY }) {
-                                UChat.chat("$failPrefix §cSomething isn't right! One or more of your party members has an empty class! Could the server be lagging?")
-                            }
-
-                            if (team.isNotEmpty()) {
-                                CooldownTracker.updateCooldownReduction()
-                                checkSpiritPet()
-                            }
-                        } else {
-                            println("Couldn't get party count")
+                if (tabEntries.isNotEmpty() && tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
+                    partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
+                    if (partyCount != null) {
+                        if (team.size != partyCount) {
+                            println("Recomputing team as party size has changed ${team.size} -> $partyCount")
+                            recomputeFlag = true
                         }
                     } else {
-                        println("Couldn't get party text")
+                        println("Couldn't get party count")
+                    }
+                } else {
+                    println("Couldn't get party text")
+                }
+
+                if (partyCount != null && (recomputeFlag || (DungeonTimer.dungeonStartTime != -1L && team.values.any { it.dungeonClass == DungeonClass.EMPTY  }))) {
+                    printDevMessage("Parsing party", "dungeonlistener")
+                    println("There are $partyCount members in this party")
+                    for (i in 0..<partyCount) {
+                        val pos = 1 + i * 4
+                        val (entry, text) = tabEntries[pos]
+                        val matcher = classPattern.find(text)
+                        if (matcher == null) {
+                            println("Skipping over entry $text due to it not matching")
+                            continue
+                        }
+                        val name = matcher.groups["name"]!!.value
+                        if (matcher.groups["class"] != null) {
+                            val dungeonClass = matcher.groups["class"]!!.value
+                            val classLevel = matcher.groups["lvl"]!!.value.romanToDecimal()
+                            println("Parsed teammate $name, they are a $dungeonClass $classLevel")
+                            team[name] =
+                                DungeonTeammate(
+                                    name,
+                                    DungeonClass.getClassFromName(
+                                        dungeonClass
+                                    ), classLevel,
+                                    pos,
+                                    entry.locationSkin
+                                )
+                        } else {
+                            println("Parsed teammate $name with value EMPTY, $text")
+                            team[name] = DungeonTeammate(
+                                name,
+                                DungeonClass.EMPTY, 0,
+                                pos,
+                                entry.locationSkin
+                            )
+                        }
+
+                        team[name]?.mapPlayer?.icon = "icon-${(i + (partyCount-1)) % (partyCount)}}"
+                    }
+                    if (partyCount != team.size) {
+                        UChat.chat("$failPrefix §cSomething isn't right! I expected $partyCount members but only got ${team.size}")
+                    }
+
+                    if (DungeonTimer.dungeonStartTime != -1L && System.currentTimeMillis() - DungeonTimer.dungeonStartTime >= 2000 && team.values.any { it.dungeonClass == DungeonClass.EMPTY }) {
+                        UChat.chat("$failPrefix §cSomething isn't right! One or more of your party members has an empty class! Could the server be lagging?")
+                    }
+
+                    if (team.isNotEmpty()) {
+                        CooldownTracker.updateCooldownReduction()
+                        checkSpiritPet()
                     }
                 } else {
                     val self = team[mc.thePlayer.name]
