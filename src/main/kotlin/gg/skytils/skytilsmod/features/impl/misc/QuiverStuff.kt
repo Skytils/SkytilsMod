@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.utils.*
@@ -35,8 +36,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object QuiverStuff {
     private val activeArrowRegex = Regex("§7Active Arrow: (?<type>§.[\\w -]+) §7\\(§e(?<amount>\\d+)§7\\)")
 
-    private var selectedType = "§cUnknown"
+    private var selectedType: String = ""
     private var arrowCount = -1
+    private var sentWarning = false
 
     init {
         QuiverDisplay
@@ -49,8 +51,18 @@ object QuiverStuff {
         val stack = event.packet.func_149174_e() ?: return
         val line = ItemUtil.getItemLore(stack).getOrNull(4) ?: return
         val match = activeArrowRegex.matchEntire(line) ?: return
-        selectedType = match.groups["type"]?.value ?: "§cUnknown"
+        selectedType = match.groups["type"]?.value ?: ""
         arrowCount = match.groups["amount"]?.value?.toIntOrNull() ?: -1
+
+        if (sentWarning && Skytils.config.restockArrowsWarning != 0 && arrowCount >= Skytils.config.restockArrowsWarning) {
+            sentWarning = false
+        } else if (
+            !sentWarning && arrowCount != -1 && selectedType.isNotBlank() &&
+            Skytils.config.restockArrowsWarning != 0 && arrowCount < Skytils.config.restockArrowsWarning
+        ) {
+            GuiManager.createTitle("§c§lRESTOCK §r$selectedType", 60)
+            sentWarning = true
+        }
     }
 
     object QuiverDisplay : GuiElement("Quiver Display", x = 0.05f, y = 0.4f) {
@@ -67,7 +79,12 @@ object QuiverStuff {
 
             RenderUtil.renderItem(arrowItem, 0, 0)
             ScreenRenderer.fontRenderer.drawString(
-                arrowCount.toString(), 20f, 5f, color, SmartFontRenderer.TextAlignment.LEFT_RIGHT, textShadow
+                if (arrowCount == -1) "???" else arrowCount.toString(),
+                20f,
+                5f,
+                color,
+                SmartFontRenderer.TextAlignment.LEFT_RIGHT,
+                textShadow
             )
         }
 
@@ -96,7 +113,7 @@ object QuiverStuff {
             if (!toggled || !Utils.inSkyblock) return
             val alignment =
                 if (scaleX < UResolution.scaledWidth / 2f) SmartFontRenderer.TextAlignment.LEFT_RIGHT else SmartFontRenderer.TextAlignment.RIGHT_LEFT
-            val text = "Selected: §r$selectedType"
+            val text = "Selected: §r${selectedType.ifBlank { "§cUnknown" }}"
 
             ScreenRenderer.fontRenderer.drawString(
                 text,
