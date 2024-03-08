@@ -144,7 +144,7 @@ dependencies {
 
 sourceSets {
     main {
-        output.setResourcesDir(file("${buildDir}/classes/kotlin/main"))
+        output.setResourcesDir(kotlin.classesDirectory)
         blossom {
             javaSources {
                 property("version", project.version.toString())
@@ -182,7 +182,7 @@ tasks {
     }
     named<RemapJarTask>("remapJar") {
         archiveBaseName.set("Skytils")
-        input.set(shadowJar.get().archiveFile)
+        inputFile.set(shadowJar.get().archiveFile)
         doLast {
             MessageDigest.getInstance("SHA-256").digest(archiveFile.get().asFile.readBytes())
                 .let {
