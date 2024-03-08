@@ -21,17 +21,28 @@ package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
+import net.minecraft.world.storage.MapData
 
-class DungeonMapParser(mapColors: ByteArray) {
+object DungeonMapColorParser {
     private var centerColors: ByteArray = ByteArray(121)
     private var sideColors: ByteArray = ByteArray(121)
 
-    init {
-        val halfRoom = MapUtils.mapRoomSize / 2
-        val halfTile = halfRoom + 2
-        val startX = MapUtils.startCorner.first + halfRoom
-        val startY = MapUtils.startCorner.second + halfRoom
+    private var halfRoom = -1
+    private var halfTile = -1
+    private var startX = -1
+    private var startY = -1
 
+    fun calibrate() {
+        halfRoom = MapUtils.mapRoomSize / 2
+        halfTile = halfRoom + 2
+        startX = MapUtils.startCorner.first + halfRoom
+        startY = MapUtils.startCorner.second + halfRoom
+
+        centerColors = ByteArray(121)
+        sideColors = ByteArray(121)
+    }
+
+    fun updateMap(mapData: MapData) {
         for (y in 0..10) {
             for (x in 0..10) {
                 val mapX = startX + x * halfTile
@@ -39,7 +50,7 @@ class DungeonMapParser(mapColors: ByteArray) {
 
                 if (mapX >= 128 || mapY >= 128) continue
 
-                centerColors[y * 11 + x] = mapColors[mapY * 128 + mapX]
+                centerColors[y * 11 + x] = mapData.colors[mapY * 128 + mapX]
 
                 val sideIndex = if (x % 2 == 0 && y % 2 == 0) {
                     val topX = mapX - halfRoom
@@ -54,7 +65,7 @@ class DungeonMapParser(mapColors: ByteArray) {
                     }
                 }
 
-                sideColors[y * 11 + x] = mapColors[sideIndex]
+                sideColors[y * 11 + x] = mapData.colors[sideIndex]
             }
         }
     }

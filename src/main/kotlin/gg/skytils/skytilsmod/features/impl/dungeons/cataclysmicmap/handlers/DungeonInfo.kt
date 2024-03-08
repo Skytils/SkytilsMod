@@ -22,6 +22,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Puzz
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Room
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Tile
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Unknown
+import net.minecraft.world.storage.MapData
 
 object DungeonInfo {
     // 6 x 6 room grid, 11 x 11 with connections
@@ -37,6 +38,8 @@ object DungeonInfo {
 
     var keys = 0
 
+    var dungeonMap: MapData? = null
+
     fun reset() {
         dungeonList.fill(Unknown(0, 0))
         roomCount = 0
@@ -49,5 +52,7 @@ object DungeonInfo {
         secretCount = 0
 
         keys = 0
+
+        dungeonMap = null
     }
 }

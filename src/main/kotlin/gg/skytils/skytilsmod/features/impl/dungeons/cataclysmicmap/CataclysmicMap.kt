@@ -54,12 +54,16 @@ object CataclysmicMap {
         if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null) return
 
         if (!MapUtils.calibrated) {
-            MapUtils.calibrated = MapUtils.calibrateMap()
-        }
+            if (DungeonInfo.dungeonMap == null) {
+                DungeonInfo.dungeonMap = MapUtils.getMapData()
+            }
 
-        if (DungeonTimer.scoreShownAt == -1L && DungeonTimer.bossEntryTime == -1L) {
-            MapUpdater.updateRooms()
-            MapUpdater.updatePlayers()
+            MapUtils.calibrated = MapUtils.calibrateMap()
+        } else if (DungeonTimer.scoreShownAt == -1L && DungeonTimer.bossEntryTime == -1L) {
+            DungeonInfo.dungeonMap?.let {
+                MapUpdater.updateRooms(it)
+                MapUpdater.updatePlayers(it)
+            }
         }
 
         if (DungeonScanner.shouldScan) {

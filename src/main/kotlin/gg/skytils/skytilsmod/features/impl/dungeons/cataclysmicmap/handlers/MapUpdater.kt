@@ -19,7 +19,7 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapParser
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapColorParser
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Door
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.DoorType
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Unknown
@@ -31,13 +31,14 @@ import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
+import net.minecraft.world.storage.MapData
 import kotlin.math.roundToInt
 
 object MapUpdater {
-    fun updatePlayers() {
+    fun updatePlayers(mapData: MapData) {
         if (DungeonListener.team.isEmpty()) return
 
-        val decor = MapUtils.getMapData()?.mapDecorations ?: return
+        val decor = mapData.mapDecorations
         DungeonListener.team.forEach { (name, team) ->
             val player = team.mapPlayer
             decor.entries.find { (icon, _) -> icon == player.icon }?.let { (_, vec4b) ->
@@ -56,13 +57,13 @@ object MapUpdater {
         }
     }
 
-    fun updateRooms() {
-        val map = DungeonMapParser(MapUtils.getMapData()?.colors ?: return)
+    fun updateRooms(mapData: MapData) {
+        DungeonMapColorParser.updateMap(mapData)
 
         for (x in 0..10) {
             for (z in 0..10) {
                 val room = DungeonInfo.dungeonList[z * 11 + x]
-                val mapTile = map.getTile(x, z)
+                val mapTile = DungeonMapColorParser.getTile(x, z)
 
                 if (room is Unknown) {
                     DungeonInfo.dungeonList[z * 11 + x] = mapTile

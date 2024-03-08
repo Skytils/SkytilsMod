@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapColorParser
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.item.ItemMap
@@ -66,6 +67,8 @@ object MapUtils {
                 }
             }
             coordMultiplier = (mapRoomSize + 4.0) / DungeonScanner.roomSize
+
+            DungeonMapColorParser.calibrate()
             return true
         }
         return false
