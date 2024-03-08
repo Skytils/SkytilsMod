@@ -20,9 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapColorParser
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Door
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.DoorType
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Unknown
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils.mapX
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils.mapZ
@@ -77,13 +75,26 @@ object MapUpdater {
                 if (room is Door && Utils.equalsOneOf(room.type, DoorType.ENTRANCE, DoorType.WITHER, DoorType.BLOOD)) {
                     if (mapTile is Door && mapTile.type == DoorType.WITHER) {
                         room.opened = false
-                    } else if (!room.opened && mc.theWorld.getChunkFromChunkCoords(
+                    } else if (!room.opened) {
+                        val chunk = mc.theWorld.getChunkFromChunkCoords(
                             room.x shr 4,
                             room.z shr 4
-                        ).isLoaded
-                    ) {
-                        if (mc.theWorld.getBlockState(BlockPos(room.x, 69, room.z)).block == Blocks.air) {
+                        )
+                        if (chunk.isLoaded) {
+                            if (chunk.getBlockState(BlockPos(room.x, 69, room.z)).block == Blocks.air)
                             room.opened = true
+                        } else if (mapTile is Door && mapTile.state == RoomState.DISCOVERED) {
+                            if (room.type == DoorType.BLOOD) {
+                                val bloodRoom = DungeonInfo.uniqueRooms.find { (r, _) ->
+                                    r.data.type == RoomType.BLOOD
+                                }?.first
+
+                                if (bloodRoom != null && bloodRoom.state != RoomState.UNOPENED) {
+                                    room.opened = true
+                                }
+                            } else {
+                                room.opened = true
+                            }
                         }
                     }
                 }
