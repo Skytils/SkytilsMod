@@ -137,7 +137,26 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
             val xOffset = (pos.first shr 1) * (MapUtils.mapRoomSize + connectorSize)
             val yOffset = (pos.second shr 1) * (MapUtils.mapRoomSize + connectorSize)
 
-            if (CataclysmicMapConfig.mapCheckmark != 0 && CataclysmicMapConfig.mapRoomSecrets != 2) {
+            val color = if (CataclysmicMapConfig.mapColorText) when (room.state) {
+                RoomState.GREEN -> 0x55ff55
+                RoomState.CLEARED, RoomState.FAILED -> 0xffffff
+                else -> 0xaaaaaa
+            } else 0xffffff
+            val secretCount = room.data.secrets
+            val roomType = room.data.type
+            val hasSecrets = secretCount > 0
+
+            if (CataclysmicMapConfig.mapRoomSecrets == 2 && hasSecrets && room.state != RoomState.UNOPENED) {
+                GlStateManager.pushMatrix()
+                GlStateManager.translate(
+                    xOffset + (MapUtils.mapRoomSize shr 1).toFloat(),
+                    yOffset + 2 + (MapUtils.mapRoomSize shr 1).toFloat(),
+                    0f
+                )
+                GlStateManager.scale(2f, 2f, 1f)
+                RenderUtils.renderCenteredText(listOf(secretCount.toString()), 0, 0, color)
+                GlStateManager.popMatrix()
+            } else if (CataclysmicMapConfig.mapCheckmark != 0) {
                 getCheckmark(room.state, CataclysmicMapConfig.mapCheckmark)?.let {
                     GlStateManager.enableAlpha()
                     GlStateManager.color(1f, 1f, 1f, 1f)
@@ -149,45 +168,26 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                         checkmarkSize,
                         checkmarkSize
                     )
-                    //GlStateManager.disableAlpha()
                 }
             }
 
             if (room.state == RoomState.UNOPENED) return@forEach
 
-            val color = if (CataclysmicMapConfig.mapColorText) when (room.state) {
-                RoomState.GREEN -> 0x55ff55
-                RoomState.CLEARED, RoomState.FAILED -> 0xffffff
-                else -> 0xaaaaaa
-            } else 0xffffff
-
-            if (CataclysmicMapConfig.mapRoomSecrets == 2) {
-                GlStateManager.pushMatrix()
-                GlStateManager.translate(
-                    xOffset + (MapUtils.mapRoomSize shr 1).toFloat(),
-                    yOffset + 2 + (MapUtils.mapRoomSize shr 1).toFloat(),
-                    0f
-                )
-                GlStateManager.scale(2f, 2f, 1f)
-                RenderUtils.renderCenteredText(listOf(room.data.secrets.toString()), 0, 0, color)
-                GlStateManager.popMatrix()
-            }
-
             val name = mutableListOf<String>()
 
             if (CataclysmicMapConfig.mapRoomNames != 0 && Utils.equalsOneOf(
-                    room.data.type,
+                    roomType,
                     RoomType.PUZZLE,
                     RoomType.TRAP
                 ) || CataclysmicMapConfig.mapRoomNames == 2 && Utils.equalsOneOf(
-                    room.data.type,
+                    roomType,
                     RoomType.NORMAL, RoomType.RARE, RoomType.CHAMPION
                 )
             ) {
                 name.addAll(room.data.name.split(" "))
             }
             if (room.data.type == RoomType.NORMAL && CataclysmicMapConfig.mapRoomSecrets == 1) {
-                name.add(room.data.secrets.toString())
+                name.add(secretCount.toString())
             }
             // Offset + half of roomsize
             RenderUtils.renderCenteredText(
@@ -256,6 +256,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
     override fun render() {
         if (!toggled || SBInfo.mode != SkyblockIsland.Dungeon.mode || mc.thePlayer == null || mc.theWorld == null) return
+        if (DungeonTimer.dungeonStartTime == -1L) return
         if (CataclysmicMapConfig.mapHideInBoss && DungeonTimer.bossEntryTime != -1L) return
         mc.mcProfiler.startSection("border")
 
