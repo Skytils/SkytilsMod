@@ -207,7 +207,7 @@ class Skytils {
                 customEncoder(BrotliEncoder, 1.0F)
                 deflate(1.0F)
                 gzip(0.9F)
-                identity(0F)
+                identity(0.1F)
             }
             install(ContentNegotiation) {
                 json(json)
