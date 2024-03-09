@@ -18,7 +18,7 @@
 import org.apache.tools.ant.filters.FixCrLfFilter
 
 plugins {
-    kotlin("jvm") version "1.9.21"
+    kotlin("jvm") version "1.9.23"
     id("gg.essential.loom") version "1.3.12"
     id("gg.essential.defaults") version "0.3.0"
 }
