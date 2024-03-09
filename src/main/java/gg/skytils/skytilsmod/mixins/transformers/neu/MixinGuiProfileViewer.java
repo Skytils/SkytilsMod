@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.neu;
 
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import gg.skytils.skytilsmod.mixins.hooks.neu.GuiProfileViewerHookKt;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
@@ -25,21 +26,26 @@ import org.spongepowered.asm.mixin.Dynamic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
+
+/**
+ * These methods don't exist after NotEnoughUpdates/NotEnoughUpdates#81, and rarity drawing is handled by NEU.
+ * This mixin is only for versions before that.
+ */
 @Pseudo
 @Mixin(targets = "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer", remap = false)
 public abstract class MixinGuiProfileViewer extends GuiScreen {
-
     @Dynamic
-    @Redirect(method = "drawInvsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V"))
-    private void renderRarityOnInvPage(ItemStack stack, int x, int y) {
+    @WrapWithCondition(method = "drawInvsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V"))
+    private boolean renderRarityOnInvPage(ItemStack stack, int x, int y) {
         GuiProfileViewerHookKt.renderRarityOnPage(stack, x, y);
+        return true;
     }
 
     @Dynamic
-    @Redirect(method = "drawPetsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V", ordinal = 0))
-    private void renderRarityOnPetsPage(ItemStack stack, int x, int y) {
+    @WrapWithCondition(method = "drawPetsPage", at = @At(value = "INVOKE", target = "Lio/github/moulberry/notenoughupdates/util/Utils;drawItemStack(Lnet/minecraft/item/ItemStack;II)V", ordinal = 0))
+    private boolean renderRarityOnPetsPage(ItemStack stack, int x, int y) {
         GuiProfileViewerHookKt.renderRarityOnPage(stack, x, y);
+        return true;
     }
 }

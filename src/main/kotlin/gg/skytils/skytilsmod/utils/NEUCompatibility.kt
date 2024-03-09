@@ -18,33 +18,8 @@
 
 package gg.skytils.skytilsmod.utils
 
-import net.minecraft.item.ItemStack
-import java.lang.invoke.MethodHandle
-import java.lang.invoke.MethodHandles
-import java.lang.invoke.MethodType
-
 object NEUCompatibility {
     var isCustomAHActive = false
     var isStorageMenuActive = false
     var isTradeWindowActive = false
-
-    val drawItemStackMethod: MethodHandle by lazy {
-        try {
-            MethodHandles.publicLookup().findStatic(
-                Class.forName("io.github.moulberry.notenoughupdates.util.Utils"),
-                "drawItemStack",
-                MethodType.methodType(
-                    Void.TYPE,
-                    ItemStack::class.java,
-                    Int::class.javaPrimitiveType,
-                    Int::class.javaPrimitiveType
-                )
-            )
-        } catch (e: Throwable) {
-            throw IllegalStateException(
-                "Skytils couldn't locate an NEU function. Please make sure you have the latest version of NEU.",
-                e
-            )
-        }
-    }
 }

@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.sk1eroam;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import gg.skytils.skytilsmod.mixins.hooks.renderer.ItemRendererHookKt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.EnumAction;
@@ -36,6 +37,6 @@ public abstract class MixinAnimationHandler {
     @Dynamic
     @ModifyVariable(method = "renderItemInFirstPerson", at = @At("STORE"))
     private EnumAction changeEnumAction(EnumAction action) {
-        return mc.thePlayer.getItemInUse() != null ? ItemRendererHookKt.getItemInUseCountForFirstPerson(mc.thePlayer, mc.thePlayer.getItemInUse()) == 0 ? EnumAction.NONE : action : action;
+        return mc.thePlayer.getItemInUse() != null ? ItemRendererHookKt.getItemInUseCountForFirstPerson(mc.thePlayer, mc.thePlayer.getItemInUse(), null) == 0 ? EnumAction.NONE : action : action;
     }
 }

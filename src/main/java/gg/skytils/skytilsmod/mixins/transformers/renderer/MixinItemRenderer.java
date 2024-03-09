@@ -18,6 +18,8 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.renderer;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import gg.skytils.skytilsmod.mixins.hooks.renderer.ItemRendererHookKt;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -26,7 +28,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemRenderer.class)
@@ -34,9 +35,9 @@ public class MixinItemRenderer {
     @Shadow
     private ItemStack itemToRender;
 
-    @Redirect(method = "renderItemInFirstPerson", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;getItemInUseCount()I"))
-    private int getItemInUseCountForFirstPerson(AbstractClientPlayer abstractClientPlayer) {
-        return ItemRendererHookKt.getItemInUseCountForFirstPerson(abstractClientPlayer, itemToRender);
+    @WrapOperation(method = "renderItemInFirstPerson", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;getItemInUseCount()I"))
+    private int getItemInUseCountForFirstPerson(AbstractClientPlayer abstractClientPlayer, Operation<Integer> original) {
+        return ItemRendererHookKt.getItemInUseCountForFirstPerson(abstractClientPlayer, itemToRender, original);
     }
 
     @Inject(method = "transformFirstPersonItem", at = @At(value = "TAIL"))

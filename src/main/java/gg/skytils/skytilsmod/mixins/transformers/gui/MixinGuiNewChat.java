@@ -18,6 +18,8 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.gui;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import gg.skytils.skytilsmod.features.impl.handlers.ChatTabs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
@@ -51,9 +53,9 @@ public abstract class MixinGuiNewChat extends Gui {
     @Shadow
     public abstract int getLineCount();
 
-    @Redirect(method = "setChatLine", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiUtilRenderComponents;splitText(Lnet/minecraft/util/IChatComponent;ILnet/minecraft/client/gui/FontRenderer;ZZ)Ljava/util/List;"))
-    private List<IChatComponent> filterDrawnTextComponents(IChatComponent p_178908_0_, int p_178908_1_, FontRenderer p_178908_2_, boolean p_178908_3_, boolean p_178908_4_) {
-        return ChatTabs.INSTANCE.shouldAllow(p_178908_0_) ? GuiUtilRenderComponents.splitText(p_178908_0_, p_178908_1_, p_178908_2_, p_178908_3_, p_178908_4_) : Collections.emptyList();
+    @WrapOperation(method = "setChatLine", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiUtilRenderComponents;splitText(Lnet/minecraft/util/IChatComponent;ILnet/minecraft/client/gui/FontRenderer;ZZ)Ljava/util/List;"))
+    private List<IChatComponent> filterDrawnTextComponents(IChatComponent p_178908_0_, int p_178908_1_, FontRenderer p_178908_2_, boolean p_178908_3_, boolean p_178908_4_, Operation<List<IChatComponent>> original) {
+        return ChatTabs.INSTANCE.shouldAllow(p_178908_0_) ? original.call(p_178908_0_, p_178908_1_, p_178908_2_, p_178908_3_, p_178908_4_) : Collections.emptyList();
     }
 
     @Redirect(method = "printChatMessageWithOptionalDeletion", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/IChatComponent;getUnformattedText()Ljava/lang/String;"))

@@ -18,6 +18,8 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.renderer;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import gg.skytils.skytilsmod.mixins.hooks.renderer.RendererLivingEntityHookKt;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -27,7 +29,6 @@ import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(RendererLivingEntity.class)
@@ -41,8 +42,8 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> exte
         RendererLivingEntityHookKt.setColorMultiplier(entity, lightBrightness, partialTickTime, cir);
     }
 
-    @Redirect(method = "setBrightness", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;hurtTime:I", opcode = Opcodes.GETFIELD))
-    private int changeHurtTime(EntityLivingBase instance) {
-        return RendererLivingEntityHookKt.replaceHurtTime(instance);
+    @WrapOperation(method = "setBrightness", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;hurtTime:I", opcode = Opcodes.GETFIELD))
+    private int changeHurtTime(EntityLivingBase instance, Operation<Integer> original) {
+        return RendererLivingEntityHookKt.replaceHurtTime(instance, original);
     }
 }

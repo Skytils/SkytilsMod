@@ -18,7 +18,6 @@
 package gg.skytils.skytilsmod.mixins.hooks.neu
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.utils.NEUCompatibility.drawItemStackMethod
 import gg.skytils.skytilsmod.utils.RenderUtil.renderRarity
 import net.minecraft.item.ItemStack
 
@@ -26,5 +25,4 @@ fun renderRarityOnPage(stack: ItemStack, x: Int, y: Int) {
     if (Skytils.config.showItemRarity) {
         renderRarity(stack, x, y)
     }
-    drawItemStackMethod.invokeExact(stack, x, y)
 }
