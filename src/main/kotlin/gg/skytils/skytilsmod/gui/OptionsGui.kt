@@ -165,6 +165,14 @@ class OptionsGui(val parent: GuiScreen? = null) :
                 UDesktop.browse(URI("https://github.com/Skytils/SkytilsMod"))
             }
         }
+        SimpleButton("Legal").childOf(window).constrain {
+            x = 3.pixels
+            y = basicYConstraint { window.getHeight() - this.getHeight() - 3 }
+            width = RelativeConstraint(0.1f)
+            height = RelativeConstraint(0.05f)
+        }.onMouseClick {
+            mc.displayGuiScreen(LegalGui())
+        }
         animate()
     }
 

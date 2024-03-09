@@ -23,6 +23,7 @@ import net.minecraft.scoreboard.ScorePlayerTeam
 
 /**
  * Taken from https://gist.github.com/aaron1998ish/33c4e1836bd5cf79501d163a1b5c8304
+ * Source: Mojang [net.minecraft.client.gui.GuiIngame.renderScoreboard]
  */
 object ScoreboardUtil {
     @JvmStatic
