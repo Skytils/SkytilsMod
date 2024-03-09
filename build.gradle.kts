@@ -132,6 +132,8 @@ dependencies {
     shadowMe(ktorServer("host-common"))
     shadowMe(ktorServer("auth"))
 
+    shadowMe("org.brotli:dec:0.1.2")
+
     shadowMe(project(":events"))
     shadowMe(project(":hypixel-api:types"))
 

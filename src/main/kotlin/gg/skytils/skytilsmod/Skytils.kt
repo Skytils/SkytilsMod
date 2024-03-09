@@ -204,8 +204,10 @@ class Skytils {
 
         val client = HttpClient(CIO) {
             install(ContentEncoding) {
+                customEncoder(BrotliEncoder, 1.0F)
                 deflate(1.0F)
                 gzip(0.9F)
+                identity(0F)
             }
             install(ContentNegotiation) {
                 json(json)
