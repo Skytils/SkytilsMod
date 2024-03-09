@@ -25,6 +25,7 @@ import net.minecraft.world.storage.MapData
 object DungeonMapColorParser {
     private var centerColors: ByteArray = ByteArray(121)
     private var sideColors: ByteArray = ByteArray(121)
+    private var cachedTiles: Array<Tile?> = Array(121) { null }
 
     private var halfRoom = -1
     private var halfTile = -1
@@ -39,9 +40,12 @@ object DungeonMapColorParser {
 
         centerColors = ByteArray(121)
         sideColors = ByteArray(121)
+        cachedTiles = Array(121) { null }
     }
 
     fun updateMap(mapData: MapData) {
+        cachedTiles = Array(121) { null }
+
         for (y in 0..10) {
             for (x in 0..10) {
                 val mapX = startX + x * halfTile
@@ -71,10 +75,13 @@ object DungeonMapColorParser {
 
     fun getTile(arrayX: Int, arrayY: Int): Tile {
         val index = arrayY * 11 + arrayX
-        if (index >= 121) return Unknown(0, 0)
-        val xPos = DungeonScanner.startX + arrayX * (DungeonScanner.roomSize shr 1)
-        val zPos = DungeonScanner.startZ + arrayY * (DungeonScanner.roomSize shr 1)
-        return scanTile(arrayX, arrayY, xPos, zPos)
+        val cached = cachedTiles.getOrElse(index) { return Unknown(0, 0) }
+        if (cached == null) {
+            val xPos = DungeonScanner.startX + arrayX * (DungeonScanner.roomSize shr 1)
+            val zPos = DungeonScanner.startZ + arrayY * (DungeonScanner.roomSize shr 1)
+            cachedTiles[index] = scanTile(arrayX, arrayY, xPos, zPos)
+        }
+        return cachedTiles[index] ?: Unknown(0, 0)
     }
 
     private fun scanTile(arrayX: Int, arrayY: Int, worldX: Int, worldZ: Int): Tile {
