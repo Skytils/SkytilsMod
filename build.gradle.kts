@@ -88,7 +88,7 @@ val shadowMeMod: Configuration by configurations.creating {
 }
 
 dependencies {
-    shadowMe("gg.essential:loader-launchwrapper:1.2.1")
+    shadowMe("gg.essential:loader-launchwrapper:1.2.2")
     implementation("gg.essential:essential-1.8.9-forge:14616+g169bd9af6a") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
