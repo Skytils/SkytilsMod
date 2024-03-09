@@ -214,14 +214,13 @@ object DungeonListener {
             if (Utils.inDungeons && mc.thePlayer != null && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
                 val tabEntries = TabListUtils.tabEntries
                 var partyCount: Int? = null
-                var recomputeFlag = team.isEmpty()
 
                 if (tabEntries.isNotEmpty() && tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
                     partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
                     if (partyCount != null) {
                         if (team.size != partyCount) {
                             println("Recomputing team as party size has changed ${team.size} -> $partyCount")
-                            recomputeFlag = true
+                            team.clear()
                         }
                     } else {
                         println("Couldn't get party count")
@@ -230,7 +229,7 @@ object DungeonListener {
                     println("Couldn't get party text")
                 }
 
-                if (partyCount != null && (recomputeFlag || (DungeonTimer.dungeonStartTime != -1L && team.values.any { it.dungeonClass == DungeonClass.EMPTY  }))) {
+                if (partyCount != null && (team.isEmpty() || (DungeonTimer.dungeonStartTime != -1L && team.values.any { it.dungeonClass == DungeonClass.EMPTY  }))) {
                     printDevMessage("Parsing party", "dungeonlistener")
                     println("There are $partyCount members in this party")
                     for (i in 0..<partyCount) {
