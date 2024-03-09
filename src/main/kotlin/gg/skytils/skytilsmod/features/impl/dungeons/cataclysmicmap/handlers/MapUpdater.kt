@@ -64,11 +64,23 @@ object MapUpdater {
 
                 if (room is Unknown) {
                     DungeonInfo.dungeonList[z * 11 + x] = mapTile
+                    if (mapTile is Room) {
+                        val connected = DungeonMapColorParser.getConnected(x, z)
+                        connected.firstOrNull { it.data.name != "Unknown" }?.let {
+                            mapTile.addToUnique(z, x, it.data.name)
+                        }
+                    }
                     continue
                 }
 
                 if (mapTile.state.ordinal < room.state.ordinal) {
                     room.state = mapTile.state
+                }
+
+                if (mapTile is Door && room is Door) {
+                    if (mapTile.type == DoorType.WITHER && room.type != DoorType.WITHER) {
+                        room.type = mapTile.type
+                    }
                 }
 
                 if (room is Door && Utils.equalsOneOf(room.type, DoorType.ENTRANCE, DoorType.WITHER, DoorType.BLOOD)) {
@@ -84,11 +96,11 @@ object MapUpdater {
                             room.opened = true
                         } else if (mapTile is Door && mapTile.state == RoomState.DISCOVERED) {
                             if (room.type == DoorType.BLOOD) {
-                                val bloodRoom = DungeonInfo.uniqueRooms.find { (r, _) ->
-                                    r.data.type == RoomType.BLOOD
-                                }?.first
+                                val bloodRoom = DungeonInfo.uniqueRooms.find { r ->
+                                    r.mainRoom.data.type == RoomType.BLOOD
+                                }
 
-                                if (bloodRoom != null && bloodRoom.state != RoomState.UNOPENED) {
+                                if (bloodRoom != null && bloodRoom.mainRoom.state != RoomState.UNOPENED) {
                                     room.opened = true
                                 }
                             } else {

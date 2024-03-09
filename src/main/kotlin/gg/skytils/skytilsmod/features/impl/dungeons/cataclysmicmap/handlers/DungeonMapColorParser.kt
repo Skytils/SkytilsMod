@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers
 
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
+import net.minecraft.util.EnumFacing
 import net.minecraft.world.storage.MapData
 
 object DungeonMapColorParser {
@@ -27,14 +28,17 @@ object DungeonMapColorParser {
     private var sideColors: ByteArray = ByteArray(121)
     private var cachedTiles: Array<Tile?> = Array(121) { null }
 
-    private var halfRoom = -1
-    private var halfTile = -1
-    private var startX = -1
-    private var startY = -1
+    var halfRoom = -1
+    var halfTile = -1
+    // connectorSize
+    var quarterRoom = -1
+    var startX = -1
+    var startY = -1
 
     fun calibrate() {
         halfRoom = MapUtils.mapRoomSize / 2
         halfTile = halfRoom + 2
+        quarterRoom = halfRoom / 2
         startX = MapUtils.startCorner.first + halfRoom
         startY = MapUtils.startCorner.second + halfRoom
 
@@ -82,6 +86,21 @@ object DungeonMapColorParser {
             cachedTiles[index] = scanTile(arrayX, arrayY, xPos, zPos)
         }
         return cachedTiles[index] ?: Unknown(0, 0)
+    }
+
+    fun getConnected(arrayX: Int, arrayY: Int): List<Room> {
+        val tile = getTile(arrayX, arrayY) as? Room ?: return emptyList()
+        val connected = mutableListOf<Room>()
+        val queue = ArrayDeque<Room>()
+        queue.add(tile)
+        while (queue.isNotEmpty()) {
+            val current = queue.removeFirst()
+            connected.add(current)
+            queue.addAll(EnumFacing.HORIZONTALS.mapNotNull {
+                getTile(current.x + it.directionVec.x, current.z + it.directionVec.z) as? Room
+            })
+        }
+        return connected
     }
 
     private fun scanTile(arrayX: Int, arrayY: Int, worldX: Int, worldZ: Int): Tile {

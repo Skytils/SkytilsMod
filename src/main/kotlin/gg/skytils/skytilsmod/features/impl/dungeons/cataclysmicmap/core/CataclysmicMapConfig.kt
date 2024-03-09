@@ -163,6 +163,15 @@ object CataclysmicMapConfig : Vigilant(
     var mapRoomNames = 1
 
     @Property(
+        name = "Center Room Names",
+        type = PropertyType.SWITCH,
+        description = "Center room names.",
+        subcategory = "Text",
+        category = "Rooms"
+    )
+    var mapCenterRoomName = true
+
+    @Property(
         name = "Room Secrets",
         type = PropertyType.SELECTOR,
         description = "Shows total secrets of rooms on map.",
@@ -187,6 +196,15 @@ object CataclysmicMapConfig : Vigilant(
         options = ["None", "Default", "NEU"]
     )
     var mapCheckmark = 1
+
+    @Property(
+        name = "Center Room Checkmarks",
+        type = PropertyType.SWITCH,
+        description = "Center room checkmarks.",
+        subcategory = "Checkmarks",
+        category = "Rooms"
+    )
+    var mapCenterCheckmark = true
 
     @Property(
         name = "Blood Door",

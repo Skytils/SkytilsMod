@@ -144,7 +144,7 @@ object RenderUtils {
                     0.0
                 )
             } else {
-                player.teammate.player?.let { entityPlayer ->
+                player.teammate.player?.also { entityPlayer ->
                     // If the player is loaded in our view, use that location instead (more precise)
                     GlStateManager.translate(
                         (entityPlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first,

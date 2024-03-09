@@ -18,16 +18,13 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers
 
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Puzzle
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Room
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Tile
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Unknown
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
 import net.minecraft.world.storage.MapData
 
 object DungeonInfo {
     // 6 x 6 room grid, 11 x 11 with connections
     val dungeonList = Array<Tile>(121) { Unknown(0, 0) }
-    val uniqueRooms = mutableListOf<Pair<Room, Pair<Int, Int>>>()
+    val uniqueRooms = mutableSetOf<UniqueRoom>()
     var roomCount = 0
     val puzzles = mutableMapOf<Puzzle, Boolean>()
 

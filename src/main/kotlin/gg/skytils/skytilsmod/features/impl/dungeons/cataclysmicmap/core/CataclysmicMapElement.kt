@@ -25,6 +25,7 @@ import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonMapColorParser
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.RenderUtils
@@ -79,7 +80,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         GlStateManager.pushMatrix()
         GlStateManager.translate(MapUtils.startCorner.first.toFloat(), MapUtils.startCorner.second.toFloat(), 0f)
 
-        val connectorSize = MapUtils.mapRoomSize shr 2
+        val connectorSize = DungeonMapColorParser.quarterRoom
         val checkmarkSize = when (CataclysmicMapConfig.mapCheckmark) {
             1 -> 8.0 // default
             else -> 10.0 // neu
@@ -123,7 +124,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                 }
 
                 if (tile is Room && tile.state == RoomState.UNOPENED && CataclysmicMapConfig.mapCheckmark != 0) {
-                    drawCheckmark(tile, xOffset, yOffset, checkmarkSize)
+                    drawCheckmark(tile, xOffset.toFloat(), yOffset.toFloat(), checkmarkSize)
                 }
             }
         }
@@ -134,16 +135,21 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         GlStateManager.pushMatrix()
         GlStateManager.translate(MapUtils.startCorner.first.toFloat(), MapUtils.startCorner.second.toFloat(), 0f)
 
-        val connectorSize = MapUtils.mapRoomSize shr 2
         val checkmarkSize = when (CataclysmicMapConfig.mapCheckmark) {
             1 -> 8.0 // default
             else -> 10.0 // neu
         }
 
-        DungeonInfo.uniqueRooms.forEach { (room, pos) ->
+        DungeonInfo.uniqueRooms.forEach { unq ->
+            val room = unq.mainRoom
             if (room.state == RoomState.UNDISCOVERED) return@forEach
-            val xOffset = (pos.first shr 1) * (MapUtils.mapRoomSize + connectorSize)
-            val yOffset = (pos.second shr 1) * (MapUtils.mapRoomSize + connectorSize)
+            val size = MapUtils.mapRoomSize + DungeonMapColorParser.quarterRoom
+            val checkPos = unq.getCheckmarkPosition()
+            val namePos = unq.getNamePosition()
+            val xOffsetCheck = (checkPos.first / 2f) * size
+            val yOffsetCheck = (checkPos.second / 2f) * size
+            val xOffsetName = (namePos.first / 2f) * size
+            val yOffsetName = (namePos.second / 2f) * size
 
             val color = if (CataclysmicMapConfig.mapColorText) when (room.state) {
                 RoomState.GREEN -> 0x55ff55
@@ -160,15 +166,15 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
             if (CataclysmicMapConfig.mapRoomSecrets == 2 && hasSecrets) {
                 GlStateManager.pushMatrix()
                 GlStateManager.translate(
-                    xOffset + (MapUtils.mapRoomSize shr 1).toFloat(),
-                    yOffset + 2 + (MapUtils.mapRoomSize shr 1).toFloat(),
+                    xOffsetCheck + (MapUtils.mapRoomSize shr 1).toFloat(),
+                    yOffsetCheck + 2 + (MapUtils.mapRoomSize shr 1).toFloat(),
                     0f
                 )
                 GlStateManager.scale(2f, 2f, 1f)
                 RenderUtils.renderCenteredText(listOf(secretCount.toString()), 0, 0, color)
                 GlStateManager.popMatrix()
             } else if (CataclysmicMapConfig.mapCheckmark != 0) {
-                drawCheckmark(room, xOffset, yOffset, checkmarkSize)
+                drawCheckmark(room, xOffsetCheck, yOffsetCheck, checkmarkSize)
             }
 
             val name = mutableListOf<String>()
@@ -190,8 +196,8 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
             // Offset + half of roomsize
             RenderUtils.renderCenteredText(
                 name,
-                xOffset + (MapUtils.mapRoomSize shr 1),
-                yOffset + (MapUtils.mapRoomSize shr 1),
+                (xOffsetName + DungeonMapColorParser.halfRoom).toInt(),
+                (yOffsetName + DungeonMapColorParser.halfRoom).toInt(),
                 color
             )
         }
@@ -220,7 +226,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         }
     }
 
-    private fun drawCheckmark(tile: Tile, xOffset: Int, yOffset: Int, checkmarkSize: Double) {
+    private fun drawCheckmark(tile: Tile, xOffset: Float, yOffset: Float, checkmarkSize: Double) {
         getCheckmark(tile.state, CataclysmicMapConfig.mapCheckmark)?.let {
             GlStateManager.enableAlpha()
             GlStateManager.color(1f, 1f, 1f, 1f)

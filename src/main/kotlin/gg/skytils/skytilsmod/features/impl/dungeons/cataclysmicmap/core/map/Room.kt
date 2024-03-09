@@ -19,6 +19,8 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map
 
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
 import java.awt.Color
 
 class Room(override val x: Int, override val z: Int, var data: RoomData) : Tile {
@@ -40,4 +42,18 @@ class Room(override val x: Int, override val z: Int, var data: RoomData) : Tile 
                 else -> CataclysmicMapConfig.colorRoom
             }
         }
+
+    fun getArrayPosition(): Pair<Int, Int> {
+        return Pair((x - DungeonScanner.startX) / 16, (z - DungeonScanner.startZ) / 16)
+    }
+
+    fun addToUnique(row: Int, column: Int, roomName: String = data.name) {
+        val unique = DungeonInfo.uniqueRooms.find { it.name == roomName }
+
+        if (unique == null) {
+            DungeonInfo.uniqueRooms.add(UniqueRoom(column, row, this))
+        } else {
+            unique.addTile(column, row, this)
+        }
+    }
 }
