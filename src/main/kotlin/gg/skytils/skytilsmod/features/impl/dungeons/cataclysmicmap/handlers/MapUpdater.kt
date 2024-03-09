@@ -19,7 +19,6 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapColorParser
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils.mapX
