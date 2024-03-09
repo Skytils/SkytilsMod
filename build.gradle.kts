@@ -108,7 +108,6 @@ dependencies {
     shadowMe(platform(ktor("bom", "2.3.9", addSuffix = false)))
 
     shadowMe(ktor("serialization-kotlinx-json"))
-    shadowMe(ktor("serialization-gson"))
 
     shadowMe("org.jetbrains.kotlinx:kotlinx-serialization-json") {
         version {
@@ -201,7 +200,6 @@ tasks {
         relocate("io.ktor", "gg.skytils.ktor")
         relocate("kotlinx.serialization", "gg.skytils.ktx-serialization")
         relocate("kotlinx.coroutines", "gg.skytils.ktx-coroutines")
-        relocate("com.google.gson", "gg.skytils.gson")
 
         exclude(
             "**/LICENSE.md",
