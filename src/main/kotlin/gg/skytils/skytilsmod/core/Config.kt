@@ -108,6 +108,13 @@ object Config : Vigilant(
     var lastLaunchedVersion = "0"
 
     @Property(
+        type = PropertyType.SWITCH, name = "Always Sprint in Skyblock",
+        description = "Makes you always Sprint in Skyblock when you are eligible to.",
+        category = "General", subcategory = "Other"
+    )
+    var alwaysSprint = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Config Button on Pause",
         description = "Adds a button to configure Skytils to the pause menu.",
         category = "General", subcategory = "Other"

@@ -17,9 +17,12 @@
  */
 package gg.skytils.skytilsmod.mixins.hooks.entity
 
+import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.AddChatMessageEvent
 import gg.skytils.skytilsmod.events.impl.ItemTossEvent
+import gg.skytils.skytilsmod.utils.Utils
+import net.minecraft.client.settings.KeyBinding
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.util.IChatComponent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -32,4 +35,8 @@ fun onAddChatMessage(message: IChatComponent, ci: CallbackInfo) {
 fun onDropItem(dropAll: Boolean, cir: CallbackInfoReturnable<EntityItem?>) {
     val stack = mc.thePlayer.inventory.getCurrentItem()
     if (stack != null && ItemTossEvent(stack, dropAll).postAndCatch()) cir.returnValue = null
+}
+
+fun onKeybindCheck(keyBinding: KeyBinding): Boolean {
+    return keyBinding === mc.gameSettings.keyBindSprint && Utils.inSkyblock && Skytils.config.alwaysSprint
 }
