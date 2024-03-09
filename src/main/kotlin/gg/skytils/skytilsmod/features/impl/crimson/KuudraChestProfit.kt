@@ -116,7 +116,7 @@ object KuudraChestProfit {
             )
 
             for (item in chest.items) {
-                val line = "§8${item.stackSize} §r".toStringIfTrue(item.stackSize > 1) + item.displayText + "§f: §a" + NumberUtil.nf.format(item.value)
+                val line = "§8${item.stackSize} §r".toStringIfTrue(item.stackSize > 1) + item.displayText + "§f: §${if (item.value >= 0) 'a' else 'c'}" + NumberUtil.nf.format(item.value)
                 ScreenRenderer.fontRenderer.drawString(
                     line,
                     if (leftAlign) element.scaleX else element.scaleX + element.width,
