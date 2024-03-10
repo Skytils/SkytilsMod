@@ -87,7 +87,7 @@ object ShootTheTargetSolver {
     }
 
     @SubscribeEvent
-    fun onLoad(event: WorldEvent.Load) {
+    fun onLoad(event: WorldEvent.Unload) {
         shot.clear()
     }
 }

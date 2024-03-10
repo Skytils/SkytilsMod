@@ -202,7 +202,7 @@ object StupidTreasureChestOpeningThing {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         sendHelpPlease.clear()
         lastFoundChest = -1L
     }

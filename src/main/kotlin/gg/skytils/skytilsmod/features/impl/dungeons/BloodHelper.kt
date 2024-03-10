@@ -125,7 +125,7 @@ object BloodHelper {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         watchers.clear()
         mobs.clear()
         neededRender = emptyList()

@@ -102,7 +102,7 @@ object TicTacToeSolver {
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
+    fun onWorldLoad(event: WorldEvent.Unload) {
         topLeft = null
         roomFacing = null
         board = null

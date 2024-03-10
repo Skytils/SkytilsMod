@@ -207,7 +207,7 @@ object DungeonTimer {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         dungeonStartTime = -1
         bloodOpenTime = -1
         bloodClearTime = -1

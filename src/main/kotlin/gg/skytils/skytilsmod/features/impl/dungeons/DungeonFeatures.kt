@@ -726,7 +726,7 @@ object DungeonFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         dungeonFloor = null
         hasBossSpawned = false
         isInTerracottaPhase = false

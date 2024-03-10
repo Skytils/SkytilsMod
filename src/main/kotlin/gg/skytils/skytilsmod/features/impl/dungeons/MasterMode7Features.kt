@@ -138,7 +138,7 @@ object MasterMode7Features {
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
+    fun onWorldLoad(event: WorldEvent.Unload) {
         spawningDragons.clear()
         killedDragons.clear()
         dragonMap.clear()

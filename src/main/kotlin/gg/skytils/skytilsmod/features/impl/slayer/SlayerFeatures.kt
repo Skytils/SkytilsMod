@@ -520,7 +520,7 @@ object SlayerFeatures : CoroutineScope {
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
+    fun onWorldLoad(event: WorldEvent.Unload) {
         slayer = null
         hitMap.clear()
     }

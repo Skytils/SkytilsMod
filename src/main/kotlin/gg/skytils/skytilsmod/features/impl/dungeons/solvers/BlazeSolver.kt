@@ -240,7 +240,7 @@ object BlazeSolver {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         orderedBlazes.clear()
         blazeMode = 0
         blazeChest = null

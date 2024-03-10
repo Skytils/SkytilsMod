@@ -398,7 +398,7 @@ object MiningFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         puzzlerSolution = null
         lastJukebox = null
         raffleBox = null

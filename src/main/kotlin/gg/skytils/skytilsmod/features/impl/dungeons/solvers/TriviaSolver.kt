@@ -148,7 +148,7 @@ object TriviaSolver {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         triviaAnswer = null
     }
 }

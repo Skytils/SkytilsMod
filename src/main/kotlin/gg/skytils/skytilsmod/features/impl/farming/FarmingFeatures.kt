@@ -171,7 +171,7 @@ object FarmingFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         trapperCooldownExpire = -1
     }
 

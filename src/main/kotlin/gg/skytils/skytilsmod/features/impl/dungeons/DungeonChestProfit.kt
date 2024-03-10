@@ -227,7 +227,7 @@ object DungeonChestProfit {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         DungeonChest.entries.forEach(DungeonChest::reset)
         rerollBypass = false
     }

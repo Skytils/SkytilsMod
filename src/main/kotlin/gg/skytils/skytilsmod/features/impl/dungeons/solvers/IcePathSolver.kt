@@ -132,7 +132,7 @@ object IcePathSolver {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         silverfishChestPos = null
         roomFacing = null
         grid = null

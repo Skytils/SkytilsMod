@@ -132,7 +132,7 @@ object IceFillSolver {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         chestPos = null
         roomFacing = null
         three = null

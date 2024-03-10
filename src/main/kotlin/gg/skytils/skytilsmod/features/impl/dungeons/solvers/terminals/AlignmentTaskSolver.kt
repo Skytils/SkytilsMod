@@ -219,7 +219,7 @@ object AlignmentTaskSolver {
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
+    fun onWorldLoad(event: WorldEvent.Unload) {
         grid.clear()
         directionSet.clear()
         pendingClicks.clear()

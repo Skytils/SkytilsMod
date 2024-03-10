@@ -73,7 +73,7 @@ object BossHPDisplays {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         canGiantsSpawn = false
         giantNames = emptyList()
         guardianRespawnTimers = emptyList()

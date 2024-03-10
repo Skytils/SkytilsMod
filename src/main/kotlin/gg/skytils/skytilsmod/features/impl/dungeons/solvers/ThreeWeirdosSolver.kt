@@ -80,7 +80,7 @@ object ThreeWeirdosSolver {
 
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         riddleNPC = null
         riddleChest = null
     }

@@ -52,7 +52,7 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
+    fun onWorldLoad(event: WorldEvent.Unload) {
         cooldownReduction = 0.0
         cooldowns.clear()
     }

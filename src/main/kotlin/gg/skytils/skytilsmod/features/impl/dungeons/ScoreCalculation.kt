@@ -491,7 +491,7 @@ object ScoreCalculation {
     }
 
     @SubscribeEvent
-    fun clearScore(event: WorldEvent.Load) {
+    fun clearScore(event: WorldEvent.Unload) {
         mimicKilled.set(false)
         firstDeathHadSpirit.set(false)
         floorReq.set(floorRequirements["default"]!!)

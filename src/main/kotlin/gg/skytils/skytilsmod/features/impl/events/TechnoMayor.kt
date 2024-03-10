@@ -137,7 +137,7 @@ object TechnoMayor {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         shinyPigs.clear()
         latestPig = null
     }

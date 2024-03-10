@@ -122,7 +122,7 @@ object SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
+    fun onWorldLoad(event: WorldEvent.Unload) {
         nameSlotCache.clear()
     }
 

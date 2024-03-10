@@ -72,7 +72,7 @@ object CataclysmicMap {
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
+    fun onWorldLoad(event: WorldEvent.Unload) {
         reset()
     }
 

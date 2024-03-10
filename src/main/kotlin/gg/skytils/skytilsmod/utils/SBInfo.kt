@@ -79,7 +79,7 @@ object SBInfo {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Load) {
+    fun onWorldChange(event: WorldEvent.Unload) {
         lastLocRaw = -1
         locraw = null
         mode = null
