@@ -34,6 +34,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMa
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
 import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
+import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.openGUI
 import net.minecraft.client.Minecraft
@@ -171,6 +172,19 @@ class OptionsGui(val parent: GuiScreen? = null) :
             height = RelativeConstraint(0.05f)
         }.onMouseClick {
             mc.displayGuiScreen(LegalGui())
+        }
+        SimpleButton("ur a wizard Harry", true, true).childOf(window).constrain {
+            x = 3.pixels
+            y = basicYConstraint { window.getHeight() - this.getHeight() * 2 - 6 }
+            width = RelativeConstraint(0.1f)
+            height = RelativeConstraint(0.05f)
+        }.onMouseClick {
+            Skytils.displayScreen = SuperSecretGui()
+        }.apply {
+            (this as SimpleButton).text.constrain {
+                width = RelativeConstraint(0.9f)
+            }
+            if (!SuperSecretSettings.chamberOfSecrets) hide(true)
         }
         animate()
     }

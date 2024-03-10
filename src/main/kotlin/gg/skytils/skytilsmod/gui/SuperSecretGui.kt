@@ -51,6 +51,8 @@ class SuperSecretGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopen
     )
 
     init {
+        SuperSecretSettings.add("chamberofsecrets")
+        SuperSecretSettings.dirty = true
         UMinecraft.getMinecraft().soundHandler.playSound(catSound)
         UIText("Shhhhhhh.. It's a secret...").childOf(window).constrain {
             x = CenterConstraint()
