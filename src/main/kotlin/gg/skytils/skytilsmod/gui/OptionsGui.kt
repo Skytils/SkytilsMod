@@ -49,18 +49,7 @@ class OptionsGui(val parent: GuiScreen? = null) :
             y = RelativeConstraint(0.075f)
             textScale = basicTextScaleConstraint { window.getHeight() / 40 }
         }
-    private val order = arrayOf(
-        UKeyboard.KEY_UP,
-        UKeyboard.KEY_UP,
-        UKeyboard.KEY_DOWN,
-        UKeyboard.KEY_DOWN,
-        UKeyboard.KEY_LEFT,
-        UKeyboard.KEY_RIGHT,
-        UKeyboard.KEY_LEFT,
-        UKeyboard.KEY_RIGHT,
-        UKeyboard.KEY_B,
-        UKeyboard.KEY_A
-    )
+
     private var orderIndex = 0
 
     init {
@@ -188,7 +177,7 @@ class OptionsGui(val parent: GuiScreen? = null) :
 
     override fun onKeyPressed(keyCode: Int, typedChar: Char, modifiers: UKeyboard.Modifiers?) {
         super.onKeyPressed(keyCode, typedChar, modifiers)
-        if (keyCode == order[orderIndex]) orderIndex++
+        if (keyCode == order[orderIndex] || keyCode == gamerOrder[orderIndex]) orderIndex++
         else orderIndex = 0
         if (orderIndex == order.size) {
             orderIndex = 0
@@ -212,5 +201,32 @@ class OptionsGui(val parent: GuiScreen? = null) :
             textScale = basicTextScaleConstraint { window.getHeight() / 40 }
         }
         super.setWorldAndResolution(mc, width, height)
+    }
+
+    companion object {
+        private val order = arrayOf(
+            UKeyboard.KEY_UP,
+            UKeyboard.KEY_UP,
+            UKeyboard.KEY_DOWN,
+            UKeyboard.KEY_DOWN,
+            UKeyboard.KEY_LEFT,
+            UKeyboard.KEY_RIGHT,
+            UKeyboard.KEY_LEFT,
+            UKeyboard.KEY_RIGHT,
+            UKeyboard.KEY_B,
+            UKeyboard.KEY_A
+        )
+        private val gamerOrder = arrayOf(
+            UKeyboard.KEY_W,
+            UKeyboard.KEY_W,
+            UKeyboard.KEY_S,
+            UKeyboard.KEY_S,
+            UKeyboard.KEY_A,
+            UKeyboard.KEY_D,
+            UKeyboard.KEY_A,
+            UKeyboard.KEY_D,
+            UKeyboard.KEY_B,
+            UKeyboard.KEY_A
+        )
     }
 }
