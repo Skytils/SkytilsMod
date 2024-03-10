@@ -81,8 +81,8 @@ object DungeonMapColorParser {
         val index = arrayY * 11 + arrayX
         val cached = cachedTiles.getOrElse(index) { return Unknown(0, 0) }
         if (cached == null) {
-            val xPos = DungeonScanner.startX + arrayX * halfRoom
-            val zPos = DungeonScanner.startZ + arrayY * halfRoom
+            val xPos = DungeonScanner.startX + arrayX * (DungeonScanner.roomSize shr 1)
+            val zPos = DungeonScanner.startZ + arrayY * (DungeonScanner.roomSize shr 1)
             cachedTiles[index] = scanTile(arrayX, arrayY, xPos, zPos)
         }
         return cachedTiles[index] ?: Unknown(0, 0)
