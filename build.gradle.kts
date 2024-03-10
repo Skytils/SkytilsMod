@@ -204,6 +204,7 @@ tasks {
         relocate("kotlinx.coroutines", "gg.skytils.ktx-coroutines")
 
         exclude(
+            "**/LICENSE_MixinExtras",
             "**/LICENSE.md",
             "**/LICENSE.txt",
             "**/LICENSE",
