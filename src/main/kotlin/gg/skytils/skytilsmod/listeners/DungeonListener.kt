@@ -54,6 +54,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object DungeonListener {
     val team = hashMapOf<String, DungeonTeammate>()
     val deads = hashSetOf<DungeonTeammate>()
+    val disconnected = hashSetOf<String>()
     val missingPuzzles = hashSetOf<String>()
     val hutaoFans: Cache<String, Boolean> = Caffeine.newBuilder()
         .weakKeys()
@@ -89,7 +90,8 @@ object DungeonListener {
     private val classPattern =
         Regex("§r(?:§.)+(?:\\[.+] )?(?<name>\\w+?)(?:§.)* (?:§r(?:§[\\da-fklmno]){1,2}.+ )?§r§f\\(§r§d(?:(?<class>Archer|Berserk|Healer|Mage|Tank) (?<lvl>\\w+)|§r§7EMPTY|§r§cDEAD)§r§f\\)§r")
     private val missingPuzzlePattern = Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] ?§r")
-    private val deathRegex = Regex("§r§c ☠ §r§7(?:You were |(?:§.)+(?<username>\\w+)§r).* and became a ghost§r§7\\.§r")
+    private val deathRegex = Regex("§r§c ☠ §r§7(?:You were |(?:§.)+(?<username>\\w+)§r)(?<reason>.*) and became a ghost§r§7\\.§r")
+    private val reconnectedRegex = Regex("§r§c ☠ §r§7(?:§.)+(?<username>\\w+) §r§7reconnected§r§7.§r")
     private val reviveRegex = Regex("^§r§a ❣ §r§7(?:§.)+(?<username>\\w+)§r§a was revived")
     private val secretsRegex = Regex("\\s*§7(?<secrets>\\d+)\\/(?<maxSecrets>\\d+) Secrets")
     private val keyPickupRegex = Regex("§r§e§lRIGHT CLICK §r§7on §r§7.+?§r§7 to open it\\. This key can only be used to open §r§a(?<num>\\d+)§r§7 door!§r")
@@ -100,6 +102,7 @@ object DungeonListener {
     fun onWorldLoad(event: WorldEvent.Load) {
         team.clear()
         deads.clear()
+        disconnected.clear()
         missingPuzzles.clear()
     }
 
@@ -140,11 +143,21 @@ object DungeonListener {
                     if (Skytils.config.autoRepartyOnDungeonEnd) {
                         RepartyCommand.processCommand(mc.thePlayer, emptyArray())
                     }
-                } else if (text.startsWith("§r§c ☠ ") && text.endsWith(" and became a ghost§r§7.§r")) {
-                    val match = deathRegex.find(text) ?: return
-                    val username = match.groups["username"]?.value ?: mc.thePlayer.name
-                    val teammate = team[username] ?: return
-                    markDead(teammate)
+                } else if (text.startsWith("§r§c ☠ ")) {
+                    if (text.endsWith(" §r§7reconnected§r§7.§r")) {
+                        val match = reconnectedRegex.find(text) ?: return
+                        val username = match.groups["username"]?.value ?: return
+                        disconnected.remove(username)
+                    } else if (text.endsWith(" and became a ghost§r§7.§r")) {
+                        val match = deathRegex.find(text) ?: return
+                        val username = match.groups["username"]?.value ?: mc.thePlayer.name
+                        val teammate = team[username] ?: return
+                        markDead(teammate)
+
+                        if (match.groups["reason"]?.value?.contains("disconnected") == true) {
+                            disconnected.add(username)
+                        }
+                    }
                 } else if (text.startsWith("§r§a ❣ ")) {
                     val match = reviveRegex.find(text) ?: return
                     val username = match.groups["username"]!!.value
@@ -241,6 +254,11 @@ object DungeonListener {
                             continue
                         }
                         val name = matcher.groups["name"]!!.value
+                        if (name in disconnected) {
+                            println("Skipping over entry $name due to player being disconnected")
+                            continue
+                        }
+
                         if (matcher.groups["class"] != null) {
                             val dungeonClass = matcher.groups["class"]!!.value
                             val classLevel = matcher.groups["lvl"]!!.value.romanToDecimal()
