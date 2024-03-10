@@ -1717,7 +1717,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.PERCENT_SLIDER, name = "Low Health Vignette Threshold",
-        description = "Render a red vignette on the edge of the screen when your health drops below this threshold. Set to 0.0%% to disable.",
+        description = "Render a red vignette on the edge of the screen when your health drops below this threshold. Set to 0.0%% to disable.\n§cThis feature will temporarily disable HUD Caching while active.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
     var lowHealthVignetteThreshold = 0.0f
