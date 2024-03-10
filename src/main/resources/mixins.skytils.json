@@ -79,6 +79,7 @@
     "renderer.MixinTileEntitySkullRenderer",
     "sba.MixinContainerPreviewManager",
     "sk1eroam.MixinAnimationHandler",
+    "skyclientupdater.MixinUpdateChecker",
     "util.MixinChatStyle",
     "util.MixinIChatComponentSerializer",
     "util.MixinUtil",
