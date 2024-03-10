@@ -58,8 +58,8 @@ object DungeonScanner {
         for (x in 0..10) {
             for (z in 0..10) {
                 // Translates the grid index into world position.
-                val xPos = startX + x * (roomSize shr 1)
-                val zPos = startZ + z * (roomSize shr 1)
+                val xPos = startX + x * DungeonMapColorParser.halfRoom
+                val zPos = startZ + z * DungeonMapColorParser.halfRoom
 
                 if (!mc.theWorld.getChunkFromChunkCoords(xPos shr 4, zPos shr 4).isLoaded) {
                     // The room being scanned has not been loaded in.

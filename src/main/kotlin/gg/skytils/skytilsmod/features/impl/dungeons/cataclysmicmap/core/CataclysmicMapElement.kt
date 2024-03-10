@@ -166,8 +166,8 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
             if (CataclysmicMapConfig.mapRoomSecrets == 2 && hasSecrets) {
                 GlStateManager.pushMatrix()
                 GlStateManager.translate(
-                    xOffsetCheck + (MapUtils.mapRoomSize shr 1).toFloat(),
-                    yOffsetCheck + 2 + (MapUtils.mapRoomSize shr 1).toFloat(),
+                    xOffsetCheck + DungeonMapColorParser.halfRoom.toFloat(),
+                    yOffsetCheck + 2 + DungeonMapColorParser.halfRoom.toFloat(),
                     0f
                 )
                 GlStateManager.scale(2f, 2f, 1f)
