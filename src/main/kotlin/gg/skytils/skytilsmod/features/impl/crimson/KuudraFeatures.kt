@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.features.impl.crimson
 
+import gg.essential.universal.ChatColor
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsmod.Skytils.Companion.domain
@@ -105,9 +106,10 @@ object KuudraFeatures {
     )
  }
 
-enum class CrimsonFaction(val keyMaterial: String) {
-    BARBARIAN("ENCHANTED_RED_SAND"),
-    MAGE("ENCHANTED_MYCELIUM");
+enum class CrimsonFaction(val color: ChatColor, val keyMaterial: String) {
+    BARBARIAN(ChatColor.RED, "ENCHANTED_RED_SAND"),
+    MAGE(ChatColor.DARK_PURPLE, "ENCHANTED_MYCELIUM");
 
     val displayName = name.toTitleCase()
+    val identifier = name.first().uppercase()
 }

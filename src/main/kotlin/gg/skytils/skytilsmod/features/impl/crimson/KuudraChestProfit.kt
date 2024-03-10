@@ -63,8 +63,9 @@ object KuudraChestProfit {
                         chestType.addItem(lootSlot)
                     }
                     if (key != null && Skytils.config.kuudraChestProfitCountsKey) {
-                        val keyCost = key.getPrice(KuudraFeatures.myFaction ?: error("Failed to get Crimson Faction"))
-                        chestType.items.add(KuudraChestLootItem(1, key.displayName, -keyCost))
+                        val faction = KuudraFeatures.myFaction ?: error("Failed to get Crimson Faction")
+                        val keyCost = key.getPrice(faction)
+                        chestType.items.add(KuudraChestLootItem(1, "${key.rarity.baseColor}${key.displayName} §7(${faction.color}${faction.identifier}§7)", -keyCost))
                         chestType.value -= keyCost
                     }
                 }
@@ -224,12 +225,12 @@ object KuudraChestProfit {
         }
     }
 
-    enum class KuudraKey(val displayName: String, val coinCost: Int, val materialCost: Int) {
-        BASIC("Kuudra Key", 200000, 2),
-        HOT("Hot Kuudra Key", 400000, 6),
-        BURNING("Burning Kuudra Key", 750000, 20),
-        FIERY("Fiery Kuudra Key", 1500000, 60),
-        INFERNAL("Infernal Kuudra Key", 3000000, 120);
+    enum class KuudraKey(val displayName: String, val rarity: ItemRarity, val coinCost: Int, val materialCost: Int) {
+        BASIC("Kuudra Key", ItemRarity.RARE, 200000, 2),
+        HOT("Hot Kuudra Key", ItemRarity.EPIC, 400000, 6),
+        BURNING("Burning Kuudra Key", ItemRarity.EPIC, 750000, 20),
+        FIERY("Fiery Kuudra Key", ItemRarity.EPIC, 1500000, 60),
+        INFERNAL("Infernal Kuudra Key", ItemRarity.LEGENDARY,3000000, 120);
 
         companion object {
             // all keys cost 2 CORRUPTED_NETHER_STAR but nether stars are coop-soulbound
