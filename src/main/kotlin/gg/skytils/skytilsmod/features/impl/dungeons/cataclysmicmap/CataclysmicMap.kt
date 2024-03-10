@@ -22,6 +22,7 @@ import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapElement
@@ -31,12 +32,14 @@ import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Room
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.MapUpdater
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.MimicDetector
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.TabListUtils
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderWorldLastEvent
+import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -63,6 +66,10 @@ object CataclysmicMap {
             DungeonInfo.dungeonMap?.let {
                 MapUpdater.updateRooms(it)
                 MapUpdater.updatePlayers(it)
+            }
+
+            if ((DungeonFeatures.dungeonFloorNumber ?: 0) >= 6) {
+                MimicDetector.checkMimicDead()
             }
         }
 
@@ -109,5 +116,9 @@ object CataclysmicMap {
 
     init {
         CataclysmicMapElement
+
+        arrayOf(
+            MimicDetector,
+        ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 }

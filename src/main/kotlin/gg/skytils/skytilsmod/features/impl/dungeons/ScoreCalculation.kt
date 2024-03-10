@@ -33,13 +33,11 @@ import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
-import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.event.entity.living.LivingDeathEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -466,25 +464,6 @@ object ScoreCalculation {
                     it.text = it.text.substringAfter("Skytils-SC > ")
                 } else if (it.text.startsWith("\$SKYTILS-DUNGEON-SCORE-MIMIC\$")) {
                     it.text = it.text.replace("\$SKYTILS-DUNGEON-SCORE-MIMIC\$", "Mimic Killed!")
-                }
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onEntityDeath(event: LivingDeathEvent) {
-        if (!Utils.inDungeons) return
-        if (event.entity is EntityZombie) {
-            val entity = event.entity as EntityZombie
-            if (entity.isChild && entity.getCurrentArmor(0) == null && entity.getCurrentArmor(1) == null && entity.getCurrentArmor(
-                    2
-                ) == null && entity.getCurrentArmor(3) == null
-            ) {
-                if (!mimicKilled.get()) {
-                    mimicKilled.set(true)
-                    if (Skytils.config.scoreCalculationAssist) {
-                        Skytils.sendMessageQueue.add("/pc \$SKYTILS-DUNGEON-SCORE-MIMIC$")
-                    }
                 }
             }
         }
