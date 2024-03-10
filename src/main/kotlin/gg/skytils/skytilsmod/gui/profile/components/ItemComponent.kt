@@ -38,7 +38,7 @@ class ItemComponent(val state: State<ItemStack>) : UIComponent() {
         super.draw(matrixStack)
         matrixStack.push()
         matrixStack.translate(getLeft(), getTop(), 100f)
-        matrixStack.scale(getWidth() / 16f, getHeight() / 16f, 0f)
+        //matrixStack.scale(getWidth() / 16f, getHeight() / 16f, 0f)
         UGraphics.color4f(1f, 1f, 1f, 1f)
         matrixStack.runWithGlobalState {
             val item = state.get()

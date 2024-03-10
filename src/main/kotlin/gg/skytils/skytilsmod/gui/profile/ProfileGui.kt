@@ -52,7 +52,7 @@ import net.minecraft.item.Item
 import java.awt.Color
 import java.util.*
 
-class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V2, drawDefaultBackground = false) {
+class ProfileGui(uuid: UUID, name: String) : WindowScreen(ElementaVersion.V4, drawDefaultBackground = false) {
     private val uuidState: State<UUID> = BasicState(uuid).also {
         it.onSetValue { uuid ->
             loadProfile(uuid)
