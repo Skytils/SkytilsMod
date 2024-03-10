@@ -838,6 +838,11 @@ object RenderUtil {
         wr.pos(matrixStack, sr.scaledWidth.toDouble(), 0.0, -90.0).tex(1.0, 0.0).endVertex()
         wr.pos(matrixStack, 0.0, 0.0, -90.0).tex(0.0, 0.0).endVertex()
         tessellator.draw()
+
+        UGraphics.depthMask(true)
+        UGraphics.enableDepth()
+        UGraphics.color4f(1.0f, 1.0f, 1.0f, 1.0f)
+        UGraphics.tryBlendFuncSeparate(770, 771, 1, 0)
     }
 
     /*
