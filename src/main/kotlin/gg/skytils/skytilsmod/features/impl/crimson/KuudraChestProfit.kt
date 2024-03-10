@@ -149,7 +149,7 @@ object KuudraChestProfit {
 
         var keyNeeded: KuudraKey? = null
         var value = 0.0
-        val items = ArrayList<KuudraChestLootItem>(3)
+        val items = ArrayList<KuudraChestLootItem>()
 
         fun reset() {
             keyNeeded = null

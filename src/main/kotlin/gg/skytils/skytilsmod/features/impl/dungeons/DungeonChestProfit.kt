@@ -266,7 +266,7 @@ object DungeonChestProfit {
 
         var price = 0.0
         var value = 0.0
-        var items = ArrayList<DungeonChestLootItem>(3)
+        var items = ArrayList<DungeonChestLootItem>()
         val profit
             get() = value - price
 
