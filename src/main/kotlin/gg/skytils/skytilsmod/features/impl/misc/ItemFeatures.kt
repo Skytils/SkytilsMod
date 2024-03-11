@@ -268,14 +268,44 @@ object ItemFeatures {
             if (event.slot != null && event.slot.hasStack) {
                 val item = event.slot.stack ?: return
                 val extraAttr = getExtraAttributes(item)
+                val chestName = event.chestName
+                val isTabKeyPressed = (Keyboard.isKeyDown(15)) //15 = TAB
                 if (Skytils.config.stopClickingNonSalvageable) {
-                    if (event.chestName.startsWith("Salvage") && extraAttr != null) {
+                    if (chestName.startsWith("Salvage") && extraAttr != null) {
                         if (!extraAttr.hasKey("baseStatBoostPercentage") && !item.displayName.contains("Salvage") && !item.displayName.contains(
                                 "Essence"
                             )
                         ) {
                             event.isCanceled = true
                         }
+                    }
+                }
+                if (Skytils.config.abiphoneCallPrevention && getItemLore(item).isNotEmpty()) { //keycode 56 and 184 = LMENU and RMENU (ALT) keys respectively
+                    //i would check for chest name here, but bingo abiphones have this "SuPeR sPeCiAL" `B` variant that i can't be bothered to check for, so enjoy this catch-all conditional below
+                    if ((getItemLore(item).any { it.contains("click to call!") }) && !isTabKeyPressed) {
+                        event.isCanceled = true
+                    }
+                }
+                if (Skytils.config.mayorVotePerkThreshold > 1 && chestName.startsWith("Election")) {
+                    val mayorColorCode = item.displayName.take(2)
+                    val numPerks = getItemLore(item)
+                        .filter {
+                            it.startsWith(mayorColorCode) && !it.startsWith("$mayorColorCode§") //count lines that actually contain mayor perks w/o false positives
+                            && !(it.contains(" vote") || it.contains("SPECIAL ")) //ignore non-perk lines that share color code with that of mayor
+                        }
+                    if (numPerks.size < Skytils.config.mayorVotePerkThreshold && !isTabKeyPressed) {
+                        event.isCanceled = true
+                    }
+                }
+                //implement suggestion #2743 by Ownwn — NOTE: does not override NEU's wardrobe keybinds
+                if (Skytils.config.wardrobeUnequipPrevent && getItemLore(item).isNotEmpty() && chestName.startsWith("Wardrobe")) {
+                    if ((item.displayName.contains("Equipped")) && !isTabKeyPressed) {
+                        event.isCanceled = true
+                    }
+                }
+                if (Skytils.config.pickupMinionPrevent && chestName.contains(" Minion ") && !chestName.endsWith(" Recipe") && getItemLore(item).isNotEmpty()) {
+                    if (item.displayName.contains("Pickup Minion") && !isTabKeyPressed) {
+                        event.isCanceled = true
                     }
                 }
             }
@@ -415,6 +445,61 @@ object ItemFeatures {
                     gems.getString("${it}_gem").ifEmpty { it.substringBeforeLast("_") }.toTitleCase()
                 }"
             })
+        }
+        if (Skytils.config.abiphoneCallPrevention && event.toolTip.any { it.contains("click to call!") }) {
+            also {
+                for (i in event.toolTip.indices) {
+                    if (event.toolTip[i].contains("click to call!")) {
+                        event.toolTip[i] = "§eTab-click to call!"
+                        return@also
+                    }
+                }
+            }
+        }
+        if (Skytils.config.mayorVotePerkThreshold > 1 && event.toolTip.any { it.contains("vote") }) {
+            also {
+                val mayorName =item.displayName.stripControlCodes()
+                val mayorColorCode = item.displayName.take(2)
+                val numPerks = getItemLore(item)
+                    .filter {
+                        it.startsWith(mayorColorCode) && !it.startsWith("$mayorColorCode§")
+                        && !(it.contains(" vote") || it.contains("SPECIAL "))
+                    }
+                val plural = if (Skytils.config.mayorVotePerkThreshold > 1) "s" else ""
+                if (numPerks.size < Skytils.config.mayorVotePerkThreshold) {
+                    val lessThanMessage = "$mayorName has less than ${Skytils.config.mayorVotePerkThreshold} perk$plural"
+                    for (i in event.toolTip.indices) { //A lot of this can be done with event.toolTip.last(), but with how frequently Hypixel admins can change item tooltips...
+                        if (event.toolTip[i].contains("Click to vote for ")) {
+                            event.toolTip[i] = "§e$lessThanMessage!"
+                            event.toolTip.add("§eVote for $mayorName anyway by Tab-clicking.")
+                            return@also
+                        } else if (event.toolTip[i].contains("You voted for this candidate!")) {
+                            event.toolTip[i] = "§eChange your vote; $lessThanMessage."
+                            return@also
+                        }
+                    }
+                }
+            }
+        }
+        if (Skytils.config.wardrobeUnequipPrevent && event.toolTip.any { it.contains(" unequip ") }) {
+            also {
+                for (i in event.toolTip.indices) {
+                    if (event.toolTip[i].contains(" unequip ")) {
+                        event.toolTip[i] = "§eTab-click to unequip this armor"
+                        return@also
+                    }
+                }
+            }
+        }
+        if (Skytils.config.pickupMinionPrevent && event.toolTip.any { it.contains(" pickup!") }) {
+            also {
+                for (i in event.toolTip.indices) {
+                    if (event.toolTip[i].contains(" pickup!")) {
+                        event.toolTip[i] = "§eTab-click to pickup!"
+                        return@also
+                    }
+                }
+            }
         }
         if (DevTools.getToggle("nbt") && Keyboard.isKeyDown(46) && GuiScreen.isCtrlKeyDown() && !GuiScreen.isShiftKeyDown() && !GuiScreen.isAltKeyDown()) {
             GuiScreen.setClipboardString(event.itemStack?.tagCompound?.toString())

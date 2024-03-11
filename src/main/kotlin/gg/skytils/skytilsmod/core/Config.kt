@@ -2185,6 +2185,35 @@ object Config : Vigilant(
     var protectStarredItems = false
 
     @Property(
+    type = PropertyType.SWITCH, name = "Abiphone Call Prevention",
+    description = "Prevents you from calling your Abiphone contacts without holding the Tab key.",
+    category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var abiphoneCallPrevention = false
+
+    @Property(
+        type = PropertyType.NUMBER, name = "Mayor Voting Perk Threshold",
+        description = "Prevents you from voting for mayors with fewer than this many perks. Set to \"1\" to disable. Hold the Tab key when voting to override this threshold.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        min = 1, max = 3
+    )
+    var mayorVotePerkThreshold = 1
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Wardrobe Unequipping Prevention",
+        description = "Prevents you from unequipping your currently worn wardrobe slot without holding the Tab key. Does not override NEU's Wardrobe Keybinds.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var wardrobeUnequipPrevent = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Pickup Minion Prevention",
+        description = "Prevents you from picking up your minion without holding the Tab key.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var pickupMinionPrevent = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Spider's Den Rain Timer",
         description = "Shows the duration of rain in the Spider's Den.",
         category = "Miscellaneous", subcategory = "Quality of Life"
