@@ -244,9 +244,10 @@ object Config : Vigilant(
     var croesusHideOpened = false
 
     @Property(
-        type = PropertyType.BUTTON, name = "Dungeon Map (CataclysmicMap)",
-        description = "Displays the dungeon map on your screen.",
-        category = "Dungeons", subcategory = "Miscellaneous"
+        type = PropertyType.BUTTON, name = "Cataclysmic Map",
+        description = "Click to configure the dungeon map settings.",
+        category = "Dungeons", subcategory = "Miscellaneous",
+        searchTags = ["Highlight Box Wither Doors"]
     )
     fun openCataclysmicMapConfig() {
         Skytils.displayScreen = CataclysmicMapConfig.gui()
