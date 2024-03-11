@@ -231,8 +231,13 @@ object DungeonListener {
                 if (tabEntries.isNotEmpty() && tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
                     partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
                     if (partyCount != null) {
-                        if (team.size != partyCount) {
+                        // we can just keep disconnected players here i think
+                        if (team.size < partyCount) {
                             println("Recomputing team as party size has changed ${team.size} -> $partyCount")
+                            team.clear()
+                        } else if (team.size > 5) {
+                            UChat.chat("$failPrefix §cSomething isn't right! I got more than 5 members. Expected $partyCount members but got ${team.size}")
+                            println("Got more than 5 players on the team??")
                             team.clear()
                         }
                     } else {
@@ -245,7 +250,7 @@ object DungeonListener {
                 if (partyCount != null && (team.isEmpty() || (DungeonTimer.dungeonStartTime != -1L && team.values.any { it.dungeonClass == DungeonClass.EMPTY  }))) {
                     printDevMessage("Parsing party", "dungeonlistener")
                     println("There are $partyCount members in this party")
-                    for (i in 0..<partyCount) {
+                    for (i in 0..<5) {
                         val pos = 1 + i * 4
                         val (entry, text) = tabEntries[pos]
                         val matcher = classPattern.find(text)
@@ -284,8 +289,9 @@ object DungeonListener {
 
                         team[name]?.mapPlayer?.icon = "icon-${(i + (partyCount-1)) % (partyCount)}}"
                     }
+
                     if (partyCount != team.size) {
-                        UChat.chat("$failPrefix §cSomething isn't right! I expected $partyCount members but only got ${team.size}")
+                        UChat.chat("$failPrefix §cSomething isn't right! I expected $partyCount members but got ${team.size}")
                     }
 
                     if (DungeonTimer.dungeonStartTime != -1L && System.currentTimeMillis() - DungeonTimer.dungeonStartTime >= 2000 && team.values.any { it.dungeonClass == DungeonClass.EMPTY }) {
@@ -301,7 +307,10 @@ object DungeonListener {
                     for (teammate in team.values) {
                         if (tabEntries.size <= teammate.tabEntryIndex) continue
                         val entry = tabEntries[teammate.tabEntryIndex].second
-                        if (!entry.contains(teammate.playerName)) continue
+                        if (!entry.contains(teammate.playerName)) {
+                            println("Expected ${teammate.playerName} at ${teammate.tabEntryIndex}, got ${entry}")
+                            continue
+                        }
                         teammate.player = mc.theWorld.playerEntities.find {
                             it.name == teammate.playerName && it.uniqueID.version() == 4
                         }
