@@ -76,7 +76,7 @@ class SlayerBossComponent(slayer: State<SlayerBossData?>, type: String) : UIRoun
             "vampire" -> ItemUtil.setSkullTexture(
                 ItemStack(Items.skull, it.first, 3),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzVhYTI5ZWE5NjE3NTdkYzNjOTBiZmFiZjMwMmM1YWJlOWQzMDhmYjRhN2QzODY0ZTU3ODhhZDJjYzkxNjBhYTIifX19",
-                "a612df1f-ce7b-36f7-8d16-44af2b6df56d"
+                "af0ec305-3efa-4238-956c-6327b0c041fc"
             )
             else -> ItemStack(Items.skull, -1, 1)
         }
