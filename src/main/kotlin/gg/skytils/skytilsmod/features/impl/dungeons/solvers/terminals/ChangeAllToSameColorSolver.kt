@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -45,7 +44,7 @@ object ChangeAllToSameColorSolver {
         ).withIndex().associate { (i, c) ->
             c.metadata to i
         }
-    private var mostCommon = -1
+    private var mostCommon = EnumDyeColor.RED.metadata
 
     @SubscribeEvent
     fun onForegroundEvent(event: GuiContainerEvent.ForegroundDrawnEvent) {
@@ -53,8 +52,14 @@ object ChangeAllToSameColorSolver {
         val grid = event.container.inventorySlots.filter {
             it.inventory == event.container.lowerChestInventory && it.stack?.displayName?.startsWith("§a") == true
         }
-        mostCommon =
-            ordering.keys.maxByOrNull { c -> grid.count { it.stack?.metadata == c } } ?: EnumDyeColor.RED.metadata
+        val counts = ordering.keys.associateWith { c -> grid.count { it.stack?.metadata == c } }
+        val currentPath = counts[mostCommon]!!
+        val (candidate, maxCount) = counts.maxBy { it.value }
+
+        if (maxCount > currentPath) {
+            mostCommon = candidate
+        }
+
         val targetIndex = ordering[mostCommon]!!
         val mapping = grid.filter { it.stack.metadata != mostCommon }.associateWith { slot ->
             val stack = slot.stack
