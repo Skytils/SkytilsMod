@@ -322,6 +322,7 @@ class Skytils {
             PotionEffectTimers,
             PricePaid,
             ProtectItems,
+            QuiverStuff,
             RainTimer,
             RandomStuff,
             RelicWaypoints,

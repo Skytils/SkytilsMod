@@ -95,7 +95,6 @@ object ItemFeatures {
     val bitCosts = HashMap<String, Int>()
     val copperCosts = HashMap<String, Int>()
     val hotbarRarityCache = arrayOfNulls<ItemRarity>(9)
-    var selectedArrow = ""
     var soulflowAmount = ""
     var stackingEnchantDisplayText = ""
     var lowSoulFlowPinged = false
@@ -103,7 +102,6 @@ object ItemFeatures {
     var lastShieldClick = 0L
 
     init {
-        SelectedArrowDisplay()
         StackingEnchantDisplay()
         SoulflowGuiElement()
         WitherShieldDisplay()
@@ -452,11 +450,6 @@ object ItemFeatures {
                 val extraAttr = getExtraAttributes(item) ?: return
                 val itemId = getSkyBlockItemID(extraAttr) ?: return
 
-                if (itemId == "ARROW_SWAPPER") {
-                    selectedArrow = getItemLore(item).find {
-                        it.startsWith("§aSelected: §")
-                    }?.substringAfter("§aSelected: ") ?: "§cUnknown"
-                }
                 if (equalsOneOf(itemId, "SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) {
                     getItemLore(item).find {
                         it.startsWith("§7Internalized: ")
@@ -766,47 +759,6 @@ object ItemFeatures {
             if (sideHit !== EnumFacing.UP && newBlock.block is BlockSign) return@all false
             if (newBlock.block is BlockLadder || newBlock.block is BlockDoor) return@all false
             return@all newBlock.block.isPassable(mc.theWorld, newPos)
-        }
-    }
-
-    class SelectedArrowDisplay : GuiElement("Arrow Swapper Display", x = 0.65f, y = 0.85f) {
-        override fun render() {
-            if (toggled && Utils.inSkyblock) {
-                val alignment =
-                    if (scaleX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                ScreenRenderer.fontRenderer.drawString(
-                    selectedArrow,
-                    if (scaleX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
-                    0f,
-                    CommonColors.WHITE,
-                    alignment,
-                    TextShadow.NORMAL
-                )
-            }
-        }
-
-        override fun demoRender() {
-            val alignment =
-                if (scaleX < UResolution.scaledWidth / 2f) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-            ScreenRenderer.fontRenderer.drawString(
-                "§aSelected: §rSkytils Arrow",
-                if (scaleX < UResolution.scaledWidth / 2f) 0f else width.toFloat(),
-                0f,
-                CommonColors.RAINBOW,
-                alignment,
-                TextShadow.NORMAL
-            )
-        }
-
-        override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
-        override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("§aSelected: §rSkytils Arrow")
-        override val toggled: Boolean
-            get() = Skytils.config.showSelectedArrowDisplay
-
-        init {
-            Skytils.guiManager.registerElement(this)
         }
     }
 

@@ -817,7 +817,6 @@ object Config : Vigilant(
     )
     var creeperBeamsSolver = false
 
-
     @Property(
         type = PropertyType.SWITCH, name = "Ice Fill Solver",
         description = "§b[WIP] §rShows the path to take on the Ice Fill puzzle.",
@@ -2190,6 +2189,21 @@ object Config : Vigilant(
         searchTags = ["Lock"]
     )
     var protectStarredItems = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Quiver Display",
+        description = "Displays the amount of arrows in your quiver.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var quiverDisplay = false
+
+    @Property(
+        type = PropertyType.NUMBER, name = "Restock Arrows Warning",
+        description = "Shows a warning when your quiver is low on arrows. Set to 0 to disable.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        min = 0, max = 1200, increment = 100
+    )
+    var restockArrowsWarning = 0
 
     @Property(
         type = PropertyType.SWITCH, name = "Spider's Den Rain Timer",
