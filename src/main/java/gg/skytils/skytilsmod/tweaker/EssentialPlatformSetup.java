@@ -53,7 +53,7 @@ public class EssentialPlatformSetup {
     }
 
     @SuppressWarnings("unused")
-    public static void setup() {
+    public static void setup() throws Throwable {
         try {
             String ver = System.getProperty("java.runtime.version", "unknown");
             String javaLoc = System.getProperty("java.home");
@@ -84,6 +84,13 @@ public class EssentialPlatformSetup {
             }
         } catch (Throwable t) {
             t.printStackTrace();
+        }
+
+        try {
+            DependencyLoader.loadDependencies();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
         }
 
         registerTransformerExclusions(

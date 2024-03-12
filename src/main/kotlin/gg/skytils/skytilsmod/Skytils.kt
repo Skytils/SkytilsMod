@@ -18,6 +18,8 @@
 
 package gg.skytils.skytilsmod
 
+import com.aayushatharva.brotli4j.Brotli4jLoader
+import com.aayushatharva.brotli4j.service.BrotliNativeProvider
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
@@ -244,6 +246,7 @@ class Skytils {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
+        Brotli4jLoader.ensureAvailability()
         DataFetcher.preload()
         guiManager = GuiManager
         jarFile = event.sourceFile

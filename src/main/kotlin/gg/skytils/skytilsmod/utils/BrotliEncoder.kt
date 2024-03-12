@@ -18,11 +18,11 @@
 
 package gg.skytils.skytilsmod.utils
 
+import com.aayushatharva.brotli4j.decoder.BrotliInputStream
 import io.ktor.client.plugins.compression.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.CoroutineScope
-import org.brotli.dec.BrotliInputStream
 import java.io.FilterInputStream
 import java.io.IOException
 import java.io.InputStream

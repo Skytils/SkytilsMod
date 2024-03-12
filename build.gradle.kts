@@ -132,7 +132,7 @@ dependencies {
     shadowMe(ktorServer("host-common"))
     shadowMe(ktorServer("auth"))
 
-    shadowMe("org.brotli:dec:0.1.2")
+    shadowMe("com.aayushatharva.brotli4j:brotli4j:1.16.0")
 
     shadowMe(project(":events"))
     shadowMe(project(":hypixel-api:types"))

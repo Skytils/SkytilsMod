@@ -33,6 +33,7 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -149,6 +150,27 @@ public class TweakerUtil {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    static void addToClasspath(URL url) throws Throwable {
+        Launch.classLoader.addURL(url);
+        ClassLoader parent = Launch.classLoader.getClass().getClassLoader();
+        if (parent != null) {
+            try {
+                Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+                addURL.setAccessible(true);
+                addURL.invoke(parent, url);
+            } catch (Throwable t) {
+                t.printStackTrace();
+
+                Field ucpField = parent.getClass().getDeclaredField("ucp");
+                ucpField.setAccessible(true);
+
+                Object ucp = ucpField.get(parent);
+                Method ucpAddURL = ucp.getClass().getDeclaredMethod("addURL", URL.class);
+                ucpAddURL.invoke(ucp, url);
+            }
         }
     }
 }
