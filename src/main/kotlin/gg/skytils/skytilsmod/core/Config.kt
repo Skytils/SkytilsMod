@@ -1422,6 +1422,13 @@ object Config : Vigilant(
     var bossBarFix = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Inject Fake Dungeon Map",
+        description = "Injects a fake Magical Map into your hotbar to make old mods work again!\nP.S.: Use Cataclysmic Map!",
+        category = "Miscellaneous", subcategory = "Fixes"
+    )
+    var injectFakeDungeonMap = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Fix Falling Sand Rendering",
         description = "Adds a check to rendering in order to prevent crashes.",
         category = "Miscellaneous", subcategory = "Fixes"
