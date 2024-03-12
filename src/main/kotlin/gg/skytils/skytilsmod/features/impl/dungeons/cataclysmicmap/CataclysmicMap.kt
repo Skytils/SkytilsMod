@@ -50,6 +50,8 @@ object CataclysmicMap {
         DungeonInfo.reset()
         MapUtils.calibrated = false
         DungeonScanner.hasScanned = false
+        MimicDetector.mimicOpenTime = 0
+        MimicDetector.mimicPos = null
     }
 
     @SubscribeEvent
