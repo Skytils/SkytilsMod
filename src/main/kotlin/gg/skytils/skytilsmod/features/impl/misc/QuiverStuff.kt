@@ -23,14 +23,15 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
-import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.ItemUtil
+import gg.skytils.skytilsmod.utils.RenderUtil
+import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object QuiverStuff {
@@ -45,10 +46,11 @@ object QuiverStuff {
         SelectedArrowDisplay
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent
     fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inSkyblock || event.packet !is S2FPacketSetSlot || event.packet.func_149173_d() != 44) return
         val stack = event.packet.func_149174_e() ?: return
+        if (!Utils.equalsOneOf(stack.item, Items.bow, Items.feather)) return
         val line = ItemUtil.getItemLore(stack).getOrNull(4) ?: return
         val match = activeArrowRegex.matchEntire(line) ?: return
         selectedType = match.groups["type"]?.value ?: ""
@@ -57,10 +59,10 @@ object QuiverStuff {
         if (sentWarning && Skytils.config.restockArrowsWarning != 0 && arrowCount >= Skytils.config.restockArrowsWarning) {
             sentWarning = false
         } else if (
-            !sentWarning && arrowCount != -1 && selectedType.isNotBlank() &&
+            !sentWarning && arrowCount != -1 &&
             Skytils.config.restockArrowsWarning != 0 && arrowCount < Skytils.config.restockArrowsWarning
         ) {
-            GuiManager.createTitle("§c§lRESTOCK §r$selectedType", 60)
+            GuiManager.createTitle("§c§lRESTOCK §r${selectedType.ifBlank { "§cUnknown" }}", 60)
             sentWarning = true
         }
     }
