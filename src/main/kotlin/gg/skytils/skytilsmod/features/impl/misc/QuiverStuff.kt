@@ -50,7 +50,7 @@ object QuiverStuff {
     fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inSkyblock || event.packet !is S2FPacketSetSlot || event.packet.func_149173_d() != 44) return
         val stack = event.packet.func_149174_e() ?: return
-        if (!Utils.equalsOneOf(stack.item, Items.bow, Items.feather)) return
+        if (!Utils.equalsOneOf(stack.item, Items.arrow, Items.feather)) return
         val line = ItemUtil.getItemLore(stack).getOrNull(4) ?: return
         val match = activeArrowRegex.matchEntire(line) ?: return
         selectedType = match.groups["type"]?.value ?: ""
