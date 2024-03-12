@@ -227,17 +227,20 @@ object DungeonListener {
             if (Utils.inDungeons && mc.thePlayer != null && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
                 val tabEntries = TabListUtils.tabEntries
                 var partyCount: Int? = null
+                var oldTeam: Map<String, DungeonTeammate>? = null
 
                 if (tabEntries.isNotEmpty() && tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
                     partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
                     if (partyCount != null) {
                         // we can just keep disconnected players here i think
-                        if (team.size < partyCount) {
+                        if (team.size != partyCount) {
                             println("Recomputing team as party size has changed ${team.size} -> $partyCount")
+                            oldTeam = team.clone() as Map<String, DungeonTeammate>
                             team.clear()
                         } else if (team.size > 5) {
                             UChat.chat("$failPrefix §cSomething isn't right! I got more than 5 members. Expected $partyCount members but got ${team.size}")
                             println("Got more than 5 players on the team??")
+                            oldTeam = team.clone() as Map<String, DungeonTeammate>
                             team.clear()
                         }
                     } else {
@@ -279,12 +282,18 @@ object DungeonListener {
                                 )
                         } else {
                             println("Parsed teammate $name with value EMPTY, $text")
-                            team[name] = DungeonTeammate(
-                                name,
-                                DungeonClass.EMPTY, 0,
-                                pos,
-                                entry.locationSkin
-                            )
+                            if (oldTeam != null && name in oldTeam) {
+                                val old = oldTeam[name]!!
+                                team[name] = old.copy(tabEntryIndex = pos)
+                                println("Got old teammate $name with value EMPTY, using $old instead")
+                            } else {
+                                team[name] = DungeonTeammate(
+                                    name,
+                                    DungeonClass.EMPTY, 0,
+                                    pos,
+                                    entry.locationSkin
+                                )
+                            }
                         }
 
                         team[name]?.mapPlayer?.icon = "icon-${(i + (partyCount-1)) % (partyCount)}}"
@@ -308,7 +317,7 @@ object DungeonListener {
                         if (tabEntries.size <= teammate.tabEntryIndex) continue
                         val entry = tabEntries[teammate.tabEntryIndex].second
                         if (!entry.contains(teammate.playerName)) {
-                            println("Expected ${teammate.playerName} at ${teammate.tabEntryIndex}, got ${entry}")
+                            println("Expected ${teammate.playerName} at ${teammate.tabEntryIndex}, got $entry")
                             continue
                         }
                         teammate.player = mc.theWorld.playerEntities.find {
