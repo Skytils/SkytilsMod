@@ -32,23 +32,17 @@ import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.features.impl.handlers.CategoryList
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoint
 import gg.skytils.skytilsmod.features.impl.handlers.WaypointCategory
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoints
+import gg.skytils.skytilsmod.features.impl.handlers.Waypoints.getStringFromWaypoints
 import gg.skytils.skytilsmod.gui.components.HelpComponent
 import gg.skytils.skytilsmod.gui.components.MultiCheckboxComponent
 import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.SkyblockIsland
 import gg.skytils.skytilsmod.utils.childContainers
-import kotlinx.serialization.encodeToString
-import org.apache.commons.codec.binary.Base64
-import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
-import org.apache.commons.compress.compressors.gzip.GzipParameters
 import java.awt.Color
-import java.io.ByteArrayOutputStream
-import java.util.zip.Deflater
 
 class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
@@ -59,6 +53,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     private val scrollComponent: ScrollComponent
 
     private val islandDropdown: DropDown
+    private val versionDropdown: DropDown
 
     private val entries = HashMap<UIContainer, Entry>()
     private val categoryContainers = HashMap<UIContainer, Category>()
@@ -90,6 +85,10 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
                     loadWaypointsForSelection(s)
                 }
             }
+        versionDropdown = DropDown(1, (1..2).map { "Format v${it}" }).childOf(window).constrain {
+            x = 5.pixels(true)
+            y = SiblingConstraint(5f)
+        }
 
         UIText("Waypoints").childOf(window).constrain {
             x = CenterConstraint()
@@ -185,20 +184,8 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
                 island = island
             )
         }.toSet()
-        val str = Skytils.json.encodeToString(CategoryList(categories))
-            .lines().joinToString("", transform = String::trim)
 
-        val data = Base64.encodeBase64String(ByteArrayOutputStream().use { bs ->
-            GzipCompressorOutputStream(bs, GzipParameters().apply {
-                compressionLevel = Deflater.BEST_COMPRESSION
-            }).use { gs ->
-                gs.write(str.encodeToByteArray())
-            }
-            bs.toByteArray()
-        })
-
-
-        setClipboardString("<Skytils-Waypoint-Data>(V1):${data}")
+        setClipboardString(getStringFromWaypoints(categories, versionDropdown.getValue() + 1))
 
         val count = categories.sumOf { it.waypoints.size }
         EssentialAPI.getNotifications()

@@ -17,6 +17,9 @@
  */
 package gg.skytils.skytilsmod.features.impl.handlers
 
+import com.aayushatharva.brotli4j.decoder.BrotliInputStream
+import com.aayushatharva.brotli4j.encoder.BrotliOutputStream
+import com.aayushatharva.brotli4j.encoder.Encoder
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
@@ -28,6 +31,7 @@ import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
+import net.minecraft.client.gui.GuiScreen
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -36,12 +40,16 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.binary.Base64InputStream
+import org.apache.commons.codec.binary.Base64OutputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
+import org.apache.commons.compress.compressors.gzip.GzipParameters
 import java.awt.Color
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.Reader
 import java.io.Writer
-import java.util.TreeSet
+import java.util.zip.Deflater
 
 object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     val categories = HashSet<WaypointCategory>()
@@ -57,9 +65,15 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
             val version = str.substringBefore(')').substringAfter('V').toIntOrNull() ?: 0
             val content = str.substringAfter(':')
 
+            val bombChecker = DecompressionBombChecker(100)
             val data = when (version) {
                 1 -> {
-                    GzipCompressorInputStream(Base64InputStream(content.byteInputStream())).use {
+                    bombChecker.wrapOutput(GzipCompressorInputStream(bombChecker.wrapInput(Base64InputStream(content.byteInputStream())))).use {
+                        it.readBytes().decodeToString()
+                    }
+                }
+                2 -> {
+                    bombChecker.wrapOutput(BrotliInputStream(bombChecker.wrapInput(Base64InputStream(content.byteInputStream())))).use {
                         it.readBytes().decodeToString()
                     }
                 }
@@ -121,6 +135,41 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         } else throw IllegalArgumentException("Unknown waypoint format")
 
         return categories
+    }
+
+    fun getStringFromWaypoints(categories: Set<WaypointCategory>, version: Int): String {
+        val str = Skytils.json.encodeToString(CategoryList(categories))
+            .lines().joinToString("", transform = String::trim)
+
+        val data = when (version) {
+            2 -> {
+                Base64.encodeBase64String(ByteArrayOutputStream().use { bs ->
+                    BrotliOutputStream(bs, Encoder.Parameters().apply {
+                        // setMode(Encoder.Mode.TEXT) for smaller values this actually makes the compressed data larger, larger values have no effect
+                        setQuality(11)
+                    }).use {
+                        it.write(str.encodeToByteArray())
+                    }
+                    bs.toByteArray()
+                })
+            }
+
+            1 -> {
+                Base64.encodeBase64String(ByteArrayOutputStream().use { bs ->
+                    GzipCompressorOutputStream(bs, GzipParameters().apply {
+                        compressionLevel = Deflater.BEST_COMPRESSION
+                    }).use { gs ->
+                        gs.write(str.encodeToByteArray())
+                    }
+                    bs.toByteArray()
+                })
+            }
+
+            else -> throw IllegalArgumentException("Unknown version $version")
+        }
+
+
+        return "<Skytils-Waypoint-Data>(V${version}):${data}"
     }
 
     fun computeVisibleWaypoints() {
