@@ -29,9 +29,11 @@ import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
 import gg.skytils.skytilsmod.utils.*
-import kotlinx.serialization.*
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
-import net.minecraft.client.gui.GuiScreen
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -40,7 +42,6 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.binary.Base64InputStream
-import org.apache.commons.codec.binary.Base64OutputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipParameters
@@ -49,7 +50,10 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.Reader
 import java.io.Writer
+import java.nio.file.Path
 import java.util.zip.Deflater
+import kotlin.io.path.name
+import kotlin.io.path.outputStream
 
 object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     val categories = HashSet<WaypointCategory>()
@@ -137,8 +141,24 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         return categories
     }
 
+    @OptIn(ExperimentalSerializationApi::class)
+    fun getWaypointsFromFile(file: File): CategoryList {
+        val version = file.nameWithoutExtension.substringAfterLast(".V").toIntOrNull() ?: 0
+
+        val bombChecker = DecompressionBombChecker(100)
+        val inputStream = when (version) {
+            2 -> {
+                bombChecker.wrapOutput(BrotliInputStream(bombChecker.wrapInput(file.inputStream())))
+            }
+
+            else -> throw IllegalArgumentException("Unknown version $version")
+        }
+
+        return json.decodeFromStream<CategoryList>(inputStream)
+    }
+
     fun getStringFromWaypoints(categories: Set<WaypointCategory>, version: Int): String {
-        val str = Skytils.json.encodeToString(CategoryList(categories))
+        val str = json.encodeToString(CategoryList(categories))
             .lines().joinToString("", transform = String::trim)
 
         val data = when (version) {
@@ -172,6 +192,20 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         return "<Skytils-Waypoint-Data>(V${version}):${data}"
     }
 
+    fun writeWaypointsToFile(categoryList: CategoryList, path: Path, version: Int) {
+        val realPath = if (!path.name.endsWith(".V$version.SkytilsWaypoints")) path.resolveSibling("${path.name}.V$version.SkytilsWaypoints") else path
+        when (version) {
+            2 -> {
+                BrotliOutputStream(realPath.outputStream(), Encoder.Parameters().apply {
+                    setQuality(11)
+                }).use {
+                    it.write(json.encodeToString(categoryList).encodeToByteArray())
+                }
+            }
+            else -> throw IllegalArgumentException("Unknown version $version")
+        }
+    }
+
     fun computeVisibleWaypoints() {
         if (!Utils.inSkyblock) {
             visibleWaypoints = emptyList()
@@ -189,7 +223,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     fun onWorldChange(event: WorldEvent.Unload) {
         visibleWaypoints = emptyList()
     }
-    
+
     @SubscribeEvent
     fun onLocraw(event: LocrawReceivedEvent) {
         tickTimer(20, task = ::computeVisibleWaypoints)

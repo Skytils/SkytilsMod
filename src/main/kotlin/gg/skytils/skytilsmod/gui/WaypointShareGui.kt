@@ -32,6 +32,7 @@ import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
+import gg.skytils.skytilsmod.features.impl.handlers.CategoryList
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoint
 import gg.skytils.skytilsmod.features.impl.handlers.WaypointCategory
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoints
@@ -43,6 +44,8 @@ import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.SkyblockIsland
 import gg.skytils.skytilsmod.utils.childContainers
 import java.awt.Color
+import javax.swing.JFileChooser
+import javax.swing.filechooser.FileNameExtensionFilter
 
 class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
 
@@ -124,6 +127,20 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
             exportSelectedWaypoints()
         }
 
+        SimpleButton("Import from File").childOf(bottomButtons).constrain {
+            x = 0.pixels()
+            y = SiblingConstraint(5f)
+        }.onLeftClick {
+            importFromFile()
+        }
+
+        SimpleButton("Export to File").childOf(bottomButtons).constrain {
+            x = SiblingConstraint(5f)
+            y = CramSiblingConstraint()
+        }.onLeftClick {
+            exportToFile()
+        }
+
         HelpComponent(
             window,
             "This menu is used to share waypoints with other people. To import waypoints from another person, copy the *entire* string of text to your clipboard, and then click 'Import from Clipboard'. To send waypoints to someone else, make sure the ones you want to share are selected and then click 'Export Selected to Clipboard'. Make sure the very long string of text is not cut off by any character limits, or people will not be able to import your waypoints."
@@ -147,6 +164,75 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         }
 
         loadWaypointsForSelection(islandDropdown.getValue())
+    }
+
+
+    private fun importFromFile() {
+        runCatching {
+            val fileChooser = JFileChooser()
+            fileChooser.fileFilter = FileNameExtensionFilter("Skytils Waypoints", "SkytilsWaypoints")
+            fileChooser.dialogTitle = "Select a file to import waypoints from"
+            if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                val file = fileChooser.selectedFile
+                val data = Waypoints.getWaypointsFromFile(file)
+                Waypoints.categories.addAll(data.categories)
+                EssentialAPI.getNotifications().push(
+                    "Waypoints Imported",
+                    "Successfully imported ${data.categories.sumOf { it.waypoints.size }} waypoints!",
+                    2.5f
+                )
+
+                PersistentSave.markDirty<Waypoints>()
+                loadWaypointsForSelection(islandDropdown.getValue())
+            }
+        }.onFailure {
+            it.printStackTrace()
+            EssentialAPI.getNotifications()
+                .push("Error", "Failed to import waypoints, reason: ${it::class.simpleName}: ${it.message}")
+        }
+
+    }
+
+    private fun exportToFile() {
+        runCatching {
+            val version = versionDropdown.getValue() + 1
+            val fileChooser = JFileChooser()
+            fileChooser.dialogTitle = "Select a file to export waypoints to"
+            fileChooser.fileFilter = FileNameExtensionFilter("Skytils Waypoints", "SkytilsWaypoints")
+            if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+                val file = fileChooser.selectedFile
+
+                val island = SkyblockIsland.entries[islandDropdown.getValue()]
+
+                // Convert the selected waypoints into an object that can be easily serialized
+                val categories = categoryContainers.map { entry ->
+                    WaypointCategory(
+                        name = entry.value.name,
+                        waypoints = entry.value.container.childContainers.mapNotNull {
+                            if (entries[it]?.selected?.checked != true) null
+                            else entries[it]?.waypoint
+                        }.toHashSet(),
+                        isExpanded = true,
+                        island = island
+                    )
+                }.toSet()
+
+                Waypoints.writeWaypointsToFile(CategoryList(categories), file.toPath(), version)
+
+                val count = categories.sumOf { it.waypoints.size }
+                EssentialAPI.getNotifications()
+                    .push(
+                        "Waypoints Exported",
+                        "$count ${island.displayName} waypoints were saved!",
+                        2.5f
+                    )
+
+            }
+        }.onFailure {
+            it.printStackTrace()
+            EssentialAPI.getNotifications()
+                .push("Error", "Failed to export waypoints, reason: ${it::class.simpleName}: ${it.message}")
+        }
     }
 
     private fun importFromClipboard() {
