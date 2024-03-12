@@ -1296,5 +1296,14 @@
     ],
     "crypts": 8,
     "secrets": 4
+  },
+  {
+    "name": "Zodd",
+    "type": "NORMAL",
+    "cores": [
+      105458531
+    ],
+    "crypts": 1,
+    "secrets": 1
   }
 ]
