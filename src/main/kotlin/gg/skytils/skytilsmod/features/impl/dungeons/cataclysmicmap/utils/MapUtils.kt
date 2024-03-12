@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonMapColorParser
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
 import gg.skytils.skytilsmod.utils.Utils
@@ -80,7 +81,7 @@ object MapUtils {
     private fun findEntranceCorner(): Pair<Int, Int> {
         var start = 0
         var currLength = 0
-        getMapData()?.colors?.forEachIndexed { index, byte ->
+        (DungeonInfo.dungeonMap ?: DungeonInfo.guessMapData)?.colors?.forEachIndexed { index, byte ->
             if (byte == 30.toByte()) {
                 if (currLength == 0) start = index
                 currLength++

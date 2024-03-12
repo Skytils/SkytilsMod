@@ -22,6 +22,7 @@ import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
@@ -35,9 +36,10 @@ import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.MapU
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.MimicDetector
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
 import gg.skytils.skytilsmod.utils.RenderUtil
-import gg.skytils.skytilsmod.utils.TabListUtils
 import gg.skytils.skytilsmod.utils.Utils
+import net.minecraft.network.play.server.S34PacketMaps
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.storage.MapData
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.event.world.WorldEvent
@@ -65,7 +67,7 @@ object CataclysmicMap {
 
             MapUtils.calibrated = MapUtils.calibrateMap()
         } else if (DungeonTimer.scoreShownAt == -1L && DungeonTimer.bossEntryTime == -1L) {
-            DungeonInfo.dungeonMap?.let {
+            (DungeonInfo.dungeonMap ?: DungeonInfo.guessMapData)?.let {
                 MapUpdater.updateRooms(it)
                 MapUpdater.updatePlayers(it)
             }
@@ -113,6 +115,19 @@ object CataclysmicMap {
                 CataclysmicMapConfig.witherDoorFill
             )
             UGraphics.enableDepth()
+        }
+    }
+
+    @SubscribeEvent
+    fun onPacket(event: PacketEvent.ReceiveEvent) {
+        if (event.packet is S34PacketMaps && Utils.inDungeons && DungeonInfo.dungeonMap == null && mc.theWorld != null) {
+            val id = event.packet.mapId
+            if (id and 1000 == 0) {
+                val guess = mc.theWorld.mapStorage.loadData(MapData::class.java, "map_${id}") as MapData? ?: return
+                if (guess.mapDecorations.any { it.value.func_176110_a() == 1.toByte() }) {
+                    DungeonInfo.guessMapData = guess
+                }
+            }
         }
     }
 
