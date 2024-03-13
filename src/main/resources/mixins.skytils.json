@@ -45,6 +45,7 @@
     "gui.MixinGuiScreen",
     "inventory.MixinSlot",
     "item.MixinItemArmor",
+    "item.MixinItemBow",
     "item.MixinItemStack",
     "model.MixinModelBlaze",
     "multiplayer.MixinPlayerControllerMP",

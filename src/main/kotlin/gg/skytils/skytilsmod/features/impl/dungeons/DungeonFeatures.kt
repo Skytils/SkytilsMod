@@ -180,7 +180,8 @@ object DungeonFeatures {
         }
     }
 
-    private var fakeDungeonMap: ItemStack? = null
+    var fakeDungeonMap: ItemStack? = null
+    var intendedItemStack: ItemStack? = null
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
@@ -316,8 +317,8 @@ object DungeonFeatures {
             }
             if (Skytils.config.injectFakeDungeonMap && DungeonTimer.bossEntryTime == -1L) {
                 (DungeonInfo.dungeonMap ?: DungeonInfo.guessMapData)?.let {
-                    val itemInSlot = mc.thePlayer?.inventory?.getStackInSlot(8)?.item
-                    if (itemInSlot != Items.filled_map && itemInSlot != Items.arrow) {
+                    val slot = mc.thePlayer?.inventory?.getStackInSlot(8)
+                    if (slot?.item != Items.filled_map) {
                         if (fakeDungeonMap == null) {
                             val guessMapId = it.mapName.substringAfter("map_").toIntOrNull()
                             if (guessMapId == null) {
@@ -328,9 +329,16 @@ object DungeonFeatures {
                                 it.setLore(listOf("§7Shows the layout of the Dungeon as", "§7it is explored and completed.", "", "§cThis isn't the real map!", "§eSkytils injected this data in for you."))
                             }
                         }
+                        intendedItemStack = slot
                         mc.thePlayer.inventory.setInventorySlotContents(8, fakeDungeonMap)
                     }
+                }.ifNull {
+                    fakeDungeonMap = null
+                    intendedItemStack = null
                 }
+            } else {
+                fakeDungeonMap = null
+                intendedItemStack = null
             }
         }
     }
@@ -764,6 +772,7 @@ object DungeonFeatures {
         hasClearedText = false
         terracottaSpawns.clear()
         fakeDungeonMap = null
+        intendedItemStack = null
     }
 
     class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", x = 0.05f, y = 0.4f) {
