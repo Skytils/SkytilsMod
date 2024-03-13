@@ -48,7 +48,7 @@ public class DependencyLoader {
             }
         }
 
-        addToClasspath(downloadLocation.toURL());
+        addToClasspath(downloadLocation.toURI().toURL());
 
         return downloadLocation;
     }
