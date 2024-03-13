@@ -111,6 +111,15 @@ object TicTacToeSolver {
     }
 
     @SubscribeEvent
+    fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
+        if (event.puzzle == "Tic Tac Toe") {
+            board = null
+            bestMove = null
+            mappedPositions.clear()
+        }
+    }
+
+    @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!Utils.inDungeons || !Skytils.config.ticTacToeSolver) return
         if (bestMove != null) {

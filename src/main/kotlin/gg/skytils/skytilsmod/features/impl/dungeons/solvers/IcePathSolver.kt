@@ -21,6 +21,7 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.tickTimer
+import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -38,8 +39,6 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.awt.Point
-import java.util.*
-import kotlin.collections.ArrayDeque
 import kotlin.math.abs
 
 object IcePathSolver {
@@ -53,7 +52,7 @@ object IcePathSolver {
     init {
         tickTimer(20, repeats = true) {
             if (!Utils.inDungeons || !Skytils.config.icePathSolver || mc.thePlayer == null || "Ice Path" !in DungeonListener.missingPuzzles) return@tickTimer
-            if (silverfishChestPos != null && roomFacing != null) {
+            if (silverfishChestPos != null && roomFacing != null && silverfish != null) {
                 if (grid == null) {
                     grid = getGridLayout()
                     silverfishPos = getGridPointFromPos(silverfish!!.position)
@@ -111,9 +110,18 @@ object IcePathSolver {
     }
 
     @SubscribeEvent
+    fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
+        if (event.puzzle == "Ice Path") {
+            steps.clear()
+            silverfish = null
+            silverfishPos = null
+        }
+    }
+
+    @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
         if (!Skytils.config.icePathSolver) return
-        if (silverfishChestPos != null && roomFacing != null && grid != null && silverfish!!.isEntityAlive) {
+        if (silverfishChestPos != null && roomFacing != null && grid != null && silverfish?.isEntityAlive == true) {
             GlStateManager.disableCull()
             steps.zipWithNext().forEach { (point, point2) ->
                 val pos = getVec3RelativeToGrid(point!!.x, point.y)

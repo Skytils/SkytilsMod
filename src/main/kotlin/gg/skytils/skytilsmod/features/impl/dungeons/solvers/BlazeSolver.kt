@@ -248,5 +248,15 @@ object BlazeSolver {
         lastKilledBlazeHp = 0
     }
 
+    @SubscribeEvent
+    fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
+        if (event.puzzle == "Higher Or Lower") {
+            orderedBlazes.clear()
+            impossible = false
+            lastKilledBlazeHp = 0
+            calcOrder()
+        }
+    }
+
     data class ShootableBlaze(@JvmField var blaze: EntityBlaze, var health: Int)
 }
