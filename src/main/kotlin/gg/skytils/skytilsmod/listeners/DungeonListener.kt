@@ -255,6 +255,10 @@ object DungeonListener {
                     println("There are $partyCount members in this party")
                     for (i in 0..<5) {
                         val pos = 1 + i * 4
+                        if (pos >= tabEntries.size) {
+                            println("Tried to get index $pos but doesn't exist!")
+                            break
+                        }
                         val (entry, text) = tabEntries[pos]
                         val matcher = classPattern.find(text)
                         if (matcher == null) {
