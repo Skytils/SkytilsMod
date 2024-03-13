@@ -88,7 +88,7 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
                     loadWaypointsForSelection(s)
                 }
             }
-        versionDropdown = DropDown(1, (1..2).map { "Format v${it}" }).childOf(window).constrain {
+        versionDropdown = DropDown(0, (1..2).map { "Format v${it}" }).childOf(window).constrain {
             x = 5.pixels(true)
             y = SiblingConstraint(5f)
         }
