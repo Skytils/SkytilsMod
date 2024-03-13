@@ -34,6 +34,7 @@ import gg.skytils.skytilsmod.core.UpdateChecker
 import gg.skytils.skytilsmod.features.impl.dungeons.PartyFinderStats
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMap
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.ScanUtils
@@ -348,6 +349,11 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                             UChat.chat("$successPrefix §aCopied map data to clipboard.")
                         } else {
                             UChat.chat("$failPrefix §cMap data not found.")
+                        }
+                    }
+                    "cheater" -> {
+                        if (Skytils.deobfEnvironment) {
+                            UChat.chat(DungeonInfo.uniqueRooms.sortedByDescending { it.mainRoom.data.type }.map { it.name })
                         }
                     }
                     else -> {
