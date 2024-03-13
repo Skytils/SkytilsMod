@@ -1,8 +1,8 @@
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map
 
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapElement
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasElement
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 
 
 class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
@@ -16,7 +16,7 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
         DungeonInfo.cryptCount += room.data.crypts
         DungeonInfo.secretCount += room.data.secrets
         when (room.data.type) {
-            RoomType.ENTRANCE -> CataclysmicMapElement.dynamicRotation = when {
+            RoomType.ENTRANCE -> CatlasElement.dynamicRotation = when {
                 arrY == 0 -> 180f
                 arrX == 0 -> -90f
                 arrX > arrY -> 90f
@@ -69,10 +69,10 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
     }
 
     fun getNamePosition(): Pair<Int, Int> {
-        return if (CataclysmicMapConfig.mapCenterRoomName) center else topLeft
+        return if (CatlasConfig.mapCenterRoomName) center else topLeft
     }
 
     fun getCheckmarkPosition(): Pair<Int, Int> {
-        return if (CataclysmicMapConfig.mapCenterCheckmark) center else topLeft
+        return if (CatlasConfig.mapCenterCheckmark) center else topLeft
     }
 }

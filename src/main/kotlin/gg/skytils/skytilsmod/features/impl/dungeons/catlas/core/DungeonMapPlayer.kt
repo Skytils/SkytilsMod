@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core
 
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import net.minecraft.entity.player.EntityPlayer

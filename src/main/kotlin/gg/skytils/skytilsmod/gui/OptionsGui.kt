@@ -30,8 +30,7 @@ import gg.essential.elementa.dsl.*
 import gg.essential.universal.UDesktop
 import gg.essential.universal.UKeyboard
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMap
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -121,13 +120,13 @@ class OptionsGui(val parent: GuiScreen? = null) :
         }.onMouseClick {
             mc.displayGuiScreen(EnchantNamesGui())
         }
-        SimpleButton("Edit CataclysmicMap").childOf(window).constrain {
+        SimpleButton("Edit Catlas").childOf(window).constrain {
             x = CenterConstraint()
             y = SiblingConstraint() + 2.pixels()
             width = 200.pixels()
             height = 20.pixels()
         }.onMouseClick {
-            mc.displayGuiScreen(CataclysmicMapConfig.gui())
+            mc.displayGuiScreen(CatlasConfig.gui())
         }
         SimpleButton("Open Config Folder").childOf(window).constrain {
             x = CenterConstraint()

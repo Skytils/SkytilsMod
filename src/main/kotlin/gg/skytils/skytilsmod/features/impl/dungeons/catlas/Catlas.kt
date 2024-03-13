@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas
 
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UGraphics
@@ -26,14 +26,14 @@ import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapElement
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.MapUpdater
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.MimicDetector
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasElement
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.MapUpdater
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.MimicDetector
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.network.play.server.S34PacketMaps
@@ -45,7 +45,7 @@ import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 
-object CataclysmicMap {
+object Catlas {
 
     fun reset() {
         DungeonInfo.reset()
@@ -88,7 +88,7 @@ object CataclysmicMap {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!Utils.inDungeons || DungeonTimer.bossEntryTime != -1L || !CataclysmicMapConfig.boxWitherDoors) return
+        if (!Utils.inDungeons || DungeonTimer.bossEntryTime != -1L || !CatlasConfig.boxWitherDoors) return
 
         DungeonInfo.dungeonList.filterIsInstance<Door>().filter {
             it.type != DoorType.NORMAL && it.state == RoomState.DISCOVERED && !it.opened
@@ -98,20 +98,20 @@ object CataclysmicMap {
             val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
 
             val color =
-                if (DungeonInfo.keys > 0) CataclysmicMapConfig.witherDoorKeyColor else CataclysmicMapConfig.witherDoorNoKeyColor
+                if (DungeonInfo.keys > 0) CatlasConfig.witherDoorKeyColor else CatlasConfig.witherDoorNoKeyColor
 
             UGraphics.disableDepth()
             RenderUtil.drawOutlinedBoundingBox(
                 aabb,
-                color.withAlpha(CataclysmicMapConfig.witherDoorOutline),
-                CataclysmicMapConfig.witherDoorOutlineWidth,
+                color.withAlpha(CatlasConfig.witherDoorOutline),
+                CatlasConfig.witherDoorOutlineWidth,
                 event.partialTicks
             )
             RenderUtil.drawFilledBoundingBox(
                 matrixStack,
                 aabb.offset(-viewerX, -viewerY, -viewerZ),
                 color,
-                CataclysmicMapConfig.witherDoorFill
+                CatlasConfig.witherDoorFill
             )
             UGraphics.enableDepth()
         }
@@ -140,7 +140,7 @@ object CataclysmicMap {
     }
 
     init {
-        CataclysmicMapElement
+        CatlasElement
 
         arrayOf(
             MimicDetector,

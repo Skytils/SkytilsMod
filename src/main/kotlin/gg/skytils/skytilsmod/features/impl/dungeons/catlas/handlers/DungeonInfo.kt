@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers
 
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
 import net.minecraft.world.storage.MapData
 
 object DungeonInfo {

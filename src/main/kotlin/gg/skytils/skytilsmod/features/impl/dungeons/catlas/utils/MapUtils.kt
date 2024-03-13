@@ -16,13 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonMapColorParser
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonMapColorParser
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.item.ItemMap
 import net.minecraft.util.Vec4b

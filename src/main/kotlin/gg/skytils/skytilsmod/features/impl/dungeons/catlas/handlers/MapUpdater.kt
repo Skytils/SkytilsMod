@@ -16,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils.mapX
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils.mapZ
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils.yaw
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils.mapX
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils.mapZ
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils.yaw
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.init.Blocks

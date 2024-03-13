@@ -16,13 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map
 
-import java.awt.Color
+enum class RoomType {
+    BLOOD, CHAMPION, ENTRANCE, FAIRY, NORMAL, PUZZLE, RARE, TRAP;
 
-interface Tile {
-    val x: Int
-    val z: Int
-    var state: RoomState
-    val color: Color
+    companion object {
+        fun fromMapColor(color: Int): RoomType? = when (color) {
+            18 -> BLOOD
+            74 -> CHAMPION
+            30 -> ENTRANCE
+            82 -> FAIRY
+            63, 85 -> NORMAL
+            66 -> PUZZLE
+            62 -> TRAP
+            else -> null
+        }
+    }
 }

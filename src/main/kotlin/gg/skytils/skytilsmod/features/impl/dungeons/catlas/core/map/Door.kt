@@ -16,9 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map
 
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import java.awt.Color
 
 class Door(override val x: Int, override val z: Int, var type: DoorType) : Tile {
@@ -26,12 +26,12 @@ class Door(override val x: Int, override val z: Int, var type: DoorType) : Tile 
     override var state: RoomState = RoomState.UNDISCOVERED
     override val color: Color
         get() {
-            return if (state == RoomState.UNOPENED) CataclysmicMapConfig.colorUnopenedDoor
+            return if (state == RoomState.UNOPENED) CatlasConfig.colorUnopenedDoor
             else when (this.type) {
-                DoorType.BLOOD -> CataclysmicMapConfig.colorBloodDoor
-                DoorType.ENTRANCE -> CataclysmicMapConfig.colorEntranceDoor
-                DoorType.WITHER -> if (opened) CataclysmicMapConfig.colorOpenWitherDoor else CataclysmicMapConfig.colorWitherDoor
-                else -> CataclysmicMapConfig.colorRoomDoor
+                DoorType.BLOOD -> CatlasConfig.colorBloodDoor
+                DoorType.ENTRANCE -> CatlasConfig.colorEntranceDoor
+                DoorType.WITHER -> if (opened) CatlasConfig.colorOpenWitherDoor else CatlasConfig.colorWitherDoor
+                else -> CatlasConfig.colorRoomDoor
             }
         }
 }

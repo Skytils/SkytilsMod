@@ -16,14 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapElement
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner.scan
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.ScanUtils
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner.scan
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.ScanUtils
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 

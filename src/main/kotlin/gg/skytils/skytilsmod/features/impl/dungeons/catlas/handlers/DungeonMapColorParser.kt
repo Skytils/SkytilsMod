@@ -16,10 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers
 
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils
 import net.minecraft.util.EnumFacing
 import net.minecraft.world.storage.MapData
 

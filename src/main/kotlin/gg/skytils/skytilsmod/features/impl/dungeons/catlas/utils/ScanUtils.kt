@@ -16,14 +16,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils
 
 import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Room
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.RoomData
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Room
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.RoomData
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
 import gg.skytils.skytilsmod.utils.Utils
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
@@ -37,7 +37,7 @@ object ScanUtils {
     val roomList by lazy {
         json.decodeFromStream<Set<RoomData>>(
             mc.resourceManager.getResource(
-                ResourceLocation("skytils", "cataclysmicmap/rooms.json")
+                ResourceLocation("skytils", "catlas/rooms.json")
             ).inputStream
         )
     }

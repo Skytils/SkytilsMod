@@ -32,12 +32,12 @@ import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.UpdateChecker
 import gg.skytils.skytilsmod.features.impl.dungeons.PartyFinderStats
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMap
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.ScanUtils
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.Catlas
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.ScanUtils
 import gg.skytils.skytilsmod.features.impl.events.GriffinBurrows
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
@@ -57,7 +57,6 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.ChatComponentText
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -323,11 +322,11 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 element.scale = 1f
             }
 
-            "cataclysmicmap", "dungeonmap" -> {
+            "catlas", "dungeonmap" -> {
                 when (args.getOrNull(1)?.lowercase()) {
                     // Scans the dungeon
                     "scan" -> {
-                        CataclysmicMap.reset()
+                        Catlas.reset()
                         DungeonScanner.scan()
                     }
                     // Copies room data or room core to clipboard
@@ -357,7 +356,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                         }
                     }
                     else -> {
-                        Skytils.displayScreen = CataclysmicMapConfig.gui()
+                        Skytils.displayScreen = CatlasConfig.gui()
                     }
                 }
             }

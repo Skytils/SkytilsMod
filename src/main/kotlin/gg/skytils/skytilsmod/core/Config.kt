@@ -30,7 +30,7 @@ import gg.skytils.skytilsmod.Reference
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.PotionNotificationsGui
 import gg.skytils.skytilsmod.gui.SpiritLeapNamesGui
@@ -182,7 +182,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Inject Fake Dungeon Map",
-        description = "Injects a fake Magical Map into your hotbar to make old mods work again!\nP.S.: Use Cataclysmic Map!",
+        description = "Injects a fake Magical Map into your hotbar to make old mods work again!\nP.S.: Use Catlas!",
         category = "Dungeons", subcategory = "Fixes"
     )
     var injectFakeDungeonMap = false
@@ -251,13 +251,13 @@ object Config : Vigilant(
     var croesusHideOpened = false
 
     @Property(
-        type = PropertyType.BUTTON, name = "Cataclysmic Map",
+        type = PropertyType.BUTTON, name = "Catlas",
         description = "Click to configure the dungeon map settings.",
         category = "Dungeons", subcategory = "Miscellaneous",
-        searchTags = ["Highlight Box Wither Doors"]
+        searchTags = ["Highlight Box Wither Doors", "Cataclysmic Map", "Dungeon Map"]
     )
-    fun openCataclysmicMapConfig() {
-        Skytils.displayScreen = CataclysmicMapConfig.gui()
+    fun openCatlasConfig() {
+        Skytils.displayScreen = CatlasConfig.gui()
     }
 
     @Property(
@@ -3211,6 +3211,13 @@ object Config : Vigilant(
                         )
                         PersistentSave.markDirty<GuiManager>()
                     }
+                }
+                ver < UpdateChecker.SkytilsVersion("1.9.0-pre4") -> {
+                    val cataclysmicMapDir = File("./config/skytils/cataclysmicmap")
+                    val catlasDir = File("./config/skytils/catlas")
+                    catlasDir.mkdirs()
+                    cataclysmicMapDir.copyRecursively(catlasDir, true) { _, _ -> OnErrorAction.SKIP }
+                    cataclysmicMapDir.deleteRecursively()
                 }
             }
         }

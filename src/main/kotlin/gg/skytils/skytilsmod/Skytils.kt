@@ -19,7 +19,6 @@
 package gg.skytils.skytilsmod
 
 import com.aayushatharva.brotli4j.Brotli4jLoader
-import com.aayushatharva.brotli4j.service.BrotliNativeProvider
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
@@ -33,8 +32,8 @@ import gg.skytils.skytilsmod.features.impl.crimson.KuudraChestProfit
 import gg.skytils.skytilsmod.features.impl.crimson.KuudraFeatures
 import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
 import gg.skytils.skytilsmod.features.impl.dungeons.*
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.CataclysmicMap
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.Catlas
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.*
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals.*
 import gg.skytils.skytilsmod.features.impl.events.GriffinBurrows
@@ -256,7 +255,7 @@ class Skytils {
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
         config.init()
-        CataclysmicMapConfig
+        CatlasConfig
         UpdateChecker.downloadDeleteTask()
 
         arrayOf(
@@ -292,7 +291,7 @@ class Skytils {
             CustomNotifications,
             DamageSplash,
             DungeonFeatures,
-            CataclysmicMap,
+            Catlas,
             DungeonTimer,
             DupeTracker,
             EnchantNames,

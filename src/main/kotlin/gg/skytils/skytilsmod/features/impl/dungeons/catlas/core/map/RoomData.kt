@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map
 
 import kotlinx.serialization.Serializable
 

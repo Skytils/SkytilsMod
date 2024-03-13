@@ -16,11 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map
 
 import java.awt.Color
 
-class Unknown(override val x: Int, override val z: Int) : Tile {
-    override val color: Color = Color(0, 0, 0, 0)
-    override var state: RoomState = RoomState.UNDISCOVERED
+interface Tile {
+    val x: Int
+    val z: Int
+    var state: RoomState
+    val color: Color
 }

@@ -16,16 +16,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core
 
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.*
 import java.awt.Color
 import java.io.File
 
-object CataclysmicMapConfig : Vigilant(
-    File("./config/skytils/cataclysmicmap/config.toml"),
-    "Cataclysmic Map",
+object CatlasConfig : Vigilant(
+    File("./config/skytils/catlas/config.toml"),
+    "Catlas",
     sortingBehavior = CategorySorting
 ) {
 
@@ -398,7 +398,7 @@ object CataclysmicMapConfig : Vigilant(
     init {
         initialize()
         setCategoryDescription(
-            "Map", "CataclysmicMap is a fork of works created by SkyblockAddons, UnclaimedBloom6, and Harry282"
+            "Map", "Catlas is a fork of works created by SkyblockAddons, UnclaimedBloom6, and Harry282"
         )
     }
 

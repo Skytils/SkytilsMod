@@ -16,19 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core
 
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonMapColorParser
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.MapUtils
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils.RenderUtils
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonMapColorParser
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.RenderUtils
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.SkyblockIsland
@@ -40,16 +40,16 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 
-object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
+object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
-    private val neuGreen = ResourceLocation("skytils", "cataclysmicmap/neu/green_check.png")
-    private val neuWhite = ResourceLocation("skytils", "cataclysmicmap/neu/white_check.png")
-    private val neuCross = ResourceLocation("skytils", "cataclysmicmap/neu/cross.png")
-    private val neuQuestion = ResourceLocation("skytils", "cataclysmicmap/neu/question.png")
-    private val defaultGreen = ResourceLocation("skytils", "cataclysmicmap/default/green_check.png")
-    private val defaultWhite = ResourceLocation("skytils", "cataclysmicmap/default/white_check.png")
-    private val defaultCross = ResourceLocation("skytils", "cataclysmicmap/default/cross.png")
-    private val defaultQuestion = ResourceLocation("skytils", "cataclysmicmap/default/question.png")
+    private val neuGreen = ResourceLocation("skytils", "catlas/neu/green_check.png")
+    private val neuWhite = ResourceLocation("skytils", "catlas/neu/white_check.png")
+    private val neuCross = ResourceLocation("skytils", "catlas/neu/cross.png")
+    private val neuQuestion = ResourceLocation("skytils", "catlas/neu/question.png")
+    private val defaultGreen = ResourceLocation("skytils", "catlas/default/green_check.png")
+    private val defaultWhite = ResourceLocation("skytils", "catlas/default/white_check.png")
+    private val defaultCross = ResourceLocation("skytils", "catlas/default/cross.png")
+    private val defaultQuestion = ResourceLocation("skytils", "catlas/default/question.png")
 
     var dynamicRotation = 0f
 
@@ -65,7 +65,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         GlStateManager.translate(64.0, 64.0, 0.0)
         GlStateManager.rotate(-mc.thePlayer.rotationYaw + 180f, 0f, 0f, 1f)
 
-        if (CataclysmicMapConfig.mapCenter) {
+        if (CatlasConfig.mapCenter) {
             GlStateManager.translate(
                 -((mc.thePlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first - 2),
                 -((mc.thePlayer.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second - 2),
@@ -81,7 +81,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         GlStateManager.translate(MapUtils.startCorner.first.toFloat(), MapUtils.startCorner.second.toFloat(), 0f)
 
         val connectorSize = DungeonMapColorParser.quarterRoom
-        val checkmarkSize = when (CataclysmicMapConfig.mapCheckmark) {
+        val checkmarkSize = when (CatlasConfig.mapCheckmark) {
             1 -> 8.0 // default
             else -> 10.0 // neu
         }
@@ -123,7 +123,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                     )
                 }
 
-                if (tile is Room && tile.state == RoomState.UNOPENED && CataclysmicMapConfig.mapCheckmark != 0) {
+                if (tile is Room && tile.state == RoomState.UNOPENED && CatlasConfig.mapCheckmark != 0) {
                     drawCheckmark(tile, xOffset.toFloat(), yOffset.toFloat(), checkmarkSize)
                 }
             }
@@ -135,7 +135,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         GlStateManager.pushMatrix()
         GlStateManager.translate(MapUtils.startCorner.first.toFloat(), MapUtils.startCorner.second.toFloat(), 0f)
 
-        val checkmarkSize = when (CataclysmicMapConfig.mapCheckmark) {
+        val checkmarkSize = when (CatlasConfig.mapCheckmark) {
             1 -> 8.0 // default
             else -> 10.0 // neu
         }
@@ -151,7 +151,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
             val xOffsetName = (namePos.first / 2f) * size
             val yOffsetName = (namePos.second / 2f) * size
 
-            val color = if (CataclysmicMapConfig.mapColorText) when (room.state) {
+            val color = if (CatlasConfig.mapColorText) when (room.state) {
                 RoomState.GREEN -> 0x55ff55
                 RoomState.CLEARED -> 0xffffff
                 RoomState.FAILED -> 0xff0000
@@ -163,7 +163,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
             if (room.state == RoomState.UNOPENED) return@forEach
 
-            if (CataclysmicMapConfig.mapRoomSecrets == 2 && hasSecrets) {
+            if (CatlasConfig.mapRoomSecrets == 2 && hasSecrets) {
                 GlStateManager.pushMatrix()
                 GlStateManager.translate(
                     xOffsetCheck + DungeonMapColorParser.halfRoom.toFloat(),
@@ -173,24 +173,24 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                 GlStateManager.scale(2f, 2f, 1f)
                 RenderUtils.renderCenteredText(listOf(secretCount.toString()), 0, 0, color)
                 GlStateManager.popMatrix()
-            } else if (CataclysmicMapConfig.mapCheckmark != 0) {
+            } else if (CatlasConfig.mapCheckmark != 0) {
                 drawCheckmark(room, xOffsetCheck, yOffsetCheck, checkmarkSize)
             }
 
             val name = mutableListOf<String>()
 
-            if (CataclysmicMapConfig.mapRoomNames != 0 && Utils.equalsOneOf(
+            if (CatlasConfig.mapRoomNames != 0 && Utils.equalsOneOf(
                     roomType,
                     RoomType.PUZZLE,
                     RoomType.TRAP
-                ) || CataclysmicMapConfig.mapRoomNames == 2 && Utils.equalsOneOf(
+                ) || CatlasConfig.mapRoomNames == 2 && Utils.equalsOneOf(
                     roomType,
                     RoomType.NORMAL, RoomType.RARE, RoomType.CHAMPION
                 )
             ) {
                 name.addAll(room.data.name.split(" "))
             }
-            if (room.data.type == RoomType.NORMAL && CataclysmicMapConfig.mapRoomSecrets == 1) {
+            if (room.data.type == RoomType.NORMAL && CatlasConfig.mapRoomSecrets == 1) {
                 name.add(secretCount.toString())
             }
             // Offset + half of roomsize
@@ -227,7 +227,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
     }
 
     private fun drawCheckmark(tile: Tile, xOffset: Float, yOffset: Float, checkmarkSize: Double) {
-        getCheckmark(tile.state, CataclysmicMapConfig.mapCheckmark)?.let {
+        getCheckmark(tile.state, CatlasConfig.mapCheckmark)?.let {
             GlStateManager.enableAlpha()
             GlStateManager.color(1f, 1f, 1f, 1f)
             mc.textureManager.bindTexture(it)
@@ -276,11 +276,11 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
     override fun render() {
         if (!toggled || SBInfo.mode != SkyblockIsland.Dungeon.mode || mc.thePlayer == null || mc.theWorld == null) return
         if (DungeonTimer.dungeonStartTime == -1L) return
-        if (CataclysmicMapConfig.mapHideInBoss && DungeonTimer.bossEntryTime != -1L) return
+        if (CatlasConfig.mapHideInBoss && DungeonTimer.bossEntryTime != -1L) return
         mc.mcProfiler.startSection("border")
 
         RenderUtils.renderRect(
-            0.0, 0.0, 128.0, 128.0, CataclysmicMapConfig.mapBackground
+            0.0, 0.0, 128.0, 128.0, CatlasConfig.mapBackground
         )
 
         RenderUtils.renderRectBorder(
@@ -288,16 +288,16 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
             0.0,
             128.0,
             128.0,
-            CataclysmicMapConfig.mapBorderWidth.toDouble(),
-            CataclysmicMapConfig.mapBorder
+            CatlasConfig.mapBorderWidth.toDouble(),
+            CatlasConfig.mapBorder
         )
 
         mc.mcProfiler.endSection()
 
-        if (CataclysmicMapConfig.mapRotate) {
+        if (CatlasConfig.mapRotate) {
             GlStateManager.pushMatrix()
             setupRotate()
-        } else if (CataclysmicMapConfig.mapDynamicRotate) {
+        } else if (CatlasConfig.mapDynamicRotate) {
             GlStateManager.translate(64.0, 64.0, 0.0)
             GlStateManager.rotate(dynamicRotation, 0f, 0f, 1f)
             GlStateManager.translate(-64.0, -64.0, 0.0)
@@ -311,10 +311,10 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         renderPlayerHeads()
         mc.mcProfiler.endSection()
 
-        if (CataclysmicMapConfig.mapRotate) {
+        if (CatlasConfig.mapRotate) {
             GL11.glDisable(GL11.GL_SCISSOR_TEST)
             GlStateManager.popMatrix()
-        } else if (CataclysmicMapConfig.mapDynamicRotate) {
+        } else if (CatlasConfig.mapDynamicRotate) {
             GlStateManager.translate(64.0, 64.0, 0.0)
             GlStateManager.rotate(-dynamicRotation, 0f, 0f, 1f)
             GlStateManager.translate(-64.0, -64.0, 0.0)
@@ -327,7 +327,7 @@ object CataclysmicMapElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
     }
 
     override val toggled: Boolean
-        get() = CataclysmicMapConfig.mapEnabled
+        get() = CatlasConfig.mapEnabled
     override val height: Int
         get() = 128
     override val width: Int

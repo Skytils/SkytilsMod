@@ -16,11 +16,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map
 
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
 import java.awt.Color
 
 class Room(override val x: Int, override val z: Int, var data: RoomData) : Tile {
@@ -30,16 +30,16 @@ class Room(override val x: Int, override val z: Int, var data: RoomData) : Tile 
     override var state: RoomState = RoomState.UNDISCOVERED
     override val color: Color
         get() {
-            return if (state == RoomState.UNOPENED) CataclysmicMapConfig.colorUnopened
+            return if (state == RoomState.UNOPENED) CatlasConfig.colorUnopened
             else when (data.type) {
-                RoomType.BLOOD -> CataclysmicMapConfig.colorBlood
-                RoomType.CHAMPION -> CataclysmicMapConfig.colorMiniboss
-                RoomType.ENTRANCE -> CataclysmicMapConfig.colorEntrance
-                RoomType.FAIRY -> CataclysmicMapConfig.colorFairy
-                RoomType.PUZZLE -> CataclysmicMapConfig.colorPuzzle
-                RoomType.RARE -> CataclysmicMapConfig.colorRare
-                RoomType.TRAP -> CataclysmicMapConfig.colorTrap
-                else -> CataclysmicMapConfig.colorRoom
+                RoomType.BLOOD -> CatlasConfig.colorBlood
+                RoomType.CHAMPION -> CatlasConfig.colorMiniboss
+                RoomType.ENTRANCE -> CatlasConfig.colorEntrance
+                RoomType.FAIRY -> CatlasConfig.colorFairy
+                RoomType.PUZZLE -> CatlasConfig.colorPuzzle
+                RoomType.RARE -> CatlasConfig.colorRare
+                RoomType.TRAP -> CatlasConfig.colorTrap
+                else -> CatlasConfig.colorRoom
             }
         }
 

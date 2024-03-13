@@ -16,14 +16,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.utils
+package gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapElement
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.DungeonMapPlayer
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
-import gg.skytils.skytilsmod.listeners.DungeonListener
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasElement
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.DungeonMapPlayer
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.bindColor
@@ -41,7 +40,7 @@ object RenderUtils {
 
     private val tessellator: Tessellator = Tessellator.getInstance()
     private val worldRenderer: WorldRenderer = tessellator.worldRenderer
-    private val mapIcons = ResourceLocation("skytils", "cataclysmicmap/marker.png")
+    private val mapIcons = ResourceLocation("skytils", "catlas/marker.png")
 
     private fun preDraw() {
         GlStateManager.enableAlpha()
@@ -105,12 +104,12 @@ object RenderUtils {
         if (text.isEmpty()) return
         GlStateManager.pushMatrix()
         GlStateManager.translate(x.toFloat(), y.toFloat(), 0f)
-        GlStateManager.scale(CataclysmicMapConfig.textScale, CataclysmicMapConfig.textScale, 1f)
+        GlStateManager.scale(CatlasConfig.textScale, CatlasConfig.textScale, 1f)
 
-        if (CataclysmicMapConfig.mapRotate) {
+        if (CatlasConfig.mapRotate) {
             GlStateManager.rotate(mc.thePlayer.rotationYaw + 180f, 0f, 0f, 1f)
-        } else if (CataclysmicMapConfig.mapDynamicRotate) {
-            GlStateManager.rotate(-CataclysmicMapElement.dynamicRotation, 0f, 0f, 1f)
+        } else if (CatlasConfig.mapDynamicRotate) {
+            GlStateManager.rotate(-CatlasElement.dynamicRotation, 0f, 0f, 1f)
         }
 
         val fontHeight = mc.fontRendererObj.FONT_HEIGHT + 1
@@ -126,8 +125,8 @@ object RenderUtils {
             )
         }
 
-        if (CataclysmicMapConfig.mapDynamicRotate) {
-            GlStateManager.rotate(CataclysmicMapElement.dynamicRotation, 0f, 0f, 1f)
+        if (CatlasConfig.mapDynamicRotate) {
+            GlStateManager.rotate(CatlasElement.dynamicRotation, 0f, 0f, 1f)
         }
 
         GlStateManager.popMatrix()
@@ -158,9 +157,9 @@ object RenderUtils {
 
             // Apply head rotation and scaling
             GlStateManager.rotate(player.yaw + 180f, 0f, 0f, 1f)
-            GlStateManager.scale(CataclysmicMapConfig.playerHeadScale, CataclysmicMapConfig.playerHeadScale, 1f)
+            GlStateManager.scale(CatlasConfig.playerHeadScale, CatlasConfig.playerHeadScale, 1f)
 
-            if (CataclysmicMapConfig.mapVanillaMarker && (player.isOurMarker || name == mc.thePlayer.name)) {
+            if (CatlasConfig.mapVanillaMarker && (player.isOurMarker || name == mc.thePlayer.name)) {
                 GlStateManager.rotate(180f, 0f, 0f, 1f)
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 mc.textureManager.bindTexture(mapIcons)
@@ -190,16 +189,16 @@ object RenderUtils {
             }
 
             // Handle player names
-            if (CataclysmicMapConfig.playerHeads == 2 || CataclysmicMapConfig.playerHeads == 1 && Utils.equalsOneOf(
+            if (CatlasConfig.playerHeads == 2 || CatlasConfig.playerHeads == 1 && Utils.equalsOneOf(
                     ItemUtil.getSkyBlockItemID(mc.thePlayer.heldItem),
                     "SPIRIT_LEAP", "INFINITE_SPIRIT_LEAP", "HAUNT_ABILITY"
                 )
             ) {
-                if (!CataclysmicMapConfig.mapRotate) {
+                if (!CatlasConfig.mapRotate) {
                     GlStateManager.rotate(-player.yaw + 180f, 0f, 0f, 1f)
                 }
                 GlStateManager.translate(0f, 10f, 0f)
-                GlStateManager.scale(CataclysmicMapConfig.playerNameScale, CataclysmicMapConfig.playerNameScale, 1f)
+                GlStateManager.scale(CatlasConfig.playerNameScale, CatlasConfig.playerNameScale, 1f)
                 mc.fontRendererObj.drawString(
                     name, -mc.fontRendererObj.getStringWidth(name) / 2f, 0f, 0xffffff, true
                 )
