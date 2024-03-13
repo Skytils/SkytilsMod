@@ -181,6 +181,13 @@ object Config : Vigilant(
     var updateChannel = 2
 
     @Property(
+        type = PropertyType.SWITCH, name = "Inject Fake Dungeon Map",
+        description = "Injects a fake Magical Map into your hotbar to make old mods work again!\nP.S.: Use Cataclysmic Map!",
+        category = "Dungeons", subcategory = "Fixes"
+    )
+    var injectFakeDungeonMap = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Crypts Counter",
         description = "Shows the amount of crypts destroyed on your HUD.",
         category = "Dungeons", subcategory = "HUD"
@@ -1419,13 +1426,6 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Fixes"
     )
     var bossBarFix = false
-
-    @Property(
-        type = PropertyType.SWITCH, name = "Inject Fake Dungeon Map",
-        description = "Injects a fake Magical Map into your hotbar to make old mods work again!\nP.S.: Use Cataclysmic Map!",
-        category = "Miscellaneous", subcategory = "Fixes"
-    )
-    var injectFakeDungeonMap = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Fix Falling Sand Rendering",

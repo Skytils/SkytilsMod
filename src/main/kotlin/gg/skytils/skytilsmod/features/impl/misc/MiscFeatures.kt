@@ -31,13 +31,11 @@ import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.*
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntityArmorstand
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
-import gg.skytils.skytilsmod.utils.ItemUtil.setLore
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
@@ -453,8 +451,6 @@ object MiscFeatures {
         }
     }
 
-    private var fakeDungeonMap: ItemStack? = null
-
     @SubscribeEvent
     fun onTick(event: TickEvent.ClientTickEvent) {
         if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
@@ -471,27 +467,6 @@ object MiscFeatures {
                 }
             }
         }
-        (DungeonInfo.dungeonMap ?: DungeonInfo.guessMapData)?.let {
-            val itemInSlot = mc.thePlayer?.inventory?.getStackInSlot(8)?.item
-            if (Skytils.config.injectFakeDungeonMap && itemInSlot != Items.filled_map && itemInSlot != Items.arrow) {
-                if (fakeDungeonMap == null) {
-                    val guessMapId = it.mapName.substringAfter("map_").toIntOrNull()
-                    if (guessMapId == null) {
-                        mc.theWorld.setItemData("map_-1337", it)
-                    }
-                    fakeDungeonMap = ItemStack(Items.filled_map, 1337, guessMapId ?: -1337).also {
-                        it.setStackDisplayName("§bMagical Map")
-                        it.setLore(listOf("§7Shows the layout of the Dungeon as", "§7it is explored and completed.", "", "§cThis isn't the real map! Skytils injected this data in for you."))
-                    }
-                }
-                mc.thePlayer.inventory.setInventorySlotContents(8, fakeDungeonMap)
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Unload) {
-        fakeDungeonMap = null
     }
 
     @SubscribeEvent

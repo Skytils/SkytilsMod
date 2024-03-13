@@ -28,10 +28,12 @@ import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.*
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.ItemUtil.setLore
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
@@ -57,6 +59,7 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemSkull
+import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.*
 import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
@@ -176,6 +179,8 @@ object DungeonFeatures {
             }
         }
     }
+
+    private var fakeDungeonMap: ItemStack? = null
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
@@ -306,6 +311,24 @@ object DungeonFeatures {
                                 }
                             }
                         }
+                    }
+                }
+            }
+            if (Skytils.config.injectFakeDungeonMap && DungeonTimer.bossEntryTime == -1L) {
+                (DungeonInfo.dungeonMap ?: DungeonInfo.guessMapData)?.let {
+                    val itemInSlot = mc.thePlayer?.inventory?.getStackInSlot(8)?.item
+                    if (itemInSlot != Items.filled_map && itemInSlot != Items.arrow) {
+                        if (fakeDungeonMap == null) {
+                            val guessMapId = it.mapName.substringAfter("map_").toIntOrNull()
+                            if (guessMapId == null) {
+                                mc.theWorld.setItemData("map_-1337", it)
+                            }
+                            fakeDungeonMap = ItemStack(Items.filled_map, 1337, guessMapId ?: -1337).also {
+                                it.setStackDisplayName("§bMagical Map")
+                                it.setLore(listOf("§7Shows the layout of the Dungeon as", "§7it is explored and completed.", "", "§cThis isn't the real map!", "§eSkytils injected this data in for you."))
+                            }
+                        }
+                        mc.thePlayer.inventory.setInventorySlotContents(8, fakeDungeonMap)
                     }
                 }
             }
@@ -740,6 +763,7 @@ object DungeonFeatures {
         blazes = 0
         hasClearedText = false
         terracottaSpawns.clear()
+        fakeDungeonMap = null
     }
 
     class SpiritBearSpawnTimer : GuiElement("Spirit Bear Spawn Timer", x = 0.05f, y = 0.4f) {
