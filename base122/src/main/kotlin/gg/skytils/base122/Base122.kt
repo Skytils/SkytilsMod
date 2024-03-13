@@ -26,14 +26,16 @@ fun breakInto7BitChunks(input: ByteArray) =
             a
         }.sum()
         val chunks = byteList.size * 8 / 7
-        val remainder = chunks.rem(8)
-        (0 until chunks).map {
-            val offset = (chunks - it - 1) * 7 + remainder
+        val rem = chunks.rem(8)
+        val chunkList = (0 until chunks).map {
+            val offset = (chunks - it - 1) * 7 + rem
             val mask = (0b01111111).toLong() shl offset
-            bytes.and(mask) shr offset
-        } + if (remainder != 0) {
-            bytes and ((0b1 shl remainder) - 1L)
-        } else {
-            0L
+            (bytes.and(mask) shr offset).toByte()
         }
+        val remainder = if (rem != 0) {
+            listOf((bytes and ((0b1 shl rem) - 1L)).toByte())
+        } else {
+            emptyList()
+        }
+        chunkList + remainder
     }

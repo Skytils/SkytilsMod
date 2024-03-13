@@ -34,10 +34,22 @@ class Test {
             0b10000000.toByte(),
             0b01111111
         )
+        val expectedValues = byteArrayOf(
+            0b01111111,
+            0b00000000,
+            0b01111111,
+            0b00000000,
+            0b01111111,
+            0b00000000,
+            0b01111111,
+            0b00000000,
+            0b00111111,
+            0b00000001
+        )
         val result = breakInto7BitChunks(bytes)
-        result.forEachIndexed { index, l ->
-            val expectedValue = 0b01111111 * ((index + 1) % 2).toLong()
-            assertEquals(expectedValue, l, "Unexpected value at index $index (${l.toString(2)})")
+        result.forEachIndexed { index, b ->
+            val expectedValue = expectedValues[index]
+            assertEquals(expectedValue, b, "Unexpected value at index $index (${b.toString(2)})")
         }
     }
 
@@ -60,9 +72,9 @@ class Test {
             0b01111111,
             0b00000001
         )
-        result.forEachIndexed { index, l ->
-            val expectedValue = expectedValues[index].toLong()
-            assertEquals(expectedValue, l, "Unexpected value at index $index (${l.toString(2)})")
+        result.forEachIndexed { index, b ->
+            val expectedValue = expectedValues[index]
+            assertEquals(expectedValue, b, "Unexpected value at index $index (${b.toString(2)})")
         }
     }
 }
