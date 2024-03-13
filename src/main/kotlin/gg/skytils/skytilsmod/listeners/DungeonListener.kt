@@ -56,6 +56,7 @@ object DungeonListener {
     val deads = hashSetOf<DungeonTeammate>()
     val disconnected = hashSetOf<String>()
     val missingPuzzles = hashSetOf<String>()
+    val completedPuzzles = hashSetOf<String>()
     val hutaoFans: Cache<String, Boolean> = Caffeine.newBuilder()
         .weakKeys()
         .weakValues()
@@ -104,6 +105,7 @@ object DungeonListener {
         deads.clear()
         disconnected.clear()
         missingPuzzles.clear()
+        completedPuzzles.clear()
     }
 
     @SubscribeEvent
@@ -212,15 +214,22 @@ object DungeonListener {
             }
             if (missingPuzzles.size != localMissingPuzzles.size || !missingPuzzles.containsAll(localMissingPuzzles)) {
                 val newPuzzles = localMissingPuzzles.filter { it !in missingPuzzles }
-                val completedPuzzles = missingPuzzles.filter { it !in localMissingPuzzles }
+                val localCompletedPuzzles = missingPuzzles.filter { it !in localMissingPuzzles }
+                val resetPuzzles = localMissingPuzzles.filter { it in completedPuzzles }
+
+                resetPuzzles.forEach {
+                    DungeonEvent.PuzzleEvent.Reset(it).postAndCatch()
+                }
                 newPuzzles.forEach {
                     DungeonEvent.PuzzleEvent.Discovered(it).postAndCatch()
                 }
-                completedPuzzles.forEach {
+                localCompletedPuzzles.forEach {
                     DungeonEvent.PuzzleEvent.Completed(it).postAndCatch()
                 }
                 missingPuzzles.clear()
                 missingPuzzles.addAll(localMissingPuzzles)
+                completedPuzzles.clear()
+                completedPuzzles.addAll(localCompletedPuzzles)
             }
         }
         tickTimer(2, repeats = true) {

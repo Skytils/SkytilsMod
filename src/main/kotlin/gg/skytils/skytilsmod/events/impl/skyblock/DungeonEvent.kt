@@ -24,5 +24,6 @@ open class DungeonEvent : SkytilsEvent() {
     open class PuzzleEvent(val puzzle: String) : DungeonEvent() {
         class Discovered(puzzle: String) : PuzzleEvent(puzzle)
         class Completed(puzzle: String) : PuzzleEvent(puzzle)
+        class Reset(puzzle: String): PuzzleEvent(puzzle)
     }
 }
