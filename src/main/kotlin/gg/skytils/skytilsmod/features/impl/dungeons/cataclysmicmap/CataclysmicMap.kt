@@ -23,13 +23,12 @@ import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.PacketEvent
+import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.CataclysmicMapElement
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.Door
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.DoorType
-import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.RoomState
+import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.core.map.*
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.DungeonScanner
 import gg.skytils.skytilsmod.features.impl.dungeons.cataclysmicmap.handlers.MapUpdater
@@ -116,6 +115,15 @@ object CataclysmicMap {
             )
             UGraphics.enableDepth()
         }
+    }
+
+    @SubscribeEvent
+    fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
+        val mapRoom = DungeonInfo.uniqueRooms.find { room ->
+            room.mainRoom.data.type == RoomType.PUZZLE && Puzzle.fromName(room.name)?.tabName == event.puzzle
+        }
+
+        mapRoom?.mainRoom?.state = RoomState.DISCOVERED
     }
 
     @SubscribeEvent
