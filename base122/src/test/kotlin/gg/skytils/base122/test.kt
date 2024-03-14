@@ -77,4 +77,18 @@ class Test {
             assertEquals(expectedValue, b, "Unexpected value at index $index (${b.toString(2)})")
         }
     }
+
+    @Test
+    fun testEncodeSingleByte() {
+        val input = byteArrayOf(0b11111111.toByte())
+        val expectedValues = byteArrayOf(
+            0b01111111,
+            0b01000000
+        )
+        val result = encode(input)
+        result.forEachIndexed { index, uByte ->
+            val expectedValue = expectedValues[index].toUByte()
+            assertEquals(expectedValue, uByte, "Unexpected value at index $index (${uByte.toString(2)})")
+        }
+    }
 }

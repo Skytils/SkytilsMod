@@ -16,9 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@file:OptIn(ExperimentalUnsignedTypes::class)
 package gg.skytils.base122
 
-@OptIn(ExperimentalUnsignedTypes::class)
+internal val illegalCharacters = ubyteArrayOf(
+    0u,  //null
+    10u, //newline
+    13u, //carriage return
+    34u, //double quote
+    38u, //ampersand
+    92u  //backslash
+)
+internal val shortenedMarker = 0b111
+
 fun breakInto7BitChunks(input: ByteArray) =
     input.asUByteArray().asIterable().chunked(7).flatMap { byteList ->
         val bytes = byteList.mapIndexed { index, byte ->
@@ -38,4 +48,45 @@ fun breakInto7BitChunks(input: ByteArray) =
             emptyList()
         }
         chunkList + remainder
+    }
+
+fun encode(input: ByteArray) =
+    sequence {
+        breakInto7BitChunks(input)
+            .toByteArray()
+            .inputStream()
+            .let { bytes ->
+                while (bytes.available() > 0) {
+                    val bits = bytes.read().toUByte()
+
+                    val illegalIndex = illegalCharacters.indexOf(bits)
+                    if (illegalIndex != -1) {
+                        // Illegal char markers
+                        var first = 0b11000010
+                        var second = 0b10000000
+
+                        // Illegal characters are encoded as two bytes
+                        // so we get the next chunk of seven bits.
+                        val nextBits = if (bytes.available() > 0) {
+                            first = first or ((0b111 and shortenedMarker) shl 2)
+                            bytes.read().toUByte()
+                        } else {
+                            first = first or ((0b111 and illegalIndex) shl 2)
+                            bits
+                        }
+
+                        val firstBit = if ((nextBits and 0b01000000u) > 0u) {
+                            1
+                        } else {
+                            0
+                        }
+                        first = first or firstBit
+                        second = second or (nextBits and 0b00111111u).toInt()
+                        yield(first.toUByte())
+                        yield(second.toUByte())
+                    } else {
+                        yield(bits)
+                    }
+                }
+            }
     }
