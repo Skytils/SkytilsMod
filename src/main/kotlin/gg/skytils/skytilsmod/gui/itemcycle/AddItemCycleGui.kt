@@ -20,8 +20,6 @@ package gg.skytils.skytilsmod.gui.itemcycle
 
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
-import gg.essential.elementa.components.ScrollComponent
-import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.UIText
 import gg.essential.elementa.components.input.UITextInput
@@ -30,7 +28,6 @@ import gg.essential.elementa.constraints.ChildBasedSizeConstraint
 import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
-import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.elementa.state.BasicState
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.core.PersistentSave
@@ -38,10 +35,8 @@ import gg.skytils.skytilsmod.features.impl.handlers.ItemCycle
 import gg.skytils.skytilsmod.features.impl.handlers.ItemCycle.getIdentifier
 import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.gui.components.SimpleButton
-import gg.skytils.skytilsmod.gui.profile.components.InventoryComponent
 import gg.skytils.skytilsmod.gui.profile.components.SlotComponent
 import net.minecraft.item.ItemStack
-import java.awt.Color
 import java.util.*
 
 class AddItemCycleGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2), ReopenableGUI {
@@ -124,7 +119,12 @@ class AddItemCycleGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2), Reope
             x = SiblingConstraint(10f)
             y = 0.pixels
         }.onLeftClick {
-            ItemCycle.cycles[uuid] = ItemCycle.Cycle(uuid, nameInput.getText().ifBlank { return@onLeftClick }, hashSetOf(), chosenItem.get().getIdentifier() ?: return@onLeftClick)
+            ItemCycle.cycles[uuid] = ItemCycle.Cycle(
+                uuid,
+                nameInput.getText().ifBlank { return@onLeftClick },
+                hashSetOf(),
+                chosenItem.get().getIdentifier() ?: return@onLeftClick
+            )
 
             mc.displayGuiScreen(ItemCycleGui())
             PersistentSave.markDirty<ItemCycle>()

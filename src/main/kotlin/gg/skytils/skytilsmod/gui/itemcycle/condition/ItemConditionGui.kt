@@ -37,8 +37,10 @@ import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.gui.itemcycle.ItemCycleConditionGui
 import gg.skytils.skytilsmod.gui.profile.components.SlotComponent
 
-class ItemConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cycle.Condition.ItemCondition? = null) : WindowScreen(
-    ElementaVersion.V5, newGuiScale = 2) {
+class ItemConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cycle.Condition.ItemCondition? = null) :
+    WindowScreen(
+        ElementaVersion.V5, newGuiScale = 2
+    ) {
     init {
         UIText("Item Condition for ${cycle.name} (${cycle.uuid})").childOf(window).constrain {
             x = CenterConstraint()
@@ -60,12 +62,13 @@ class ItemConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cycl
             width = 15.percent
         }
 
-        val negationDropdown = DropDown(if (condition?.negated == true) 1 else 0, listOf("IS", "IS NOT")).childOf(container).constrain {
-            x = SiblingConstraint(10f)
-            y = 0.pixels
-            width = 20.percent
-            height = 10.percent
-        }
+        val negationDropdown =
+            DropDown(if (condition?.negated == true) 1 else 0, listOf("IS", "IS NOT")).childOf(container).constrain {
+                x = SiblingConstraint(10f)
+                y = 0.pixels
+                width = 20.percent
+                height = 10.percent
+            }
 
         val chosenItem = BasicState(condition?.item)
 

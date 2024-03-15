@@ -36,8 +36,10 @@ import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.gui.itemcycle.ItemCycleConditionGui
 import gg.skytils.skytilsmod.utils.SkyblockIsland
 
-class IslandConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cycle.Condition.IslandCondition? = null) : WindowScreen(
-    ElementaVersion.V5, newGuiScale = 2) {
+class IslandConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cycle.Condition.IslandCondition? = null) :
+    WindowScreen(
+        ElementaVersion.V5, newGuiScale = 2
+    ) {
     init {
         UIText("Island Condition for ${cycle.name} (${cycle.uuid})").childOf(window).constrain {
             x = CenterConstraint()
@@ -70,12 +72,13 @@ class IslandConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cy
             setText(cond.islands.joinToString(",") { it.mode })
         }
 
-        val negationDropdown = DropDown(if (condition?.negated == true) 1 else 0, listOf("IS", "IS NOT")).childOf(container).constrain {
-            x = SiblingConstraint(10f)
-            y = 0.pixels
-            width = 20.percent
-            height = 10.percent
-        }
+        val negationDropdown =
+            DropDown(if (condition?.negated == true) 1 else 0, listOf("IS", "IS NOT")).childOf(container).constrain {
+                x = SiblingConstraint(10f)
+                y = 0.pixels
+                width = 20.percent
+                height = 10.percent
+            }
 
         val bottomButtons = UIContainer().childOf(window).constrain {
             x = CenterConstraint()
@@ -100,7 +103,8 @@ class IslandConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cy
             }
 
             cond.negated = negationDropdown.getValue() == 1
-            cond.islands = islands.getText().split(",").mapNotNullTo(hashSetOf()){ SkyblockIsland.entries.find { isl -> isl.mode == it } }
+            cond.islands = islands.getText().split(",")
+                .mapNotNullTo(hashSetOf()) { SkyblockIsland.entries.find { isl -> isl.mode == it } }
 
             mc.displayGuiScreen(ItemCycleConditionGui(cycle))
             PersistentSave.markDirty<ItemCycle>()

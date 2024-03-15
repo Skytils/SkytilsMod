@@ -97,9 +97,11 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
                 sbId != null -> {
                     Cycle.ItemIdentifier(sbId, Cycle.ItemIdentifier.Type.SKYBLOCK_ID)
                 }
+
                 this != null -> {
                     Cycle.ItemIdentifier(this.unlocalizedName, Cycle.ItemIdentifier.Type.VANILLA_ID)
                 }
+
                 else -> null
             }
         }
@@ -107,20 +109,14 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
 
     @Serializable
     data class Cycle(
-        val uuid: @Contextual UUID,
-        var name: String,
-        val conditions: MutableSet<Condition>,
-        var swapTo: ItemIdentifier
+        val uuid: @Contextual UUID, var name: String, val conditions: MutableSet<Condition>, var swapTo: ItemIdentifier
     ) {
         @Serializable
         data class ItemIdentifier(
-            val id: String,
-            val type: Type
+            val id: String, val type: Type
         ) {
             enum class Type {
-                SKYBLOCK_ID,
-                SKYBLOCK_UUID,
-                VANILLA_ID
+                SKYBLOCK_ID, SKYBLOCK_UUID, VANILLA_ID
             }
         }
 
@@ -133,21 +129,21 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
             @Serializable
             @SerialName("IslandCondition")
             class IslandCondition(var islands: Set<SkyblockIsland>, var negated: Boolean = false) : Condition() {
-                override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean = islands.any { SBInfo.mode == it.mode } == !negated
+                override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
+                    islands.any { SBInfo.mode == it.mode } == !negated
+
                 override fun displayText(): String = "${if (negated) "Not " else ""}${islands.joinToString(", ")}"
             }
 
             @Serializable
             @SerialName("ClickCondition")
-            class ClickCondition(var clickedButton: Int, var clickType: Int, var negated: Boolean = false) : Condition() {
+            class ClickCondition(var clickedButton: Int, var clickType: Int, var negated: Boolean = false) :
+                Condition() {
                 override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
-                    ((
-                            clickedButton == -1000 || event.clickedButton == clickedButton
-                    ) && (
-                            clickType == -1000 || event.clickType == clickType
-                    )) == !negated
+                    ((clickedButton == -1000 || event.clickedButton == clickedButton) && (clickType == -1000 || event.clickType == clickType)) == !negated
 
-                override fun displayText(): String = "${if (negated) "Not " else ""} button $clickedButton, type $clickType"
+                override fun displayText(): String =
+                    "${if (negated) "Not " else ""} button $clickedButton, type $clickType"
             }
 
             @Serializable
