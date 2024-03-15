@@ -31,6 +31,7 @@ import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.listeners.DungeonListener
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorC0EPacketClickWindow
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.ItemUtil.setLore
@@ -60,6 +61,7 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemSkull
 import net.minecraft.item.ItemStack
+import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.*
 import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
@@ -179,9 +181,6 @@ object DungeonFeatures {
             }
         }
     }
-
-    var fakeDungeonMap: ItemStack? = null
-    var intendedItemStack: ItemStack? = null
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
@@ -315,31 +314,45 @@ object DungeonFeatures {
                     }
                 }
             }
-            if (Skytils.config.injectFakeDungeonMap && DungeonTimer.bossEntryTime == -1L) {
-                (DungeonInfo.dungeonMap ?: DungeonInfo.guessMapData)?.let {
-                    val slot = mc.thePlayer?.inventory?.getStackInSlot(8)
-                    if (slot?.item != Items.filled_map) {
-                        if (fakeDungeonMap == null) {
-                            val guessMapId = it.mapName.substringAfter("map_").toIntOrNull()
-                            if (guessMapId == null) {
-                                mc.theWorld.setItemData("map_-1337", it)
-                            }
-                            fakeDungeonMap = ItemStack(Items.filled_map, 1337, guessMapId ?: -1337).also {
-                                it.setStackDisplayName("§bMagical Map")
-                                it.setLore(listOf("§7Shows the layout of the Dungeon as", "§7it is explored and completed.", "", "§cThis isn't the real map!", "§eSkytils injected this data in for you."))
-                            }
+        }
+    }
+
+    var fakeDungeonMap: ItemStack? = null
+    var intendedItemStack: ItemStack? = null
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    fun onTickLowest(event: ClientTickEvent) {
+        if (!Utils.inDungeons && event.phase != TickEvent.Phase.START) return
+        if (Skytils.config.injectFakeDungeonMap && DungeonTimer.bossEntryTime == -1L) {
+            (DungeonInfo.dungeonMap ?: DungeonInfo.guessMapData)?.let {
+                val slot = mc.thePlayer?.inventory?.getStackInSlot(8)
+                if (slot?.item != Items.filled_map) {
+                    if (fakeDungeonMap == null) {
+                        val guessMapId = it.mapName.substringAfter("map_").toIntOrNull()
+                        if (guessMapId == null) {
+                            mc.theWorld.setItemData("map_-1337", it)
                         }
-                        intendedItemStack = slot
-                        mc.thePlayer.inventory.setInventorySlotContents(8, fakeDungeonMap)
+                        fakeDungeonMap = ItemStack(Items.filled_map, 1337, guessMapId ?: -1337).also {
+                            it.setStackDisplayName("§bMagical Map")
+                            it.setLore(listOf("§7Shows the layout of the Dungeon as", "§7it is explored and completed.", "", "§cThis isn't the real map!", "§eSkytils injected this data in for you."))
+                        }
                     }
-                }.ifNull {
-                    fakeDungeonMap = null
-                    intendedItemStack = null
+                    intendedItemStack = slot
+                    mc.thePlayer.inventory.setInventorySlotContents(8, fakeDungeonMap)
                 }
-            } else {
+            }.ifNull {
                 fakeDungeonMap = null
                 intendedItemStack = null
             }
+        } else {
+            fakeDungeonMap = null
+            intendedItemStack = null
+        }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onPacketSend(event: PacketEvent.SendEvent) {
+        if (fakeDungeonMap != null && event.packet is C0EPacketClickWindow && event.packet.clickedItem == fakeDungeonMap) {
+            (event.packet as AccessorC0EPacketClickWindow).setClickedItem(intendedItemStack)
         }
     }
 
