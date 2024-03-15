@@ -124,7 +124,7 @@ class AddItemCycleGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2), Reope
             x = SiblingConstraint(10f)
             y = 0.pixels
         }.onLeftClick {
-            ItemCycle.cycles[uuid] = ItemCycle.Cycle(uuid, nameInput.getText(), hashSetOf(), chosenItem.get().getIdentifier() ?: return@onLeftClick)
+            ItemCycle.cycles[uuid] = ItemCycle.Cycle(uuid, nameInput.getText().ifBlank { return@onLeftClick }, hashSetOf(), chosenItem.get().getIdentifier() ?: return@onLeftClick)
 
             mc.displayGuiScreen(ItemCycleGui())
             PersistentSave.markDirty<ItemCycle>()

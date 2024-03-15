@@ -26,6 +26,7 @@ import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.SkyblockIsland
 import gg.skytils.skytilsmod.utils.Utils
 import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import net.minecraft.item.ItemStack
@@ -130,12 +131,14 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
             abstract fun displayText(): String
 
             @Serializable
+            @SerialName("IslandCondition")
             class IslandCondition(var islands: Set<SkyblockIsland>, var negated: Boolean = false) : Condition() {
                 override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean = islands.any { SBInfo.mode == it.mode } == !negated
                 override fun displayText(): String = "${if (negated) "Not " else ""}${islands.joinToString(", ")}"
             }
 
             @Serializable
+            @SerialName("ClickCondition")
             class ClickCondition(var clickedButton: Int, var clickType: Int, var negated: Boolean = false) : Condition() {
                 override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
                     ((
@@ -148,6 +151,7 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
             }
 
             @Serializable
+            @SerialName("ItemCondition")
             class ItemCondition(var item: ItemIdentifier, var negated: Boolean = false) : Condition() {
                 override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean {
                     return (clickedItem == item) == !negated
