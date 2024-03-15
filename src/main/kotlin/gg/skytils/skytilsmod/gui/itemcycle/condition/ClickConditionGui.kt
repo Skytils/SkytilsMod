@@ -52,8 +52,8 @@ class ClickConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cyc
         }
 
         val cond = condition ?: ItemCycle.Cycle.Condition.ClickCondition(
-            -1,
-            -1,
+            -1000,
+            -1000,
             false
         )
 

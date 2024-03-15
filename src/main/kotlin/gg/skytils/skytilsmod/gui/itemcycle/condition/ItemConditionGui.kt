@@ -88,10 +88,14 @@ class ItemConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cycl
         val chosenText by UIText("Chosen Item: None").childOf(container).constrain {
             x = 0.pixels
             y = SiblingConstraint(10f)
+        }.apply {
+            if (condition?.item != null) {
+                setText("Chosen Item: ${condition.item}")
+            }
         }
 
         chosenItem.onSetValue {
-            chosenText.setText("Chosen Item: ${it}")
+            chosenText.setText("Chosen Item: $it")
         }
 
         val bottomButtons = UIContainer().childOf(window).constrain {

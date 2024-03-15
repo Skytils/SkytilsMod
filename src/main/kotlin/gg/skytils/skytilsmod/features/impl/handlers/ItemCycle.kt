@@ -139,9 +139,9 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
             class ClickCondition(var clickedButton: Int, var clickType: Int, var negated: Boolean = false) : Condition() {
                 override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
                     ((
-                            clickedButton == -1 || event.clickedButton == clickedButton
+                            clickedButton == -1000 || event.clickedButton == clickedButton
                     ) && (
-                            clickType == -1 || event.clickType == clickType
+                            clickType == -1000 || event.clickType == clickType
                     )) == !negated
 
                 override fun displayText(): String = "${if (negated) "Not " else ""} button $clickedButton, type $clickType"
