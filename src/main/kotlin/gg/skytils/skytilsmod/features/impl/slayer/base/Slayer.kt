@@ -111,7 +111,7 @@ open class Slayer<T : EntityLivingBase>(
                     "slayer"
                 )
                 SlayerFeatures.slayer = null
-                throw IllegalStateException("Wrong entity!")
+                throw Exception("Wrong entity!")
             }
         }
     open fun tick(event: TickEvent.ClientTickEvent) {}
