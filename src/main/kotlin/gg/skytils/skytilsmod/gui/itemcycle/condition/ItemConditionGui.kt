@@ -28,6 +28,7 @@ import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.state.BasicState
+import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.features.impl.handlers.ItemCycle
@@ -57,6 +58,13 @@ class ItemConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cycl
             x = 0.pixels
             y = 0.pixels
             width = 15.percent
+        }
+
+        val negationDropdown = DropDown(if (condition?.negated == true) 1 else 0, listOf("IS", "IS NOT")).childOf(container).constrain {
+            x = SiblingConstraint(10f)
+            y = 0.pixels
+            width = 20.percent
+            height = 10.percent
         }
 
         val chosenItem = BasicState(condition?.item)
@@ -108,6 +116,7 @@ class ItemConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cycl
                 cycle.conditions.add(cond)
             }
 
+            cond.negated = negationDropdown.getValue() == 1
             cond.item = chosenItem.get() ?: return@onLeftClick
 
             mc.displayGuiScreen(ItemCycleConditionGui(cycle))

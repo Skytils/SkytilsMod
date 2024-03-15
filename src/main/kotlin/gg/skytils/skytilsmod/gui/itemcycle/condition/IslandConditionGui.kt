@@ -28,6 +28,7 @@ import gg.essential.elementa.constraints.ChildBasedSizeConstraint
 import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
+import gg.essential.vigilance.gui.settings.DropDown
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.features.impl.handlers.ItemCycle
@@ -69,6 +70,13 @@ class IslandConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cy
             setText(cond.islands.joinToString(",") { it.mode })
         }
 
+        val negationDropdown = DropDown(if (condition?.negated == true) 1 else 0, listOf("IS", "IS NOT")).childOf(container).constrain {
+            x = SiblingConstraint(10f)
+            y = 0.pixels
+            width = 20.percent
+            height = 10.percent
+        }
+
         val bottomButtons = UIContainer().childOf(window).constrain {
             x = CenterConstraint()
             y = 90.percent
@@ -91,6 +99,7 @@ class IslandConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cy
                 cycle.conditions.add(cond)
             }
 
+            cond.negated = negationDropdown.getValue() == 1
             cond.islands = islands.getText().split(",").mapNotNull { SkyblockIsland.entries.find { isl -> isl.mode == it } }
 
             mc.displayGuiScreen(ItemCycleConditionGui(cycle))
