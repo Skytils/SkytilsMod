@@ -52,7 +52,7 @@ class IslandConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cy
             height = 70.percent + 2.pixels
         }
 
-        val cond = condition ?: ItemCycle.Cycle.Condition.IslandCondition(emptyList(), false)
+        val cond = condition ?: ItemCycle.Cycle.Condition.IslandCondition(emptySet(), false)
         UIText("UUID: ${cond.uuid}").childOf(container).constrain {
             x = 0.pixels
             y = 0.pixels
@@ -100,7 +100,7 @@ class IslandConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cy
             }
 
             cond.negated = negationDropdown.getValue() == 1
-            cond.islands = islands.getText().split(",").mapNotNull { SkyblockIsland.entries.find { isl -> isl.mode == it } }
+            cond.islands = islands.getText().split(",").mapNotNullTo(hashSetOf()){ SkyblockIsland.entries.find { isl -> isl.mode == it } }
 
             mc.displayGuiScreen(ItemCycleConditionGui(cycle))
             PersistentSave.markDirty<ItemCycle>()

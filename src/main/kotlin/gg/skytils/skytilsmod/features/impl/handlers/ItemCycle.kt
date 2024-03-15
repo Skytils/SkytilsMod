@@ -49,7 +49,7 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
     }
 
     override fun write(writer: Writer) {
-        writer.write(json.encodeToString(cycles))
+        writer.write(json.encodeToString<Map<UUID, Cycle>>(cycles))
     }
 
     override fun setDefault(writer: Writer) {
@@ -130,7 +130,7 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
             abstract fun displayText(): String
 
             @Serializable
-            class IslandCondition(var islands: List<SkyblockIsland>, var negated: Boolean = false) : Condition() {
+            class IslandCondition(var islands: Set<SkyblockIsland>, var negated: Boolean = false) : Condition() {
                 override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean = islands.any { SBInfo.mode == it.mode } == !negated
                 override fun displayText(): String = "${if (negated) "Not " else ""}${islands.joinToString(", ")}"
             }

@@ -19,7 +19,6 @@ package gg.skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
 import gg.essential.universal.utils.MCClickEventAction
-import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
@@ -64,7 +63,7 @@ object ItemCycleCommand : BaseCommand("skytilsitemcycle", aliases = listOf("stic
                         val negated = args.getOrNull(4)?.toBoolean() ?: false
                         when (args.getOrNull(3)) {
                             "island" -> {
-                                val islands = args.getOrNull(5)?.split(",")?.mapNotNull { SkyblockIsland.entries.find { isl -> isl.mode == it } } ?: throw WrongUsageException("You must specify an island mode.")
+                                val islands = args.getOrNull(5)?.split(",")?.mapNotNullTo(hashSetOf()) { SkyblockIsland.entries.find { isl -> isl.mode == it } } ?: throw WrongUsageException("You must specify an island mode.")
                                 val cond = ItemCycle.Cycle.Condition.IslandCondition(islands, negated)
                                 cycle.conditions.add(cond)
                                 UTextComponent("$successPrefix §fAdded a new island condition with id ${cond.uuid} to cycle")
