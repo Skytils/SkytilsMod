@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.gui
 
+import gg.essential.api.EssentialAPI
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.*
@@ -28,6 +29,7 @@ import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.constraints.animation.Animations
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.ScissorEffect
+import gg.essential.universal.UChat
 import gg.essential.vigilance.data.PropertyItem
 import gg.essential.vigilance.data.PropertyType
 import gg.essential.vigilance.gui.settings.DropDown
@@ -39,6 +41,7 @@ import gg.skytils.skytilsmod.gui.components.AccordionComponent
 import gg.skytils.skytilsmod.gui.components.CustomFilterComponent
 import gg.skytils.skytilsmod.gui.components.RepoFilterComponent
 import gg.skytils.skytilsmod.gui.components.SimpleButton
+import gg.skytils.skytilsmod.utils.ModChecker
 import java.awt.Color
 
 class SpamHiderGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
@@ -362,7 +365,7 @@ class SpamHiderGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
         addCustomHider.onMouseClick {
             val filter =
                 SpamHider.Filter(
-                    "New Filter",
+                    "Enter Unique Filter Name Here",
                     0,
                     true,
                     "Input Pattern Here".toRegex(),
@@ -387,6 +390,13 @@ class SpamHiderGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     }
 
     override fun onScreenClose() {
+        if (SpamHider.filters.mapTo(hashSetOf()) { it.name }.size != SpamHider.filters.size) {
+            if (ModChecker.canShowNotifications) {
+                EssentialAPI.getNotifications().push("Warning!", "Your spam hider filters must have unique names!\nThey will not save correctly upon exiting.")
+            } else {
+                UChat.chat("${Skytils.failPrefix} §cYour spam hider filters must have unique names!\nThey will not save correctly upon exiting.")
+            }
+        }
         PersistentSave.markDirty<SpamHider>()
         Skytils.config.markDirty()
     }
