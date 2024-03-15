@@ -303,6 +303,7 @@ class Skytils {
             GriffinBurrows,
             IceFillSolver,
             IcePathSolver,
+            ItemCycle,
             ItemFeatures,
             KeyShortcuts,
             KuudraChestProfit,
@@ -383,6 +384,7 @@ class Skytils {
         cch.registerCommand(CalcXPCommand)
         cch.registerCommand(FragBotCommand)
         cch.registerCommand(HollowWaypointCommand)
+        cch.registerCommand(ItemCycleCommand)
         cch.registerCommand(LimboCommand)
         cch.registerCommand(OrderedWaypointCommand)
         cch.registerCommand(ScamCheckCommand)
