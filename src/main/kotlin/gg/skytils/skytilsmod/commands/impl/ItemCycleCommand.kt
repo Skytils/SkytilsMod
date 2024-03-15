@@ -21,12 +21,14 @@ import gg.essential.universal.UChat
 import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
 import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.features.impl.handlers.ItemCycle
 import gg.skytils.skytilsmod.features.impl.handlers.ItemCycle.getIdentifier
+import gg.skytils.skytilsmod.gui.itemcycle.ItemCycleGui
 import gg.skytils.skytilsmod.utils.SkyblockIsland
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.WrongUsageException
@@ -41,8 +43,9 @@ object ItemCycleCommand : BaseCommand("skytilsitemcycle", aliases = listOf("stic
             "create" -> {
                 val item = mc.thePlayer.heldItem?.getIdentifier() ?: throw WrongUsageException("You must be holding an item to create a cycle.")
                 val id = UUID.randomUUID()
+                val name = args.getOrNull(1) ?: id.toString()
 
-                ItemCycle.cycles[id] = ItemCycle.Cycle(UUID.randomUUID(), hashSetOf(), item)
+                ItemCycle.cycles[id] = ItemCycle.Cycle(UUID.randomUUID(), name, hashSetOf(), item)
 
                 UTextComponent("$successPrefix §fCreated a new no-op cycle with id $id")
                     .setClick(MCClickEventAction.SUGGEST_COMMAND, "/stic condition $id")
@@ -114,7 +117,7 @@ object ItemCycleCommand : BaseCommand("skytilsitemcycle", aliases = listOf("stic
                     UChat.chat("$failPrefix §cNo cycle with id $id found")
             }
             else -> {
-                UChat.chat("$failPrefix §cInvalid subcommand. Usage: /stic <create|condition|target|delete>")
+                Skytils.displayScreen = ItemCycleGui()
             }
         }
     }

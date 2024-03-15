@@ -106,7 +106,8 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
 
     @Serializable
     data class Cycle(
-        val id: @Contextual UUID,
+        val uuid: @Contextual UUID,
+        var name: String,
         val conditions: MutableSet<Condition>,
         var swapTo: ItemIdentifier
     ) {
@@ -126,26 +127,33 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
         sealed class Condition(val uuid: @Contextual UUID = UUID.randomUUID()) {
             abstract fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean
 
+            abstract fun displayText(): String
+
             @Serializable
-            class IslandCondition(val islands: List<SkyblockIsland>, val negated: Boolean = false) : Condition() {
+            class IslandCondition(var islands: List<SkyblockIsland>, var negated: Boolean = false) : Condition() {
                 override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean = islands.any { SBInfo.mode == it.mode } == !negated
+                override fun displayText(): String = "${if (negated) "Not " else ""}${islands.joinToString(", ")}"
             }
 
             @Serializable
-            class ClickCondition(val clickedButton: Int, val clickType: Int, val negated: Boolean = false) : Condition() {
+            class ClickCondition(var clickedButton: Int, var clickType: Int, var negated: Boolean = false) : Condition() {
                 override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
                     ((
                             clickedButton == -1 || event.clickedButton == clickedButton
                     ) && (
                             clickType == -1 || event.clickType == clickType
                     )) == !negated
+
+                override fun displayText(): String = "${if (negated) "Not " else ""} button $clickedButton, type $clickType"
             }
 
             @Serializable
-            class ItemCondition(val item: ItemIdentifier, val negated: Boolean = false) : Condition() {
+            class ItemCondition(var item: ItemIdentifier, var negated: Boolean = false) : Condition() {
                 override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean {
                     return (clickedItem == item) == !negated
                 }
+
+                override fun displayText(): String = "${if (negated) "Not " else ""}${item.type}: ${item.id}"
             }
         }
     }
