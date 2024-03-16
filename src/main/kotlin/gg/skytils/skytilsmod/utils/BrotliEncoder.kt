@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.utils
 
+import com.aayushatharva.brotli4j.Brotli4jLoader
 import com.aayushatharva.brotli4j.decoder.BrotliInputStream
 import io.ktor.client.plugins.compression.*
 import io.ktor.utils.io.*
@@ -43,4 +44,10 @@ class BrotliEncoder(val useNative: Boolean) : ContentEncoder {
     }
 
     override fun CoroutineScope.encode(source: ByteReadChannel): ByteReadChannel = throw UnsupportedOperationException("Cannot encode Brotli")
+
+    init {
+        if (useNative) {
+            Brotli4jLoader.ensureAvailability()
+        }
+    }
 }
