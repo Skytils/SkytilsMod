@@ -68,11 +68,14 @@ object SheepifyRebellion {
         Utils.isBSMod || SuperSecretSettings.sheepifyRebellion
     }
 
-    val palEntities by lazy {
+    val palEntities: List<Int> by lazy {
         mutableListOf<Int>().apply {
             addAll(50..68)
             addAll(90..101)
             remove(63) // vault the ender dragon cause the model is different
+            if (isSkytilsPlus) {
+                remove(91)
+            }
         }
     }
 
