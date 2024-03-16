@@ -28,6 +28,7 @@ import gg.essential.elementa.state.State
 import gg.skytils.hypixel.types.player.Player
 import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.skytilsmod.gui.constraints.FixedChildBasedRangeConstraint
+import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.SkillUtils
 import gg.skytils.skytilsmod.utils.toTitleCase
@@ -141,7 +142,13 @@ class DungeonsComponent(private val playerState: State<Player?>, private val pro
     }
 
     val cata by XPComponent(
-        ItemComponent(ItemStack(Items.skull, 1, 1)),
+        ItemComponent(
+            ItemUtil.setSkullTexture(
+                ItemStack(Items.skull, 1, 3),
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTY0ZTFjM2UzMTVjOGQ4ZmZmYzM3OTg1YjY2ODFjNWJkMTZhNmY5N2ZmZDA3MTk5ZThhMDVlZmJlZjEwMzc5MyJ9fX0",
+                "00b3837d-9275-304c-8bf9-656659087e6b"
+            )
+        ),
         "Catacombs",
         0f,
         0

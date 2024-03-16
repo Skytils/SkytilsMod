@@ -60,13 +60,23 @@ class SlayerBossComponent(slayer: State<SlayerBossData?>, type: String) : UIRoun
             )
             "wolf" -> ItemUtil.setSkullTexture(
                 ItemStack(Items.skull, it.first, 3),
-                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjgzYTJhYTlkMzczNGI5MTlhYzI0Yzk2NTllNWUwZjg2ZWNhZmJmNjRkNDc4OGNmYTQzM2JiZWMxODllOCJ9fX0=",
-                "daf2a9b9-2326-4cc2-b1a9-d49194886c70"
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGMzZGQ5ODRiYjY1OTg0OWJkNTI5OTQwNDY5NjRjMjI3MjVmNzE3ZTk4NmIxMmQ1NDhmZDE2OTM2N2Q0OTQifX19",
+                "f4c8960f-0ab6-4ef7-89bf-bce34519c3b7"
             )
             "enderman" -> ItemUtil.setSkullTexture(
                 ItemStack(Items.skull, it.first, 3),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWIwOWEzNzUyNTEwZTkxNGIwYmRjOTA5NmIzOTJiYjM1OWY3YThlOGE5NTY2YTAyZTdmNjZmYWZmOGQ2Zjg5ZSJ9fX0=",
                 "c4880012-4860-43d2-aaaf-51dfc00a8399"
+            )
+            "blaze" -> ItemUtil.setSkullTexture(
+                ItemStack(Items.skull, it.first, 3),
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjc4ZWYyZTRjZjJjNDFhMmQxNGJmZGU5Y2FmZjEwMjE5ZjViMWJmNWIzNWE0OWViNTFjNjQ2Nzg4MmNiNWYwIn19fQ==",
+                "83d17ecb-a464-4f7b-8528-0fd67d24cdff"
+            )
+            "vampire" -> ItemUtil.setSkullTexture(
+                ItemStack(Items.skull, it.first, 3),
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHBzOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzVhYTI5ZWE5NjE3NTdkYzNjOTBiZmFiZjMwMmM1YWJlOWQzMDhmYjRhN2QzODY0ZTU3ODhhZDJjYzkxNjBhYTIifX19",
+                "af0ec305-3efa-4238-956c-6327b0c041fc"
             )
             else -> ItemStack(Items.skull, -1, 1)
         }
