@@ -115,7 +115,7 @@ class ItemCycleGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2), Reopenab
             }
         }
 
-        SimpleButton("UUID").childOf(container).constrain {
+        SimpleButton("Copy UUID").childOf(container).constrain {
             x = SiblingConstraint(10f)
             y = CenterConstraint()
             width = 10.percent

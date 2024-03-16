@@ -53,12 +53,12 @@ class ItemCycleConditionGui(cycle: ItemCycle.Cycle) : WindowScreen(ElementaVersi
             x = CenterConstraint()
             y = 15.percent
             width = 90.percent
-            height = 70.percent + 2.pixels
+            height = 65.percent + 2.pixels
         }
 
         val bottomButtons by UIContainer().childOf(window).constrain {
             x = CenterConstraint()
-            y = 90.percent
+            y = 85.percent
             width = ChildBasedSizeConstraint()
             height = ChildBasedSizeConstraint()
         }
@@ -104,7 +104,6 @@ class ItemCycleConditionGui(cycle: ItemCycle.Cycle) : WindowScreen(ElementaVersi
             x = SiblingConstraint(5f)
             y = CenterConstraint()
             width = 30.percent
-            height = 10.percent
         }
 
         SimpleButton("Edit").childOf(container).constrain {

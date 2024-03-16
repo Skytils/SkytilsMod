@@ -76,8 +76,8 @@ class IslandConditionGui(val cycle: ItemCycle.Cycle, val condition: ItemCycle.Cy
             DropDown(if (condition?.negated == true) 1 else 0, listOf("IS", "IS NOT")).childOf(container).constrain {
                 x = SiblingConstraint(10f)
                 y = 0.pixels
-                width = 20.percent
-                height = 10.percent
+                width = 100.pixels
+                height = 20.pixels
             }
 
         val bottomButtons = UIContainer().childOf(window).constrain {
