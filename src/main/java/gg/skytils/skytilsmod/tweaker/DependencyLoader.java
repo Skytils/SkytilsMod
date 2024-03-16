@@ -32,8 +32,9 @@ import static gg.skytils.skytilsmod.tweaker.TweakerUtil.addToClasspath;
 public class DependencyLoader {
 
     private static final String MAVEN_CENTRAL_ROOT = "https://repo1.maven.org/maven2/";
+    public static boolean hasNativeBrotli = false;
 
-    public static void loadDependencies() throws Throwable {
+    public static void loadDependencies() {
         loadBrotli();
     }
 
@@ -48,15 +49,31 @@ public class DependencyLoader {
             }
         }
 
+        System.out.println("Brotli size: " + Files.size(downloadPath));
+
         addToClasspath(downloadLocation.toURI().toURL());
 
         return downloadLocation;
     }
 
-    public static void loadBrotli() throws Throwable {
-        String brotli4jPlatform = getBrotli4jPlatform();
-        loadDependency(String.format("com/aayushatharva/brotli4j/native-%s/1.16.0/native-%s-1.16.0.jar", brotli4jPlatform, brotli4jPlatform));
-        Brotli4jLoader.ensureAvailability();
+    public static void loadBrotli() {
+        if (System.getProperty("skytils.noNativeBrotli") != null) {
+            System.out.println("Native Brotli disabled by system property");
+            hasNativeBrotli = false;
+            return;
+        }
+
+        try {
+            String brotli4jPlatform = getBrotli4jPlatform();
+            loadDependency(String.format("com/aayushatharva/brotli4j/native-%s/1.16.0/native-%s-1.16.0.jar", brotli4jPlatform, brotli4jPlatform));
+            Brotli4jLoader.ensureAvailability();
+            hasNativeBrotli = true;
+            System.out.println("Native Brotli loaded");
+        } catch (Throwable t) {
+            System.out.println("Failed to load native Brotli");
+            t.printStackTrace();
+            hasNativeBrotli = false;
+        }
     }
 
     public static String getBrotli4jPlatform() {

@@ -67,6 +67,7 @@ import gg.skytils.skytilsmod.mixins.hooks.util.MouseHelperHook
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiStreamUnavailable
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
+import gg.skytils.skytilsmod.tweaker.DependencyLoader
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
@@ -205,7 +206,7 @@ class Skytils {
 
         val client = HttpClient(CIO) {
             install(ContentEncoding) {
-                customEncoder(BrotliEncoder, 1.0F)
+                customEncoder(BrotliEncoder(DependencyLoader.hasNativeBrotli), 1.0F)
                 deflate(1.0F)
                 gzip(0.9F)
                 identity(0.1F)
@@ -245,7 +246,6 @@ class Skytils {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent) {
-        Brotli4jLoader.ensureAvailability()
         DataFetcher.preload()
         guiManager = GuiManager
         jarFile = event.sourceFile
@@ -432,6 +432,14 @@ class Skytils {
         }
 
         checkSystemTime()
+
+        if (!DependencyLoader.hasNativeBrotli) {
+            if (ModChecker.canShowNotifications) {
+                EssentialAPI.getNotifications().push("Skytils Warning", "Native Brotli is not available. Skytils will use the Java Brotli decoder, which cannot encode Brotli.", duration = 3f)
+            } else {
+                UChat.chat("$prefix §fNative Brotli is not available. Skytils will use the Java Brotli decoder, which cannot encode Brotli.")
+            }
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

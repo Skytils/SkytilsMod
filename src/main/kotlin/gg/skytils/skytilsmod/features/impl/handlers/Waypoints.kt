@@ -28,6 +28,7 @@ import gg.skytils.skytilsmod.commands.impl.OrderedWaypointCommand
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
+import gg.skytils.skytilsmod.tweaker.DependencyLoader
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -77,7 +78,15 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                     }
                 }
                 2 -> {
-                    bombChecker.wrapOutput(BrotliInputStream(bombChecker.wrapInput(Base64InputStream(content.byteInputStream())))).use {
+                    val wrapped = bombChecker.wrapInput(Base64InputStream(content.byteInputStream()))
+
+                    val inputStream = if (DependencyLoader.hasNativeBrotli) {
+                        BrotliInputStream(wrapped)
+                    } else {
+                        org.brotli.dec.BrotliInputStream(wrapped)
+                    }
+
+                    bombChecker.wrapOutput(inputStream).use {
                         it.readBytes().decodeToString()
                     }
                 }
@@ -148,7 +157,14 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         val bombChecker = DecompressionBombChecker(100)
         val inputStream = when (version) {
             2 -> {
-                bombChecker.wrapOutput(BrotliInputStream(bombChecker.wrapInput(file.inputStream())))
+                val wrapped = bombChecker.wrapInput(file.inputStream())
+
+                val inputStream = if (DependencyLoader.hasNativeBrotli) {
+                    BrotliInputStream(wrapped)
+                } else {
+                    org.brotli.dec.BrotliInputStream(wrapped)
+                }
+                bombChecker.wrapOutput(inputStream)
             }
 
             else -> throw IllegalArgumentException("Unknown version $version")
@@ -163,6 +179,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
 
         val data = when (version) {
             2 -> {
+                if (!DependencyLoader.hasNativeBrotli) error("Brotli encoder is not available")
                 Base64.encodeBase64String(ByteArrayOutputStream().use { bs ->
                     BrotliOutputStream(bs, Encoder.Parameters().apply {
                         // setMode(Encoder.Mode.TEXT) for smaller values this actually makes the compressed data larger, larger values have no effect
@@ -196,6 +213,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         val realPath = if (!path.name.endsWith(".V$version.SkytilsWaypoints")) path.resolveSibling("${path.name}.V$version.SkytilsWaypoints") else path
         when (version) {
             2 -> {
+                if (!DependencyLoader.hasNativeBrotli) error ("Brotli encoder is not available")
                 BrotliOutputStream(realPath.outputStream(), Encoder.Parameters().apply {
                     setQuality(11)
                 }).use {

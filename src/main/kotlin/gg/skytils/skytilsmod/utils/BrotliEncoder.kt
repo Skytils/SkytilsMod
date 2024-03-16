@@ -24,12 +24,22 @@ import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.CoroutineScope
 
-object BrotliEncoder : ContentEncoder {
+class BrotliEncoder(val useNative: Boolean) : ContentEncoder {
     override val name: String = "br"
 
     override fun CoroutineScope.decode(source: ByteReadChannel): ByteReadChannel {
         val bombChecker = DecompressionBombChecker(100)
-        return bombChecker.wrapOutput(BrotliInputStream(bombChecker.wrapInput(source.toInputStream()))).toByteReadChannel()
+        val wrapped = bombChecker.wrapInput(source.toInputStream())
+
+        val inputStream = if (useNative) {
+            BrotliInputStream(wrapped)
+        } else {
+            org.brotli.dec.BrotliInputStream(wrapped)
+        }
+
+        return bombChecker.wrapOutput(
+            inputStream
+        ).toByteReadChannel()
     }
 
     override fun CoroutineScope.encode(source: ByteReadChannel): ByteReadChannel = throw UnsupportedOperationException("Cannot encode Brotli")

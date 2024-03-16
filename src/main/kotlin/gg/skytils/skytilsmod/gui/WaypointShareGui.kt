@@ -256,30 +256,36 @@ class WaypointShareGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2) {
     }
 
     private fun exportSelectedWaypoints() {
-        val island = SkyblockIsland.entries[islandDropdown.getValue()]
+        runCatching {
+            val island = SkyblockIsland.entries[islandDropdown.getValue()]
 
-        // Convert the selected waypoints into an object that can be easily serialized
-        val categories = categoryContainers.map { entry ->
-            WaypointCategory(
-                name = entry.value.name,
-                waypoints = entry.value.container.childContainers.mapNotNull {
-                    if (entries[it]?.selected?.checked != true) null
-                    else entries[it]?.waypoint
-                }.toHashSet(),
-                isExpanded = true,
-                island = island
-            )
-        }.toSet()
+            // Convert the selected waypoints into an object that can be easily serialized
+            val categories = categoryContainers.map { entry ->
+                WaypointCategory(
+                    name = entry.value.name,
+                    waypoints = entry.value.container.childContainers.mapNotNull {
+                        if (entries[it]?.selected?.checked != true) null
+                        else entries[it]?.waypoint
+                    }.toHashSet(),
+                    isExpanded = true,
+                    island = island
+                )
+            }.toSet()
 
-        setClipboardString(getStringFromWaypoints(categories, versionDropdown.getValue() + 1))
+            setClipboardString(getStringFromWaypoints(categories, versionDropdown.getValue() + 1))
 
-        val count = categories.sumOf { it.waypoints.size }
-        EssentialAPI.getNotifications()
-            .push(
-                "Waypoints Exported",
-                "$count ${island.displayName} waypoints were copied to your clipboard!",
-                2.5f
-            )
+            val count = categories.sumOf { it.waypoints.size }
+            EssentialAPI.getNotifications()
+                .push(
+                    "Waypoints Exported",
+                    "$count ${island.displayName} waypoints were copied to your clipboard!",
+                    2.5f
+                )
+        }.onFailure {
+            it.printStackTrace()
+            EssentialAPI.getNotifications()
+                .push("Error", "Failed to export waypoints, reason: ${it::class.simpleName}: ${it.message}")
+        }
     }
 
     private fun loadWaypointsForSelection(selection: Int) {
