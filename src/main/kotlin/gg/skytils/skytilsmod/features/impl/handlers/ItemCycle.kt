@@ -46,15 +46,15 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
 
     override fun read(reader: Reader) {
         cycles.clear()
-        cycles.putAll(json.decodeFromString<Map<UUID, Cycle>>(reader.readText()))
+        cycles.putAll(json.decodeFromString<Map<@Contextual UUID, Cycle>>(reader.readText()))
     }
 
     override fun write(writer: Writer) {
-        writer.write(json.encodeToString<Map<UUID, Cycle>>(cycles))
+        writer.write(json.encodeToString<Map<@Contextual UUID, Cycle>>(cycles))
     }
 
     override fun setDefault(writer: Writer) {
-        writer.write(json.encodeToString(emptyMap<UUID, Cycle>()))
+        writer.write(json.encodeToString(emptyMap<@Contextual UUID, Cycle>()))
     }
 
     @SubscribeEvent
@@ -128,7 +128,7 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
 
             @Serializable
             @SerialName("IslandCondition")
-            class IslandCondition(var islands: Set<SkyblockIsland>, var negated: Boolean = false) : Condition() {
+            class IslandCondition(var islands: Set<@Serializable(with = SkyblockIsland.ModeSerializer::class) SkyblockIsland>, var negated: Boolean = false) : Condition() {
                 override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
                     islands.any { SBInfo.mode == it.mode } == !negated
 
