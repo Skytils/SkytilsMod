@@ -378,6 +378,7 @@ class Skytils {
         cch.registerCommand(ScamCheckCommand)
         cch.registerCommand(SlayerCommand)
         cch.registerCommand(TrophyFishCommand)
+        cch.registerCommand(TYFRSCommand)
 
         if (!cch.commands.containsKey("armorcolor")) {
             cch.registerCommand(ArmorColorCommand)
