@@ -420,10 +420,7 @@ object ItemFeatures {
             val tier = extraAttr.getInteger("item_tier")
 
             if (boost > 0 && tier > 0) {
-                event.toolTip.addAll(
-                    event.toolTip.size - 1,
-                    listOf("§6Base Stat Boost: §b$boost%", "§6Item Tier: §b$tier")
-                )
+                event.toolTip.addAll(listOf("§6Base Stat Boost: §b$boost%", "§6Item Tier: §b$tier"))
             }
         }
 
