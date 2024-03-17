@@ -88,6 +88,18 @@ object ItemFeatures {
 
     private val headPattern =
         Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
+    private val obtainedFromFloor = mapOf(
+        1 to "§aF1",
+        2 to "§aF2",
+        3 to "§aF3",
+        4 to "§aF4§7/§4M1",
+        5 to "§aF5§7/§4M2",
+        6 to "§aF6§7/§4M3",
+        7 to "§aF7§7/§4M4",
+        8 to "§4M5",
+        9 to "§4M6",
+        10 to "§4M7",
+    )
 
     // TODO: it is possible for 2 items to have the same name but different material
     val itemIdToNameLookup = hashMapOf<String, String>()
@@ -417,10 +429,10 @@ object ItemFeatures {
 
         if (Skytils.config.showItemQuality && extraAttr != null) {
             val boost = extraAttr.getInteger("baseStatBoostPercentage")
-            val tier = extraAttr.getInteger("item_tier")
+            val floor = obtainedFromFloor[extraAttr.getInteger("item_tier")]
 
-            if (boost > 0 && tier > 0) {
-                event.toolTip.addAll(listOf("§6Base Stat Boost: §b$boost%", "§6Item Tier: §b$tier"))
+            if (boost > 0 && floor != null) {
+                event.toolTip.add("§6Quality: §b$boost% §7($floor§7)")
             }
         }
 
