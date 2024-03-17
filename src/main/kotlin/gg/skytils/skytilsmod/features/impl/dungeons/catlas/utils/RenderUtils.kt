@@ -40,7 +40,7 @@ object RenderUtils {
 
     private val tessellator: Tessellator = Tessellator.getInstance()
     private val worldRenderer: WorldRenderer = tessellator.worldRenderer
-    private val mapIcons = ResourceLocation("skytils", "catlas/marker.png")
+    private val mapIcons = ResourceLocation("catlas:marker.png")
 
     private fun preDraw() {
         GlStateManager.enableAlpha()

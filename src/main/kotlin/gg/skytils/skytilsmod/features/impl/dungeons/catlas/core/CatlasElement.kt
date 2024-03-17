@@ -42,14 +42,14 @@ import java.awt.Color
 
 object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
-    private val neuGreen = ResourceLocation("skytils", "catlas/neu/green_check.png")
-    private val neuWhite = ResourceLocation("skytils", "catlas/neu/white_check.png")
-    private val neuCross = ResourceLocation("skytils", "catlas/neu/cross.png")
-    private val neuQuestion = ResourceLocation("skytils", "catlas/neu/question.png")
-    private val defaultGreen = ResourceLocation("skytils", "catlas/default/green_check.png")
-    private val defaultWhite = ResourceLocation("skytils", "catlas/default/white_check.png")
-    private val defaultCross = ResourceLocation("skytils", "catlas/default/cross.png")
-    private val defaultQuestion = ResourceLocation("skytils", "catlas/default/question.png")
+    private val neuGreen = ResourceLocation("catlas:neu/green_check.png")
+    private val neuWhite = ResourceLocation("catlas:neu/white_check.png")
+    private val neuCross = ResourceLocation("catlas:neu/cross.png")
+    private val neuQuestion = ResourceLocation("catlas:neu/question.png")
+    private val defaultGreen = ResourceLocation("catlas:default/green_check.png")
+    private val defaultWhite = ResourceLocation("catlas:default/white_check.png")
+    private val defaultCross = ResourceLocation("catlas:default/cross.png")
+    private val defaultQuestion = ResourceLocation("catlas:default/question.png")
 
     var dynamicRotation = 0f
 

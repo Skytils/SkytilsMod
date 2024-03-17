@@ -37,7 +37,7 @@ object ScanUtils {
     val roomList by lazy {
         json.decodeFromStream<Set<RoomData>>(
             mc.resourceManager.getResource(
-                ResourceLocation("skytils", "catlas/rooms.json")
+                ResourceLocation("catlas:rooms.json")
             ).inputStream
         )
     }
