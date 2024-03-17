@@ -414,6 +414,19 @@ object ItemFeatures {
                 }"
             })
         }
+
+        if (Skytils.config.showItemQuality && extraAttr != null) {
+            val boost = extraAttr.getInteger("baseStatBoostPercentage")
+            val tier = extraAttr.getInteger("item_tier")
+
+            if (boost > 0 && tier > 0) {
+                event.toolTip.addAll(
+                    event.toolTip.size - 1,
+                    listOf("§6Base Stat Boost: §b$boost%", "§6Item Tier: §b$tier")
+                )
+            }
+        }
+
         if (DevTools.getToggle("nbt") && Keyboard.isKeyDown(46) && GuiScreen.isCtrlKeyDown() && !GuiScreen.isShiftKeyDown() && !GuiScreen.isAltKeyDown()) {
             GuiScreen.setClipboardString(event.itemStack?.tagCompound?.toString())
         }
