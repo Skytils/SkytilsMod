@@ -155,6 +155,17 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
 
                 override fun displayText(): String = "${if (negated) "Not " else ""}${item.type}: ${item.id}"
             }
+
+            @Serializable
+            @SerialName("SlotCondition")
+            class SlotCondition(var slotId: Int, var negated: Boolean = false) :
+                Condition() {
+                override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
+                    event.slotId == slotId == !negated
+
+                override fun displayText(): String =
+                    "${if (negated) "Not " else ""} slot $slotId"
+            }
         }
     }
 }

@@ -70,7 +70,7 @@ class ItemCycleConditionGui(cycle: ItemCycle.Cycle) : WindowScreen(ElementaVersi
             mc.displayGuiScreen(ItemCycleGui())
         }
 
-        DropDown(0, listOf("Add New Condition", "Click", "Island", "Item")).childOf(bottomButtons).constrain {
+        DropDown(0, listOf("Add New Condition", "Click", "Island", "Item", "Slot")).childOf(bottomButtons).constrain {
             x = SiblingConstraint(5f)
             y = 0.pixels
         }.onValueChange {
@@ -78,6 +78,7 @@ class ItemCycleConditionGui(cycle: ItemCycle.Cycle) : WindowScreen(ElementaVersi
                 1 -> mc.displayGuiScreen(ClickConditionGui(cycle))
                 2 -> mc.displayGuiScreen(IslandConditionGui(cycle))
                 3 -> mc.displayGuiScreen(ItemConditionGui(cycle))
+                4 -> mc.displayGuiScreen(SlotConditionGui(cycle))
             }
         }
 
@@ -129,6 +130,7 @@ class ItemCycleConditionGui(cycle: ItemCycle.Cycle) : WindowScreen(ElementaVersi
             is ItemCycle.Cycle.Condition.ClickCondition -> ClickConditionGui(cycle, condition)
             is ItemCycle.Cycle.Condition.IslandCondition -> IslandConditionGui(cycle, condition)
             is ItemCycle.Cycle.Condition.ItemCondition -> ItemConditionGui(cycle, condition)
+            is ItemCycle.Cycle.Condition.SlotCondition -> SlotConditionGui(cycle, condition)
         }
     }
 }
