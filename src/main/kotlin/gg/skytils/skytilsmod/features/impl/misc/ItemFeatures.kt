@@ -420,12 +420,12 @@ object ItemFeatures {
             val boost = extraAttr.getInteger("baseStatBoostPercentage")
             val tier = extraAttr.getInteger("item_tier")
 
-            val isMasterMode = requirementPattern.matchEntire(extraAttr.getString("dungeon_skill_req"))?.let {
-                val level = it.groups["level"]?.value?.toIntOrNull() ?: return@let null
-                level > 24
-            }
-
             if (boost > 0 && tier > 0) {
+                val isMasterMode = requirementPattern.matchEntire(extraAttr.getString("dungeon_skill_req"))?.let {
+                    val level = it.groups["level"]?.value?.toIntOrNull() ?: return@let null
+                    level > 24
+                }
+
                 val floor = when (isMasterMode) {
                     true -> "§4M${tier - 3}"
                     false -> "§aF$tier"
