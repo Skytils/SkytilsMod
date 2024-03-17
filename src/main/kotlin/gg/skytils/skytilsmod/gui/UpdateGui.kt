@@ -89,7 +89,13 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
             val st = client.get(url) {
                 expectSuccess = false
                 onDownload { bytesSentTotal, contentLength ->
-                    progress = bytesSentTotal / contentLength.toDouble()
+                    if (contentLength != 0L)
+                        progress = bytesSentTotal / contentLength.toDouble()
+                }
+                timeout {
+                    connectTimeoutMillis = null
+                    requestTimeoutMillis = null
+                    socketTimeoutMillis = null
                 }
             }
             if (st.status != HttpStatusCode.OK) {

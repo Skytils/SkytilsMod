@@ -219,6 +219,7 @@ class Skytils {
                 retryOnServerErrors(maxRetries = 3)
                 exponentialDelay()
             }
+            install(HttpTimeout)
             install(UserAgent) {
                 agent = "Skytils/$VERSION"
             }
