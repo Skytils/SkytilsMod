@@ -34,7 +34,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SWITCH,
         description = "Render the map!",
         category = "Map",
-        subcategory = "Toggle"
+        subcategory = "Toggle",
+        i18nName = "catlas.config.map.toggle.map_enabled",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.toggle"
     )
     var mapEnabled = false
 
@@ -43,7 +46,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SWITCH,
         description = "Rotates map to follow the player.",
         category = "Map",
-        subcategory = "Toggle"
+        subcategory = "Toggle",
+        i18nName = "catlas.config.map.toggle.rotate_map",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.toggle"
     )
     var mapRotate = false
 
@@ -52,7 +58,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SWITCH,
         description = "Centers the map on the player if Rotate Map is enabled.",
         category = "Map",
-        subcategory = "Toggle"
+        subcategory = "Toggle",
+        i18nName = "catlas.config.map.toggle.center_map",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.toggle"
     )
     var mapCenter = false
 
@@ -61,7 +70,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SWITCH,
         description = "Keeps the entrance room at the bottom. Does not work with rotate map.",
         category = "Map",
-        subcategory = "Toggle"
+        subcategory = "Toggle",
+        i18nName = "catlas.config.map.toggle.dynamic_rotate",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.toggle"
     )
     var mapDynamicRotate = false
 
@@ -70,7 +82,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SWITCH,
         description = "Hides the map in boss.",
         category = "Map",
-        subcategory = "Toggle"
+        subcategory = "Toggle",
+        i18nName = "catlas.config.map.toggle.hide_in_boss",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.toggle"
     )
     var mapHideInBoss = false
 
@@ -80,7 +95,10 @@ object CatlasConfig : Vigilant(
         description = "Show player name under player head",
         category = "Map",
         subcategory = "Toggle",
-        options = ["Off", "Holding Leap", "Always"]
+        options = ["Off", "Holding Leap", "Always"],
+        i18nName = "catlas.config.map.toggle.show_player_names",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.toggle"
     )
     var playerHeads = 0
 
@@ -89,7 +107,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SWITCH,
         description = "Uses the vanilla head marker for yourself.",
         category = "Map",
-        subcategory = "Toggle"
+        subcategory = "Toggle",
+        i18nName = "catlas.config.map.toggle.vanilla_head_marker",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.toggle"
     )
     var mapVanillaMarker = false
 
@@ -100,7 +121,10 @@ object CatlasConfig : Vigilant(
         category = "Map",
         subcategory = "Size",
         maxF = 2f,
-        decimalPlaces = 2
+        decimalPlaces = 2,
+        i18nName = "catlas.config.map.size.map_text_scale",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.size"
     )
     var textScale = 0.75f
 
@@ -111,7 +135,10 @@ object CatlasConfig : Vigilant(
         category = "Map",
         subcategory = "Size",
         maxF = 2f,
-        decimalPlaces = 2
+        decimalPlaces = 2,
+        i18nName = "catlas.config.map.size.player_heads_scale",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.size"
     )
     var playerHeadScale = 1f
 
@@ -122,7 +149,10 @@ object CatlasConfig : Vigilant(
         category = "Map",
         subcategory = "Size",
         maxF = 2f,
-        decimalPlaces = 2
+        decimalPlaces = 2,
+        i18nName = "catlas.config.map.size.player_name_scale",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.size"
     )
     var playerNameScale = .8f
 
@@ -131,7 +161,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Map",
         subcategory = "Render",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.map.render.map_background_color",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.render"
     )
     var mapBackground = Color(0, 0, 0, 100)
 
@@ -140,7 +173,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Map",
         subcategory = "Render",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.map.render.map_border_color",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.render"
     )
     var mapBorder = Color(0, 0, 0, 255)
 
@@ -149,7 +185,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.DECIMAL_SLIDER,
         category = "Map",
         subcategory = "Render",
-        maxF = 10f
+        maxF = 10f,
+        i18nName = "catlas.config.map.render.border_thickness",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.render"
     )
     var mapBorderWidth = 3f
 
@@ -158,7 +197,9 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SELECTOR,
         description = "Shows names of rooms on map.",
         category = "Rooms",
-        options = ["None", "Puzzles / Trap", "All"]
+        options = ["None", "Puzzles / Trap", "All"],
+        i18nName = "catlas.config.rooms..room_names",
+        i18nCategory = "catlas.config.rooms"
     )
     var mapRoomNames = 1
 
@@ -167,7 +208,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SWITCH,
         description = "Center room names.",
         subcategory = "Text",
-        category = "Rooms"
+        category = "Rooms",
+        i18nName = "catlas.config.rooms.text.center_room_names",
+        i18nCategory = "catlas.config.rooms",
+        i18nSubcategory = "catlas.config.rooms.text"
     )
     var mapCenterRoomName = true
 
@@ -176,7 +220,9 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SELECTOR,
         description = "Shows total secrets of rooms on map.",
         category = "Rooms",
-        options = ["Off", "On", "Replace Checkmark"]
+        options = ["Off", "On", "Replace Checkmark"],
+        i18nName = "catlas.config.rooms..room_secrets",
+        i18nCategory = "catlas.config.rooms"
     )
     var mapRoomSecrets = 0
 
@@ -184,7 +230,7 @@ object CatlasConfig : Vigilant(
         name = "Color Text",
         type = PropertyType.SWITCH,
         description = "Colors name and secret count based on room state.",
-        category = "Rooms"
+        category = "Rooms", i18nName = "catlas.config.rooms..color_text", i18nCategory = "catlas.config.rooms"
     )
     var mapColorText = false
 
@@ -193,7 +239,9 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SELECTOR,
         description = "Adds room checkmarks based on room state.",
         category = "Rooms",
-        options = ["None", "Default", "NEU"]
+        options = ["None", "Default", "NEU"],
+        i18nName = "catlas.config.rooms..room_checkmarks",
+        i18nCategory = "catlas.config.rooms"
     )
     var mapCheckmark = 1
 
@@ -202,7 +250,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SWITCH,
         description = "Center room checkmarks.",
         subcategory = "Checkmarks",
-        category = "Rooms"
+        category = "Rooms",
+        i18nName = "catlas.config.rooms.checkmarks.center_room_checkmarks",
+        i18nCategory = "catlas.config.rooms",
+        i18nSubcategory = "catlas.config.rooms.checkmarks"
     )
     var mapCenterCheckmark = true
 
@@ -211,7 +262,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Doors",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.doors.blood_door",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.doors"
     )
     var colorBloodDoor = Color(231, 0, 0)
 
@@ -220,7 +274,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Doors",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.doors.entrance_door",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.doors"
     )
     var colorEntranceDoor = Color(20, 133, 0)
 
@@ -229,7 +286,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Doors",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.doors.normal_door",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.doors"
     )
     var colorRoomDoor = Color(92, 52, 14)
 
@@ -238,7 +298,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Doors",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.doors.wither_door",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.doors"
     )
     var colorWitherDoor = Color(0, 0, 0)
 
@@ -247,7 +310,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Doors",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.doors.opened_wither_door",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.doors"
     )
     var colorOpenWitherDoor = Color(92, 52, 14)
 
@@ -256,7 +322,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Doors",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.doors.unopened_door",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.doors"
     )
     var colorUnopenedDoor = Color(65, 65, 65)
 
@@ -265,7 +334,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Rooms",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.rooms.blood_room",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.rooms"
     )
     var colorBlood = Color(255, 0, 0)
 
@@ -274,7 +346,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Rooms",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.rooms.entrance_room",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.rooms"
     )
     var colorEntrance = Color(20, 133, 0)
 
@@ -283,7 +358,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Rooms",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.rooms.fairy_room",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.rooms"
     )
     var colorFairy = Color(224, 0, 255)
 
@@ -292,7 +370,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Rooms",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.rooms.miniboss_room",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.rooms"
     )
     var colorMiniboss = Color(254, 223, 0)
 
@@ -301,7 +382,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Rooms",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.rooms.normal_room",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.rooms"
     )
     var colorRoom = Color(107, 58, 17)
 
@@ -310,7 +394,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Rooms",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.rooms.puzzle_room",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.rooms"
     )
     var colorPuzzle = Color(117, 0, 133)
 
@@ -319,7 +406,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Rooms",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.rooms.rare_room",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.rooms"
     )
     var colorRare = Color(255, 203, 89)
 
@@ -328,7 +418,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Rooms",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.rooms.trap_room",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.rooms"
     )
     var colorTrap = Color(216, 127, 51)
 
@@ -337,7 +430,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Colors",
         subcategory = "Rooms",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.colors.rooms.unopened_room",
+        i18nCategory = "catlas.config.colors",
+        i18nSubcategory = "catlas.config.colors.rooms"
     )
     var colorUnopened = Color(65, 65, 65)
 
@@ -348,6 +444,9 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SWITCH,
         category = "Other Features",
         subcategory = "Wither Door",
+        i18nName = "catlas.config.other_features.wither_door.box_wither_doors",
+        i18nCategory = "catlas.config.other_features",
+        i18nSubcategory = "catlas.config.other_features.wither_door"
     )
     var boxWitherDoors = false
 
@@ -356,7 +455,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Other Features",
         subcategory = "Wither Door",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.other_features.wither_door.no_key_color",
+        i18nCategory = "catlas.config.other_features",
+        i18nSubcategory = "catlas.config.other_features.wither_door"
     )
     var witherDoorNoKeyColor = Color(255, 0, 0)
 
@@ -365,7 +467,10 @@ object CatlasConfig : Vigilant(
         type = PropertyType.COLOR,
         category = "Other Features",
         subcategory = "Wither Door",
-        allowAlpha = true
+        allowAlpha = true,
+        i18nName = "catlas.config.other_features.wither_door.has_key_color",
+        i18nCategory = "catlas.config.other_features",
+        i18nSubcategory = "catlas.config.other_features.wither_door"
     )
     var witherDoorKeyColor = Color(0, 255, 0)
 
@@ -375,7 +480,10 @@ object CatlasConfig : Vigilant(
         category = "Other Features",
         subcategory = "Wither Door",
         minF = 1f,
-        maxF = 10f
+        maxF = 10f,
+        i18nName = "catlas.config.other_features.wither_door.door_outline_width",
+        i18nCategory = "catlas.config.other_features",
+        i18nSubcategory = "catlas.config.other_features.wither_door"
     )
     var witherDoorOutlineWidth = 3f
 
@@ -383,7 +491,10 @@ object CatlasConfig : Vigilant(
         name = "Door Outline Opacity",
         type = PropertyType.PERCENT_SLIDER,
         category = "Other Features",
-        subcategory = "Wither Door"
+        subcategory = "Wither Door",
+        i18nName = "catlas.config.other_features.wither_door.door_outline_opacity",
+        i18nCategory = "catlas.config.other_features",
+        i18nSubcategory = "catlas.config.other_features.wither_door"
     )
     var witherDoorOutline = 1f
 
@@ -391,7 +502,10 @@ object CatlasConfig : Vigilant(
         name = "Door Fill Opacity",
         type = PropertyType.PERCENT_SLIDER,
         category = "Other Features",
-        subcategory = "Wither Door"
+        subcategory = "Wither Door",
+        i18nName = "catlas.config.other_features.wither_door.door_fill_opacity",
+        i18nCategory = "catlas.config.other_features",
+        i18nSubcategory = "catlas.config.other_features.wither_door"
     )
     var witherDoorFill = 0.25f
 
