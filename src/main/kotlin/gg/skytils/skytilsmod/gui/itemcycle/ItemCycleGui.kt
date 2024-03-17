@@ -123,6 +123,14 @@ class ItemCycleGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2), Reopenab
             setClipboardString(uuid.toString())
         }
 
+        SimpleButton("Rebind").childOf(container).constrain {
+            x = SiblingConstraint(10f)
+            y = CenterConstraint()
+            width = 10.percent
+        }.onLeftClick {
+            mc.displayGuiScreen(RebindItemCycleGui(cycle))
+        }
+
         SimpleButton("Remove").childOf(container).constrain {
             x = 85.percent
             y = CenterConstraint()
