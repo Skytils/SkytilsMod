@@ -29,7 +29,7 @@ plugins {
     id("gg.essential.loom") version "1.3.12"
     id("gg.essential.defaults") version "0.3.0"
     idea
-    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.8"
 
     signing
 }
