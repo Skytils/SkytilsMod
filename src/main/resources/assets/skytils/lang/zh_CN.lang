@@ -323,7 +323,6 @@ skytils.config.slayer..current_sven_rng_meter=当前Sven RNG计
 skytils.config.slayer..current_voidgloom_rng_meter=当前虚空ogloom RNG计
 skytils.config.slayer..current_inferno_rng_meter=当前炼狱RNG计
 skytils.config.slayer..current_bloodfiend_rng_meter=当前夺血魔RNG计
-skytils.config.slayer.quality_of_life.click_to_open_maddox_menu=点击打开Maddox菜单
 skytils.config.slayer.general.carry_mode=携带模式
 skytils.config.slayer.general.use_hits_to_detect_slayer=使用击中检测猎杀
 skytils.config.slayer.quality_of_life.ping_when_in_atoned_horror_danger_zone=进入宽恕的恐惧危险区时蜂鸣
