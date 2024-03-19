@@ -32,13 +32,10 @@ object ItemWorthStrategy : ItemProtectStrategy() {
         val value = AuctionData.lowestBINs.getOrDefault(id, 0.0)
         val threshold = Skytils.config.protectItemBINThreshold.toInt()
         return when (type) {
-            ProtectType.CLICKOUTOFWINDOW, ProtectType.DROPKEYININVENTORY, ProtectType.SALVAGE, ProtectType.SELLTONPC, ProtectType.USERCLOSEWINDOW -> {
-                value >= threshold
-            }
-
             ProtectType.HOTBARDROPKEY -> {
                 !DungeonFeatures.hasClearedText && value >= threshold
             }
+            else -> value >= threshold
         }
     }
 
