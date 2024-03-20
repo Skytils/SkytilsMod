@@ -47,7 +47,11 @@ import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.*
 import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
+import gg.skytils.skytilsmod.gui.editing.VanillaEditingGui
+import gg.skytils.skytilsmod.gui.features.*
 import gg.skytils.skytilsmod.gui.profile.ProfileGui
+import gg.skytils.skytilsmod.gui.updater.UpdateGui
+import gg.skytils.skytilsmod.gui.waypoints.WaypointsGui
 import gg.skytils.skytilsmod.localapi.LocalAPI
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.coroutines.async
@@ -211,7 +215,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
             "editlocation", "editlocations", "location", "locations", "loc", "gui" ->
                 Skytils.displayScreen = ElementaEditingGui()
 
-            "oldgui" -> Skytils.displayScreen = LocationEditGui()
+            "oldgui" -> Skytils.displayScreen = VanillaEditingGui()
 
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()
             "spam", "spamhider" -> Skytils.displayScreen = SpamHiderGui()

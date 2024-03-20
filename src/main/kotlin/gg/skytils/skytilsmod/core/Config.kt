@@ -32,8 +32,8 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
-import gg.skytils.skytilsmod.gui.PotionNotificationsGui
-import gg.skytils.skytilsmod.gui.SpiritLeapNamesGui
+import gg.skytils.skytilsmod.gui.features.PotionNotificationsGui
+import gg.skytils.skytilsmod.gui.features.SpiritLeapNamesGui
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.utils.ModChecker
 import gg.skytils.skytilsmod.utils.SuperSecretSettings

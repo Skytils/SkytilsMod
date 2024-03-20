@@ -26,7 +26,7 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.RenderHUDEvent
-import gg.skytils.skytilsmod.gui.LocationEditGui
+import gg.skytils.skytilsmod.gui.editing.VanillaEditingGui
 import gg.skytils.skytilsmod.utils.GlState
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -135,7 +135,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderHUD(event: RenderHUDEvent) {
-        if (Minecraft.getMinecraft().currentScreen is LocationEditGui) return
+        if (Minecraft.getMinecraft().currentScreen is VanillaEditingGui) return
         mc.mcProfiler.startSection("SkytilsHUD")
         gui.draw(UMatrixStack.Compat.get())
         for ((_, element) in elements) {

@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,8 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.gui
+package gg.skytils.skytilsmod.gui.features
 
+import gg.essential.api.EssentialAPI
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.ScrollComponent
@@ -33,18 +34,26 @@ import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.features.impl.handlers.CommandAliases
+import gg.skytils.skytilsmod.features.impl.handlers.CustomNotifications
+import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.gui.components.HelpComponent
 import gg.skytils.skytilsmod.gui.components.SimpleButton
-import net.minecraft.util.ChatAllowedCharacters
 import java.awt.Color
 
-class CommandAliasesGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), ReopenableGUI {
+class CustomNotificationsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
+    private val components = HashMap<UIContainer, Entry>()
+
+    private data class Entry(
+        val container: UIContainer,
+        val regex: UITextInput,
+        val displayText: UITextInput,
+        val ticks: UITextInput
+    )
 
     init {
-        UIText("Command Aliases").childOf(window).constrain {
+        UIText("Custom Notifications").childOf(window).constrain {
             x = CenterConstraint()
             y = RelativeConstraint(0.075f)
             height = 14.pixels()
@@ -73,24 +82,24 @@ class CommandAliasesGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reo
             mc.displayGuiScreen(null)
         }
 
-        SimpleButton("Add Alias").childOf(bottomButtons).constrain {
+        SimpleButton("Add Notification").childOf(bottomButtons).constrain {
             x = SiblingConstraint(5f)
             y = 0.pixels()
         }.onLeftClick {
-            addNewAlias()
+            addNewNotification()
         }
 
         HelpComponent(
             window,
-            "What are aliases? Aliases are little shortcuts for commands. For example, /slay could be short for /skytilsslayer. Want to give it a try? Click 'Add Alias', enter 'slay' for 'Alias Name' and 'skytilsslayer' as the executed command! Then, run the command /slay Sychic! Aliases will also append any arguments that you supply."
+            "What are custom notifications? Custom Notifications allow you to configure popups for when certain chat messages are entered, using regex."
         )
 
-        for (name in CommandAliases.aliases) {
-            addNewAlias(name.key, name.value)
+        for (notif in CustomNotifications.notifications.sortedBy { it.text }) {
+            addNewNotification(notif.regex.pattern, notif.text, notif.displayTicks)
         }
     }
 
-    private fun addNewAlias(alias: String = "", replacement: String = "") {
+    private fun addNewNotification(regex: String = "", text: String = "", ticks: Int = 20) {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
@@ -98,37 +107,51 @@ class CommandAliasesGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reo
             height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
-        val aliasName = UITextInput("Alias Name").childOf(container).constrain {
+        val triggerMessage = UITextInput("Trigger Regex").childOf(container).constrain {
             x = 5.pixels()
             y = CenterConstraint()
-            width = 30.percent()
+            width = 40.percent()
         }.apply {
             onLeftClick {
                 grabWindowFocus()
             }
-            setText(alias)
+            setText(regex)
         }
 
-        val commandInput = UITextInput("Executed Command").childOf(container).constrain {
+        val displayText = UITextInput("Display Text").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
-            width = 50.percent()
+            width = 32.percent()
         }.apply {
             onLeftClick {
                 grabWindowFocus()
             }
-            setText(replacement)
+            setText(text)
         }
-        aliasName.apply {
+
+        val displayTicks = UITextInput("Ticks").childOf(container).constrain {
+            x = SiblingConstraint(5f)
+            y = CenterConstraint()
+            width = 5.percent()
+        }.apply {
+            onLeftClick {
+                grabWindowFocus()
+            }
+            setText(ticks.toString())
+        }
+        triggerMessage.apply {
             onKeyType { _, keyCode ->
-                if (keyCode == UKeyboard.KEY_TAB) commandInput.grabWindowFocus()
-                setText(getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
+                if (keyCode == UKeyboard.KEY_TAB) displayText.grabWindowFocus()
             }
         }
-        commandInput.apply {
+        displayText.apply {
             onKeyType { _, keyCode ->
-                if (keyCode == UKeyboard.KEY_TAB) aliasName.grabWindowFocus()
-                setText(getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
+                if (keyCode == UKeyboard.KEY_TAB) displayTicks.grabWindowFocus()
+            }
+        }
+        displayTicks.apply {
+            onKeyType { _, keyCode ->
+                if (keyCode == UKeyboard.KEY_TAB) triggerMessage.grabWindowFocus()
             }
         }
 
@@ -138,24 +161,34 @@ class CommandAliasesGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reo
             height = 75.percent()
         }.onLeftClick {
             scrollComponent.removeChild(container)
+            components.remove(container)
         }
+
+        components[container] = Entry(container, triggerMessage, displayText, displayTicks)
     }
 
     override fun onScreenClose() {
         super.onScreenClose()
-        CommandAliases.aliases.clear()
+        CustomNotifications.notifications.clear()
 
-        for (container in scrollComponent.allChildren) {
-            val text = container.childrenOfType<UITextInput>()
-            if (text.size != 2) throw IllegalStateException("${container.componentName} does not have 2 UITextInput's! Available children ${container.children.map { it.componentName }}")
-            val alias = (text.find { it.placeholder == "Alias Name" }
-                ?: throw IllegalStateException("${container.componentName} does not have the alias UITextInput! Available children ${container.children.map { it.componentName }}")).getText()
-            val replacement = (text.find { it.placeholder == "Executed Command" }
-                ?: throw IllegalStateException("${container.componentName} does not have the command UITextInput! Available children ${container.children.map { it.componentName }}")).getText()
-            if (alias.isBlank() || replacement.isBlank()) continue
-            CommandAliases.aliases[alias] = replacement
+        for ((_, triggerRegex, displayText, displayTicks) in components.values) {
+            if (triggerRegex.getText().isBlank() || displayText.getText().isBlank() || displayTicks.getText()
+                    .isBlank()
+            ) continue
+            runCatching {
+                CustomNotifications.notifications.add(
+                    CustomNotifications.Notification(
+                        triggerRegex.getText().replace("%%MC_IGN%%", mc.session.username).toRegex(),
+                        displayText.getText(),
+                        displayTicks.getText().toInt()
+                    )
+                )
+            }.onFailure {
+                it.printStackTrace()
+                EssentialAPI.getNotifications().push("Invalid notification", triggerRegex.getText(), 3f)
+            }
         }
 
-        PersistentSave.markDirty<CommandAliases>()
+        PersistentSave.markDirty<CustomNotifications>()
     }
 }
