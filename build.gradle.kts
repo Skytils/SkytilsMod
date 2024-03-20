@@ -98,6 +98,10 @@ dependencies {
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
         exclude(module = "gson")
+        exclude(module = "vigilance")
+    }
+    shadowMe("com.github.Skytils.Vigilance:vigilance-1.8.9-forge:afb0909442") {
+        isTransitive = false
     }
 
     shadowMeMod("com.github.Skytils:AsmHelper:91ecc2bd9c") {
@@ -207,6 +211,7 @@ tasks {
         relocate("io.ktor", "gg.skytils.ktor")
         relocate("kotlinx.serialization", "gg.skytils.ktx-serialization")
         relocate("kotlinx.coroutines", "gg.skytils.ktx-coroutines")
+        relocate("gg.essential.vigilance", "gg.skytils.vigilance")
 
         exclude(
             "**/LICENSE_MixinExtras",
