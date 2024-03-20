@@ -49,6 +49,13 @@ fun injectSplashProgressTransformer() = modify("net.minecraftforge.fml.client.Sp
                         astore().also {
                             index = it.index
                         }
+                        getStatic("net/minecraftforge/fml/client/SplashProgress", "rotate", "Z")
+                        invokeStatic(
+                            "gg/skytils/skytilsmod/asm/transformers/SplashProgressTransformer",
+                            "setForgeGifRotate",
+                            "(Z)Z;"
+                        )
+                        putStatic("net/minecraftforge/fml/client/SplashProgress", "rotate", "Z")
                     }
                     instructions.insertBefore(insn, list.build())
                 }
@@ -101,5 +108,10 @@ object SplashProgressTransformer {
                 println("Rolled a $weight, displaying ${it.resourcePath}")
             }
         }
+    }
+
+    @JvmStatic
+    fun setForgeGifRotate(rotate: Boolean): Boolean {
+        return rotate || !SuperSecretSettings.noSychic && Utils.isBSMod
     }
 }
