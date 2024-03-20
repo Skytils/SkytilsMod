@@ -102,10 +102,6 @@ object DungeonFeatures {
     private var isInTerracottaPhase = false
     private var terracottaEndTime = -1.0
     private var rerollClicks = 0
-    private var foundLivid = false
-    var livid: Entity? = null
-    private var lividTag: Entity? = null
-    private var lividJob: Job? = null
     private var alertedSpiritPet = false
     private const val SPIRIT_PET_TEXTURE =
         "ewogICJ0aW1lc3RhbXAiIDogMTU5NTg2MjAyNjE5OSwKICAicHJvZmlsZUlkIiA6ICI0ZWQ4MjMzNzFhMmU0YmI3YTVlYWJmY2ZmZGE4NDk1NyIsCiAgInByb2ZpbGVOYW1lIiA6ICJGaXJlYnlyZDg4IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzhkOWNjYzY3MDY3N2QwY2ViYWFkNDA1OGQ2YWFmOWFjZmFiMDlhYmVhNWQ4NjM3OWEwNTk5MDJmMmZlMjI2NTUiCiAgICB9CiAgfQp9"
@@ -131,7 +127,6 @@ object DungeonFeatures {
 
     init {
         DungeonSecretDisplay
-        LividGuiElement()
         SpiritBearSpawnTimer()
     }
 
@@ -225,95 +220,6 @@ object DungeonFeatures {
                 GuiManager.createTitle("Spirit Pet", 20)
                 alertedSpiritPet = true
             }
-
-            if (Skytils.config.findCorrectLivid && !foundLivid) {
-                if (equalsOneOf(dungeonFloor, "F5", "M5")) {
-                    when (Skytils.config.lividFinderType) {
-                        1 -> {
-                            val loadedLivids = mc.theWorld.loadedEntityList.filter {
-                                val name = it.name
-                                name.contains("Livid") && name.length > 5 && name[1] == name[5]
-                            }
-                            if (loadedLivids.size > 8) {
-                                lividTag = loadedLivids[0]
-                                val aabb = AxisAlignedBB(
-                                    lividTag!!.posX - 0.5,
-                                    lividTag!!.posY - 2,
-                                    lividTag!!.posZ - 0.5,
-                                    lividTag!!.posX + 0.5,
-                                    lividTag!!.posY,
-                                    lividTag!!.posZ + 0.5
-                                )
-                                livid = mc.theWorld.loadedEntityList.find {
-                                    val coll = it.entityBoundingBox ?: return@find false
-                                    return@find it is EntityOtherPlayerMP && it.name.endsWith(" Livid") && aabb.isVecInside(
-                                        coll.minVec
-                                    ) && aabb.isVecInside(
-                                        coll.maxVec
-                                    )
-                                }
-                                foundLivid = true
-                            }
-                        }
-
-                        0 -> {
-                            if (hasBossSpawned && mc.thePlayer.isPotionActive(Potion.blindness) && (lividJob == null || lividJob?.isCancelled == true || lividJob?.isCompleted == true)) {
-                                lividJob = Skytils.launch {
-                                    while (mc.thePlayer.isPotionActive(Potion.blindness)) {
-                                        delay(1)
-                                    }
-                                    val state = mc.theWorld.getBlockState(BlockPos(6, 109, 43))
-                                    val color = state.getValue(BlockStainedGlass.COLOR)
-                                    val a = when (color) {
-                                        EnumDyeColor.WHITE -> EnumChatFormatting.WHITE
-                                        EnumDyeColor.MAGENTA -> EnumChatFormatting.LIGHT_PURPLE
-                                        EnumDyeColor.PINK -> EnumChatFormatting.LIGHT_PURPLE
-                                        EnumDyeColor.RED -> EnumChatFormatting.RED
-                                        EnumDyeColor.SILVER -> EnumChatFormatting.GRAY
-                                        EnumDyeColor.GRAY -> EnumChatFormatting.GRAY
-                                        EnumDyeColor.GREEN -> EnumChatFormatting.DARK_GREEN
-                                        EnumDyeColor.LIME -> EnumChatFormatting.GREEN
-                                        EnumDyeColor.BLUE -> EnumChatFormatting.BLUE
-                                        EnumDyeColor.PURPLE -> EnumChatFormatting.DARK_PURPLE
-                                        EnumDyeColor.YELLOW -> EnumChatFormatting.YELLOW
-                                        else -> null
-                                    }
-                                    val otherColor =
-                                        (color as AccessorEnumDyeColor).chatColor
-                                    for (entity in mc.theWorld.loadedEntityList) {
-                                        if (entity !is EntityArmorStand) continue
-                                        val fallBackColor = entity.name.startsWith("$otherColor﴾ $otherColor§lLivid")
-                                        if ((a != null && entity.name.startsWith("$a﴾ $a§lLivid")) || fallBackColor) {
-                                            if (fallBackColor && !(a != null && entity.name.startsWith("$a﴾ $a§lLivid"))) {
-                                                UChat.chat("§bBlock color ${color.name} should be mapped to ${otherColor}${otherColor.name}§b. Please report this to discord.gg/skytils")
-                                            }
-                                            lividTag = entity
-                                            val aabb = AxisAlignedBB(
-                                                lividTag!!.posX - 0.5,
-                                                lividTag!!.posY - 2,
-                                                lividTag!!.posZ - 0.5,
-                                                lividTag!!.posX + 0.5,
-                                                lividTag!!.posY,
-                                                lividTag!!.posZ + 0.5
-                                            )
-                                            livid = mc.theWorld.loadedEntityList.find {
-                                                val coll = it.entityBoundingBox ?: return@find false
-                                                return@find it is EntityOtherPlayerMP && it.name.endsWith(" Livid") && aabb.isVecInside(
-                                                    coll.minVec
-                                                ) && aabb.isVecInside(
-                                                    coll.maxVec
-                                                )
-                                            }
-                                            foundLivid = true
-                                            break
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -325,7 +231,7 @@ object DungeonFeatures {
         if (Skytils.config.injectFakeDungeonMap && DungeonTimer.bossEntryTime == -1L) {
             (DungeonInfo.dungeonMap ?: DungeonInfo.guessMapData)?.let {
                 val slot = mc.thePlayer?.inventory?.getStackInSlot(8)
-                if (slot?.item != Items.filled_map) {
+                if (slot != null && slot.item != Items.filled_map) {
                     if (fakeDungeonMap == null) {
                         val guessMapId = it.mapName.substringAfter("map_").toIntOrNull()
                         if (guessMapId == null) {
@@ -632,23 +538,6 @@ object DungeonFeatures {
                     }
                 }
             }
-            if (event.entity == lividTag) {
-                val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
-                val aabb = AxisAlignedBB(
-                    x - 0.5,
-                    y - 2,
-                    z - 0.5,
-                    x + 0.5,
-                    y,
-                    z + 0.5
-                )
-                RenderUtil.drawOutlinedBoundingBox(
-                    aabb,
-                    Color(255, 107, 11, 255),
-                    3f,
-                    RenderUtil.getPartialTicks()
-                )
-            }
         }
     }
 
@@ -775,9 +664,6 @@ object DungeonFeatures {
         hasBossSpawned = false
         isInTerracottaPhase = false
         terracottaEndTime = -1.0
-        lividTag = null
-        livid = null
-        foundLivid = false
         alertedSpiritPet = false
         lastLitUpTime = -1L
         startWithoutFullParty = false
@@ -831,54 +717,6 @@ object DungeonFeatures {
 
         override val toggled: Boolean
             get() = Skytils.config.spiritBearTimer
-
-        init {
-            Skytils.guiManager.registerElement(this)
-        }
-    }
-
-    internal class LividGuiElement : GuiElement("Livid HP", x = 0.05f, y = 0.4f) {
-        override fun render() {
-            val player = mc.thePlayer
-            val world: World? = mc.theWorld
-            if (toggled && Utils.inDungeons && player != null && world != null) {
-                if (lividTag == null) return
-
-                val leftAlign = scaleX < sr.scaledWidth / 2f
-                val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-                ScreenRenderer.fontRenderer.drawString(
-                    lividTag!!.name.replace("§l", ""),
-                    if (leftAlign) 0f else width.toFloat(),
-                    0f,
-                    CommonColors.WHITE,
-                    alignment,
-                    textShadow
-                )
-            }
-        }
-
-        override fun demoRender() {
-
-            val leftAlign = scaleX < sr.scaledWidth / 2f
-            val text = "§r§f﴾ Livid §e6.9M§c❤ §f﴿"
-            val alignment = if (leftAlign) TextAlignment.LEFT_RIGHT else TextAlignment.RIGHT_LEFT
-            ScreenRenderer.fontRenderer.drawString(
-                text,
-                if (leftAlign) 0f else 0f + width,
-                0f,
-                CommonColors.WHITE,
-                alignment,
-                textShadow
-            )
-        }
-
-        override val height: Int
-            get() = ScreenRenderer.fontRenderer.FONT_HEIGHT
-        override val width: Int
-            get() = ScreenRenderer.fontRenderer.getStringWidth("§r§f﴾ Livid §e6.9M§c❤ §f﴿")
-
-        override val toggled: Boolean
-            get() = Skytils.config.findCorrectLivid
 
         init {
             Skytils.guiManager.registerElement(this)

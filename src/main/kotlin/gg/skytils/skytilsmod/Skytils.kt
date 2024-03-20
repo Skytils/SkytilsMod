@@ -309,6 +309,7 @@ class Skytils {
             KeyShortcuts,
             KuudraChestProfit,
             KuudraFeatures,
+            LividFinder,
             LockOrb,
             MasterMode7Features,
             MayorDiana,

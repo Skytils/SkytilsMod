@@ -1242,7 +1242,7 @@ object Config : Vigilant(
     @Property(
         type = PropertyType.SELECTOR, name = "Type of Livid Finder",
         category = "Dungeons", subcategory = "Solvers",
-        options = ["Block", "Entity"],
+        options = ["Block Change (NEW)", "Static Block"],
         i18nName = "skytils.config.dungeons.solvers.type_of_livid_finder",
         i18nCategory = "skytils.config.dungeons",
         i18nSubcategory = "skytils.config.dungeons.solvers"
