@@ -42,7 +42,11 @@ repositories {
     mavenCentral()
     maven("https://repo.sk1er.club/repository/maven-public/")
     maven("https://repo.sk1er.club/repository/maven-releases/")
-    maven("https://jitpack.io")
+    maven("https://jitpack.io") {
+        mavenContent {
+            includeGroupAndSubgroups("com.github")
+        }
+    }
 }
 
 vineflower {
