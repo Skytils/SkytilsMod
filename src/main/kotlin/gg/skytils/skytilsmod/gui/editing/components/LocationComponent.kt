@@ -43,13 +43,15 @@ class LocationComponent(val element: GuiElement) : UIComponent() {
             when (event.mouseButton) {
                 1 -> {
                     constrain {
-                        x = 10.pixels
-                        y = 10.pixels
-                        element.setPos(10, 10)
+                        val scaleX = 10f / UResolution.scaledWidth
+                        val scaleY = 10f / UResolution.scaledHeight
+                        element.setPos(scaleX, scaleY)
+                        element.scale = 1f
 
+                        x = RelativeConstraint(scaleX)
+                        y = RelativeConstraint(scaleY)
                         width = element.scaleWidth.pixels
                         height = element.scaleHeight.pixels
-                        element.scale = 1f
                     }
                 }
                 2 -> {
@@ -74,7 +76,7 @@ class LocationComponent(val element: GuiElement) : UIComponent() {
             }
         }
         onMouseScroll { event ->
-            element.scale = (element.scale + event.delta).coerceAtLeast(0.01).toFloat()
+            element.scale = (element.scale + (event.delta / 10)).coerceAtLeast(0.01).toFloat()
             constrain {
                 width = element.scaleWidth.pixels
                 height = element.scaleHeight.pixels
