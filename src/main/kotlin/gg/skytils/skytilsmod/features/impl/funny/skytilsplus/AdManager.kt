@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.funny.skytilsplus
 
 import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.mixins.hooks.gui.addColor
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
@@ -30,6 +31,7 @@ import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.random.Random
 
 object AdManager {
     private val ad = ResourceLocation("skytils:skytilsplus/codeskytils.png")
@@ -45,7 +47,9 @@ object AdManager {
 
     fun joinedSkyblock() {
         if (!Utils.isBSMod || SkytilsPlus.redeemed) return
-        UTextComponent(addColor("Your play session today is powered by BSMod! Click me to try BSMod+ today for free!", 0))
-            .setClick(MCClickEventAction.SUGGEST_COMMAND, "/bsmod+ redeem FREETRIAL").chat()
+        tickTimer(60) {
+            UTextComponent(addColor("Your play session today is powered by BSMod! Click me to try BSMod+ today for free!".toCharArray().joinToString("") { if (Random.nextDouble() > .5) it.uppercase() else it.lowercase() }, 0))
+                .setClick(MCClickEventAction.SUGGEST_COMMAND, "/bsmod+ redeem FREETRIAL").chat()
+        }
     }
 }
