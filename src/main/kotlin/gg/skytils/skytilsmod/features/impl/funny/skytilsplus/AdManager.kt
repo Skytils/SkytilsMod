@@ -1,0 +1,51 @@
+/*
+ * Skytils - Hypixel Skyblock Quality of Life Mod
+ * Copyright (C) 2020-2024 Skytils
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package gg.skytils.skytilsmod.features.impl.funny.skytilsplus
+
+import gg.essential.universal.utils.MCClickEventAction
+import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.skytilsmod.mixins.hooks.gui.addColor
+import gg.skytils.skytilsmod.utils.RenderUtil
+import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
+import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
+import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
+import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.util.ResourceLocation
+import net.minecraftforge.client.event.GuiScreenEvent
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+
+object AdManager {
+    private val ad = ResourceLocation("skytils:skytilsplus/codeskytils.png")
+
+    @SubscribeEvent
+    fun onGuiDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
+        if (!Utils.isBSMod || SkytilsPlus.redeemed) return
+        if (event.gui is GuiContainer) {
+            RenderUtil.renderTexture(ad, 5, 5, 244, 307, false)
+            ScreenRenderer.fontRenderer.drawString("Want a break from the ads? Get BSMod+ today!", 5f, 5 + 307 + 10f, CommonColors.RAINBOW, shadow = SmartFontRenderer.TextShadow.OUTLINE)
+        }
+    }
+
+    fun joinedSkyblock() {
+        if (!Utils.isBSMod || SkytilsPlus.redeemed) return
+        UTextComponent(addColor("Your play session today is powered by BSMod! Click me to try BSMod+ today for free!", 0))
+            .setClick(MCClickEventAction.SUGGEST_COMMAND, "/bsmod+ redeem FREETRIAL").chat()
+    }
+}

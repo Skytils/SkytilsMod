@@ -24,6 +24,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.features.impl.funny.Funny
+import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.AdManager
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
@@ -200,6 +201,7 @@ object ChatListener {
                 Skytils.config.writeData()
             }
             Funny.joinedSkyblock()
+            AdManager.joinedSkyblock()
         }
     }
 

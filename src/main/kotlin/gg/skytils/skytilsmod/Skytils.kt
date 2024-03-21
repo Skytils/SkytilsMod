@@ -44,6 +44,7 @@ import gg.skytils.skytilsmod.features.impl.farming.GardenFeatures
 import gg.skytils.skytilsmod.features.impl.farming.TreasureHunter
 import gg.skytils.skytilsmod.features.impl.farming.VisitorHelper
 import gg.skytils.skytilsmod.features.impl.funny.Funny
+import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SkytilsPlus
 import gg.skytils.skytilsmod.features.impl.handlers.*
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
 import gg.skytils.skytilsmod.features.impl.mining.StupidTreasureChestOpeningThing

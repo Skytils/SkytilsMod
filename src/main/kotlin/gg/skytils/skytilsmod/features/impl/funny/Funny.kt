@@ -27,11 +27,11 @@ import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SheepifyRebellion
+import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SkytilsPlus
 import gg.skytils.skytilsmod.gui.elements.GIFResource
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.getSkytilsResource
-import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.util.MathHelper
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -96,7 +96,7 @@ object Funny {
     }
 
     init {
-        listOf(SheepifyRebellion).forEach(MinecraftForge.EVENT_BUS::register)
+        MinecraftForge.EVENT_BUS.register(SkytilsPlus)
         GuiManager.registerElement(JamCatElement)
     }
 
