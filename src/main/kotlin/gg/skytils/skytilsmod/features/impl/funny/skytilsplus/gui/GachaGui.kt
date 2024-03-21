@@ -35,6 +35,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.MC
 import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SkytilsPlus
 import gg.skytils.skytilsmod.gui.components.SimpleButton
+import gg.skytils.skytilsmod.utils.TabListUtils
 import gg.skytils.skytilsmod.utils.splitToWords
 import kotlinx.coroutines.*
 import java.time.Instant
@@ -45,6 +46,45 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
 class GachaGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2) {
+    private val flexSet = hashSetOf(
+        "{name}, I just purchased {length} of BSMod+!",
+        "GUYS I JUST WON {length} of BSMod+! {name} you should try too!!!",
+        "I ROLLED {length} of BSMod+ GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG @{name}",
+        "{length} of BSMod+ is mine, I'm so lucky! @{name}",
+        "Bow down peasants, I have {length} of BSMod+! @{name}",
+        "Guess who's the coolest kid on the block? {name} with {length} of BSMod+!",
+        "Eat your heart out {name}, I got {length} of BSMod+ baby!",
+        "Cha-ching! Just flexed my way to {length} of BSMod+! @{name}",
+        "Yo {name}, watch and learn how to win {length} of BSMod+ like a boss!",
+        "I'm living the high life with {length} of BSMod+, care to join me {name}?",
+        "Step aside {name}, the new subscription king/queen has {length} of BSMod+!",
+        "Jackpot! I hit the {length} of BSMod+ jackpot! @{name}",
+        "Mic drop! I just got {length} of BSMod+, no big deal. ;) @{name}",
+        "Sorry {name}, you'll never be as cool as me with my {length} of BSMod+!",
+        "Lmao {name}, you're still rocking the free version? Get on my {length} BSMod+ level!",
+        "I can't hear you over the sound of my {length} BSMod+ subscription, {name}!",
+        "What's that {name}? You're jealous of my {length} BSMod+? I can't blame you!",
+        "You snooze, you lose {name}! While you were sleeping, I copped {length} of BSMod+!",
+        "Imagine not having {length} of BSMod+, couldn't be {name}! Git gud, scrub!",
+        "Hey {name}, maybe if you stopped being poor, you could afford {length} of BSMod+ too!",
+        "Oooh, {name} is mad they didn't get {length} of BSMod+, how sad!",
+        "Yo {name}, my {length} BSMod+ subscription is more valuable than your entire inventory!",
+        "Keep trying {name}, maybe one day you'll be half as cool as me with my {length} BSMod+!",
+        "Sorry {name}, but you'll have to speak up, I can't hear you over my {length} BSMod+ flex!",
+        "{name} if you wish to defeat me you must obtain {length} of BSMod+. (RIP Technoblade)",
+        "./bsmod+chat {name} I just got {length} of BSMod+! (I'm not flexing, I swear)",
+        "I'm not saying I'm better than you {name}, but I do have {length} of BSMod+... (I'm better than you)",
+        "I got {length} of BSMod+! {name} did u know the BS stands for Breaststroke?",
+        "My {length} BSMod+ sub is OP, nerf pls! Sorry {name}, you're just too bad!",
+        "Imagine being f2p lmao, my {length} BSMod+ sub is just built different! @{name}",
+        "Ez clap {name}, my {length} BSMod+ subscription is just too cracked!",
+        "Hey {name}, you mad? Maybe if you had {length} of BSMod+ you wouldn't be so trash!",
+        "Get a job {name} so you can pay for {length} of BSMod+!!",
+        "Get on my level {name}! My {length} BSMod+ sub is better than a maxed Hyp term!",
+        "You call that a skyblock grind? Try {length} of BSMod+ and then we'll talk @{name}!",
+        "LOWBALLING ur entire NW {name}!!! U DONT HAVE {length} of BSMOD+!!"
+    )
+
     init {
         UIText("Successfully Redeemed BSMod+ License Key!").childOf(window).constrain {
             x = CenterConstraint()
@@ -113,7 +153,8 @@ class GachaGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2) {
 
                 withContext(Dispatchers.MC) {
                     gacha.hide()
-                    UIText("You won a ${picked.second.getText()} subscription!").childOf(window).constrain {
+                    val pickedText = picked.second.getText()
+                    UIText("You won a $pickedText subscription!").childOf(window).constrain {
                         x = CenterConstraint()
                         y = CenterConstraint()
                         textScale = 2.5f.pixels
@@ -122,6 +163,19 @@ class GachaGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2) {
                         x = CenterConstraint()
                         y = SiblingConstraint(5f)
                         textScale = 2f.pixels
+                    }
+                    SimpleButton("Flex on the Haters").childOf(window).constrain {
+                        x = CenterConstraint()
+                        y = SiblingConstraint(5f)
+                    }.onLeftClick {
+                        Skytils.sendMessageQueue.add("/ac " +
+                            flexSet.random()
+                                .replace("{length}", pickedText)
+                                .replace("{name}", TabListUtils.tabEntries.filter {
+                                    val uuid = it.first.gameProfile.id
+                                    uuid != mc.thePlayer.uniqueID && uuid.version() == 4
+                                }.randomOrNull()?.first?.gameProfile?.name ?: "everyone")
+                        )
                     }
                     SimpleButton("Claim").childOf(window).constrain {
                         x = CenterConstraint()
