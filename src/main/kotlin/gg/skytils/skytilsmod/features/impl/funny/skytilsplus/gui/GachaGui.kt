@@ -36,8 +36,11 @@ import gg.skytils.skytilsmod.core.MC
 import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SkytilsPlus
 import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.utils.TabListUtils
+import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.splitToWords
 import kotlinx.coroutines.*
+import net.minecraft.client.audio.PositionedSoundRecord
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.Loader
 import java.time.Instant
@@ -129,6 +132,7 @@ class GachaGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2) {
         }.onLeftClick {
             hide(true)
             gacha.unhide()
+            mc.thePlayer.playSound("skytils:skytils.gacha.roll", 1f, 1f)
             Skytils.launch {
                 withTimeoutOrNull(5.seconds) {
                     while (true) {
@@ -182,9 +186,14 @@ class GachaGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2) {
                             ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/sbechat ${flex.replace("{name}", "every one")}")
                         }
                     }
-                    SimpleButton("Claim").childOf(window).constrain {
+                    UIText("Flex weekly to get an extra day on your subscription!").childOf(window).constrain {
                         x = CenterConstraint()
                         y = SiblingConstraint(5f)
+                        textScale = .8.pixels
+                    }
+                    SimpleButton("Claim").childOf(window).constrain {
+                        x = CenterConstraint()
+                        y = SiblingConstraint(10f)
                     }.onLeftClick {
                         SkytilsPlus.markRedeemed()
                         mc.displayGuiScreen(null)

@@ -1,0 +1,9 @@
+{
+  "skytils.gacha.roll": {
+    "category": "record",
+    "sounds": [
+      "../skytilsplus/gacha"
+    ],
+    "stream": true
+  }
+}
