@@ -29,6 +29,7 @@ import gg.essential.elementa.dsl.childOf
 import gg.essential.elementa.dsl.constrain
 import gg.essential.elementa.dsl.percent
 import gg.essential.elementa.dsl.pixels
+import gg.essential.universal.UChat
 import gg.essential.vigilance.gui.VigilancePalette
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.Skytils
@@ -38,6 +39,7 @@ import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.utils.TabListUtils
 import gg.skytils.skytilsmod.utils.splitToWords
 import kotlinx.coroutines.*
+import net.minecraftforge.fml.common.Loader
 import java.time.Instant
 import kotlin.random.Random
 import kotlin.random.nextLong
@@ -168,14 +170,17 @@ class GachaGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2) {
                         x = CenterConstraint()
                         y = SiblingConstraint(5f)
                     }.onLeftClick {
+                        val flex = flexSet.random().replace("{length}", pickedText)
                         Skytils.sendMessageQueue.add("/ac " +
-                            flexSet.random()
-                                .replace("{length}", pickedText)
-                                .replace("{name}", TabListUtils.tabEntries.filter {
+                                flex.replace("{name}", TabListUtils.tabEntries.filter {
                                     val uuid = it.first.gameProfile.id
                                     uuid != mc.thePlayer.uniqueID && uuid.version() == 4
                                 }.randomOrNull()?.first?.gameProfile?.name ?: "everyone")
                         )
+                        if (Loader.isModLoaded("skyblockextras")) {
+                            UChat.say("/sbeconnect")
+                            UChat.say("/sbechat ${flex.replace("{name}", "every one")}")
+                        }
                     }
                     SimpleButton("Claim").childOf(window).constrain {
                         x = CenterConstraint()
