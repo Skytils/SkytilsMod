@@ -20,8 +20,14 @@ package gg.skytils.skytilsmod.features.impl.funny.skytilsplus
 
 import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UTextComponent
+import gg.essential.vigilance.gui.SettingsGui
+import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.tickTimer
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
+import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.gui.PaywallGui
+import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.mixins.hooks.gui.addColor
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -29,6 +35,7 @@ import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.util.ResourceLocation
+import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
@@ -36,6 +43,15 @@ import kotlin.random.Random
 object AdManager {
     private val ad = ResourceLocation("skytils:skytilsplus/codeskytils.png")
     private var lastAdBreak = -1L
+
+    @SubscribeEvent
+    fun onGuiOpen(event: GuiOpenEvent) {
+        if (!Utils.isBSMod || SkytilsPlus.redeemed) return
+        if (mc.currentScreen is PaywallGui) return
+        if (event.gui is ReopenableGUI || (event.gui as? AccessorSettingsGui)?.config == CatlasConfig) {
+            event.gui = PaywallGui(event.gui)
+        }
+    }
 
     @SubscribeEvent
     fun onGuiDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
