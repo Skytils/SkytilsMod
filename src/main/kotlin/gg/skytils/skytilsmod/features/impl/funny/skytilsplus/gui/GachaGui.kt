@@ -132,7 +132,7 @@ class GachaGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2) {
         }.onLeftClick {
             hide(true)
             gacha.unhide()
-            mc.thePlayer.playSound("skytils:skytils.gacha.roll", 1f, 1f)
+            Utils.playLoudSound("skytils:bsmod.gacha_roll", 1.0)
             Skytils.launch {
                 withTimeoutOrNull(5.seconds) {
                     while (true) {

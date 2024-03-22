@@ -35,6 +35,7 @@ import kotlin.random.Random
 
 object AdManager {
     private val ad = ResourceLocation("skytils:skytilsplus/codeskytils.png")
+    private var lastAdBreak = -1L
 
     @SubscribeEvent
     fun onGuiDraw(event: GuiScreenEvent.BackgroundDrawnEvent) {
@@ -42,6 +43,11 @@ object AdManager {
         if (event.gui is GuiContainer) {
             RenderUtil.renderTexture(ad, 5, 5, 244, 307, false)
             ScreenRenderer.fontRenderer.drawString("Want a break from the ads? Get BSMod+ today!", 5f, 5 + 307 + 10f, CommonColors.RAINBOW, shadow = SmartFontRenderer.TextShadow.OUTLINE)
+
+            if (System.currentTimeMillis() - lastAdBreak > 1000 * 60) {
+                lastAdBreak = System.currentTimeMillis()
+                Utils.playLoudSound("skytils:bsmod.sparkle_adbreak", 1.0)
+            }
         }
     }
 
