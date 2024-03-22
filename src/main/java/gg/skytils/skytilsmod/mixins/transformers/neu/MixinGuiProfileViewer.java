@@ -18,7 +18,7 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.neu;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import gg.skytils.skytilsmod.mixins.hooks.neu.GuiProfileViewerHookKt;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;

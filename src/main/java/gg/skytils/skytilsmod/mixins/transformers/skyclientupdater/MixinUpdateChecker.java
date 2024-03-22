@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Locale;
 
 @Pseudo
-@Mixin(targets = "mynameisjeff.skyblockclientupdater.UpdateChecker")
+@Mixin(targets = "mynameisjeff.skyblockclientupdater.UpdateChecker", remap = false)
 public abstract class MixinUpdateChecker {
 
     /***
