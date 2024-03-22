@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(MouseHelper.class)
-public class MixinMouseHelper {
+public abstract class MixinMouseHelper {
     @WrapWithCondition(method = "ungrabMouseCursor", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;setCursorPosition(II)V", remap = false))
     private boolean shouldSetCursorPos(int newX, int newY) {
         return MouseHelperHook.INSTANCE.shouldResetMouseToCenter();
