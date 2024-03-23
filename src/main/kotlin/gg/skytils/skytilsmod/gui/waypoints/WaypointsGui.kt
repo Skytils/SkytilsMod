@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.gui
+package gg.skytils.skytilsmod.gui.waypoints
 
 import gg.essential.api.EssentialAPI
 import gg.essential.elementa.ElementaVersion
@@ -37,6 +37,7 @@ import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoint
 import gg.skytils.skytilsmod.features.impl.handlers.WaypointCategory
 import gg.skytils.skytilsmod.features.impl.handlers.Waypoints
+import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.gui.components.HelpComponent
 import gg.skytils.skytilsmod.gui.components.MultiCheckboxComponent
 import gg.skytils.skytilsmod.gui.components.SimpleButton

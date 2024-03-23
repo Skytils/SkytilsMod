@@ -18,36 +18,23 @@
 
 package gg.skytils.skytilsmod.utils
 
-import com.aayushatharva.brotli4j.Brotli4jLoader
-import com.aayushatharva.brotli4j.decoder.BrotliInputStream
 import io.ktor.client.plugins.compression.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.CoroutineScope
+import org.brotli.dec.BrotliInputStream
 
-class BrotliEncoder(val useNative: Boolean) : ContentEncoder {
+object BrotliEncoder: ContentEncoder {
     override val name: String = "br"
 
     override fun CoroutineScope.decode(source: ByteReadChannel): ByteReadChannel {
         val bombChecker = DecompressionBombChecker(100)
         val wrapped = bombChecker.wrapInput(source.toInputStream())
 
-        val inputStream = if (useNative) {
-            BrotliInputStream(wrapped)
-        } else {
-            org.brotli.dec.BrotliInputStream(wrapped)
-        }
-
         return bombChecker.wrapOutput(
-            inputStream
+            BrotliInputStream(wrapped)
         ).toByteReadChannel()
     }
 
     override fun CoroutineScope.encode(source: ByteReadChannel): ByteReadChannel = throw UnsupportedOperationException("Cannot encode Brotli")
-
-    init {
-        if (useNative) {
-            Brotli4jLoader.ensureAvailability()
-        }
-    }
 }

@@ -18,7 +18,7 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.entity;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase;
 import gg.skytils.skytilsmod.mixins.hooks.entity.EntityLivingBaseHook;
 import net.minecraft.entity.Entity;

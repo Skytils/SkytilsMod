@@ -20,11 +20,11 @@ package gg.skytils.skytilsmod.features.impl.overlays
 import gg.essential.universal.UKeyboard
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.features.impl.misc.ContainerSellValue
 import gg.skytils.skytilsmod.gui.elements.CleanButton
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiEditSign
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.NumberUtil
@@ -85,7 +85,11 @@ object AuctionPriceOverlay {
                     "Create BIN Auction"
                 )
             ) {
-                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, 29, 2, 3, mc.thePlayer)
+                (event.gui as AccessorGuiContainer).invokeHandleMouseClick(
+                    (event.gui as GuiChest).inventorySlots.getSlot(
+                        29
+                    ), 29, 2, 3
+                )
                 event.isCanceled = true
             } else if (Utils.equalsOneOf(
                     SBInfo.lastOpenContainerName,
@@ -93,7 +97,11 @@ object AuctionPriceOverlay {
                     "Confirm BIN Auction"
                 )
             ) {
-                mc.playerController.windowClick(mc.thePlayer.openContainer.windowId, 11, 2, 3, mc.thePlayer)
+                (event.gui as AccessorGuiContainer).invokeHandleMouseClick(
+                    (event.gui as GuiChest).inventorySlots.getSlot(
+                        11
+                    ), 11, 2, 3
+                )
                 event.isCanceled = true
             }
         }
@@ -116,15 +124,13 @@ object AuctionPriceOverlay {
                     }
                 }
             }
-            if (Utils.equalsOneOf(
+            if (event.slotId == 11 && Utils.equalsOneOf(
                     SBInfo.lastOpenContainerName,
                     "Confirm Auction",
                     "Confirm BIN Auction"
                 )
             ) {
-                if (event.slotId == 11) {
-                    lastAuctionedStack = null
-                }
+                lastAuctionedStack = null
             }
         }
     }

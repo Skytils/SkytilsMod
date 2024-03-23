@@ -33,6 +33,9 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
+import gg.skytils.skytilsmod.gui.editing.VanillaEditingGui
+import gg.skytils.skytilsmod.gui.features.*
+import gg.skytils.skytilsmod.gui.waypoints.WaypointsGui
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.openGUI
@@ -77,7 +80,7 @@ class OptionsGui(val parent: GuiScreen? = null) :
         }.onMouseClick {
             mc.displayGuiScreen(
                 if (it.mouseButton == 1) ElementaEditingGui()
-                else LocationEditGui()
+                else VanillaEditingGui()
             )
         }
         SimpleButton("Edit Key Shortcuts").childOf(window).constrain {

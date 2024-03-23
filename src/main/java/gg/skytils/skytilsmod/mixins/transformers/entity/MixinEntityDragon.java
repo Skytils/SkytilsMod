@@ -18,7 +18,7 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.entity;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import gg.skytils.skytilsmod.features.impl.dungeons.MasterMode7Features;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.IEntityMultiPart;

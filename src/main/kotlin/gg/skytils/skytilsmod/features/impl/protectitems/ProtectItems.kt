@@ -94,23 +94,38 @@ object ProtectItems {
                         }
                     }
                 }
-                if (chestName != "Large Chest" && !chestName.contains("Auction") && inv.sizeInventory == 54) {
-                    val sellItem = inv.getStackInSlot(49)
-                    if (sellItem != null) {
-                        if (sellItem.item === Item.getItemFromBlock(Blocks.hopper) && sellItem.displayName.contains(
-                                "Sell Item"
-                            ) || ItemUtil.getItemLore(sellItem).any { s: String -> s.contains("buyback") }
-                        ) {
-                            if (event.slotId != 49 && event.slot.inventory === mc.thePlayer.inventory) {
-                                val strategy = ItemProtectStrategy.findValidStrategy(
-                                    item,
-                                    extraAttr,
-                                    ItemProtectStrategy.ProtectType.SELLTONPC
-                                )
-                                if (strategy != null) {
-                                    notifyStopped(event, "selling", strategy)
-                                    return
+                if (chestName != "Large Chest" && inv.sizeInventory == 54) {
+                    if (!chestName.contains("Auction")) {
+                        val sellItem = inv.getStackInSlot(49)
+                        if (sellItem != null) {
+                            if (sellItem.item === Item.getItemFromBlock(Blocks.hopper) && sellItem.displayName.contains(
+                                    "Sell Item"
+                                ) || ItemUtil.getItemLore(sellItem).any { s: String -> s.contains("buyback") }
+                            ) {
+                                if (event.slotId != 49 && event.slot.inventory === mc.thePlayer.inventory) {
+                                    val strategy = ItemProtectStrategy.findValidStrategy(
+                                        item,
+                                        extraAttr,
+                                        ItemProtectStrategy.ProtectType.SELLTONPC
+                                    )
+                                    if (strategy != null) {
+                                        notifyStopped(event, "selling", strategy)
+                                        return
+                                    }
                                 }
+                            }
+                        }
+                    } else if (event.slotId == 29 && chestName.startsWith("Create ") && chestName.endsWith(" Auction")) {
+                        val itemForSale = inv.getStackInSlot(13)
+                        if (itemForSale != null) {
+                            val strategy = ItemProtectStrategy.findValidStrategy(
+                                itemForSale,
+                                ItemUtil.getExtraAttributes(itemForSale),
+                                ItemProtectStrategy.ProtectType.SELLTOAUCTION
+                            )
+                            if (strategy != null) {
+                                notifyStopped(event, "auctioning", strategy)
+                                return
                             }
                         }
                     }

@@ -30,13 +30,10 @@ object StarredItemStrategy : ItemProtectStrategy() {
         if (extraAttr == null) return false
         val isStarred = ItemUtil.getStarCount(extraAttr) > 0
         return when (type) {
-            ProtectType.CLICKOUTOFWINDOW, ProtectType.DROPKEYININVENTORY, ProtectType.SALVAGE, ProtectType.SELLTONPC, ProtectType.USERCLOSEWINDOW -> {
-                isStarred
-            }
-
             ProtectType.HOTBARDROPKEY -> {
                 !DungeonFeatures.hasClearedText && isStarred
             }
+            else -> isStarred
         }
     }
 

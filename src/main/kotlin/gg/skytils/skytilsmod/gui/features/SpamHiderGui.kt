@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.gui
+package gg.skytils.skytilsmod.gui.features
 
 import gg.essential.api.EssentialAPI
 import gg.essential.elementa.ElementaVersion

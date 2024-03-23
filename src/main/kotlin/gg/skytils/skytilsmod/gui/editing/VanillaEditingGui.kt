@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gg.skytils.skytilsmod.gui
+package gg.skytils.skytilsmod.gui.editing
 
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
@@ -25,6 +25,7 @@ import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.structure.LocationButton
 import gg.skytils.skytilsmod.core.structure.ResizeButton
 import gg.skytils.skytilsmod.core.structure.ResizeButton.Corner
+import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
@@ -33,7 +34,7 @@ import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
 import java.awt.Color
 
-open class LocationEditGui : GuiScreen(), ReopenableGUI {
+open class VanillaEditingGui : GuiScreen(), ReopenableGUI {
     private var xOffset = 0f
     private var yOffset = 0f
     private var resizing = false
