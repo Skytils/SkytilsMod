@@ -35,24 +35,6 @@ object ItemUtil {
     private const val NBT_COMPOUND = 10
 
     /**
-     * Returns the display name of a given item
-     * @author Mojang
-     * @param item the Item to get the display name of
-     * @return the display name of the item
-     */
-    @JvmStatic
-    fun getDisplayName(item: ItemStack): String {
-        var s = item.item.getItemStackDisplayName(item)
-        if (item.tagCompound != null && item.tagCompound.hasKey("display", 10)) {
-            val nbtTagCompound = item.tagCompound.getCompoundTag("display")
-            if (nbtTagCompound.hasKey("Name", 8)) {
-                s = nbtTagCompound.getString("Name")
-            }
-        }
-        return s
-    }
-
-    /**
      * Returns the Skyblock Item ID of a given Skyblock item
      *
      * @author BiscuitDevelopment

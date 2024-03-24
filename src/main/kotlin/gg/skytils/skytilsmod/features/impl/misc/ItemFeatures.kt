@@ -37,7 +37,6 @@ import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloor
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
 import gg.skytils.skytilsmod.utils.*
-import gg.skytils.skytilsmod.utils.ItemUtil.getDisplayName
 import gg.skytils.skytilsmod.utils.ItemUtil.getExtraAttributes
 import gg.skytils.skytilsmod.utils.ItemUtil.getItemLore
 import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
@@ -291,7 +290,7 @@ object ItemFeatures {
                 "Superpairs ("
             ) == true
         ) {
-            if (getDisplayName(item).stripControlCodes() == "Enchanted Book") {
+            if (item.displayName.stripControlCodes() == "Enchanted Book") {
                 val lore = getItemLore(item)
                 if (lore.size >= 3) {
                     if (lore[0] == "§8Item Reward" && lore[1].isEmpty()) {
@@ -433,7 +432,7 @@ object ItemFeatures {
                                     x,
                                     y,
                                     z
-                                ) <= dist && getDisplayName(it.heldItem).stripControlCodes().containsAny(
+                                ) <= dist && it.heldItem.displayName.stripControlCodes().containsAny(
                                     "Necron's Blade", "Scylla", "Astraea", "Hyperion", "Valkyrie"
                                 )
                             }) {
