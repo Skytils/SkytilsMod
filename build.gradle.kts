@@ -27,7 +27,7 @@ plugins {
     id("net.kyori.blossom") version "2.0.0"
     id("io.github.juuxel.loom-quiltflower") version "1.10.0"
     id("gg.essential.loom") version "1.3.12"
-    id("gg.essential.defaults") version "0.3.0"
+    id("gg.essential.defaults") version "0.4.0"
     idea
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
 
