@@ -23,19 +23,29 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
 
 enum class EventPriority {
-    Highest,
-    High,
-    Normal,
-    Low ,
     Lowest {
+        override val next: EventPriority = this
+
         override suspend fun <T : Event> post(event: T) {
             flow.emit(event)
         }
+    },
+    Low {
+        override val next: EventPriority = Lowest
+    },
+    Normal {
+        override val next: EventPriority = Low
+    },
+    High {
+        override val next: EventPriority = Normal
+    },
+    Highest {
+        override val next: EventPriority = High
     };
 
     @PublishedApi
     internal val flow: MutableSharedFlow<Event> = MutableSharedFlow()
-    internal val next: EventPriority = entries[this.ordinal + 1]
+    internal abstract val next: EventPriority
 
     @PublishedApi
     internal suspend inline fun <reified T : Event> subscribe(noinline block: suspend (T) -> Unit) =
