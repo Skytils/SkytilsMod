@@ -2135,7 +2135,10 @@ object Config : Vigilant(
     @Property(
         type = PropertyType.SWITCH, name = "Show Item Quality ",
         description = "Shows the base stat boost and item tier.",
-        category = "Miscellaneous", subcategory = "Items"
+        category = "Miscellaneous", subcategory = "Items",
+        i18nName = "skytils.config.miscellaneous.items.show_item_quality",
+        i18nCategory = "skytils.config.miscellaneous",
+        i18nSubcategory = "skytils.config.miscellaneous.items"
     )
     var showItemQuality = false
 
