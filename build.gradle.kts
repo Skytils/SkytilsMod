@@ -69,6 +69,7 @@ loom {
             property("legacy.debugClassLoading", "true")
             property("legacy.debugClassLoadingSave", "true")
             property("legacy.debugClassLoadingFiner", "true")
+            programArgs("--tweakClass", "gg.skytils.earlytweaker.EarlyTweakerLoader")
             programArgs("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
             programArgs("--mixin", "mixins.skytils.json")
             programArgs("--mixin", "mixins.skytils-events.json")

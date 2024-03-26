@@ -37,8 +37,6 @@ public class SkytilsTweaker extends EssentialSetupTweaker {
 
     public SkytilsTweaker() throws Throwable {
         runStage("gg.skytils.skytilsmod.tweaker.DuplicateSkytilsChecker", "checkForDuplicates");
-        EarlyTweakerFinder.saveTweaker(SkytilsEarlyTweaker.class);
-        EarlyTweakerLoader.ensureVersion(Constants.VERSION, SkytilsTweaker.class);
         runStage("gg.skytils.skytilsmod.utils.SuperSecretSettings", "load");
         boolean isFML = System.getSecurityManager() != null && System.getSecurityManager().getClass().equals(FMLSecurityManager.class);
         if (System.getProperty("skytils.noSecurityManager") == null && (System.getSecurityManager() == null || isFML || System.getSecurityManager().getClass() == SecurityManager.class)) {
