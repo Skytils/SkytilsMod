@@ -21,12 +21,16 @@ package gg.skytils.skytilsmod.earlytweaker;
 import gg.skytils.earlytweaker.IEarlyTweaker;
 
 import java.io.File;
-import java.util.List;
 
 @IEarlyTweaker.EarlyOrder(-1000)
 public class SkytilsEarlyTweaker implements IEarlyTweaker {
-    @Override
-    public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
-        System.out.println("Hello from EarlyTweaker!");
+    public static final File essentialAutoUpdateFlag = new File("./config/skytils/nextLaunchEssentialAutoUpdate");
+
+    public SkytilsEarlyTweaker() {
+        if (essentialAutoUpdateFlag.exists()) {
+            System.out.println("Skytils: Enabling essential auto update");
+            System.setProperty("essential.autoUpdate", "true");
+            essentialAutoUpdateFlag.deleteOnExit();
+        }
     }
 }
