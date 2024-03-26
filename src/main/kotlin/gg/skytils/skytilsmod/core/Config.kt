@@ -4314,6 +4314,7 @@ object Config : Vigilant(
         addDependency("messageTitle300Score", "createTitleOn300Score")
 
         addDependency("bloodHelperColor", "bloodHelper")
+        addDependency("boxStarredMobsColor", "boxStarredMobs")
 
         addDependency("highlightDoorOpener", "spiritLeapNames")
 
