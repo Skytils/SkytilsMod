@@ -51,6 +51,7 @@ abstract class ItemProtectStrategy {
         SALVAGE,
         CLICKOUTOFWINDOW,
         DROPKEYININVENTORY,
-        HOTBARDROPKEY
+        HOTBARDROPKEY,
+        SELLTOAUCTION
     }
 }

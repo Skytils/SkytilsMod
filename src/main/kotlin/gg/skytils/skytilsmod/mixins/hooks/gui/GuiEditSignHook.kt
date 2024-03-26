@@ -28,7 +28,9 @@ val prompts = listOf(
     "Your auction",
     "Enter the amount",
     "Auction", // Auction time
-).map { "^^^^^^^^^^^^^^^" to it }
+)
 
-fun isConfirmableSign(gui: AccessorGuiEditSign) =
-    prompts.any { it in gui.tileSign.signText.asSequence().map { it.unformattedText }.zipWithNext() }
+fun isConfirmableSign(gui: AccessorGuiEditSign): Boolean =
+    gui.tileSign.signText.drop(1).zip(gui.tileSign.signText.drop(2)).any { p ->
+        p.first.unformattedText.all { it == '^' } && prompts.any { it in p.second.unformattedText }
+    }

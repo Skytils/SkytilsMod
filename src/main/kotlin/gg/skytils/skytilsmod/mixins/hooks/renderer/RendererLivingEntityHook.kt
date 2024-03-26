@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.mixins.hooks.renderer
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
+import gg.skytils.skytilsmod.features.impl.dungeons.LividFinder
 import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures.slayer
 import gg.skytils.skytilsmod.features.impl.slayer.impl.DemonlordSlayer
 import gg.skytils.skytilsmod.features.impl.slayer.impl.SeraphSlayer
@@ -64,7 +65,7 @@ fun setColorMultiplier(
                 }
             }
         }
-    } else if (DungeonFeatures.livid == entity) {
+    } else if (LividFinder.livid == entity) {
         cir.returnValue = ColorFactory.AZURE.withAlpha(169)
     }
 }

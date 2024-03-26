@@ -17,7 +17,6 @@
  */
 package gg.skytils.skytilsmod.features.impl.handlers
 
-import com.aayushatharva.brotli4j.decoder.BrotliInputStream
 import com.aayushatharva.brotli4j.encoder.BrotliOutputStream
 import com.aayushatharva.brotli4j.encoder.Encoder
 import gg.essential.elementa.utils.withAlpha
@@ -46,6 +45,7 @@ import org.apache.commons.codec.binary.Base64InputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 import org.apache.commons.compress.compressors.gzip.GzipParameters
+import org.brotli.dec.BrotliInputStream
 import java.awt.Color
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -80,11 +80,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                 2 -> {
                     val wrapped = bombChecker.wrapInput(Base64InputStream(content.byteInputStream()))
 
-                    val inputStream = if (DependencyLoader.hasNativeBrotli) {
-                        BrotliInputStream(wrapped)
-                    } else {
-                        org.brotli.dec.BrotliInputStream(wrapped)
-                    }
+                    val inputStream = BrotliInputStream(wrapped)
 
                     bombChecker.wrapOutput(inputStream).use {
                         it.readBytes().decodeToString()
@@ -159,11 +155,8 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
             2 -> {
                 val wrapped = bombChecker.wrapInput(file.inputStream())
 
-                val inputStream = if (DependencyLoader.hasNativeBrotli) {
-                    BrotliInputStream(wrapped)
-                } else {
-                    org.brotli.dec.BrotliInputStream(wrapped)
-                }
+                val inputStream = BrotliInputStream(wrapped)
+
                 bombChecker.wrapOutput(inputStream)
             }
 

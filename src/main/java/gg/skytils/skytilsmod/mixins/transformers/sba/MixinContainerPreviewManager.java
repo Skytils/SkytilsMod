@@ -18,7 +18,7 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.sba;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import gg.skytils.skytilsmod.core.Config;
 import gg.skytils.skytilsmod.utils.RenderUtil;
 import net.minecraft.client.renderer.entity.RenderItem;

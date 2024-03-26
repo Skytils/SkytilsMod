@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.gui
+package gg.skytils.skytilsmod.gui.features
 
 import gg.essential.api.EssentialAPI
 import gg.essential.elementa.ElementaVersion
@@ -34,25 +34,25 @@ import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.features.impl.handlers.CustomNotifications
+import gg.skytils.skytilsmod.features.impl.handlers.PotionEffectTimers
+import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.gui.components.HelpComponent
 import gg.skytils.skytilsmod.gui.components.SimpleButton
 import java.awt.Color
 
-class CustomNotificationsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), ReopenableGUI {
+class PotionNotificationsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
     private val components = HashMap<UIContainer, Entry>()
 
     private data class Entry(
         val container: UIContainer,
-        val regex: UITextInput,
-        val displayText: UITextInput,
-        val ticks: UITextInput
+        val potionId: UITextInput,
+        val remainingTicks: UITextInput
     )
 
     init {
-        UIText("Custom Notifications").childOf(window).constrain {
+        UIText("Potion Notifications").childOf(window).constrain {
             x = CenterConstraint()
             y = RelativeConstraint(0.075f)
             height = 14.pixels()
@@ -81,7 +81,7 @@ class CustomNotificationsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2)
             mc.displayGuiScreen(null)
         }
 
-        SimpleButton("Add Notification").childOf(bottomButtons).constrain {
+        SimpleButton("Add Potion").childOf(bottomButtons).constrain {
             x = SiblingConstraint(5f)
             y = 0.pixels()
         }.onLeftClick {
@@ -90,15 +90,15 @@ class CustomNotificationsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2)
 
         HelpComponent(
             window,
-            "What are custom notifications? Custom Notifications allow you to configure popups for when certain chat messages are entered, using regex."
+            "Enter the potion ID and the ticks for the potion to be considered low"
         )
 
-        for (notif in CustomNotifications.notifications.sortedBy { it.text }) {
-            addNewNotification(notif.regex.pattern, notif.text, notif.displayTicks)
+        for (notif in PotionEffectTimers.notifications.toSortedMap()) {
+            addNewNotification(notif.key, notif.value)
         }
     }
 
-    private fun addNewNotification(regex: String = "", text: String = "", ticks: Int = 20) {
+    private fun addNewNotification(potionName: String = "", ticks: Long = 20 * 60L) {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
@@ -106,51 +106,35 @@ class CustomNotificationsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2)
             height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
-        val triggerMessage = UITextInput("Trigger Regex").childOf(container).constrain {
+        val potion = UITextInput("Potion Name").childOf(container).constrain {
             x = 5.pixels()
             y = CenterConstraint()
-            width = 40.percent()
+            width = 70.percent()
         }.apply {
             onLeftClick {
                 grabWindowFocus()
             }
-            setText(regex)
+            setText(potionName)
         }
 
-        val displayText = UITextInput("Display Text").childOf(container).constrain {
+        val remainingTicks = UITextInput("Ticks").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
-            width = 32.percent()
-        }.apply {
-            onLeftClick {
-                grabWindowFocus()
-            }
-            setText(text)
-        }
-
-        val displayTicks = UITextInput("Ticks").childOf(container).constrain {
-            x = SiblingConstraint(5f)
-            y = CenterConstraint()
-            width = 5.percent()
+            width = 8.percent()
         }.apply {
             onLeftClick {
                 grabWindowFocus()
             }
             setText(ticks.toString())
         }
-        triggerMessage.apply {
+        potion.apply {
             onKeyType { _, keyCode ->
-                if (keyCode == UKeyboard.KEY_TAB) displayText.grabWindowFocus()
+                if (keyCode == UKeyboard.KEY_TAB) remainingTicks.grabWindowFocus()
             }
         }
-        displayText.apply {
+        remainingTicks.apply {
             onKeyType { _, keyCode ->
-                if (keyCode == UKeyboard.KEY_TAB) displayTicks.grabWindowFocus()
-            }
-        }
-        displayTicks.apply {
-            onKeyType { _, keyCode ->
-                if (keyCode == UKeyboard.KEY_TAB) triggerMessage.grabWindowFocus()
+                if (keyCode == UKeyboard.KEY_TAB) potion.grabWindowFocus()
             }
         }
 
@@ -163,31 +147,25 @@ class CustomNotificationsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2)
             components.remove(container)
         }
 
-        components[container] = Entry(container, triggerMessage, displayText, displayTicks)
+        components[container] = Entry(container, potion, remainingTicks)
     }
 
     override fun onScreenClose() {
         super.onScreenClose()
-        CustomNotifications.notifications.clear()
+        PotionEffectTimers.notifications.clear()
 
-        for ((_, triggerRegex, displayText, displayTicks) in components.values) {
-            if (triggerRegex.getText().isBlank() || displayText.getText().isBlank() || displayTicks.getText()
+        for ((_, potion, remainingTicks) in components.values) {
+            if (potion.getText().isBlank() || remainingTicks.getText()
                     .isBlank()
             ) continue
             runCatching {
-                CustomNotifications.notifications.add(
-                    CustomNotifications.Notification(
-                        triggerRegex.getText().replace("%%MC_IGN%%", mc.session.username).toRegex(),
-                        displayText.getText(),
-                        displayTicks.getText().toInt()
-                    )
-                )
+                PotionEffectTimers.notifications[potion.getText()] = remainingTicks.getText().toLong()
             }.onFailure {
                 it.printStackTrace()
-                EssentialAPI.getNotifications().push("Invalid notification", triggerRegex.getText(), 3f)
+                EssentialAPI.getNotifications().push("Invalid notification", potion.getText(), 3f)
             }
         }
 
-        PersistentSave.markDirty<CustomNotifications>()
+        PersistentSave.markDirty<PotionEffectTimers>()
     }
 }

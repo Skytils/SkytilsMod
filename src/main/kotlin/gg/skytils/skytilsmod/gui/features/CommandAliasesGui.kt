@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,9 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.gui
+package gg.skytils.skytilsmod.gui.features
 
-import gg.essential.api.EssentialAPI
 import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.ScrollComponent
@@ -34,24 +33,19 @@ import gg.essential.elementa.effects.OutlineEffect
 import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.features.impl.handlers.PotionEffectTimers
+import gg.skytils.skytilsmod.features.impl.handlers.CommandAliases
+import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.gui.components.HelpComponent
 import gg.skytils.skytilsmod.gui.components.SimpleButton
+import net.minecraft.util.ChatAllowedCharacters
 import java.awt.Color
 
-class PotionNotificationsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), ReopenableGUI {
+class CommandAliasesGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), ReopenableGUI {
 
     private val scrollComponent: ScrollComponent
-    private val components = HashMap<UIContainer, Entry>()
-
-    private data class Entry(
-        val container: UIContainer,
-        val potionId: UITextInput,
-        val remainingTicks: UITextInput
-    )
 
     init {
-        UIText("Potion Notifications").childOf(window).constrain {
+        UIText("Command Aliases").childOf(window).constrain {
             x = CenterConstraint()
             y = RelativeConstraint(0.075f)
             height = 14.pixels()
@@ -80,24 +74,24 @@ class PotionNotificationsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2)
             mc.displayGuiScreen(null)
         }
 
-        SimpleButton("Add Potion").childOf(bottomButtons).constrain {
+        SimpleButton("Add Alias").childOf(bottomButtons).constrain {
             x = SiblingConstraint(5f)
             y = 0.pixels()
         }.onLeftClick {
-            addNewNotification()
+            addNewAlias()
         }
 
         HelpComponent(
             window,
-            "Enter the potion ID and the ticks for the potion to be considered low"
+            "What are aliases? Aliases are little shortcuts for commands. For example, /slay could be short for /skytilsslayer. Want to give it a try? Click 'Add Alias', enter 'slay' for 'Alias Name' and 'skytilsslayer' as the executed command! Then, run the command /slay Sychic! Aliases will also append any arguments that you supply."
         )
 
-        for (notif in PotionEffectTimers.notifications.toSortedMap()) {
-            addNewNotification(notif.key, notif.value)
+        for (name in CommandAliases.aliases) {
+            addNewAlias(name.key, name.value)
         }
     }
 
-    private fun addNewNotification(potionName: String = "", ticks: Long = 20 * 60L) {
+    private fun addNewAlias(alias: String = "", replacement: String = "") {
         val container = UIContainer().childOf(scrollComponent).constrain {
             x = CenterConstraint()
             y = SiblingConstraint(5f)
@@ -105,35 +99,37 @@ class PotionNotificationsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2)
             height = 9.5.percent()
         }.effect(OutlineEffect(Color(0, 243, 255), 1f))
 
-        val potion = UITextInput("Potion Name").childOf(container).constrain {
+        val aliasName = UITextInput("Alias Name").childOf(container).constrain {
             x = 5.pixels()
             y = CenterConstraint()
-            width = 70.percent()
+            width = 30.percent()
         }.apply {
             onLeftClick {
                 grabWindowFocus()
             }
-            setText(potionName)
+            setText(alias)
         }
 
-        val remainingTicks = UITextInput("Ticks").childOf(container).constrain {
+        val commandInput = UITextInput("Executed Command").childOf(container).constrain {
             x = SiblingConstraint(5f)
             y = CenterConstraint()
-            width = 8.percent()
+            width = 50.percent()
         }.apply {
             onLeftClick {
                 grabWindowFocus()
             }
-            setText(ticks.toString())
+            setText(replacement)
         }
-        potion.apply {
+        aliasName.apply {
             onKeyType { _, keyCode ->
-                if (keyCode == UKeyboard.KEY_TAB) remainingTicks.grabWindowFocus()
+                if (keyCode == UKeyboard.KEY_TAB) commandInput.grabWindowFocus()
+                setText(getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
             }
         }
-        remainingTicks.apply {
+        commandInput.apply {
             onKeyType { _, keyCode ->
-                if (keyCode == UKeyboard.KEY_TAB) potion.grabWindowFocus()
+                if (keyCode == UKeyboard.KEY_TAB) aliasName.grabWindowFocus()
+                setText(getText().filter(ChatAllowedCharacters::isAllowedCharacter).take(255))
             }
         }
 
@@ -143,28 +139,24 @@ class PotionNotificationsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2)
             height = 75.percent()
         }.onLeftClick {
             scrollComponent.removeChild(container)
-            components.remove(container)
         }
-
-        components[container] = Entry(container, potion, remainingTicks)
     }
 
     override fun onScreenClose() {
         super.onScreenClose()
-        PotionEffectTimers.notifications.clear()
+        CommandAliases.aliases.clear()
 
-        for ((_, potion, remainingTicks) in components.values) {
-            if (potion.getText().isBlank() || remainingTicks.getText()
-                    .isBlank()
-            ) continue
-            runCatching {
-                PotionEffectTimers.notifications[potion.getText()] = remainingTicks.getText().toLong()
-            }.onFailure {
-                it.printStackTrace()
-                EssentialAPI.getNotifications().push("Invalid notification", potion.getText(), 3f)
-            }
+        for (container in scrollComponent.allChildren) {
+            val text = container.childrenOfType<UITextInput>()
+            if (text.size != 2) throw IllegalStateException("${container.componentName} does not have 2 UITextInput's! Available children ${container.children.map { it.componentName }}")
+            val alias = (text.find { it.placeholder == "Alias Name" }
+                ?: throw IllegalStateException("${container.componentName} does not have the alias UITextInput! Available children ${container.children.map { it.componentName }}")).getText()
+            val replacement = (text.find { it.placeholder == "Executed Command" }
+                ?: throw IllegalStateException("${container.componentName} does not have the command UITextInput! Available children ${container.children.map { it.componentName }}")).getText()
+            if (alias.isBlank() || replacement.isBlank()) continue
+            CommandAliases.aliases[alias] = replacement
         }
 
-        PersistentSave.markDirty<PotionEffectTimers>()
+        PersistentSave.markDirty<CommandAliases>()
     }
 }

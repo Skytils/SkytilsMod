@@ -19,7 +19,9 @@
 package gg.skytils.skytilsmod.tweaker;
 
 import gg.essential.loader.stage0.EssentialSetupTweaker;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import net.minecraftforge.fml.common.DuplicateModsFoundException;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
 
 import java.io.File;
@@ -32,6 +34,7 @@ import static gg.skytils.skytilsmod.tweaker.TweakerUtil.runStage;
 public class SkytilsTweaker extends EssentialSetupTweaker {
 
     public SkytilsTweaker() throws Throwable {
+        runStage("gg.skytils.skytilsmod.tweaker.DuplicateSkytilsChecker", "checkForDuplicates");
         runStage("gg.skytils.skytilsmod.utils.SuperSecretSettings", "load");
         boolean isFML = System.getSecurityManager() != null && System.getSecurityManager().getClass().equals(FMLSecurityManager.class);
         if (System.getProperty("skytils.noSecurityManager") == null && (System.getSecurityManager() == null || isFML || System.getSecurityManager().getClass() == SecurityManager.class)) {

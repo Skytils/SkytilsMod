@@ -20,8 +20,8 @@ package gg.skytils.skytilsmod.core
 import gg.essential.universal.UDesktop
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.client
-import gg.skytils.skytilsmod.gui.RequestUpdateGui
-import gg.skytils.skytilsmod.gui.UpdateGui
+import gg.skytils.skytilsmod.gui.updater.RequestUpdateGui
+import gg.skytils.skytilsmod.gui.updater.UpdateGui
 import gg.skytils.skytilsmod.utils.GithubRelease
 import gg.skytils.skytilsmod.utils.Utils
 import io.ktor.client.call.*

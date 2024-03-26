@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Pseudo
-@Mixin(targets = "club.sk1er.patcher.screen.render.caching.HUDCaching")
+@Mixin(targets = "club.sk1er.patcher.screen.render.caching.HUDCaching", remap = false)
 public abstract class MixinHUDCaching {
     @Dynamic
     @WrapOperation(method = "renderCachedHud", at = @At(value = "FIELD", target = "Lclub/sk1er/patcher/config/PatcherConfig;hudCaching:Z", opcode = Opcodes.GETSTATIC))

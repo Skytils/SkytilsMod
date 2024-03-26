@@ -42,7 +42,11 @@ repositories {
     mavenCentral()
     maven("https://repo.sk1er.club/repository/maven-public/")
     maven("https://repo.sk1er.club/repository/maven-releases/")
-    maven("https://jitpack.io")
+    maven("https://jitpack.io") {
+        mavenContent {
+            includeGroupAndSubgroups("com.github")
+        }
+    }
 }
 
 vineflower {
@@ -94,6 +98,10 @@ dependencies {
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
         exclude(module = "gson")
+        exclude(module = "vigilance")
+    }
+    shadowMe("com.github.Skytils.Vigilance:vigilance-1.8.9-forge:afb0909442") {
+        isTransitive = false
     }
 
     shadowMeMod("com.github.Skytils:AsmHelper:91ecc2bd9c") {
@@ -203,6 +211,7 @@ tasks {
         relocate("io.ktor", "gg.skytils.ktor")
         relocate("kotlinx.serialization", "gg.skytils.ktx-serialization")
         relocate("kotlinx.coroutines", "gg.skytils.ktx-coroutines")
+        relocate("gg.essential.vigilance", "gg.skytils.vigilance")
 
         exclude(
             "**/LICENSE_MixinExtras",

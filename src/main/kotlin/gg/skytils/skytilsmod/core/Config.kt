@@ -32,8 +32,8 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
-import gg.skytils.skytilsmod.gui.PotionNotificationsGui
-import gg.skytils.skytilsmod.gui.SpiritLeapNamesGui
+import gg.skytils.skytilsmod.gui.features.PotionNotificationsGui
+import gg.skytils.skytilsmod.gui.features.SpiritLeapNamesGui
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.utils.ModChecker
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -1242,7 +1242,7 @@ object Config : Vigilant(
     @Property(
         type = PropertyType.SELECTOR, name = "Type of Livid Finder",
         category = "Dungeons", subcategory = "Solvers",
-        options = ["Block", "Entity"],
+        options = ["Block Change (NEW)", "Static Block"],
         i18nName = "skytils.config.dungeons.solvers.type_of_livid_finder",
         i18nCategory = "skytils.config.dungeons",
         i18nSubcategory = "skytils.config.dungeons.solvers"
