@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.earlytweaker;
 
 import gg.skytils.earlytweaker.IEarlyTweaker;
+import net.minecraft.launchwrapper.LaunchClassLoader;
 
 import java.io.File;
 
@@ -31,6 +32,16 @@ public class SkytilsEarlyTweaker implements IEarlyTweaker {
             System.out.println("Skytils: Enabling essential auto update");
             System.setProperty("essential.autoUpdate", "true");
             essentialAutoUpdateFlag.deleteOnExit();
+        }
+    }
+
+    @Override
+    public void injectIntoClassLoader(LaunchClassLoader classLoader) {
+        try {
+            DependencyLoader.loadDependencies();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
         }
     }
 }

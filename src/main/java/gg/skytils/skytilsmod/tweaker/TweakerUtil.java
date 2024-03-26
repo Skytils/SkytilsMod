@@ -153,7 +153,7 @@ public class TweakerUtil {
         }
     }
 
-    static void addToClasspath(URL url) throws Throwable {
+    public static void addToClasspath(URL url) throws Throwable {
         Launch.classLoader.addURL(url);
         ClassLoader parent = Launch.classLoader.getClass().getClassLoader();
         if (parent != null) {

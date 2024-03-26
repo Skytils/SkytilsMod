@@ -18,7 +18,6 @@
 
 package gg.skytils.skytilsmod
 
-import com.aayushatharva.brotli4j.Brotli4jLoader
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
@@ -67,7 +66,7 @@ import gg.skytils.skytilsmod.mixins.hooks.util.MouseHelperHook
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiStreamUnavailable
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
-import gg.skytils.skytilsmod.tweaker.DependencyLoader
+import gg.skytils.skytilsmod.earlytweaker.DependencyLoader
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor

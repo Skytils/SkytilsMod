@@ -23,13 +23,13 @@ import gg.skytils.earlytweaker.Constants;
 import gg.skytils.earlytweaker.EarlyTweakerFinder;
 import gg.skytils.earlytweaker.EarlyTweakerLoader;
 import gg.skytils.skytilsmod.Reference;
+import gg.skytils.skytilsmod.earlytweaker.DependencyLoader;
 import gg.skytils.skytilsmod.earlytweaker.SkytilsEarlyTweaker;
 import net.minecraft.launchwrapper.Launch;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -97,13 +97,6 @@ public class EssentialPlatformSetup {
             }
         } catch (Throwable t) {
             t.printStackTrace();
-        }
-
-        try {
-            DependencyLoader.loadDependencies();
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
         }
 
         registerTransformerExclusions(
