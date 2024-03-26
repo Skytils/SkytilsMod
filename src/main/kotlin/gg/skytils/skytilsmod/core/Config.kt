@@ -365,7 +365,7 @@ object Config : Vigilant(
     )
     fun openDungeonSweat() {
         if (SuperSecretSettings.azooPuzzoo)
-            SuperSecretSettings.remove("azoopuzoo")
+            SuperSecretSettings.remove("azoopuzzoo")
         else
             SuperSecretSettings.add("azoopuzzoo")
         SuperSecretSettings.save()
