@@ -421,10 +421,11 @@ object ItemFeatures {
             val tier = extraAttr.getInteger("item_tier")
 
             if (boost > 0 && tier > 0) {
-                val isMasterMode = requirementPattern.matchEntire(extraAttr.getString("dungeon_skill_req"))?.let {
-                    val level = it.groupValues[1].toInt()
-                    level > 24
-                }
+                val isMasterMode =
+                    requirementPattern
+                        .matchEntire(
+                            extraAttr.getString("dungeon_skill_req")
+                        )?.groupValues?.get(1)?.toIntOrNull()?.let { it > 24 }
 
                 val floor = when (isMasterMode) {
                     true -> "§4M${tier - 3}"
@@ -433,9 +434,9 @@ object ItemFeatures {
                 }
 
                 val color = when {
-                    boost < 17 -> "§c"
-                    boost < 33 -> "§e"
-                    boost < 49 -> "§a"
+                    boost <= 17 -> "§c"
+                    boost <= 33 -> "§e"
+                    boost <= 49 -> "§a"
                     else -> "§b"
                 }
 
