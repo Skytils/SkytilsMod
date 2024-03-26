@@ -25,9 +25,10 @@ import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
-import gg.skytils.skytilsmod.core.*
+import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
@@ -49,11 +50,13 @@ import gg.skytils.skytilsmod.utils.ScoreboardUtil.sidebarLines
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.first
-import net.minecraft.block.*
+import kotlinx.coroutines.launch
+import net.minecraft.block.BlockBeacon
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -70,9 +73,10 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S29PacketSoundEffect
-import net.minecraft.util.*
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.GuiScreenEvent
+import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.ChatComponentText
+import net.minecraft.util.IChatComponent
+import net.minecraft.util.MathHelper
 import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
@@ -124,7 +128,6 @@ object SlayerFeatures : CoroutineScope {
     var expectedMaxHp: Int? = null
     private val hitMap = HashMap<EntityLivingBase, Int>()
     var BossHealths = HashMap<String, HashMap<String, Int>>()
-    var maddoxCommand = ""
 
     fun processSlayerEntity(entity: Entity) {
         slayer = try {
@@ -157,34 +160,6 @@ object SlayerFeatures : CoroutineScope {
         SlayerDisplayElement()
         SeraphDisplayElement()
         TotemDisplayElement
-    }
-
-    @SubscribeEvent
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type == 2.toByte()) return
-
-        val formatted = event.message.formattedText
-
-        if (Skytils.config.openMaddoxMenu) {
-            if (formatted.contains("§2§l[OPEN MENU]")) {
-                val listOfSiblings = event.message.siblings
-                maddoxCommand =
-                    listOfSiblings.find { it.unformattedText.contains("[OPEN MENU]") }?.chatStyle?.chatClickEvent?.value
-                        ?: ""
-                UChat.chat("$prefix §bOpen chat then click anywhere on screen to open Maddox Menu.")
-            }
-        }
-    }
-
-    @SubscribeEvent
-    fun onMouseInputPost(event: GuiScreenEvent.MouseInputEvent.Post) {
-        if (!Utils.inSkyblock) return
-        if (Mouse.getEventButton() == 0 && event.gui is GuiChat) {
-            if (Skytils.config.openMaddoxMenu && maddoxCommand.isNotBlank()) {
-                Skytils.sendMessageQueue.add(maddoxCommand)
-                maddoxCommand = ""
-            }
-        }
     }
 
     init {

@@ -323,7 +323,6 @@ skytils.config.slayer..current_sven_rng_meter=当前狼猎手RNG里程条
 skytils.config.slayer..current_voidgloom_rng_meter=当前末影人猎手RNG里程条
 skytils.config.slayer..current_inferno_rng_meter=当前烈焰人猎手RNG里程条
 skytils.config.slayer..current_bloodfiend_rng_meter=当前吸血鬼猎手RNG里程条
-skytils.config.slayer.quality_of_life.click_to_open_maddox_menu=点击打开Maddox菜单
 skytils.config.slayer.general.carry_mode=带人模式
 skytils.config.slayer.general.use_hits_to_detect_slayer=使用击中检测猎手
 skytils.config.slayer.quality_of_life.ping_when_in_atoned_horror_danger_zone=进入僵尸猎手TNT技能危险区时警报

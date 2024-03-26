@@ -3397,16 +3397,6 @@ object Config : Vigilant(
     var vampRNG = 0f
 
     @Property(
-        type = PropertyType.SWITCH, name = "Click to Open Maddox Menu",
-        description = "Open chat, then click anywhere on screen to open Maddox Menu.",
-        category = "Slayer", subcategory = "Quality of Life",
-        i18nName = "skytils.config.slayer.quality_of_life.click_to_open_maddox_menu",
-        i18nCategory = "skytils.config.slayer",
-        i18nSubcategory = "skytils.config.slayer.quality_of_life"
-    )
-    var openMaddoxMenu = false
-
-    @Property(
         type = PropertyType.SELECTOR, name = "Carry Mode",
         description = "Allow middle clicking to set your slayer boss.\nDisable this if you are doing your own boss.",
         category = "Slayer", subcategory = "General",
