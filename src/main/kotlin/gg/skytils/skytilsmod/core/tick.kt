@@ -19,7 +19,7 @@
 package gg.skytils.skytilsmod.core
 
 import gg.essential.universal.UChat
-import gg.skytils.event.Events
+import gg.skytils.event.await
 import gg.skytils.event.impl.TickEvent
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
@@ -51,7 +51,7 @@ fun tickTimer(ticks: Int, repeats: Boolean = false, register: Boolean = true, ta
 fun <T> tickTask(ticks: Int, repeats: Boolean = false, task: () -> T) =
     flow {
         do {
-            Events.await<TickEvent>(ticks)
+            await<TickEvent>(ticks)
             emit(withContext(Dispatchers.MC) {
                 task()
             })

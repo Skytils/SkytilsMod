@@ -18,7 +18,7 @@
 
 package gg.skytils.event.mixins;
 
-import gg.skytils.event.Events;
+import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.TickEvent;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,6 +37,6 @@ public class MixinMinecraft {
             )
     )
     private void tick(CallbackInfo ci) {
-        Events.INSTANCE.postSync(new TickEvent());
+        EventsKt.postSync(new TickEvent());
     }
 }
