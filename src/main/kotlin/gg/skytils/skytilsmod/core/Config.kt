@@ -2133,6 +2133,16 @@ object Config : Vigilant(
     var starDisplayType = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show Item Quality ",
+        description = "Shows the base stat boost and item tier.",
+        category = "Miscellaneous", subcategory = "Items",
+        i18nName = "skytils.config.miscellaneous.items.show_item_quality",
+        i18nCategory = "skytils.config.miscellaneous",
+        i18nSubcategory = "skytils.config.miscellaneous.items"
+    )
+    var showItemQuality = false
+
+    @Property(
         type = PropertyType.DECIMAL_SLIDER, name = "Head Display Size",
         description = "Change the size of heads in your inventory.",
         category = "Miscellaneous", subcategory = "Items",

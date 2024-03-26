@@ -88,6 +88,7 @@ object ItemFeatures {
 
     private val headPattern =
         Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
+    private val requirementPattern = Regex("CATACOMBS:(?<level>\\d+)")
 
     // TODO: it is possible for 2 items to have the same name but different material
     val itemIdToNameLookup = hashMapOf<String, String>()
@@ -414,6 +415,35 @@ object ItemFeatures {
                 }"
             })
         }
+
+        if (Skytils.config.showItemQuality && extraAttr != null) {
+            val boost = extraAttr.getInteger("baseStatBoostPercentage")
+            val tier = extraAttr.getInteger("item_tier")
+
+            if (boost > 0 && tier > 0) {
+                val isMasterMode =
+                    requirementPattern
+                        .matchEntire(
+                            extraAttr.getString("dungeon_skill_req")
+                        )?.groupValues?.get(1)?.toIntOrNull()?.let { it > 24 }
+
+                val floor = when (isMasterMode) {
+                    true -> "§4M${tier - 3}"
+                    false -> "§aF$tier"
+                    else -> "§b$tier"
+                }
+
+                val color = when {
+                    boost <= 17 -> "§c"
+                    boost <= 33 -> "§e"
+                    boost <= 49 -> "§a"
+                    else -> "§b"
+                }
+
+                event.toolTip.add("§6Quality: $color$boost% §7($floor§7)")
+            }
+        }
+
         if (DevTools.getToggle("nbt") && Keyboard.isKeyDown(46) && GuiScreen.isCtrlKeyDown() && !GuiScreen.isShiftKeyDown() && !GuiScreen.isAltKeyDown()) {
             GuiScreen.setClipboardString(event.itemStack?.tagCompound?.toString())
         }

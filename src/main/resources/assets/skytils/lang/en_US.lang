@@ -201,6 +201,7 @@ skytils.config.miscellaneous.items.hide_midas_staff_gold=Hide Midas Staff Gold
 skytils.config.miscellaneous.items.highlight_filled_bazaar_orders=Highlight Filled Bazaar Orders
 skytils.config.miscellaneous.items.item_cooldown_display=Item Cooldown Display
 skytils.config.miscellaneous.items.item_stars_display=Item Stars Display
+skytils.config.miscellaneous.items.show_item_quality=Show Item Quality
 skytils.config.miscellaneous.items.head_display_size=Head Display Size
 skytils.config.miscellaneous.items.prevent_placing_weapons=Prevent Placing Weapons
 skytils.config.miscellaneous.items.wither_shield_cooldown_tracker=Wither Shield Cooldown Tracker

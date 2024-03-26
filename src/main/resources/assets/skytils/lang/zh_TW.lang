@@ -201,6 +201,7 @@ skytils.config.miscellaneous.items.hide_midas_staff_gold=隱藏Midas Staff的黃
 skytils.config.miscellaneous.items.highlight_filled_bazaar_orders=高亮已填滿的集市訂單
 skytils.config.miscellaneous.items.item_cooldown_display=物品冷卻顯示
 skytils.config.miscellaneous.items.item_stars_display=物品星星顯示模式
+skytils.config.miscellaneous.items.show_item_quality=顯示物品質量
 skytils.config.miscellaneous.items.head_display_size=揹包內頭顱顯示大小
 skytils.config.miscellaneous.items.prevent_placing_weapons=防止放置武器
 skytils.config.miscellaneous.items.wither_shield_cooldown_tracker=Wither Shield冷卻跟蹤器
