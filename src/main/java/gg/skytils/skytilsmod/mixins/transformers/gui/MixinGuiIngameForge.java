@@ -36,7 +36,7 @@ public abstract class MixinGuiIngameForge extends GuiIngame {
         super(mcIn);
     }
 
-    @ModifyExpressionValue(method = "renderToolHightlight", at = @At(value = "FIELD", target = "Lnet/minecraftforge/client/GuiIngameForge;remainingHighlightTicks:I", opcode = Opcodes.GETFIELD, ordinal = 0))
+    @ModifyExpressionValue(method = "renderToolHightlight", at = @At(value = "FIELD", target = "Lnet/minecraftforge/client/GuiIngameForge;remainingHighlightTicks:I", opcode = Opcodes.GETFIELD))
     private int alwaysShowItemHighlight(int original) {
         return GuiIngameForgeHookKt.alwaysShowItemHighlight(original);
     }
