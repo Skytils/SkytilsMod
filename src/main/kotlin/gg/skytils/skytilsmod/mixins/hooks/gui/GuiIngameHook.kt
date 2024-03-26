@@ -31,6 +31,10 @@ var recordPlaying: String? = null
 var recordPlayingUpFor: Int = 0
 var recordIsPlaying: Boolean = false
 
+fun alwaysShowItemHighlightOptifine(orig: Int): Int {
+    return if (Skytils.config.alwaysShowItemHighlight && Utils.inSkyblock) 10 else orig
+}
+
 fun onSetActionBar(message: String, isPlaying: Boolean, ci: CallbackInfo): Boolean {
     val event = SetActionBarEvent(message, isPlaying)
     if (event.postAndCatch()) {

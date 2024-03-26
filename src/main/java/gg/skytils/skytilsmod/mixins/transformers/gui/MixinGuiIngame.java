@@ -18,10 +18,12 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.gui;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import gg.skytils.skytilsmod.mixins.hooks.gui.GuiIngameHookKt;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.entity.player.EntityPlayer;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,6 +42,11 @@ public abstract class MixinGuiIngame extends Gui {
 
     @Shadow
     protected boolean recordIsPlaying;
+
+    @ModifyExpressionValue(method = "renderSelectedItem", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/GuiIngame;remainingHighlightTicks:I", opcode = Opcodes.GETFIELD))
+    private int alwaysShowItemHighlight(int original) {
+        return GuiIngameHookKt.alwaysShowItemHighlightOptifine(original);
+    }
 
     @Inject(method = "setRecordPlaying(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
     private void onSetActionBar(String message, boolean isPlaying, CallbackInfo ci) {
