@@ -143,6 +143,9 @@ dependencies {
     shadowMe("org.brotli:dec:0.1.2")
     shadowMe("com.aayushatharva.brotli4j:brotli4j:1.16.0")
 
+    shadowMe(project(":earlytweaker")) {
+        isTransitive = false
+    }
     shadowMe(project(":events"))
     shadowMe(project(":hypixel-api:types"))
 
