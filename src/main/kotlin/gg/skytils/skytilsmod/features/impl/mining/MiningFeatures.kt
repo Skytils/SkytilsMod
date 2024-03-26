@@ -241,7 +241,7 @@ object MiningFeatures {
         ) {
             CrystalHollowsMap.Locations.KingYolkar.loc.set()
         }
-        if (formatted.startsWith("§r§f§r§c ☠")) {
+        if (unformatted.startsWith("You died") || unformatted.startsWith("☠ You were killed")) {
             waypointDelayTicks =
                 50 //this is to make sure the scoreboard has time to update and nothing moves halfway across the map
             if (Skytils.config.crystalHollowDeathWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode && lastTPLoc != null) {
