@@ -34,6 +34,7 @@ fun changeBlazeColor(
     scale: Float,
     ci: CallbackInfo
 ) {
+    if (!Skytils.config.blazeSolver) return
     if (BlazeSolver.orderedBlazes.size == 0) return
     GlStateManager.disableTexture2D()
     GlStateManager.enableBlend()
@@ -65,6 +66,7 @@ fun renderModelBlazePost(
     scale: Float,
     ci: CallbackInfo
 ) {
+    if (!Skytils.config.blazeSolver) return
     GlStateManager.disableBlend()
     GlStateManager.enableTexture2D()
 }
