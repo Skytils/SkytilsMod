@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args
 
 
 fun alwaysShowItemHighlight(orig: Int): Int {
-    return if (Skytils.config.alwaysShowItemHighlight && Utils.inSkyblock) 1 else orig
+    return if (Skytils.config.alwaysShowItemHighlight && Utils.inSkyblock) 10 else orig
 }
 
 fun modifyItemHighlightPosition(args: Args, highlightingItemStack: ItemStack) {
