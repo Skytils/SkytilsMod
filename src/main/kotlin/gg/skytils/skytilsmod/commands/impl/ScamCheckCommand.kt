@@ -24,6 +24,6 @@ import java.util.*
 
 object ScamCheckCommand : StatCommand("skytilsscamcheck", needProfile = false, listOf("stsc")) {
     override suspend fun displayStats(username: String, uuid: UUID) {
-        val check = ScamCheck.checkScammer(uuid, "command").printResult(username)
+        ScamCheck.checkScammer(uuid, "command").printResult(username)
     }
 }

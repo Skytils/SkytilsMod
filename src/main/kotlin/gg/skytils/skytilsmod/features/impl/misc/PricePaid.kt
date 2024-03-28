@@ -83,7 +83,7 @@ object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
             val uuid = ItemUtil.getExtraAttributes(stack)?.getString("uuid")
                 ?.ifEmpty { return } ?: return
             lastBought = Triple(
-                ItemUtil.getDisplayName(stack),
+                stack.displayName,
                 UUID.fromString(uuid),
                 price.replace(",", "").substringBefore(' ').toDouble()
             )

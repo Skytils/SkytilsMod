@@ -22,11 +22,9 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.utils.ItemRarity
-import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.toStringIfTrue
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.inventory.GuiChest
@@ -137,7 +135,7 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
     }
 
     private fun getPetIdFromItem(item: ItemStack): String? {
-        return petNameRegex.find(ItemUtil.getDisplayName(item))?.let { getPetIdFromMatcher(it.groups) }
+        return petNameRegex.find(item.displayName)?.let { getPetIdFromMatcher(it.groups) }
     }
 
 
