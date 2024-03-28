@@ -17,6 +17,8 @@
  */
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
+import gg.essential.universal.UChat
+import gg.essential.universal.UKeyboard
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
@@ -25,6 +27,7 @@ import gg.skytils.skytilsmod.features.impl.misc.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.ifNull
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.minecraft.client.renderer.GlStateManager
@@ -45,72 +48,78 @@ object IceFillSolver {
 
     init {
         tickTimer(20, repeats = true) {
-            if (!Utils.inDungeons || !Skytils.config.iceFillSolver || mc.thePlayer == null) return@tickTimer
-            val world: World = mc.theWorld
-            if (DungeonListener.missingPuzzles.contains("Ice Fill") && puzzles == null && (job == null || job?.isActive == false)) {
-                job = Skytils.launch {
-                    val playerX = mc.thePlayer.posX.toInt()
-                    val playerZ = mc.thePlayer.posZ.toInt()
-                    val xRange = playerX - 25..playerX + 25
-                    val zRange = playerZ - 25..playerZ + 25
-                    findChest@ for (te in mc.theWorld.loadedTileEntityList) {
-                        if (te.pos.y == 75 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
-                        ) {
-                            val pos = te.pos
-                            if (world.getBlockState(pos.down()).block == Blocks.stone) {
-                                for (direction in EnumFacing.HORIZONTALS) {
-                                    if (world.getBlockState(pos.offset(direction)).block == Blocks.cobblestone && world.getBlockState(
-                                            pos.offset(direction.opposite, 2)
-                                        ).block == Blocks.iron_bars && world.getBlockState(
-                                            pos.offset(
-                                                direction.rotateY(),
-                                                2
-                                            )
-                                        ).block == Blocks.torch && world.getBlockState(
-                                            pos.offset(
-                                                direction.rotateYCCW(),
-                                                2
-                                            )
-                                        ).block == Blocks.torch && world.getBlockState(
-                                            pos.offset(direction.opposite).down(2)
-                                        ).block == Blocks.stone_brick_stairs
-                                    ) {
-                                        puzzles = Triple(
-                                            IceFillPuzzle(world, 70, pos, direction),
-                                            IceFillPuzzle(world, 71, pos, direction),
-                                            IceFillPuzzle(world, 72, pos, direction)
-                                        )
-                                        println(
-                                            "Ice fill chest is at $pos and is facing $direction"
-                                        )
-                                        break@findChest
-                                    }
-                                }
-                            }
-                        }
+            //TODO: DEBUG
+            if (UKeyboard.isAltKeyDown() && UKeyboard.isKeyDown(UKeyboard.KEY_D)) {
+                job = null
+                puzzles = null
+            }
+            //TODO: DEBUG
+            if (!Utils.inDungeons || !Skytils.config.iceFillSolver || "Ice Fill" !in DungeonListener.missingPuzzles ||
+                puzzles != null || job?.isActive == true
+            ) return@tickTimer
+            val player = mc.thePlayer ?: return@tickTimer
+            val world = mc.theWorld ?: return@tickTimer
+
+            job = Skytils.launch {
+                world.loadedTileEntityList.filterIsInstance<TileEntityChest>().filter {
+                    it.numPlayersUsing == 0 && it.pos.y == 75 && it.getDistanceSq(
+                        player.posX, player.posY, player.posZ
+                    ) < 750
+                }.map { chest ->
+                    val pos = chest.pos
+                    EnumFacing.HORIZONTALS.firstOrNull {
+                        world.getBlockState(pos.down()).block == Blocks.stone && world.getBlockState(pos.offset(it)).block == Blocks.cobblestone && world.getBlockState(
+                            pos.offset(it.opposite, 2)
+                        ).block == Blocks.iron_bars && world.getBlockState(
+                            pos.offset(
+                                it.rotateY(), 2
+                            )
+                        ).block == Blocks.torch && world.getBlockState(
+                            pos.offset(
+                                it.rotateYCCW(), 2
+                            )
+                        ).block == Blocks.torch && world.getBlockState(
+                            pos.offset(it.opposite).down(2)
+                        ).block == Blocks.stone_brick_stairs
+                    }?.let {
+                        Pair(chest, it)
                     }
+                }.firstOrNull()?.let {
+                    //chest: BlockPos{x=-11, y=75, z=-89}; direction: east
+                    val (chest, direction) = it
+                    val pos = chest.pos
+
+                    val starts = Triple(
+                        //three: BlockPos{x=-33, y=70, z=-89}
+                        pos.down(5).offset(direction.opposite, 22),
+                        //five: BlockPos{x=-28, y=71, z=-89}
+                        pos.down(4).offset(direction.opposite, 17),
+                        //seven: BlockPos{x=-21, y=72, z=-89}
+                        pos.down(3).offset(direction.opposite, 10),
+                    )
+                    val ends = Triple(
+                        //three: BlockPos{x=-29, y=70, z=-89}
+                        starts.first.offset(direction, 3),
+                        //five: BlockPos{x=-23, y=71, z=-89}
+                        starts.second.offset(direction, 5),
+                        //seven: BlockPos{x=-14, y=72, z=-89}
+                        starts.third.offset(direction, 7),
+                    )
+
+                    puzzles = Triple(
+                        IceFillPuzzle(world, starts.first, ends.first, direction),
+                        IceFillPuzzle(world, starts.second, ends.second, direction),
+                        IceFillPuzzle(world, starts.third, ends.third, direction)
+                    )
                 }
             }
         }
     }
 
-    private fun checkForStart(world: World, pos: BlockPos, facing: EnumFacing) =
-        world.getBlockState(pos).block === Blocks.air &&
-                world.getBlockState(pos.offset(facing.rotateY())).block === Blocks.cobblestone_wall &&
-                world.getBlockState(pos.offset(facing.rotateYCCW())).block === Blocks.cobblestone_wall
-
-    private fun generatePairs(world: World, positions: List<BlockPos>) =
-        positions.flatMap { pos -> getPossibleMoves(world, pos).map { Move(pos, it) } }
-
-    private fun getPossibleMoves(world: World, pos: BlockPos) =
-        EnumFacing.HORIZONTALS.map { pos.offset(it) }.filter { spot ->
-            val down = world.getBlockState(spot.down()).block
-            (down == Blocks.ice || down == Blocks.packed_ice) && world.getBlockState(spot).block != Blocks.stone
-        }
-
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!Skytils.config.iceFillSolver || "Ice Fill" !in DungeonListener.missingPuzzles) return
+        //TODO: DEBUG
+        if (!Utils.inDungeons || !Skytils.config.iceFillSolver || "Ice Fill" !in DungeonListener.missingPuzzles) return
         val (three, five, seven) = puzzles ?: return
         val matrixStack = UMatrixStack.Compat.get()
         three.draw(matrixStack, event.partialTicks)
@@ -120,100 +129,106 @@ object IceFillSolver {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Unload) {
+        job = null //TODO: Does not stop getPaths method while running
         puzzles = null
-        job = null
     }
 
-    private class IceFillPuzzle(world: World, y: Int, chestPos: BlockPos, roomFacing: EnumFacing) {
-        private val spaces: MutableList<BlockPos> = ArrayList()
-        private lateinit var start: BlockPos
-        var paths: MutableSet<List<BlockPos>> = HashSet()
-        fun genPaths(world: World) {
-            // Generate paths
-            val moves = generatePairs(world, spaces)
-            val g = Graph(moves, world)
-            val path: MutableList<BlockPos> = ArrayList()
-            path.add(start)
-            try {
-                getPaths(g, start, mutableSetOf(start), path, spaces.size)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+    private class IceFillPuzzle(val world: World, val start: BlockPos, val end: BlockPos, val facing: EnumFacing) {
+        private val path = getBestPath().ifNull {
+            UChat.chat("${Skytils.failPrefix} §cFailed to find a solution for Ice Fill.")
+            println("Ice Fill Data: start=$start, end=$end, facing=$facing")
         }
 
-        fun draw(matrixStack: UMatrixStack, partialTicks: Float) =
-            paths.firstOrNull()?.zipWithNext { first, second ->
-                GlStateManager.disableCull()
+        fun draw(matrixStack: UMatrixStack, partialTicks: Float) {
+            GlStateManager.pushMatrix()
+            GlStateManager.disableCull()
+            path?.zipWithNext { first, second ->
                 RenderUtil.draw3DLine(
                     Vec3(first).addVector(0.5, 0.01, 0.5),
                     Vec3(second).addVector(0.5, 0.01, 0.5),
                     5,
-                    Color.RED,
+                    Color.GREEN,
                     partialTicks,
                     matrixStack,
                     Funny.alphaMult
                 )
-                GlStateManager.enableCull()
             }
-
-        private fun getPaths(
-            g: Graph,
-            v: BlockPos,
-            visited: MutableSet<BlockPos>,
-            path: MutableList<BlockPos>,
-            n: Int
-        ) {
-            if (path.size == n) {
-                val newPath: List<BlockPos> = path.toList()
-                paths.add(newPath)
-                return
-            } else {
-
-                // Check if every move starting from position `v` leads
-                // to a solution or not
-                g.adjList[v]?.forEach { w ->
-                    // Only check if we haven't been there before
-                    if (!visited.contains(w)) {
-                        visited.add(w)
-                        path.add(w)
-
-                        // Continue checking down this path
-                        getPaths(g, w, visited, path, n)
-
-                        // backtrack
-                        visited.remove(w)
-                        path.remove(w)
-                    }
-                }
-            }
+            GlStateManager.popMatrix()
         }
 
-        init {
-            chestPos.offset(roomFacing.opposite, 11).run { Utils.getBlocksWithinRangeAtSameY(chestPos, 25, y) }
-                .forEach { pos ->
-                    when (world.getBlockState(pos.down()).block) {
-                        Blocks.ice, Blocks.packed_ice ->
-                            if (world.getBlockState(pos).block === Blocks.air)
-                                spaces.add(pos)
+        private fun getBestPath(): List<BlockPos>? {
+            val spaces = getSpaces()
 
-                        Blocks.stone_brick_stairs, Blocks.stone -> {
-                            if (!::start.isInitialized && checkForStart(world, pos, roomFacing))
-                                start = pos.offset(roomFacing)
+            //TODO: Can be combined with getSpaces, I just can't be bothered
+            val moves: Map<BlockPos, Map<BlockPos, EnumFacing>> = spaces.associateWith {
+                EnumFacing.HORIZONTALS.associateBy { direction ->
+                    it.offset(direction)
+                }.filterKeys { spot -> spot in spaces }
+            }
+
+            var bestPath: List<BlockPos>? = null
+            var leastCorners = Int.MAX_VALUE
+
+            //TODO: Rework this method
+            fun getPaths(
+                moves: Map<BlockPos, Map<BlockPos, EnumFacing>>,
+                v: BlockPos,
+                visited: HashSet<BlockPos>,
+                path: MutableList<BlockPos>,
+                n: Int,
+                lastDirection: EnumFacing,
+                corners: Int
+            ) {
+                val move = moves[v] ?: return
+                if (path.size == n && v == end) {
+                    val newPath: List<BlockPos> = path.toList()
+                    leastCorners = corners
+                    bestPath = newPath
+                } else if (move.containsKey(end) && path.size != n - 1) {
+                    return
+                } else {
+                    move.forEach { w ->
+                        if (!visited.contains(w.key)) {
+                            visited.add(w.key)
+                            path.add(w.key)
+
+                            val newCorners = if (lastDirection != w.value) corners + 1 else corners
+                            if (newCorners >= leastCorners) {
+                                return@forEach
+                            }
+
+                            getPaths(moves, w.key, visited, path, n, w.value, newCorners)
+
+                            visited.remove(w.key)
+                            path.remove(w.key)
                         }
                     }
                 }
-            genPaths(world)
-        }
-    }
-
-    private data class Move(var source: BlockPos, var dest: BlockPos)
-
-    private class Graph(moves: Collection<Move>, world: World) {
-        val adjList: Map<BlockPos, Collection<BlockPos>> = buildMap {
-            moves.forEach { (source, dest) ->
-                this[source] = getPossibleMoves(world, source)
-                this[dest] = getPossibleMoves(world, dest)
             }
+
+            getPaths(moves, start, hashSetOf(start), mutableListOf(start), spaces.size, facing, 0)
+            return bestPath
+        }
+
+        private fun getSpaces(): Set<BlockPos> {
+            val spaces = hashSetOf(start)
+            val queue = mutableListOf(start)
+
+            while (queue.isNotEmpty()) {
+                val current = queue.removeAt(0)
+                EnumFacing.HORIZONTALS.forEach { direction ->
+                    val next = current.offset(direction)
+                    if (next !in spaces && Utils.equalsOneOf(
+                            world.getBlockState(next.down()).block, Blocks.ice, Blocks.packed_ice
+                        ) && world.getBlockState(next).block === Blocks.air
+                    ) {
+                        spaces.add(next)
+                        queue.add(next)
+                    }
+                }
+            }
+
+            return spaces
         }
     }
 }
