@@ -93,6 +93,7 @@ object Utils {
     var random = Random()
 
     val isBSMod by lazy {
+        return@lazy true
         val cal = Calendar.getInstance()
         return@lazy cal.get(Calendar.MONTH) == Calendar.APRIL && cal.get(Calendar.DAY_OF_MONTH) == 1
     }
