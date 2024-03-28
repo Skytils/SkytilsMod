@@ -2,14 +2,14 @@
   "bsmod.gacha_roll": {
     "category": "record",
     "sounds": [
-      "../skytilsplus/gacha"
+      "skytilsplus/gacha"
     ],
     "stream": true
   },
   "bsmod.sparkle_adbreak": {
     "category": "record",
     "sounds": [
-      "../skytilsplus/sparkle_ad_break"
+      "skytilsplus/sparkle_ad_break"
     ]
   }
 }
