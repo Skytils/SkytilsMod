@@ -24,6 +24,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.gui.GachaGui
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
+import gg.skytils.skytilsmod.utils.Utils
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -38,19 +39,23 @@ object SkytilsPlus {
 
     @SubscribeEvent
     fun onSendChat(event: SendChatMessageEvent) {
-        if (event.message.startsWith("/bsmod+ redeem")) {
+        if (Utils.isBSMod && event.message.startsWith("/bsmod+ redeem")) {
             event.isCanceled = true
             val code = event.message.split(" ").getOrNull(2)
-            if (code == "FREETRIAL") {
-                if (redeemed) {
-                    UChat.chat("${Skytils.failPrefix} §cYou have already redeemed a code.")
-                    return
+            when (code) {
+                "FREETRIAL" -> {
+                    if (redeemed) {
+                        UChat.chat("${Skytils.failPrefix} §cYou have already redeemed a code.")
+                        return
+                    }
+                    Skytils.displayScreen = GachaGui()
                 }
-                Skytils.displayScreen = GachaGui()
-            } else if (code == null) {
-                UChat.chat("${Skytils.failPrefix} §cYou need to provide a code.")
-            } else {
-                UChat.chat("${Skytils.failPrefix} §cInvalid code.")
+                null -> {
+                    UChat.chat("${Skytils.failPrefix} §cYou need to provide a code.")
+                }
+                else -> {
+                    UChat.chat("${Skytils.failPrefix} §cInvalid code.")
+                }
             }
             mc.ingameGUI.chatGUI.addToSentMessages(event.message)
         }
