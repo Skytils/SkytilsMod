@@ -163,15 +163,26 @@ object KuudraChestProfit {
             IO.launch {
                 val identifier = AuctionData.getIdentifier(item)
                 val extraAttr = ItemUtil.getExtraAttributes(item)
+                var displayName = item.displayName
 
                 val itemValue = if (identifier == null) {
                     getEssenceValue(item.displayName) ?: return@launch
                 } else if ((extraAttr?.getCompoundTag("attributes")?.keySet?.size ?: 0) > 1) {
-                    KuudraPriceData.getOrFetchAttributePricedItem(item)?.price ?: 0.0
+                    val priceData = KuudraPriceData.getOrFetchAttributePricedItem(item)
+                    if (priceData != null && priceData != KuudraPriceData.AttributePricedItem.EMPTY && priceData != KuudraPriceData.AttributePricedItem.FAILURE) {
+                        priceData.price
+                    } else {
+                        if (priceData != null) {
+                            displayName += "§c (Failed to fetch price ${if (priceData == KuudraPriceData.AttributePricedItem.FAILURE) "from API" else ", not on AH"})"
+                        } else {
+                            displayName += "§c (Failed to fetch price, using LBIN)"
+                        }
+                        AuctionData.lowestBINs[identifier] ?: 0.0
+                    }
                 } else {
                     AuctionData.lowestBINs[identifier] ?: 0.0
                 }
-                items.add(KuudraChestLootItem(item.stackSize, item.displayName, itemValue))
+                items.add(KuudraChestLootItem(item.stackSize, displayName, itemValue))
 
                 value += itemValue
             }

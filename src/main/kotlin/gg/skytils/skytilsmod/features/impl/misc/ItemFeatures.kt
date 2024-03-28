@@ -328,9 +328,13 @@ object ItemFeatures {
                             KuudraPriceData.getAttributePricedItemId(item)?.let {attrId ->
                                 val kuudraPrice = KuudraPriceData.getOrRequestAttributePricedItem(attrId)
                                 if (kuudraPrice != null) {
-                                    event.toolTip.add(
-                                        "§6Kuudra BIN Price: §b${NumberUtil.nf.format(kuudraPrice.price)}"
-                                    )
+                                    if (kuudraPrice == KuudraPriceData.AttributePricedItem.EMPTY) {
+                                        event.toolTip.add("§6Kuudra BIN Price: §cNot Found")
+                                    } else {
+                                        event.toolTip.add(
+                                            "§6Kuudra BIN Price: §b${NumberUtil.nf.format(kuudraPrice.price)}"
+                                        )
+                                    }
                                 } else {
                                     event.toolTip.add("§6Kuudra BIN Price: §cLoading...")
                                 }

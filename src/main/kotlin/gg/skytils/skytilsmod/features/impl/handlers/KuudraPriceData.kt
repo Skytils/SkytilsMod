@@ -26,7 +26,9 @@ import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.ifNull
 import gg.skytils.skytilsmod.utils.set
 import io.ktor.client.call.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -75,13 +77,21 @@ object KuudraPriceData {
         return@coroutineScope fetching.getOrPut(attrId) {
             async {
                 val parts = attrId.split(" ") as MutableList<String>
-                Skytils.client.get("https://${Skytils.domain}/api/auctions/kuudra/item_price") {
+                val response = Skytils.client.get("https://${Skytils.domain}/api/auctions/kuudra/item_price") {
                     parameter("item", parts.removeAt(0))
                     parts.forEachIndexed { i, attr ->
                         parameter("attr${i+1}", attr)
                     }
-                }.body<AttributePricedItem>().also {
-                    kuudraPriceCache[attrId] = it
+                    expectSuccess = false
+                }
+                when (response.status) {
+                    HttpStatusCode.NotFound -> AttributePricedItem.EMPTY
+                    HttpStatusCode.OK -> response.body<AttributePricedItem>()
+                    else -> AttributePricedItem.FAILURE
+                }.also {
+                    if (it != AttributePricedItem.FAILURE) {
+                        kuudraPriceCache[attrId] = it
+                    }
                     fetching -= attrId
                 }
             }
@@ -106,5 +116,10 @@ object KuudraPriceData {
         val id: String,
         val price: Double,
         val timestamp: Long? = null
-    )
+    ) {
+        companion object {
+            val EMPTY = AttributePricedItem(id = "", price = -1.0)
+            val FAILURE = AttributePricedItem(id = "", price = -1.0)
+        }
+    }
 }
