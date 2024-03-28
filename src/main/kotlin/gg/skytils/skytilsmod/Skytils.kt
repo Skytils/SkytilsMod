@@ -67,6 +67,7 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandle
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiStreamUnavailable
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
 import gg.skytils.skytilsmod.earlytweaker.DependencyLoader
+import gg.skytils.skytilsmod.mixins.hooks.entity.EntityPlayerSPHook
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
@@ -353,6 +354,7 @@ class Skytils {
             VisitorHelper,
             WaterBoardSolver,
             Waypoints,
+            EntityPlayerSPHook,
             MouseHelperHook
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
