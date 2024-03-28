@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.IO
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
+import gg.skytils.skytilsmod.features.impl.handlers.KuudraPriceData
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -166,7 +167,7 @@ object KuudraChestProfit {
                 val itemValue = if (identifier == null) {
                     getEssenceValue(item.displayName) ?: return@launch
                 } else if ((extraAttr?.getCompoundTag("attributes")?.keySet?.size ?: 0) > 1) {
-                    KuudraFeatures.getAttributePricedItem(item)?.price ?: 0.0
+                    KuudraPriceData.getAttributePricedItem(item)?.price ?: 0.0
                 } else {
                     AuctionData.lowestBINs[identifier] ?: 0.0
                 }
