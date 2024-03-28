@@ -52,10 +52,21 @@ object Config : Vigilant(
     sortingBehavior = ConfigSorting
 ) {
     @Property(
+        type = PropertyType.SWITCH, name = "Fetch Kuudra Prices",
+        description = "Fetches the Kuudra prices for Skytils to use.\nSkytils currently uses a third-party to retrieve this information.\nSome features will be hidden and will not work if this switch isn't on.",
+        category = "General", subcategory = "API",
+        searchTags = ["Kuudra Chest Profit"],
+        i18nName = "skytils.config.general.api.fetch_kuudra_prices",
+        i18nCategory = "skytils.config.general",
+        i18nSubcategory = "skytils.config.general.api"
+    )
+    var fetchKuudraPrices = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Fetch Lowest BIN Prices",
         description = "Fetches the lowest BIN features for Skytils to use.\nSome features will be hidden and will not work if this switch isn't on.",
         category = "General", subcategory = "API",
-        searchTags = ["BIN", "Bits", "Price Input", "Protect Items Above Value", "Chest Profit", "Dungeon Profit", "Container Sell Value", "Vistor Offer Helper", "Copper"],
+        searchTags = ["BIN", "Bits", "Price Input", "Protect Items Above Value", "Chest Profit", "Dungeon Profit", "Container Sell Value", "Visitor Offer Helper", "Copper", "Kuudra"],
         i18nName = "skytils.config.general.api.fetch_lowest_bin_prices",
         i18nCategory = "skytils.config.general",
         i18nSubcategory = "skytils.config.general.api"
@@ -4284,7 +4295,7 @@ object Config : Vigilant(
         addDependency("itemRarityOpacity", "showItemRarity")
         addDependency("itemRarityShape", "showItemRarity")
 
-        listOf(
+        arrayOf(
             "showLowestBINPrice",
             "betterAuctionPriceInput",
             "dungeonChestProfit",
@@ -4293,11 +4304,19 @@ object Config : Vigilant(
             "containerSellValue",
             "visitorOfferHelper",
             "showCoinsPerCopper",
-            "kuudraChestProfit"
+            "kuudraChestProfit",
+            "fetchKuudraPrices"
         ).forEach { propertyName ->
             addDependency(propertyName, "fetchLowestBINPrices")
             registerListener(propertyName) { prop: Any ->
                 if (prop is Boolean && prop) fetchLowestBINPrices = true
+            }
+        }
+
+        arrayOf("kuudraChestProfit").forEach { propertyName ->
+            addDependency(propertyName, "fetchKuudraPrices")
+            registerListener(propertyName) { prop: Any ->
+                if (prop is Boolean && prop) fetchKuudraPrices = true
             }
         }
 
@@ -4306,6 +4325,7 @@ object Config : Vigilant(
         addDependency("kismetRerollThreshold", "dungeonChestProfit")
 
         addDependency("kuudraChestProfitIncludesEssence", "kuudraChestProfit")
+        addDependency("kuudraChestProfitCountsKey", "kuudraChestProfit")
 
         addDependency("message270Score", "sendMessageOn270Score")
         addDependency("messageTitle270Score", "createTitleOn270Score")
@@ -4334,7 +4354,7 @@ object Config : Vigilant(
         addDependency("predictAlignmentClicks", "alignmentTerminalSolver")
         addDependency("predictSimonClicks", "simonSaysSolver")
 
-        listOf(
+        arrayOf(
             "emptyBurrowColor",
             "mobBurrowColor",
             "treasureBurrowColor"
@@ -4351,7 +4371,7 @@ object Config : Vigilant(
         addDependency("yangGlyphColor", "highlightYangGlyph")
         addDependency("nukekebiHeadColor", "highlightNukekebiHeads")
 
-        listOf(
+        arrayOf(
             "seraphBeaconPhaseColor",
             "seraphHitsPhaseColor",
             "seraphNormalPhaseColor"
@@ -4379,7 +4399,7 @@ object Config : Vigilant(
             }
         }
 
-        setOf(
+        arrayOf(
             "darkModeMist",
             "gardenPlotCleanupHelper",
             "recolorCarpets"

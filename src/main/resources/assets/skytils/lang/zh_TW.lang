@@ -1,3 +1,4 @@
+skytils.config.general.api.fetch_kuudra_prices=獲取最低的 Kuudra 一口價的數據
 skytils.config.general.api.fetch_lowest_bin_prices=獲取最低一口價的數據
 skytils.config.general.command_aliases.command_alias_mode=指令別名模式
 skytils.config.general.local_api.auto_start_local_api=自動啓動本地API
