@@ -166,6 +166,7 @@ skytils.config.kuudra.performance.hide_nonnametag_armor_stands_on_kuudra=在Kuud
 skytils.config.kuudra.price_checking.kuudra_chest_profit=Kuudra寶箱利潤
 skytils.config.kuudra.price_checking.kuudra_chest_profit_includes_essence=Kuudra寶箱利潤將包括精華
 skytils.config.kuudra.price_checking.kuudra_chest_profit_subtracts_key=Kuudra寶箱利潤將扣除鑰匙
+skytils.config.kuudra.price_checking.show_kuudra_lowest_bin_price=顯示Kuudra最低一口價
 skytils.config.mining.quality_of_life.dark_mode_mist=深色模式的Mist區域
 skytils.config.mining.quality_of_life.highlight_completed_commissions=高亮已完成的委託
 skytils.config.mining.quality_of_life.highlight_disabled_hotm_perks=高亮已禁用的HOTM特權

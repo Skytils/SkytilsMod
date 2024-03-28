@@ -167,7 +167,7 @@ object KuudraChestProfit {
                 val itemValue = if (identifier == null) {
                     getEssenceValue(item.displayName) ?: return@launch
                 } else if ((extraAttr?.getCompoundTag("attributes")?.keySet?.size ?: 0) > 1) {
-                    KuudraPriceData.getAttributePricedItem(item)?.price ?: 0.0
+                    KuudraPriceData.getOrFetchAttributePricedItem(item)?.price ?: 0.0
                 } else {
                     AuctionData.lowestBINs[identifier] ?: 0.0
                 }

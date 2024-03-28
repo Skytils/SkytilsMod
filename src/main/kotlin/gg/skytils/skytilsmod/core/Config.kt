@@ -1750,7 +1750,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Kuudra Chest Profit",
-        description = "Shows the estimated profit for items from chests in Kuudra.\nYou authorize Skytils to send your chest data to a third party.",
+        description = "Shows the estimated profit for items from chests in Kuudra.",
         category = "Kuudra", subcategory = "Price Checking",
         i18nName = "skytils.config.kuudra.price_checking.kuudra_chest_profit",
         i18nCategory = "skytils.config.kuudra",
@@ -1777,6 +1777,16 @@ object Config : Vigilant(
         i18nSubcategory = "skytils.config.kuudra.price_checking"
     )
     var kuudraChestProfitCountsKey = true
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Kuudra Lowest BIN Price",
+        description = "Shows the lowest Buy It Now price (including attributes) for various items in Skyblock.",
+        category = "Kuudra", subcategory = "Price Checking",
+        i18nName = "skytils.config.kuudra.price_checking.show_kuudra_lowest_bin_price",
+        i18nCategory = "skytils.config.kuudra",
+        i18nSubcategory = "skytils.config.kuudra.price_checking"
+    )
+    var showKuudraLowestBinPrice = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Dark Mode Mist",

@@ -35,6 +35,7 @@ import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
+import gg.skytils.skytilsmod.features.impl.handlers.KuudraPriceData
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.ItemUtil.getDisplayName
@@ -306,7 +307,7 @@ object ItemFeatures {
             }
         }
         if (itemId != null) {
-            if (Skytils.config.showLowestBINPrice || Skytils.config.showCoinsPerBit || Skytils.config.showCoinsPerCopper) {
+            if (Skytils.config.showLowestBINPrice || Skytils.config.showCoinsPerBit || Skytils.config.showCoinsPerCopper || Skytils.config.showKuudraLowestBinPrice) {
                 val auctionIdentifier = if (isSuperpairsReward) itemId else AuctionData.getIdentifier(item)
                 if (auctionIdentifier != null) {
                     // this might actually have multiple items as the price
@@ -322,6 +323,18 @@ object ItemFeatures {
                                     valuePer
                                 ) + " each§7)" else ""
                             )
+                        }
+                        if (Skytils.config.showKuudraLowestBinPrice && item.stackSize == 1) {
+                            KuudraPriceData.getAttributePricedItemId(item)?.let {attrId ->
+                                val kuudraPrice = KuudraPriceData.getOrRequestAttributePricedItem(attrId)
+                                if (kuudraPrice != null) {
+                                    event.toolTip.add(
+                                        "§6Kuudra BIN Price: §b${NumberUtil.nf.format(kuudraPrice.price)}"
+                                    )
+                                } else {
+                                    event.toolTip.add("§6Kuudra BIN Price: §cLoading...")
+                                }
+                            }
                         }
                         if (Skytils.config.showCoinsPerBit) {
                             var bitValue = bitCosts.getOrDefault(auctionIdentifier, -1)

@@ -21,9 +21,16 @@ package gg.skytils.skytilsmod.features.impl.handlers
 import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.lib.caffeine.cache.Caffeine
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.IO
 import gg.skytils.skytilsmod.utils.ItemUtil
+import gg.skytils.skytilsmod.utils.ifNull
+import gg.skytils.skytilsmod.utils.set
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.minutes
@@ -36,35 +43,68 @@ object KuudraPriceData {
         .expireAfterWrite(5.minutes.toJavaDuration())
         .maximumSize(100)
         .build()
+    private val fetching = mutableMapOf<String, Deferred<AttributePricedItem>>()
 
-    suspend fun getAttributePricedItem(item: ItemStack): AttributePricedItem? {
+    fun getAttributePricedItemId(item: ItemStack): String? {
         val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null
         val attributes = extraAttr.getCompoundTag("attributes")
-        if (attributes.hasNoTags()) return null
-        val itemId = ItemUtil.getSkyBlockItemID(extraAttr)
-        val attributeItem = "$itemId ${attributes.keySet.joinToString("\n") { "${it}_${ attributes.getInteger(it) }" }}"
+        if (attributes.keySet.size < 2) return null
+        val itemId = ItemUtil.getSkyBlockItemID(extraAttr) ?: return null
+        return "$itemId ${attributes.keySet.joinToString(" ") { "${it}_${attributes.getInteger(it)}" }}".intern()
+    }
 
-        if (kuudraPriceCache.getIfPresent(attributeItem) != null) return kuudraPriceCache.getIfPresent(attributeItem)
-
-        return Skytils.client.get("https://${Skytils.domain}/api/auctions/kuudra/item_price") {
-            attributes.keySet.forEachIndexed { i, attr ->
-                parameter("attr${i+1}", "${attr}_${attributes.getInteger(attr)}")
+    fun getOrRequestAttributePricedItem(attrId: String): AttributePricedItem? {
+        return kuudraPriceCache.getIfPresent(attrId).ifNull {
+            if (attrId !in fetching) {
+                IO.launch {
+                    fetchAttributePricedItem(attrId)
+                }
             }
-            parameter("item", itemId)
-        }.body<AttributePricedItem>().also {
-            kuudraPriceCache.put(attributeItem, it)
         }
     }
 
+    fun getAttributePricedItem(attrId: String): AttributePricedItem? {
+        return kuudraPriceCache.getIfPresent(attrId)
+    }
+
+    suspend fun fetchAttributePricedItem(attrId: String): AttributePricedItem = coroutineScope {
+        fetching[attrId]?.let {
+            return@coroutineScope it.await()
+        }
+
+        return@coroutineScope fetching.getOrPut(attrId) {
+            async {
+                val parts = attrId.split(" ") as MutableList<String>
+                Skytils.client.get("https://${Skytils.domain}/api/auctions/kuudra/item_price") {
+                    parameter("item", parts.removeAt(0))
+                    parts.forEachIndexed { i, attr ->
+                        parameter("attr${i+1}", attr)
+                    }
+                }.body<AttributePricedItem>().also {
+                    kuudraPriceCache[attrId] = it
+                    fetching -= attrId
+                }
+            }
+        }.await()
+    }
+
+    suspend fun getOrFetchAttributePricedItem(item: ItemStack): AttributePricedItem? {
+        val itemId = getAttributePricedItemId(item) ?: return null
+
+        return getAttributePricedItem(itemId) ?: fetchAttributePricedItem(itemId)
+    }
+
     /**
-     * @param id the ID of the lowest priced auction
+     * @param uuid the UUID of the lowest priced auction
+     * @param id the Skyblock ID of the item
      * @param price the price of the lowest priced auction
-     * @param timestamp if [id] is `null`, the timestamp of when [price] was last updated
+     * @param timestamp if [uuid] is `null`, the timestamp of when [price] was last updated
      */
     @Serializable
     data class AttributePricedItem(
+        val uuid: String? = null,
         val id: String,
         val price: Double,
-        val timestamp: Long?
+        val timestamp: Long? = null
     )
 }
