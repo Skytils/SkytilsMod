@@ -34,7 +34,7 @@ import org.lwjgl.input.Keyboard
 object KuudraFeatures {
     var kuudraOver = false
     var myFaction: CrimsonFaction? = null
-    private val factionRegex = Regex("§r§b§l(?<faction>\\w+) Reputation:§r")
+    private val factionRegex = Regex("§r§.§l(?<faction>\\w+) Reputation:§r")
 
     init {
         tickTimer(20, repeats = true) {
