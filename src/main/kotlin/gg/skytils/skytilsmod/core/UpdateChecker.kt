@@ -168,7 +168,7 @@ object UpdateChecker {
             }
             val latestTag = latestRelease.tagName
             val latestVersion = SkytilsVersion(latestTag.substringAfter("v"))
-            if (currentVersion < latestVersion) {
+            if (currentVersion < latestVersion || System.getProperty("skytils.dev.updateChecker") != null) {
                 updateObj = latestRelease
             }
         }

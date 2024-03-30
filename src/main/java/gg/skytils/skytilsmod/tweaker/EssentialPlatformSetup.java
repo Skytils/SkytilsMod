@@ -94,6 +94,13 @@ public class EssentialPlatformSetup {
                     exit();
                 }
             }
+            if (System.getProperty("os", "unknown").toLowerCase(Locale.ENGLISH).contains("win")) {
+                System.out.println("Skytils is running on Windows");
+                if (System.getProperty("skytils.noSetWindowsSSLRoot") == null) {
+                    System.out.println("Setting Windows SSL Root");
+                    System.setProperty("javax.net.ssl.trustStoreType", "Windows-ROOT");
+                }
+            }
         } catch (Throwable t) {
             t.printStackTrace();
         }
