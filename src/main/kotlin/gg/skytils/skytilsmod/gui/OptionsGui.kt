@@ -31,6 +31,7 @@ import gg.essential.universal.UDesktop
 import gg.essential.universal.UKeyboard
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
+import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SkytilsPlus
 import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
 import gg.skytils.skytilsmod.gui.editing.VanillaEditingGui
@@ -39,6 +40,7 @@ import gg.skytils.skytilsmod.gui.waypoints.WaypointsGui
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.openGUI
+import gg.skytils.skytilsmod.utils.toStringIfTrue
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import java.net.URI
@@ -47,7 +49,7 @@ class OptionsGui(val parent: GuiScreen? = null) :
     WindowScreen(ElementaVersion.V2, newGuiScale = EssentialAPI.getGuiUtil().getGuiScale()) {
 
     private val skytilsText: UIText =
-        UIText(if (Utils.isBSMod) "BSMod" else "Skytils", shadow = false).childOf(window).constrain {
+        UIText(if (Utils.isBSMod) "BSMod${"+".toStringIfTrue(SkytilsPlus.redeemed)}" else "Skytils", shadow = false).childOf(window).constrain {
             x = CenterConstraint()
             y = RelativeConstraint(0.075f)
             textScale = basicTextScaleConstraint { window.getHeight() / 40 }

@@ -22,6 +22,7 @@ import gg.essential.universal.ChatColor
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiMainMenu
 import gg.skytils.skytilsmod.utils.NumberUtil.addSuffix
+import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.client.gui.GuiMainMenu
 import java.util.*
 
@@ -29,8 +30,15 @@ fun setSplashText(gui: GuiMainMenu, cal: Calendar) {
     gui as AccessorGuiMainMenu
     if (cal.get(Calendar.MONTH) + 1 == 2 && cal.get(Calendar.DATE) == 6) {
         val numBirthday = cal.get(Calendar.YEAR) - 2021
-        gui.splashText = "§zHappy ${numBirthday.addSuffix()} Birthday Skytils!"
-        if (!Skytils.usingSBA) gui.splashText = addColor("Happy ${numBirthday.addSuffix()} Birthday Skytils!", 0)
+        if (!Skytils.usingSBA)
+            gui.splashText = addColor("Happy ${numBirthday.addSuffix()} Birthday Skytils!", 0)
+        else
+            gui.splashText = "§zHappy ${numBirthday.addSuffix()} Birthday Skytils!"
+    } else if (Utils.isBSMod) {
+        if (!Skytils.usingSBA)
+            gui.splashText = addColor("Powered by BSMod+!", 0)
+        else
+            gui.splashText = "§zPowered by BSMod+!"
     }
 }
 

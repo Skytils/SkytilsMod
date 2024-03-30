@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,18 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.mixins.transformers.util;
+package gg.skytils.skytilsmod.mixins.transformers.accessors;
 
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import gg.skytils.skytilsmod.mixins.hooks.util.MouseHelperHook;
-import net.minecraft.util.MouseHelper;
+import net.minecraft.entity.monster.EntitySlime;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(MouseHelper.class)
-public abstract class MixinMouseHelper {
-    @WrapWithCondition(method = "ungrabMouseCursor", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;setCursorPosition(II)V", remap = false))
-    private boolean shouldSetCursorPos(int newX, int newY) {
-        return MouseHelperHook.INSTANCE.shouldResetMouseToCenter();
-    }
+@Mixin({EntitySlime.class})
+public interface AccessorEntitySlime {
+    @Invoker("setSlimeSize")
+    void invokeSetSlimeSize(int size);
 }

@@ -43,6 +43,8 @@ import gg.skytils.skytilsmod.features.impl.farming.FarmingFeatures
 import gg.skytils.skytilsmod.features.impl.farming.GardenFeatures
 import gg.skytils.skytilsmod.features.impl.farming.TreasureHunter
 import gg.skytils.skytilsmod.features.impl.farming.VisitorHelper
+import gg.skytils.skytilsmod.features.impl.funny.Funny
+import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SkytilsPlus
 import gg.skytils.skytilsmod.features.impl.handlers.*
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
 import gg.skytils.skytilsmod.features.impl.mining.StupidTreasureChestOpeningThing
@@ -77,6 +79,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.cache.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
@@ -213,6 +216,7 @@ class Skytils {
             }
             install(ContentNegotiation) {
                 json(json)
+                json(json, ContentType.Text.Plain)
             }
             install(HttpCache)
             install(HttpRequestRetry) {
