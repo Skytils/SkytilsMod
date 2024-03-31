@@ -20,10 +20,8 @@ package gg.skytils.skytilsmod.tweaker;
 
 import gg.essential.universal.UDesktop;
 import gg.skytils.earlytweaker.Constants;
-import gg.skytils.earlytweaker.EarlyTweakerFinder;
 import gg.skytils.earlytweaker.EarlyTweakerLoader;
 import gg.skytils.skytilsmod.Reference;
-import gg.skytils.skytilsmod.earlytweaker.SkytilsEarlyTweaker;
 import gg.skytils.skytilsmod.earlytweaker.SkytilsEarlyTweakerRegistrant;
 import net.minecraft.launchwrapper.Launch;
 import org.apache.commons.io.IOUtils;
@@ -94,10 +92,10 @@ public class EssentialPlatformSetup {
                     exit();
                 }
             }
-            if (System.getProperty("os", "unknown").toLowerCase(Locale.ENGLISH).contains("win")) {
+            if (System.getProperty("os.name", "unknown").toLowerCase(Locale.ENGLISH).contains("win")) {
                 System.out.println("Skytils is running on Windows");
                 if (System.getProperty("skytils.noSetWindowsSSLRoot") == null) {
-                    System.out.println("Setting Windows SSL Root");
+                    System.out.println("Setting Windows SSL Root, if you don't want this, set -Dskytils.noSetWindowsSSLRoot=true");
                     System.setProperty("javax.net.ssl.trustStoreType", "Windows-ROOT");
                 }
             }
