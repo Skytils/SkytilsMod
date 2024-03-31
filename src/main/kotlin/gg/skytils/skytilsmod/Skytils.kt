@@ -238,17 +238,20 @@ class Skytils {
                     socketTimeout = 10000
                 }
                 https {
-                    trustManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
+                    val backingManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
+                        init(null as KeyStore?)
+                    }.trustManagers.first { it is X509TrustManager } as X509TrustManager
+
+                    val ourManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
                         Skytils::class.java.getResourceAsStream("/skytilscacerts.jks").use {
-                            val ks = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
-                                load(null)
-                            }
                             val ourKs = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
                                 load(it, "skytilsontop".toCharArray())
                             }
-                            ourKs.aliases().asSequence().associateWith { ourKs.getCertificate(it) }.forEach(ks::setCertificateEntry)
+                            init(ourKs)
                         }
-                    }.trustManagers.first { it is X509TrustManager }
+                    }.trustManagers.first { it is X509TrustManager } as X509TrustManager
+
+                    trustManager = UnionX509TrustManager(backingManager, ourManager)
                 }
             }
         }
