@@ -33,8 +33,11 @@ import gg.essential.vigilance.gui.VigilancePalette
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.MC
+import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SkytilsPlus
 import gg.skytils.skytilsmod.gui.components.SimpleButton
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiChat
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.TabListUtils
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.splitToWords
@@ -181,9 +184,13 @@ class GachaGui : WindowScreen(ElementaVersion.V5, newGuiScale = 2) {
                                     uuid != mc.thePlayer.uniqueID && uuid.version() == 4
                                 }.randomOrNull()?.first?.gameProfile?.name ?: "everyone")
                         )
-                        if (Loader.isModLoaded("skyblockextras")) {
-                            ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/sbeconnect")
-                            ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/sbechat ${flex.replace("{name}", "every one")}")
+                        if (Loader.isModLoaded("SkyblockExtras")) {
+                            if ("/sbeconnect" !in mc.ingameGUI.chatGUI.sentMessages) {
+                                this@GachaGui.sendChatMessage("/sbeconnect")
+                                tickTimer(100) {
+                                    this@GachaGui.sendChatMessage("/sbechat ${flex.replace("{name}", "every one")}")
+                                }
+                            }
                         }
                     }
                     UIText("Flex weekly to get an extra day on your subscription!").childOf(window).constrain {
