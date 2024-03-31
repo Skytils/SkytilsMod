@@ -152,7 +152,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                             }
                         }
                     });
-                    JButton tryAutoFix = new JButton("Update Essential");
+                    JButton tryAutoFix = new JButton("Try Auto Fix");
                     tryAutoFix.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -163,7 +163,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                             }
                         }
                     });
-                    showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>", openModFolder, watchVideo);
+                    showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>", openModFolder, watchVideo, tryAutoFix);
                 } else {
                     showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>", openModFolder);
                 }
