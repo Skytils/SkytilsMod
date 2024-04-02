@@ -25,7 +25,7 @@ import io.ktor.server.routing.*
 fun Route.registerSkytilsDataRoutes() = apply {
     route("/data") {
         get("/islands") {
-            context.respond(SkyblockIsland.entries)
+            context.respond(SkyblockIsland.entries.toTypedArray())
         }
     }
 }
