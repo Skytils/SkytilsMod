@@ -26,9 +26,8 @@ import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.SkillUtils
 import net.minecraft.client.entity.EntityPlayerSP
-import kotlin.math.ceil
 
-object CalcXPCommand : BaseCommand("skytilscalcxp") {
+object CalcXPCommand : BaseCommand("skytilscalcxp", aliases = listOf("stcalcxp")) {
     override fun getCommandUsage(player: EntityPlayerSP): String =
         "/skytilscalcxp (dungeons/skill/zombie_slayer/spider_slayer/wolf_slayer/enderman_slayer) (start level) (end level)"
 
@@ -38,29 +37,34 @@ object CalcXPCommand : BaseCommand("skytilscalcxp") {
             return
         }
         val type = args[0].lowercase()
-        var starting = args[1].toDoubleOrNull() ?: 0.0
-        var ending = args[2].toDoubleOrNull() ?: 0.0
         val xpMap = when {
-            type.endsWith("_slayer") -> SkillUtils.slayerXp[type.substringBefore("_slayer")]
+            type.endsWith("_slayer") ->
+                SkillUtils.slayerXp[type.substringBefore("_slayer")] ?: run {
+                    UChat.chat("$failPrefix §cUnable to find corresponding slayer. (${type.substringBefore("_slayer")})")
+                    return
+                }
             type == "dungeons" -> SkillUtils.dungeoneeringXp
             type == "skill" -> SkillUtils.skillXp
             else -> {
-                UChat.chat("$failPrefix §cThat skill is unknown to me!")
+                UChat.chat("$failPrefix §cUnable to find type of xp (${type})")
                 return
             }
         }
-        ending = ending.coerceIn(starting, xpMap?.keys?.last()?.toDouble())
-        starting = starting.coerceIn(0.0, ending)
-        val startingFraction = 1 - (starting % 1)
-        val endingFraction = ending % 1
-        val realStart = starting.toInt().inc()
-        val realEnd = ceil(ending).toInt()
-        var sum = 0.0
-        xpMap?.get(realStart)?.let { sum += (it * startingFraction) }
-        xpMap?.get(realEnd)?.let { sum += (it * endingFraction) }
-        for (i in realStart.inc()..realEnd.dec()) {
-            xpMap?.get(i)?.let { sum += it }
+        val starting = args[1].toDoubleOrNull()?.coerceIn(0.0, xpMap.keys.last().toDouble()) ?: 0.0
+        val ending = args[2].toDoubleOrNull()?.coerceIn(0.0, xpMap.keys.last().toDouble()) ?: 0.0
+        if (ending < starting) {
+            UChat.chat("$failPrefix §cYour start level must be less than your end level.")
         }
-        UChat.chat("$successPrefix §bYou need §6${NumberUtil.nf.format(sum)}§b to get from §6$type§b level §6${starting}§b to level §6$ending§b!")
+        val xpList = xpMap.values.toList()
+        val partials =
+            xpList[starting.toInt()] * (starting.toInt() - starting) + // Before range
+                    xpList[ending.toInt()] * (ending - ending.toInt()) // After range
+        val sum =
+            xpMap.values.toList()
+                .subList(starting.toInt(), ending.toInt())
+                .fold(partials) { acc, e ->
+                    acc + e
+                }
+        UChat.chat("$successPrefix §bYou need §6${NumberUtil.nf.format(sum)} xp§b to get from §6$type§b level §6${starting}§b to level §6$ending§b!")
     }
 }
