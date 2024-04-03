@@ -47,7 +47,7 @@ fun Route.registerWaypointRoutes() = apply {
         }
         put {
             try {
-                val body = context.receive<Set<WaypointCategory>>()
+                val body = context.receive<List<WaypointCategory>>()
                 Waypoints.categories.addAll(body)
                 PersistentSave.markDirty<Waypoints>()
                 Waypoints.computeVisibleWaypoints()
