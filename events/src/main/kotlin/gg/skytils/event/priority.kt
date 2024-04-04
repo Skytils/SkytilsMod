@@ -53,6 +53,7 @@ enum class EventPriority {
 
     internal open suspend fun <T : Event> post(event: T) {
         flow.emit(event)
+        if (!event.continuePropagation()) return
         next.post(event)
     }
 }

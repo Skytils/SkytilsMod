@@ -18,6 +18,7 @@
 
 package gg.skytils.event
 
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -28,6 +29,17 @@ suspend fun <T : Event> post(event: T) =
 fun <T : Event> postSync(event: T) =
     runBlocking {
         post(event)
+    }
+
+suspend fun <T : CancellableEvent> postCancellable(event: T) =
+    coroutineScope {
+        EventPriority.Highest.post(event)
+        return@coroutineScope event.cancelled
+    }
+
+fun <T : CancellableEvent> postCancellableSync(event: T) =
+    runBlocking {
+        postCancellable(event)
     }
 
 suspend inline fun <reified T : Event> on(priority: EventPriority = EventPriority.Normal, noinline block: suspend (T) -> Unit) =
