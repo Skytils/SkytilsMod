@@ -24,7 +24,6 @@ open class Event {
 
 open class CancellableEvent: Event() {
     var cancelled: Boolean = false
-        private set
 
     override fun continuePropagation(): Boolean = !cancelled
 }
