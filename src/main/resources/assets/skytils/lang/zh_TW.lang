@@ -195,7 +195,6 @@ skytils.config.miscellaneous.fixes.fix_world_time=修復世界時間
 skytils.config.miscellaneous.fixes.prevent_log_spam=防止垃圾日誌
 skytils.config.miscellaneous.fixes.twitch_fix=Twitch修復
 skytils.config.miscellaneous.items.price_paid=記錄支付的價格
-skytils.config.miscellaneous.items.block_zapper_fatigue_timer=Block Zapper損壞恢復倒計時
 skytils.config.miscellaneous.items.disable_block_animation=禁用格擋動畫
 skytils.config.miscellaneous.items.dropped_item_size=掉落物品大小
 skytils.config.miscellaneous.items.hide_implosion_particles=隱藏爆炸粒子

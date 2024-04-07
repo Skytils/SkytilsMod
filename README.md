@@ -184,7 +184,6 @@ If you have a GitHub account, <b>PLEASE CONSIDER STARRING</b> and forking the re
 - Jerry-chine Gun Sound Hider
 - Show Enchanted Book Abbreviation
 - Show Radioactive Bonus
-- Block Zapper Fatigue Timer
 - Etherwarp Teleport Display
 
 </details>
