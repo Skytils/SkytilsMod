@@ -2069,16 +2069,6 @@ object Config : Vigilant(
     var pricePaid = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Block Zapper Fatigue Timer",
-        description = "Displays how long your block zapper is fatigued for.",
-        category = "Miscellaneous", subcategory = "Items",
-        i18nName = "skytils.config.miscellaneous.items.block_zapper_fatigue_timer",
-        i18nCategory = "skytils.config.miscellaneous",
-        i18nSubcategory = "skytils.config.miscellaneous.items"
-    )
-    var blockZapperFatigueTimer = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Disable Block Animation",
         description = "Removes the block animation on swords.",
         category = "Miscellaneous", subcategory = "Items",

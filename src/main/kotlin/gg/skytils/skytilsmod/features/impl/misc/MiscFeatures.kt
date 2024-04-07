@@ -93,8 +93,6 @@ object MiscFeatures {
     var placedEyes = 0
     private var lastGLeaveCommand = 0L
     private var lastCoopAddCommand = 0L
-    private var blockZapperCooldownExpiration = 0L
-    private var blockZapperUses = 0
     private val cheapCoins = setOf(
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTM4MDcxNzIxY2M1YjRjZDQwNmNlNDMxYTEzZjg2MDgzYTg5NzNlMTA2NGQyZjg4OTc4Njk5MzBlZTZlNTIzNyJ9fX0=",
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZGZhMDg3ZWI3NmU3Njg3YTgxZTRlZjgxYTdlNjc3MjY0OTk5MGY2MTY3Y2ViMGY3NTBhNGM1ZGViNmM0ZmJhZCJ9fX0=",
@@ -157,33 +155,6 @@ object MiscFeatures {
             golemSpawnTime = System.currentTimeMillis() + 20000
         }
 
-        if (Skytils.config.blockZapperFatigueTimer) {
-            if (formatted.startsWith("§eZapped §a") && formatted.endsWith("§a§lUNDO§r")) {
-                blockZapperCooldownExpiration = 0L
-                blockZapperUses++
-                printDevMessage("$blockZapperUses", "zapper")
-
-                if (blockZapperUses >= 20) {
-                    blockZapperUses = 0
-                    blockZapperCooldownExpiration = System.currentTimeMillis() + 420_000
-                    printDevMessage("$blockZapperCooldownExpiration", "zapper")
-                }
-            }
-            if (unformatted == "Your zapper is temporarily fatigued!") {
-                val duration = (blockZapperCooldownExpiration - System.currentTimeMillis()).milliseconds
-                printDevMessage("$blockZapperUses ${duration.inWholeSeconds}", "zapper")
-                if (duration.isPositive()) {
-                    UChat.chat("$prefix §eThis will expire in${
-                        duration
-                            .toComponents { minutes, seconds, _ -> "${if (minutes > 0) " ${minutes}m " else " "}${seconds}s!" }
-                    }")
-                } else {
-                    blockZapperCooldownExpiration = System.currentTimeMillis() + 420_000
-                    blockZapperUses = 0
-                    printDevMessage("fallback: $blockZapperCooldownExpiration", "zapper")
-                }
-            }
-        }
         if (!Utils.inDungeons) {
             if (Skytils.config.copyDeathToClipboard) {
                 if (formatted.startsWith("§r§c ☠ ")) {
