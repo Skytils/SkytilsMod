@@ -35,6 +35,7 @@ object ItemWorthStrategy : ItemProtectStrategy() {
             ProtectType.HOTBARDROPKEY -> {
                 !DungeonFeatures.hasClearedText && value >= threshold
             }
+            ProtectType.SELLTOAUCTION -> false
             else -> value >= threshold
         }
     }

@@ -33,6 +33,7 @@ object StarredItemStrategy : ItemProtectStrategy() {
             ProtectType.HOTBARDROPKEY -> {
                 !DungeonFeatures.hasClearedText && isStarred
             }
+            ProtectType.SELLTOAUCTION -> false
             else -> isStarred
         }
     }
