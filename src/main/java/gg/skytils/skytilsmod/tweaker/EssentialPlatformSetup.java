@@ -64,38 +64,6 @@ public class EssentialPlatformSetup {
             EarlyTweakerLoader.ensureLoaded(SkytilsEarlyTweakerRegistrant.class);
         }
 
-        try {
-            String ver = System.getProperty("java.runtime.version", "unknown");
-            String javaLoc = System.getProperty("java.home");
-            if (ver.contains("1.8.0_51") || javaLoc.contains("jre-legacy")) {
-                System.out.println("Minecraft is running on legacy Java 8");
-                Path keyStoreLoc = Paths.get("./config/skytils/updates/files/skytilscacerts.jks");
-                File keyStoreFile = keyStoreLoc.toFile();
-                //check if the file matches what's in the jar based on filesize
-                if (!keyStoreFile.exists()) {
-                    System.out.println("Skytils is attempting to run keytool.");
-                    Files.createDirectories(keyStoreLoc.getParent());
-                    try (InputStream in = EssentialPlatformSetup.class.getResourceAsStream("/skytilscacerts.jks"); OutputStream os = Files.newOutputStream(keyStoreLoc)) {
-                        IOUtils.copy(Objects.requireNonNull(in), os);
-                    }
-                    String os = System.getProperty("os.name", "unknown");
-
-                    Path keyStorePath = Paths.get(javaLoc, "lib", "security", "cacerts").toAbsolutePath();
-                    Path keyToolPath = Paths.get(javaLoc, "bin", (os.toLowerCase(Locale.ENGLISH).startsWith("windows") ? "keytool.exe" : "keytool")).toAbsolutePath();
-                    File log = new File("./config/skytils/updates/files/sslfix-" + System.currentTimeMillis() + ".log");
-                    new ProcessBuilder()
-                            .command(keyToolPath.toString(), "-importkeystore", "-srckeystore", keyStoreFile.getAbsolutePath(), "-destkeystore", keyStorePath.toString(), "-srcstorepass", "skytilsontop", "-deststorepass", "changeit", "-noprompt")
-                            .redirectOutput(log)
-                            .redirectError(log)
-                            .start().waitFor();
-                    System.out.println("A reboot of Minecraft is required for the code to work, force closing the game");
-                    exit();
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-
         registerTransformerExclusions(
                 "kotlin.",
                 "kotlinx.",
