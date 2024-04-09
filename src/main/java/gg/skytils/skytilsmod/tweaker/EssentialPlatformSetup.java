@@ -59,7 +59,7 @@ public class EssentialPlatformSetup {
     public static void setup() throws Throwable {
         boolean isDev = Launch.classLoader.findResource("net/minecraft/world/World.class") != null;
         if (!isDev) {
-            EarlyTweakerLoader.ensureVersion(Constants.VERSION, SkytilsEarlyTweakerRegistrant.class);
+            EarlyTweakerLoader.ensureVersion("0.2.2", SkytilsEarlyTweakerRegistrant.class);
         } else {
             EarlyTweakerLoader.ensureLoaded(SkytilsEarlyTweakerRegistrant.class);
         }
