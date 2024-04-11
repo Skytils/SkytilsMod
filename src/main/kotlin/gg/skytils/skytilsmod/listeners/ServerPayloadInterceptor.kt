@@ -18,31 +18,44 @@
 
 package gg.skytils.skytilsmod.listeners
 
+import gg.skytils.skytilsmod.Skytils.Companion.IO
 import gg.skytils.skytilsmod.events.impl.HypixelPacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import io.netty.buffer.Unpooled
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import net.hypixel.modapi.error.ErrorReason
 import net.hypixel.modapi.packet.HypixelPacket
 import net.hypixel.modapi.packet.HypixelPacketType
 import net.hypixel.modapi.serializer.PacketSerializer
+import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.network.PacketBuffer
 import net.minecraft.network.play.client.C17PacketCustomPayload
 import net.minecraft.network.play.server.S3FPacketCustomPayload
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.minutes
 
 object ServerPayloadInterceptor {
+    private val receivedPackets = MutableSharedFlow<HypixelPacket>()
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
         if (event.packet is S3FPacketCustomPayload) {
-            HypixelPacketType.getByIdentifier(event.packet.channelName)?.let { pt ->
-                val packetSerializer = PacketSerializer(event.packet.bufferData.duplicate())
-                if (!packetSerializer.readBoolean()) {
-                    val reason = ErrorReason.getById(packetSerializer.readVarInt())
-                    HypixelPacketEvent.FailedEvent(pt, reason).postAndCatch()
-                } else {
-                    val packet = pt.packetFactory.apply(packetSerializer)
-                    HypixelPacketEvent.ReceiveEvent(packet).postAndCatch()
+            IO.launch {
+                HypixelPacketType.getByIdentifier(event.packet.channelName)?.let { pt ->
+                    val packetSerializer = PacketSerializer(event.packet.bufferData.duplicate())
+                    if (!packetSerializer.readBoolean()) {
+                        val reason = ErrorReason.getById(packetSerializer.readVarInt())
+                        HypixelPacketEvent.FailedEvent(pt, reason).postAndCatch()
+                    } else {
+                        val packet = pt.packetFactory.apply(packetSerializer)
+                        receivedPackets.emit(packet)
+                        HypixelPacketEvent.ReceiveEvent(packet).postAndCatch()
+                    }
                 }
             }
         }
@@ -62,5 +75,11 @@ object ServerPayloadInterceptor {
         val serializer = PacketSerializer(buffer)
         this.write(serializer)
         return C17PacketCustomPayload(type.identifier, buffer)
+    }
+
+    suspend fun <T : HypixelPacket> HypixelPacket.getResponse(handler: NetHandlerPlayClient): T = withTimeout(1.minutes) {
+        val packet: C17PacketCustomPayload = this@getResponse.toCustomPayload()
+        handler.addToSendQueue(packet)
+        return@withTimeout receivedPackets.filter { it.type == this@getResponse.type }.first() as T
     }
 }
