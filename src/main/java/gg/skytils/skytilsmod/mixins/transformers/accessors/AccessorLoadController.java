@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,26 +18,14 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.accessors;
 
-import net.minecraft.command.CommandHandler;
-import net.minecraft.command.ICommand;
+import com.google.common.collect.ListMultimap;
+import net.minecraftforge.fml.common.LoadController;
+import net.minecraftforge.fml.common.ModContainer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-import java.util.Map;
-import java.util.Set;
-
-@Mixin(CommandHandler.class)
-public interface AccessorCommandHandler {
+@Mixin(LoadController.class)
+public interface AccessorLoadController {
     @Accessor
-    Set<ICommand> getCommandSet();
-
-    @Accessor
-    void setCommandSet(Set<ICommand> set);
-
-    @Accessor
-    Map<String, ICommand> getCommandMap();
-
-    @Accessor
-    void setCommandMap(Map<String, ICommand> map);
-
+    ListMultimap<String, ModContainer> getPackageOwners();
 }
