@@ -18,10 +18,10 @@
 
 package gg.skytils.skytilsmod.listeners
 
-import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.HypixelPacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import io.netty.buffer.Unpooled
+import net.hypixel.modapi.error.ErrorReason
 import net.hypixel.modapi.packet.HypixelPacket
 import net.hypixel.modapi.packet.HypixelPacketType
 import net.hypixel.modapi.serializer.PacketSerializer
@@ -36,9 +36,10 @@ object ServerPayloadInterceptor {
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
         if (event.packet is S3FPacketCustomPayload) {
             HypixelPacketType.getByIdentifier(event.packet.channelName)?.let { pt ->
-                val packetSerializer = PacketSerializer(event.packet.bufferData)
+                val packetSerializer = PacketSerializer(event.packet.bufferData.duplicate())
                 if (!packetSerializer.readBoolean()) {
-                    HypixelPacketEvent.FailedEvent(pt).postAndCatch()
+                    val reason = ErrorReason.getById(packetSerializer.readVarInt())
+                    HypixelPacketEvent.FailedEvent(pt, reason).postAndCatch()
                 } else {
                     val packet = pt.packetFactory.apply(packetSerializer)
                     HypixelPacketEvent.ReceiveEvent(packet).postAndCatch()
@@ -56,11 +57,10 @@ object ServerPayloadInterceptor {
         }
     }
 
-    fun HypixelPacket.send() {
+    fun HypixelPacket.toCustomPayload(): C17PacketCustomPayload {
         val buffer = PacketBuffer(Unpooled.buffer())
         val serializer = PacketSerializer(buffer)
         this.write(serializer)
-        val packet = C17PacketCustomPayload(this.type.identifier, buffer)
-        mc.thePlayer?.sendQueue?.addToSendQueue(packet)
+        return C17PacketCustomPayload(type.identifier, buffer)
     }
 }

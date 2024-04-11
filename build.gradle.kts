@@ -153,7 +153,7 @@ dependencies {
     shadowMe(project(":events"))
     shadowMe(project(":hypixel-api:types"))
 
-    shadowMe("net.hypixel:mod-api:0.1.7")
+    shadowMe("net.hypixel:mod-api:0.2.1")
 
 
     shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")!!)
