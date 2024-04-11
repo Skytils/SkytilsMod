@@ -64,7 +64,7 @@ import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.listeners.ChatListener
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor
-import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor.toCustomPayload
+import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor.getResponse
 import gg.skytils.skytilsmod.localapi.LocalAPI
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import gg.skytils.skytilsmod.mixins.hooks.entity.EntityPlayerSPHook
@@ -548,13 +548,6 @@ class Skytils {
     }
 
     @SubscribeEvent
-    fun onHypixelPacket(event: HypixelPacketEvent.ReceiveEvent) {
-        if (event.packet is ClientboundPingPacket) {
-            println("${event.packet.response} ${event.packet.version}")
-        }
-    }
-
-    @SubscribeEvent
     fun onHypixelPacketFail(event: HypixelPacketEvent.FailedEvent) {
         UChat.chat("$failPrefix Mod API request failed: ${event.reason}")
     }
@@ -601,8 +594,10 @@ class Skytils {
         }
     }
 
-    fun onJoinHypixel(handler: NetHandlerPlayClient) {
-        handler.addToSendQueue(ServerboundPingPacket().toCustomPayload())
+    fun onJoinHypixel(handler: NetHandlerPlayClient) = IO.launch {
+        ServerboundPingPacket().getResponse<ClientboundPingPacket>(handler).let { packet ->
+            println("Hypixel Pong: ${packet.response}, version ${packet.version}")
+        }
     }
 
     @SubscribeEvent
