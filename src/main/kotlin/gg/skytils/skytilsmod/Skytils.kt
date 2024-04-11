@@ -60,6 +60,7 @@ import gg.skytils.skytilsmod.features.impl.trackers.impl.MayorJerryTracker
 import gg.skytils.skytilsmod.features.impl.trackers.impl.MythologicalTracker
 import gg.skytils.skytilsmod.gui.OptionsGui
 import gg.skytils.skytilsmod.gui.ReopenableGUI
+import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor
 import gg.skytils.skytilsmod.listeners.ChatListener
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.localapi.LocalAPI
@@ -289,6 +290,7 @@ class Skytils {
             LocalAPI,
             MayorInfo,
             SBInfo,
+            ServerPayloadInterceptor,
             SoundQueue,
             UpdateChecker,
 
