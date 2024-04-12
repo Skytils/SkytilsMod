@@ -79,7 +79,6 @@ loom {
     }
     forge {
         mixinConfig("mixins.skytils.json", "mixins.skytils-events.json")
-        accessTransformer("src/main/resources/META-INF/accesstransformer.cfg")
     }
     mixin {
         defaultRefmapName = "mixins.skytils.refmap.json"
@@ -182,7 +181,6 @@ tasks {
             attributes(
                 mapOf(
                     "Main-Class" to "SkytilsInstallerFrame",
-                    "FMLAT" to "accesstransformer.cfg",
                     "FMLCorePlugin" to "gg.skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
                     "FMLCorePluginContainsFMLMod" to true,
                     "ForceLoadAsMod" to true,

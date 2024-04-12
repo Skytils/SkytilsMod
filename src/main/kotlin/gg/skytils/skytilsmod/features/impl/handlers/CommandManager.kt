@@ -22,7 +22,6 @@ import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
-import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorLoadController
 import gg.skytils.skytilsmod.utils.ObservableAddEvent
 import gg.skytils.skytilsmod.utils.ObservableClearEvent
 import gg.skytils.skytilsmod.utils.ObservableRemoveEvent
@@ -35,10 +34,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object CommandManager {
     val cch by lazy {
         ClientCommandHandler.instance as AccessorCommandHandler
-    }
-
-    val loadController by lazy {
-        Loader.instance().modController as AccessorLoadController
     }
 
     val aliasMap = mutableMapOf<ICommand, String>()
@@ -67,11 +62,9 @@ object CommandManager {
     }
 
     fun registerCommandHelper(command: ICommand) {
-        val clazzName = command.javaClass.name
-        val pkg = clazzName.substringBeforeLast('.')
-        val owners = loadController.packageOwners[pkg].distinct()
+        val owners = Loader.instance().modList.filter { command.javaClass.`package`.name in  it.ownedPackages }
         if (owners.size != 1) {
-            println("WARNING! Command $clazzName has ${owners.size}; owners: $owners")
+            println("WARNING! Command ${command.commandName} has ${owners.size}; owners: $owners")
         }
 
         val owner = owners.firstOrNull()
