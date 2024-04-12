@@ -20,7 +20,6 @@
     "accessors.AccessorGuiMainMenu",
     "accessors.AccessorGuiNewChat",
     "accessors.AccessorGuiStreamUnavailable",
-    "accessors.AccessorLoadController",
     "accessors.AccessorMinecraft",
     "accessors.AccessorModelDragon",
     "accessors.AccessorRenderItem",
