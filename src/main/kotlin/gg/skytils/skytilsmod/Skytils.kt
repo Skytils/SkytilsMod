@@ -314,7 +314,7 @@ class Skytils {
             ChangeAllToSameColorSolver,
             DungeonChestProfit,
             ClickInOrderSolver,
-            CommandManager,
+            NamespacedCommands,
             CreeperSolver,
             CommandAliases,
             ContainerSellValue,

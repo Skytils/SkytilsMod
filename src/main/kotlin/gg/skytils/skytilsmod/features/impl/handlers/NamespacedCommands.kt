@@ -31,7 +31,7 @@ import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object CommandManager {
+object NamespacedCommands {
     val cch by lazy {
         ClientCommandHandler.instance as AccessorCommandHandler
     }

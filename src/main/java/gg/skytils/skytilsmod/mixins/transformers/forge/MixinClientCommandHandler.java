@@ -18,7 +18,7 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.forge;
 
-import gg.skytils.skytilsmod.features.impl.handlers.CommandManager;
+import gg.skytils.skytilsmod.features.impl.handlers.NamespacedCommands;
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler;
 import gg.skytils.skytilsmod.utils.ObservableSet;
 import net.minecraft.command.CommandHandler;
@@ -34,7 +34,7 @@ public abstract class MixinClientCommandHandler extends CommandHandler implement
     @Inject(method = "<init>", at = @At("RETURN"))
     private void hijackCommandHandler(CallbackInfo ci) {
         ObservableSet<ICommand> hijacked = new ObservableSet<>(this.getCommandSet());
-        CommandManager.INSTANCE.setup(hijacked);
+        NamespacedCommands.INSTANCE.setup(hijacked);
         this.setCommandSet(hijacked);
     }
 }
