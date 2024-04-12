@@ -31,6 +31,16 @@ import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+/**
+ * Namespaced commands is a feature which generates namespaces for commands.
+ *
+ * For example, when a mod adds reparty, namespaced commands will generate
+ * a command that includes the id/name of the mod
+ *
+ * `/mod:reparty`
+ *
+ * This is useful when multiple mods register a command with the same name
+ */
 object NamespacedCommands {
     val cch by lazy {
         ClientCommandHandler.instance as AccessorCommandHandler
@@ -61,6 +71,9 @@ object NamespacedCommands {
         }
     }
 
+    /**
+     * This method takes a command and registers the command's namespaced version.
+     */
     fun registerCommandHelper(command: ICommand) {
         val owners = Loader.instance().modList.filter { command.javaClass.`package`.name in  it.ownedPackages }
         if (owners.size != 1) {
@@ -77,6 +90,12 @@ object NamespacedCommands {
         aliasMap[command] = helper
     }
 
+    /**
+     * Handles the actual sending of the command.
+     *
+     * When a command is sent using the `server` namespace, it is passed directly to the server
+     * instead of running a client command.
+     */
     @SubscribeEvent
     fun onSendChat(event: SendChatMessageEvent) {
         if (event.message.startsWith("/server:")) {
