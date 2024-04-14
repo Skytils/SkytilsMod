@@ -18,20 +18,20 @@
 
 package gg.skytils.skytilsmod.tweaker;
 
-import gg.skytils.skytilsmod.earlytweaker.SkytilsEarlyTweaker;
 import kotlin.KotlinVersion;
-import kotlin.text.StringsKt;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static gg.skytils.skytilsmod.tweaker.TweakerUtil.exit;
@@ -40,6 +40,8 @@ import static gg.skytils.skytilsmod.tweaker.TweakerUtil.showMessage;
 @IFMLLoadingPlugin.Name("Skytils On Top")
 @IFMLLoadingPlugin.SortingIndex(69)
 public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
+
+    private static final Logger LOGGER = LogManager.getLogger("Skytils Loading Plugin");
 
     public static final String missingDependency =
             "<html><p>" +
@@ -50,16 +52,6 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                     "Check the Skytils Discord for any announcements, and<br>" +
                     "if there are none, ask for support." +
                     "</p></html>";
-
-    public static final String kotlinErrorMessage =
-            "<html><p>" +
-                    "Skytils has detected a mod with an older version of Kotlin.<br>" +
-                    "In order to resolve this conflict you must<br>" +
-                    "delete the outdated mods.<br>" +
-                    "You can also try to rename Skytils to be above other mods alphabetically<br>" +
-                    "by changing Skytils.jar to !Skytils.jar<br>" +
-                    "If you have already done this and are still getting this error,<br>" +
-                    "or need assistance, ask for support in the Discord.";
 
     public static final String badMixinVersionMessage =
             "<html><p>" +
@@ -105,6 +97,20 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                     "ask for support in the Discord." +
                     "</p></html>";
 
+    private static final String essentialUpdateDeniedMessage =
+            "<html><p>" +
+                    "Skytils has detected that your Essential is out of date and you have denied the update. <br>" +
+                    "In order for Skytils to function, we rely on many APIs provided by Essential. <br>" +
+                    "Please restart your game and accept Essential's update pop-up. <br>" +
+                    "Alternatively, click the \"Accept Essential Update\" button below and restart your game." +
+                    "</p></html>";
+
+    private static final String essentialUpdateAcceptedMessage =
+            "<html><p>" +
+                    "Skytils has detected that your Essential is out of date but you have accepted the update. <br>" +
+                    "Please restart your game and allow Essential to update." +
+                    "</p></html>";
+
     private final SkytilsLoadingPluginKt kotlinPlugin;
 
     public SkytilsLoadingPlugin() throws URISyntaxException {
@@ -114,60 +120,26 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                 exit();
             }
             if (!KotlinVersion.CURRENT.isAtLeast(1, 9, 0)) {
-                final File file = new File(KotlinVersion.class.getProtectionDomain().getCodeSource().getLocation().toURI());
-                File realFile = file;
-                for (int i = 0; i < 5; i++) {
-                    if (realFile == null) {
-                        realFile = file;
-                        break;
-                    }
-                    if (!realFile.getName().endsWith(".jar!") && !realFile.getName().endsWith(".jar")) {
-                        realFile = realFile.getParentFile();
-                    } else break;
-                }
-
-                String name = realFile.getName().contains(".jar") ? realFile.getName() : StringsKt.substringAfterLast(StringsKt.substringBeforeLast(file.getAbsolutePath(), ".jar", "unknown"), "/", "Unknown");
-
-                if (name.endsWith("!")) name = name.substring(0, name.length() - 1);
-                JButton openModFolder = new JButton("Open Mod Folder");
-                openModFolder.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        try {
-                            Desktop.getDesktop().open(new File("./mods"));
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                });
-                if (realFile.getParentFile().getName().equals("essential") && name.contains("Essential")) {
-                    JButton watchVideo = new JButton("Open Tutorial Video");
-                    watchVideo.addMouseListener(new MouseAdapter() {
+                EssentialPendingUpdateMode essentialUpdateMode = checkPendingEsssentialUpdateStatus();
+                if (essentialUpdateMode == EssentialPendingUpdateMode.Denied) {
+                    JButton acceptEssentialUpdate = new JButton("Accept Essential Update");
+                    acceptEssentialUpdate.addActionListener(new ActionListener() {
                         @Override
-                        public void mouseClicked(MouseEvent e) {
-                            try {
-                                Desktop.getDesktop().browse(URI.create("https://l.skytils.gg/update-essential-video"));
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                            }
+                        public void actionPerformed(ActionEvent e) {
+                            acceptPendingEssentialUpdate();
                         }
                     });
-                    JButton tryAutoFix = new JButton("Try Auto Fix");
-                    tryAutoFix.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            try {
-                                Files.createFile(SkytilsEarlyTweaker.essentialAutoUpdateFlag.toPath());
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    });
-                    showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>", openModFolder, watchVideo, tryAutoFix);
-                } else {
-                    showMessage(kotlinErrorMessage + "<br>The culprit seems to be " + name + "<br>It bundles version " + KotlinVersion.CURRENT + "</p></html>", openModFolder);
+                    showMessage(essentialUpdateDeniedMessage, acceptEssentialUpdate);
+                    exit();
+                } else if (essentialUpdateMode == EssentialPendingUpdateMode.Accepted) {
+                    showMessage(essentialUpdateAcceptedMessage);
+                    exit();
+                } else if (essentialUpdateMode == EssentialPendingUpdateMode.NoUpdate) {
+                    // FIXME: This should never be reached
+                    showMessage("You should not be here, please contact `sychic` on discord. <br>" +
+                            "Join discord.gg/skytils and ping Sychic in #general.");
+                    exit();
                 }
-                exit();
             }
             if (checkForClass("com.sky.voidchat.EDFMLLoadingPlugin")) {
                 showMessage(voidChatMessage);
@@ -188,6 +160,78 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         } catch (ClassNotFoundException ignored) {
             return false;
         }
+    }
+
+    /**
+     * Checks the status of essential's update prompt
+     * @return update status
+     */
+    private EssentialPendingUpdateMode checkPendingEsssentialUpdateStatus() {
+        // Minecraft currently does not exist, so we assume the current working directory
+        // is the `.minecraft` or instance directory
+        Path propertiesPath = Paths.get(System.getProperty("user.dir")).resolve(Paths.get("essential/essential-loader.properties"));
+        if (Files.exists(propertiesPath)) {
+            try {
+                List<String> properties = Files.readAllLines(propertiesPath);
+                for (String property : properties) {
+                    if (property.startsWith("pendingUpdateResolution")) {
+                        boolean value = Boolean.parseBoolean(property.substring(property.indexOf('=')));
+                        LOGGER.debug("Found pending update resolution: {}", value);
+                        if (value) {
+                            return EssentialPendingUpdateMode.Accepted;
+                        } else {
+                            return EssentialPendingUpdateMode.Denied;
+                        }
+                    }
+                }
+                LOGGER.info("Failed to find `pendingUpdateResolution` in properties file.");
+                return EssentialPendingUpdateMode.NoUpdate;
+            } catch (IOException ioe) {
+                LOGGER.fatal("Failed to read essential/essential-loader.properties file", ioe);
+                return EssentialPendingUpdateMode.NoUpdate;
+            }
+        }
+        LOGGER.fatal("Unable to find essential/essential-loader.properties file. How did this happen?");
+        return EssentialPendingUpdateMode.NoUpdate;
+    }
+
+    private enum EssentialPendingUpdateMode {
+        Denied,
+        Accepted,
+        NoUpdate
+    }
+
+    private void acceptPendingEssentialUpdate() {
+        // Minecraft currently does not exist, so we assume the current working directory
+        // is the `.minecraft` or instance directory
+        Path propertiesPath = Paths.get(System.getProperty("user.dir")).resolve(Paths.get("essential/essential-loader.properties"));
+        if (Files.exists(propertiesPath)) {
+            try {
+                List<String> lines = new ArrayList<>(Files.readAllLines(propertiesPath));
+                for (int i = 0; i < lines.size(); i++) {
+                    if (lines.get(i).startsWith("pendingUpdateResolution")) {
+                        // Setting this to true will cause Essential to go through its
+                        // own auto update process
+                        // see: https://github.com/EssentialGG/EssentialLoader/blob/79358c93a5f26e4b0440e9c1c964b6f4e2d12615/docs/container-mods.md?plain=1#L97
+                        lines.set(i, "pendingUpdateResolution=true");
+                    }
+                }
+                Path temp = Files.createTempFile(propertiesPath.getParent(), "skytils-temp-essential-loader", ".properties");
+                Files.write(temp, lines, StandardCharsets.UTF_8);
+                try {
+                    Files.move(temp, propertiesPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+                } catch (FileSystemException fse) {
+                    LOGGER.fatal("Atomic move failed", fse);
+                    Files.move(temp, propertiesPath, StandardCopyOption.REPLACE_EXISTING);
+                } finally {
+                    Files.deleteIfExists(temp);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        // This point should never be reached but log anyway
+        LOGGER.fatal("Unable to find essential/essential-loader.properties file. How did we get here?");
     }
 
     @Override
