@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.tweaker;
 
 import com.google.common.collect.Sets;
+import gg.skytils.earlytweaker.utils.Utils;
 import sun.misc.CompoundEnumeration;
 
 import java.io.IOException;
@@ -40,7 +41,8 @@ public class DuplicateSkytilsChecker {
             files.add(url.toString());
         }
         if (files.size() > 1) {
-            throw new RuntimeException("Duplicate Skytils classes found! Remove the duplicate jar files and try again.\n" + files);
+            String message = "Duplicate Skytils classes found! Remove the duplicate jar files and try again.\n" + files;
+            Utils.makeCrashReport(new RuntimeException(message), "Duplicate Skytils classes found!");
         }
     }
 }
