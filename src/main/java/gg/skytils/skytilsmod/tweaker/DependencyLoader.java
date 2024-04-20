@@ -16,7 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.earlytweaker;
+package gg.skytils.skytilsmod.tweaker;
 
 import com.aayushatharva.brotli4j.Brotli4jLoader;
 

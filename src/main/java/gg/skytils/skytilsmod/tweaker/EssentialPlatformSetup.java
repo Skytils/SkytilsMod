@@ -64,6 +64,13 @@ public class EssentialPlatformSetup {
             EarlyTweakerLoader.ensureLoaded(SkytilsEarlyTweakerRegistrant.class);
         }
 
+        try {
+            DependencyLoader.loadDependencies();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            throw t;
+        }
+
         registerTransformerExclusions(
                 "kotlin.",
                 "kotlinx.",

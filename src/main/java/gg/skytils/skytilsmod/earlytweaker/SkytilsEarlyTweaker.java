@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.earlytweaker;
 
 import gg.skytils.earlytweaker.IEarlyTweaker;
+import gg.skytils.skytilsmod.tweaker.DependencyLoader;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
 import java.io.File;
@@ -37,11 +38,5 @@ public class SkytilsEarlyTweaker implements IEarlyTweaker {
 
     @Override
     public void injectIntoClassLoader(LaunchClassLoader classLoader) {
-        try {
-            DependencyLoader.loadDependencies();
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
-        }
     }
 }

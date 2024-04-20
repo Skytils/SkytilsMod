@@ -25,7 +25,7 @@ import gg.skytils.skytilsmod.commands.impl.*
 import gg.skytils.skytilsmod.commands.stats.impl.CataCommand
 import gg.skytils.skytilsmod.commands.stats.impl.SlayerCommand
 import gg.skytils.skytilsmod.core.*
-import gg.skytils.skytilsmod.earlytweaker.DependencyLoader
+import gg.skytils.skytilsmod.tweaker.DependencyLoader
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.crimson.KuudraChestProfit
