@@ -20,6 +20,7 @@
     "accessors.AccessorGuiMainMenu",
     "accessors.AccessorGuiNewChat",
     "accessors.AccessorGuiStreamUnavailable",
+    "accessors.AccessorHypixelPacketRegistry",
     "accessors.AccessorMinecraft",
     "accessors.AccessorModelDragon",
     "accessors.AccessorRenderItem",
