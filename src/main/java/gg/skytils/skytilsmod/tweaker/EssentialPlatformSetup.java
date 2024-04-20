@@ -19,26 +19,15 @@
 package gg.skytils.skytilsmod.tweaker;
 
 import gg.essential.universal.UDesktop;
-import gg.skytils.earlytweaker.Constants;
-import gg.skytils.earlytweaker.EarlyTweakerLoader;
 import gg.skytils.skytilsmod.Reference;
-import gg.skytils.skytilsmod.earlytweaker.SkytilsEarlyTweakerRegistrant;
 import net.minecraft.launchwrapper.Launch;
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Locale;
-import java.util.Objects;
 
 import static gg.skytils.skytilsmod.tweaker.TweakerUtil.*;
 
@@ -58,11 +47,6 @@ public class EssentialPlatformSetup {
     @SuppressWarnings("unused")
     public static void setup() throws Throwable {
         boolean isDev = Launch.classLoader.findResource("net/minecraft/world/World.class") != null;
-        if (!isDev) {
-            EarlyTweakerLoader.ensureVersion("0.2.2", SkytilsEarlyTweakerRegistrant.class);
-        } else {
-            EarlyTweakerLoader.ensureLoaded(SkytilsEarlyTweakerRegistrant.class);
-        }
 
         try {
             DependencyLoader.loadDependencies();

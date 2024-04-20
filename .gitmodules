@@ -1,7 +1,3 @@
 [submodule "hypixel-api"]
 	path = hypixel-api
 	url = https://github.com/Skytils/hypixel-api
-
-[submodule "earlytweaker"]
-	path = earlytweaker
-	url = https://github.com/Skytils/earlytweaker

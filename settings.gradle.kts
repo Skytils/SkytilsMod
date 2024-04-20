@@ -35,6 +35,5 @@ pluginManagement {
 }
 
 rootProject.name = "SkytilsMod"
-include("earlytweaker")
 include("events")
 include("hypixel-api:types")

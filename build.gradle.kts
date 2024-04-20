@@ -70,7 +70,6 @@ loom {
             property("legacy.debugClassLoading", "true")
             property("legacy.debugClassLoadingSave", "true")
             property("legacy.debugClassLoadingFiner", "true")
-            programArgs("--tweakClass", "gg.skytils.earlytweaker.EarlyTweakerLoader")
             programArgs("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
             programArgs("--mixin", "mixins.skytils.json")
             programArgs("--mixin", "mixins.skytils-events.json")
@@ -145,9 +144,6 @@ dependencies {
     shadowMe("org.brotli:dec:0.1.2")
     shadowMe("com.aayushatharva.brotli4j:brotli4j:1.16.0")
 
-    shadowMe(project(":earlytweaker")) {
-        isTransitive = false
-    }
     shadowMe(project(":events"))
     shadowMe(project(":hypixel-api:types"))
 

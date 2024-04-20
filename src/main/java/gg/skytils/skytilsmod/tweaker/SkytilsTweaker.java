@@ -19,10 +19,6 @@
 package gg.skytils.skytilsmod.tweaker;
 
 import gg.essential.loader.stage0.EssentialSetupTweaker;
-import gg.skytils.earlytweaker.Constants;
-import gg.skytils.earlytweaker.EarlyTweakerFinder;
-import gg.skytils.earlytweaker.EarlyTweakerLoader;
-import gg.skytils.skytilsmod.earlytweaker.SkytilsEarlyTweaker;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
 
