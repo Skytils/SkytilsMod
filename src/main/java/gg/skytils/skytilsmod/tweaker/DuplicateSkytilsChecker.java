@@ -19,30 +19,25 @@
 package gg.skytils.skytilsmod.tweaker;
 
 import com.google.common.collect.Sets;
-import gg.skytils.earlytweaker.utils.Utils;
-import sun.misc.CompoundEnumeration;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 
 public class DuplicateSkytilsChecker {
     public static void checkForDuplicates() throws IOException {
-        HashSet<String> files = Sets.newHashSet();
 
-        Enumeration<URL> urls = new CompoundEnumeration<URL>(new Enumeration[] {
-                DuplicateSkytilsChecker.class.getClassLoader().getResources("gg/skytils/skytilsmod/Skytils.class"),
-                DuplicateSkytilsChecker.class.getClassLoader().getResources("skytils/skytilsmod/Skytils.class")
-        });
+        Enumeration<URL> ggSkytilsUrls = DuplicateSkytilsChecker.class.getClassLoader().getResources("gg/skytils/skytilsmod/Skytils.class");
+        Enumeration<URL> skytilsmodUrls = DuplicateSkytilsChecker.class.getClassLoader().getResources("skytils/skytilsmod/Skytils.class");
 
-        while (urls.hasMoreElements()) {
-            URL url = urls.nextElement();
-            files.add(url.toString());
-        }
-        if (files.size() > 1) {
-            String message = "Duplicate Skytils classes found! Remove the duplicate jar files and try again.\n" + files;
-            Utils.makeCrashReport(new RuntimeException(message), "Duplicate Skytils classes found!");
+        if (ggSkytilsUrls.hasMoreElements() && skytilsmodUrls.hasMoreElements()) {
+            HashSet<URL> urls = Sets.newHashSet(Collections.list(ggSkytilsUrls));
+            urls.addAll(Collections.list(skytilsmodUrls));
+
+            String message = "Duplicate Skytils classes found! Remove the duplicate jar files and try again.\n" + urls;
+            throw new RuntimeException(message);
         }
     }
 }
