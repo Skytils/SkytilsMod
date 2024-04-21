@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.tweaker;
 
+import gg.skytils.skytilsmod.Skytils;
 import kotlin.KotlinVersion;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.apache.logging.log4j.LogManager;
@@ -27,11 +28,9 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import static gg.skytils.skytilsmod.tweaker.TweakerUtil.exit;
 import static gg.skytils.skytilsmod.tweaker.TweakerUtil.showMessage;
@@ -175,17 +174,13 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         Path propertiesPath = Paths.get(System.getProperty("user.dir")).resolve(Paths.get("essential/essential-loader.properties"));
         if (Files.exists(propertiesPath)) {
             try {
-                List<String> properties = Files.readAllLines(propertiesPath);
-                for (String property : properties) {
-                    if (property.startsWith("pendingUpdateResolution")) {
-                        boolean value = Boolean.parseBoolean(property.substring(property.indexOf('=')));
-                        LOGGER.debug("Found pending update resolution: {}", value);
-                        if (value) {
-                            return EssentialPendingUpdateMode.Accepted;
-                        } else {
-                            return EssentialPendingUpdateMode.Denied;
-                        }
-                    }
+                Properties properties = new Properties();
+                properties.load(Files.newInputStream(propertiesPath.toFile().toPath()));
+                String value = properties.getProperty("pendingUpdateResolution");
+                if (value.equals("true")) {
+                    return EssentialPendingUpdateMode.Accepted;
+                } else if (value.equals("false")) {
+                    return EssentialPendingUpdateMode.Denied;
                 }
                 LOGGER.info("Failed to find `pendingUpdateResolution` in properties file.");
                 return EssentialPendingUpdateMode.NoUpdate;
@@ -216,21 +211,21 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         Path propertiesPath = Paths.get(System.getProperty("user.dir")).resolve(Paths.get("essential/essential-loader.properties"));
         if (Files.exists(propertiesPath)) {
             try {
-                List<String> lines = new ArrayList<>(Files.readAllLines(propertiesPath));
+                Properties properties = new Properties();
+                properties.load(Files.newInputStream(propertiesPath));
                 // pendingUpdateResolution will always be false because we do not run this code when it is true
                 if (accepted) {
                     // Setting "pendingUpdateResolution" to true will cause Essential to go through its
                     // own auto update process
                     // see: https://github.com/EssentialGG/EssentialLoader/blob/79358c93a5f26e4b0440e9c1c964b6f4e2d12615/docs/container-mods.md?plain=1#L97
-                    lines.remove("pendingUpdateResolution=false");
-                    lines.add("pendingUpdateResolution=true");
+                    properties.setProperty("pendingUpdateResolution", "true");
                 } else {
                     // Removing the "pendingUpdateResolution" property will cause Essential to prompt the user using the loader's GUI
                     // see: https://github.com/EssentialGG/EssentialLoader/blob/79358c93a5f26e4b0440e9c1c964b6f4e2d12615/docs/container-mods.md?plain=1#L94-L95
-                    lines.remove("pendingUpdateResolution=false");
+                    properties.remove("pendingUpdateResolution");
                 }
                 Path temp = Files.createTempFile(propertiesPath.getParent(), "skytils-temp-essential-loader", ".properties");
-                Files.write(temp, lines, StandardCharsets.UTF_8);
+                properties.store(Files.newOutputStream(temp), "Updated by Skytils version " + Skytils.VERSION);
                 try {
                     LOGGER.debug("Attempting atomic move of {} to {}", temp, propertiesPath);
                     Files.move(temp, propertiesPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
