@@ -148,7 +148,7 @@ object DungeonListener {
 
                         if (room != null && room.foundSecrets != sec) {
                             room.foundSecrets = sec
-                            WSClient.sendPacket(C2SPacketDungeonRoomSecret(SBInfo.locraw?.server ?: ServerboundLocationPacket().getResponse<ClientboundLocationPacket>(mc.netHandler).serverName, room.mainRoom.data.name, sec))
+                            WSClient.sendPacket(C2SPacketDungeonRoomSecret(SBInfo.server ?: return@launch, room.mainRoom.data.name, sec))
                         }
                     }
                 }.ifNull {

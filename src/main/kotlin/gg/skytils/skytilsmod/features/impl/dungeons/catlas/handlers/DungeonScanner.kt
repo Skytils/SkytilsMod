@@ -84,8 +84,7 @@ object DungeonScanner {
                     DungeonInfo.dungeonList[z * 11 + x] = it
                     if (it is Room && it.data.name != "Unknown") {
                         IO.launch {
-                            val serverId = SBInfo.locraw?.server ?: ServerboundLocationPacket().getResponse<ClientboundLocationPacket>(mc.netHandler).serverName
-                            WSClient.sendPacket(C2SPacketDungeonRoom(serverId, it.data.name, xPos, zPos, x, z, it.core, it.isSeparator))
+                            WSClient.sendPacket(C2SPacketDungeonRoom(SBInfo.server ?: return@launch, it.data.name, xPos, zPos, x, z, it.core, it.isSeparator))
                         }
                     }
                 }

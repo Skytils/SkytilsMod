@@ -17,21 +17,17 @@
  */
 package gg.skytils.skytilsmod.utils
 
-import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.json
 import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
-import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
+import gg.skytils.skytilsmod.events.impl.HypixelPacketEvent
+import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor.toCustomPayload
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundLocationPacket
+import net.hypixel.modapi.packet.impl.serverbound.ServerboundLocationPacket
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.network.play.client.C01PacketChatMessage
-import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -55,19 +51,19 @@ object SBInfo {
     var location = ""
     var date = ""
     var time = ""
-    var objective: String? = ""
-    var mode: String? = ""
+    var objective: String? = null
+    var mode: String? = null
+    var server: String? = null
     var currentTimeDate: Date? = null
+    var lastLocationPacket: ClientboundLocationPacket? = null
 
     @JvmField
     var lastOpenContainerName: String? = null
-    private var lastManualLocRaw: Long = -1
-    private var lastLocRaw: Long = -1
+    var lastLocationRequest: Long = -1
     private var joinedWorld: Long = -1
-    var locraw: LocrawObject? = null
     private val junkRegex = Regex("[^\u0020-\u0127û]")
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onGuiOpen(event: GuiOpenEvent) {
         if (!Utils.inSkyblock) return
         if (event.gui is GuiChest) {
@@ -80,47 +76,23 @@ object SBInfo {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Unload) {
-        lastLocRaw = -1
-        locraw = null
         mode = null
-        joinedWorld = System.currentTimeMillis()
+        server = null
         lastOpenContainerName = null
+        lastLocationRequest = -1
     }
 
     @SubscribeEvent
-    fun onSendChatMessage(event: SendChatMessageEvent) {
-        val msg = event.message
-        if (msg.trim().startsWith("/locraw")) {
-            lastManualLocRaw = System.currentTimeMillis()
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatMessage(event: PacketEvent.ReceiveEvent) {
-        if (event.packet is S02PacketChat) {
-            val unformatted = event.packet.chatComponent.unformattedText
-            if (unformatted.startsWith("{") && unformatted.endsWith("}")) {
-                try {
-                    val obj = json.decodeFromString<LocrawObject>(unformatted)
-                    if (System.currentTimeMillis() - lastManualLocRaw > 5000) {
-                        Utils.cancelChatPacket(event)
-                    }
-                    locraw = obj
-                    mode = obj.mode
-                    LocrawReceivedEvent(obj).postAndCatch()
-                } catch (e: SerializationException) {
-                    e.printStackTrace()
-                }
-            }
-        }
+    fun onWorldLoad(event: WorldEvent.Load) {
+        joinedWorld = System.currentTimeMillis()
     }
 
     @SubscribeEvent
-    fun onPacket(event: PacketEvent.SendEvent) {
-        if (Utils.isOnHypixel && event.packet is C01PacketChatMessage) {
-            if (event.packet.message.startsWith("/locraw")) {
-                lastLocRaw = System.currentTimeMillis()
-            }
+    fun onHypixelPacket(event: HypixelPacketEvent.ReceiveEvent) {
+        if (event.packet is ClientboundLocationPacket) {
+            mode = event.packet.mode.orElse(null)
+            server = event.packet.serverName
+            lastLocationPacket = event.packet
         }
     }
 
@@ -128,9 +100,9 @@ object SBInfo {
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null || !Utils.inSkyblock) return
         val currentTime = System.currentTimeMillis()
-        if (locraw == null && currentTime - joinedWorld > 1300 && currentTime - lastLocRaw > 15000) {
-            lastLocRaw = System.currentTimeMillis()
-            Skytils.sendMessageQueue.add("/locraw")
+        if (server == null && currentTime - joinedWorld > 1300 && currentTime - lastLocationRequest > 3000) {
+            lastLocationRequest = currentTime
+            mc.netHandler.addToSendQueue(ServerboundLocationPacket().toCustomPayload())
         }
         try {
             val lines = ScoreboardUtil.fetchScoreboardLines().map { it.stripControlCodes() }
@@ -223,12 +195,3 @@ enum class SkyblockIsland(val displayName: String, val mode: String) {
         }
     }
 }
-
-
-@Serializable
-data class LocrawObject(
-    val server: String,
-    val gametype: String = "unknown",
-    val mode: String = "unknown",
-    val map: String = "unknown"
-)
