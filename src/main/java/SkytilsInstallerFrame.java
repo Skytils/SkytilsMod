@@ -111,7 +111,12 @@ public class SkytilsInstallerFrame extends JFrame implements ActionListener, Mou
 
     public static OperatingSystem getOperatingSystem() {
         String osName = System.getProperty("os.name").toLowerCase(Locale.US);
-        if (osName.contains("win")) {
+        // macos can sometimes be reported as "darwin" which will be interpreted as windows
+        // windows: https://github.com/openjdk/jdk/blob/6d5699617ff0985104a8bb5f2c9eb8887cb0961e/src/java.base/windows/native/libjava/java_props_md.c#L418-L446
+        // else: https://en.wikipedia.org/wiki/Uname#Examples
+        // MacOS is always "Mac OS X"
+        // see: https://github.com/openjdk/jdk/blob/master/src/java.base/macosx/native/libjava/java_props_macosx.c#L235
+        if (osName.startsWith("win")) {
             return OperatingSystem.WINDOWS;
 
         } else if (osName.contains("mac")) {
