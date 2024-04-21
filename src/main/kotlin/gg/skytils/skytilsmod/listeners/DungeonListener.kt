@@ -48,6 +48,7 @@ import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.addSuffix
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import gg.skytils.skytilsws.client.WSClient
+import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonEnd
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoom
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoomSecret
 import gg.skytils.skytilsws.shared.packet.C2SPacketStartDungeon
@@ -161,6 +162,9 @@ object DungeonListener {
                 if (text.stripControlCodes()
                         .trim() == "> EXTRA STATS <"
                 ) {
+                    IO.launch {
+                        WSClient.sendPacket(C2SPacketDungeonEnd(SBInfo.server ?: return@launch))
+                    }
                     if (Skytils.config.dungeonDeathCounter) {
                         tickTimer(6) {
                             UChat.chat("§c☠ §lDeaths:§r ${team.values.sumOf { it.deaths }}\n${
