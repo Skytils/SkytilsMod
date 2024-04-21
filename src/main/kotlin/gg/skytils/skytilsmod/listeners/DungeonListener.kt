@@ -35,9 +35,7 @@ import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
-import gg.skytils.skytilsmod.features.impl.dungeons.catlas.Catlas
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.DungeonMapPlayer
-import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Room
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.RoomType
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
@@ -50,6 +48,7 @@ import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.addSuffix
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import gg.skytils.skytilsws.client.WSClient
+import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoom
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoomSecret
 import gg.skytils.skytilsws.shared.packet.C2SPacketStartDungeon
 import kotlinx.coroutines.async
@@ -66,6 +65,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.concurrent.CopyOnWriteArrayList
 
 object DungeonListener {
     val team = hashMapOf<String, DungeonTeammate>()
@@ -115,6 +115,7 @@ object DungeonListener {
     private val keyPickupRegex = Regex("§r§e§lRIGHT CLICK §r§7on §r§7.+?§r§7 to open it\\. This key can only be used to open §r§a(?<num>\\d+)§r§7 door!§r")
     private val witherDoorOpenedRegex = Regex("^(?:\\[.+?] )?(?<name>\\w+) opened a WITHER door!$")
     private const val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
+    val outboundRoomQueue = arrayListOf<C2SPacketDungeonRoom>()
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Unload) {
@@ -124,6 +125,7 @@ object DungeonListener {
         missingPuzzles.clear()
         completedPuzzles.clear()
         teamCached.clear()
+        outboundRoomQueue.clear()
     }
 
     @SubscribeEvent
@@ -214,6 +216,14 @@ object DungeonListener {
                                 startTime = DungeonTimer.dungeonStartTime,
                                 entranceLoc = entrance.mainRoom.z * entrance.mainRoom.x
                             ))
+                            while (DungeonTimer.dungeonStartTime != -1L) {
+                                val itr = outboundRoomQueue.iterator()
+                                while (itr.hasNext()) {
+                                    val packet = itr.next()
+                                    itr.remove()
+                                    WSClient.sendPacket(packet)
+                                }
+                            }
                         }
                     }
                 } else {
