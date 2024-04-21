@@ -260,6 +260,18 @@ class Skytils {
                     trustManager = UnionX509TrustManager(backingManager, ourManager)
                 }
             }
+
+            install(WebSockets) {
+                pingInterval = 5_000L
+                @OptIn(ExperimentalSerializationApi::class)
+                contentConverter = KotlinxWebsocketSerializationConverter(SkytilsWS.packetSerializer)
+                extensions {
+                    install(WebSocketDeflateExtension) {
+                        compressionLevel = Deflater.DEFAULT_COMPRESSION
+                        compressIfBiggerThan(bytes = 4 * 1024)
+                    }
+                }
+            }
         }
 
         val areaRegex = Regex("§r§b§l(?<area>[\\w]+): §r§7(?<loc>[\\w ]+)§r")
@@ -544,6 +556,10 @@ class Skytils {
 
         IO.launch {
             TrophyFish.loadFromApi()
+        }
+
+        IO.launch {
+            WSClient.openConnection()
         }
     }
 

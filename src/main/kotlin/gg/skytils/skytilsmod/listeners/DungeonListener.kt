@@ -24,6 +24,7 @@ import gg.essential.lib.caffeine.cache.Expiry
 import gg.essential.universal.UChat
 import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.IO
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
@@ -34,15 +35,30 @@ import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.Catlas
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.DungeonMapPlayer
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Room
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.RoomType
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
 import gg.skytils.skytilsmod.features.impl.handlers.SpiritLeap
+import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor.getResponse
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorChatComponentText
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.addSuffix
 import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
+import gg.skytils.skytilsws.client.WSClient
+import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoomSecret
+import gg.skytils.skytilsws.shared.packet.C2SPacketStartDungeon
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundLocationPacket
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket
+import net.hypixel.modapi.packet.impl.serverbound.ServerboundLocationPacket
+import net.hypixel.modapi.packet.impl.serverbound.ServerboundPartyInfoPacket
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.ResourceLocation
@@ -117,19 +133,28 @@ object DungeonListener {
             val text = event.packet.chatComponent.formattedText
             val unformatted = text.stripControlCodes()
             if (event.packet.type == 2.toByte()) {
-                if (Skytils.config.dungeonSecretDisplay) {
-                    secretsRegex.find(text)?.destructured?.also { (secrets, maxSecrets) ->
-                        val sec = secrets.toInt()
-                        val max = maxSecrets.toInt().coerceAtLeast(sec)
+                secretsRegex.find(text)?.destructured?.also { (secrets, maxSecrets) ->
+                    val sec = secrets.toInt()
+                    val max = maxSecrets.toInt().coerceAtLeast(sec)
 
-                        DungeonFeatures.DungeonSecretDisplay.secrets = sec
-                        DungeonFeatures.DungeonSecretDisplay.maxSecrets = max
-                    }.ifNull {
-                        DungeonFeatures.DungeonSecretDisplay.secrets = -1
-                        DungeonFeatures.DungeonSecretDisplay.maxSecrets = -1
+                    DungeonFeatures.DungeonSecretDisplay.secrets = sec
+                    DungeonFeatures.DungeonSecretDisplay.maxSecrets = max
+
+                    IO.launch {
+                        val x = ((mc.thePlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier / (MapUtils.mapRoomSize + 4) * 2).toInt()
+                        val z = ((mc.thePlayer.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier / (MapUtils.mapRoomSize + 4) * 2).toInt()
+
+                        val room = DungeonInfo.uniqueRooms.find { it.tiles.any { it.x == x && it.z == z } }
+
+                        if (room != null && room.foundSecrets != sec) {
+                            room.foundSecrets = sec
+                            WSClient.sendPacket(C2SPacketDungeonRoomSecret(SBInfo.locraw?.server ?: ServerboundLocationPacket().getResponse<ClientboundLocationPacket>(mc.netHandler).serverName, room.mainRoom.data.name, sec))
+                        }
                     }
+                }.ifNull {
+                    DungeonFeatures.DungeonSecretDisplay.secrets = -1
+                    DungeonFeatures.DungeonSecretDisplay.maxSecrets = -1
                 }
-
             } else {
                 if (text.stripControlCodes()
                         .trim() == "> EXTRA STATS <"
@@ -170,6 +195,27 @@ object DungeonListener {
                 } else if (text == bloodOpenedString) {
                     SpiritLeap.doorOpener = null
                     DungeonInfo.keys--
+                } else if (text == "§r§aStarting in 1 second.§r") {
+                    IO.launch {
+                        delay(2000)
+                        if (DungeonTimer.dungeonStartTime != -1L) {
+                            val location = async {
+                                ServerboundLocationPacket().getResponse<ClientboundLocationPacket>(mc.netHandler)
+                            }
+                            val party = async {
+                                ServerboundPartyInfoPacket().getResponse<ClientboundPartyInfoPacket>(mc.netHandler)
+                            }
+                            val partyMembers = party.await().members.ifEmpty { setOf(mc.thePlayer.uniqueID) }.mapTo(hashSetOf()) { it.toString() }
+                            val entrance = DungeonInfo.uniqueRooms.first { it.mainRoom.data.type == RoomType.ENTRANCE }
+                            WSClient.sendPacket(C2SPacketStartDungeon(
+                                serverId = location.await().serverName,
+                                floor = DungeonFeatures.dungeonFloor!!,
+                                members = partyMembers,
+                                startTime = DungeonTimer.dungeonStartTime,
+                                entranceLoc = entrance.mainRoom.z * entrance.mainRoom.x
+                            ))
+                        }
+                    }
                 } else {
                     witherDoorOpenedRegex.find(unformatted)?.destructured?.let { (name) ->
                         SpiritLeap.doorOpener = name
@@ -417,7 +463,7 @@ object DungeonListener {
 
     fun checkSpiritPet() {
         val teamCopy = team.values.toList()
-        Skytils.IO.launch {
+        IO.launch {
             runCatching {
                 for (teammate in teamCopy) {
                     val name = teammate.playerName
