@@ -36,10 +36,10 @@ import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.DungeonMapPlayer
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Room
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.RoomType
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
-import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
-import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.ScanUtils
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
 import gg.skytils.skytilsmod.features.impl.handlers.SpiritLeap
 import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor.getResponse
@@ -66,7 +66,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.ConcurrentLinkedQueue
 
 object DungeonListener {
     val team = hashMapOf<String, DungeonTeammate>()
@@ -116,7 +116,7 @@ object DungeonListener {
     private val keyPickupRegex = Regex("§r§e§lRIGHT CLICK §r§7on §r§7.+?§r§7 to open it\\. This key can only be used to open §r§a(?<num>\\d+)§r§7 door!§r")
     private val witherDoorOpenedRegex = Regex("^(?:\\[.+?] )?(?<name>\\w+) opened a WITHER door!$")
     private const val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
-    val outboundRoomQueue = arrayListOf<C2SPacketDungeonRoom>()
+    val outboundRoomQueue = ConcurrentLinkedQueue<C2SPacketDungeonRoom>()
 
     @SubscribeEvent
     fun onWorldLoad(event: WorldEvent.Unload) {
@@ -144,14 +144,13 @@ object DungeonListener {
                     DungeonFeatures.DungeonSecretDisplay.maxSecrets = max
 
                     IO.launch {
-                        val x = ((mc.thePlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier / (MapUtils.mapRoomSize + 4) * 2).toInt()
-                        val z = ((mc.thePlayer.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier / (MapUtils.mapRoomSize + 4) * 2).toInt()
-
-                        val room = DungeonInfo.uniqueRooms.find { it.tiles.any { it.x == x && it.z == z } }
-
-                        if (room != null && room.foundSecrets != sec) {
-                            room.foundSecrets = sec
-                            WSClient.sendPacket(C2SPacketDungeonRoomSecret(SBInfo.server ?: return@launch, room.mainRoom.data.name, sec))
+                        val tile = ScanUtils.getRoomFromPos(mc.thePlayer.position)
+                        if (tile is Room && tile.data.name != "Unknown") {
+                            val room = DungeonInfo.uniqueRooms.find { tile in it.tiles } ?: return@launch
+                            if (room.foundSecrets != sec) {
+                                room.foundSecrets = sec
+                                WSClient.sendPacket(C2SPacketDungeonRoomSecret(SBInfo.server ?: return@launch, room.mainRoom.data.name, sec))
+                            }
                         }
                     }
                 }.ifNull {
@@ -221,10 +220,8 @@ object DungeonListener {
                                 entranceLoc = entrance.mainRoom.z * entrance.mainRoom.x
                             ))
                             while (DungeonTimer.dungeonStartTime != -1L) {
-                                val itr = outboundRoomQueue.iterator()
-                                while (itr.hasNext()) {
-                                    val packet = itr.next()
-                                    itr.remove()
+                                while (outboundRoomQueue.isNotEmpty()) {
+                                    val packet = outboundRoomQueue.poll() ?: continue
                                     WSClient.sendPacket(packet)
                                 }
                             }
