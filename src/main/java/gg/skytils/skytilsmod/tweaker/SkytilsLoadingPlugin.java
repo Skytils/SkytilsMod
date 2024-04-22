@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.tweaker;
 
 import gg.skytils.skytilsmod.Skytils;
 import kotlin.KotlinVersion;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -171,9 +172,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
      * @return update status
      */
     private EssentialPendingUpdateMode checkPendingEssentialUpdateStatus() {
-        // Minecraft currently does not exist, so we assume the current working directory
-        // is the `.minecraft` or instance directory
-        Path propertiesPath = Paths.get(System.getProperty("user.dir")).resolve(Paths.get("essential/essential-loader.properties"));
+        Path propertiesPath = Launch.minecraftHome.toPath().resolve(Paths.get("essential/essential-loader.properties"));
         if (Files.exists(propertiesPath)) {
             try (InputStream input = Files.newInputStream(propertiesPath.toFile().toPath())) {
                 Properties properties = new Properties();
@@ -208,9 +207,7 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
      * @param accepted whether the update has been accepted or not
      */
     private void updatePendingEssentialUpdateStatus(boolean accepted) {
-        // Minecraft currently does not exist, so we assume the current working directory
-        // is the `.minecraft` or instance directory
-        Path propertiesPath = Paths.get(System.getProperty("user.dir")).resolve(Paths.get("essential/essential-loader.properties"));
+        Path propertiesPath = Launch.minecraftHome.toPath().resolve(Paths.get("essential/essential-loader.properties"));
         if (Files.exists(propertiesPath)) {
             try {
                 Properties properties = new Properties();
