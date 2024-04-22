@@ -212,9 +212,11 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         // is the `.minecraft` or instance directory
         Path propertiesPath = Paths.get(System.getProperty("user.dir")).resolve(Paths.get("essential/essential-loader.properties"));
         if (Files.exists(propertiesPath)) {
-            try (InputStream input = Files.newInputStream(propertiesPath)) {
+            try {
                 Properties properties = new Properties();
-                properties.load(input);
+                try (InputStream input = Files.newInputStream(propertiesPath)) {
+                    properties.load(input);
+                }
                 // pendingUpdateResolution will always be false because we do not run this code when it is true
                 if (accepted) {
                     // Setting "pendingUpdateResolution" to true will cause Essential to go through its
