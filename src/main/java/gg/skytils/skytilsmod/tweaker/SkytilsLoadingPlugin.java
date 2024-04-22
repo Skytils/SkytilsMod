@@ -28,6 +28,8 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.*;
 import java.util.Map;
 import java.util.Properties;
@@ -173,9 +175,9 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         // is the `.minecraft` or instance directory
         Path propertiesPath = Paths.get(System.getProperty("user.dir")).resolve(Paths.get("essential/essential-loader.properties"));
         if (Files.exists(propertiesPath)) {
-            try {
+            try (InputStream input = Files.newInputStream(propertiesPath.toFile().toPath())) {
                 Properties properties = new Properties();
-                properties.load(Files.newInputStream(propertiesPath.toFile().toPath()));
+                properties.load(input);
                 String value = properties.getProperty("pendingUpdateResolution");
                 if (value.equals("true")) {
                     return EssentialPendingUpdateMode.Accepted;
@@ -210,9 +212,9 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
         // is the `.minecraft` or instance directory
         Path propertiesPath = Paths.get(System.getProperty("user.dir")).resolve(Paths.get("essential/essential-loader.properties"));
         if (Files.exists(propertiesPath)) {
-            try {
+            try (InputStream input = Files.newInputStream(propertiesPath)) {
                 Properties properties = new Properties();
-                properties.load(Files.newInputStream(propertiesPath));
+                properties.load(input);
                 // pendingUpdateResolution will always be false because we do not run this code when it is true
                 if (accepted) {
                     // Setting "pendingUpdateResolution" to true will cause Essential to go through its
@@ -225,7 +227,9 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                     properties.remove("pendingUpdateResolution");
                 }
                 Path temp = Files.createTempFile(propertiesPath.getParent(), "skytils-temp-essential-loader", ".properties");
-                properties.store(Files.newOutputStream(temp), "Updated by Skytils version " + Skytils.VERSION);
+                try (OutputStream output = Files.newOutputStream(temp)) {
+                    properties.store(output, "Updated by Skytils version " + Skytils.VERSION);
+                }
                 try {
                     LOGGER.debug("Attempting atomic move of {} to {}", temp, propertiesPath);
                     Files.move(temp, propertiesPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
