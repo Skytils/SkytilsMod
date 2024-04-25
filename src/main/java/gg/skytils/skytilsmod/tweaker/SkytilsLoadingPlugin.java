@@ -26,8 +26,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -134,13 +132,10 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                     // removes the pendingUpdateResolution key
                     updatePendingEssentialUpdateStatus(false);
                     JButton acceptEssentialUpdate = new JButton("Accept Essential Update");
-                    acceptEssentialUpdate.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            // updates the pendingUpdateResolution key to true
-                            updatePendingEssentialUpdateStatus(true);
-                            exit();
-                        }
+                    acceptEssentialUpdate.addActionListener(e -> {
+                        // updates the pendingUpdateResolution key to true
+                        updatePendingEssentialUpdateStatus(true);
+                        exit();
                     });
                     showMessage(essentialUpdateDeniedMessage, acceptEssentialUpdate);
                     exit();
@@ -149,13 +144,10 @@ public class SkytilsLoadingPlugin implements IFMLLoadingPlugin {
                     exit();
                 } else if (essentialUpdateMode == EssentialPendingUpdateMode.Pending){
                     JButton acceptEssentialUpdate = new JButton("Accept Essential Update");
-                    acceptEssentialUpdate.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            // updates the pendingUpdateResolution key to true
-                            updatePendingEssentialUpdateStatus(true);
-                            exit();
-                        }
+                    acceptEssentialUpdate.addActionListener(e -> {
+                        // updates the pendingUpdateResolution key to true
+                        updatePendingEssentialUpdateStatus(true);
+                        exit();
                     });
                     showMessage(essentialUpdateAvailableMessage, acceptEssentialUpdate);
                     exit();
