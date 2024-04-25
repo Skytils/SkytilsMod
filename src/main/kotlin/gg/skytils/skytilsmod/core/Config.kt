@@ -4294,6 +4294,7 @@ object Config : Vigilant(
 
         addDependency("itemRarityOpacity", "showItemRarity")
         addDependency("itemRarityShape", "showItemRarity")
+        addDependency("showPetRarity", "showItemRarity")
 
         arrayOf(
             "showLowestBINPrice",
