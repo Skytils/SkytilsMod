@@ -82,6 +82,7 @@ object SplashProgressTransformer {
         96.7 to getSkytilsResource("splashes/bigrat.png"),
         97.0 to getSkytilsResource("splashes/doge.png"),
         98.5 to getSkytilsResource("splashes/janipfp.gif"),
+        98.95 to getSkytilsResource("splashes/nopothecar2.gif"),
         // this is around the chance of winning the jackpot on the lottery
         100 - 100 * 1 / 302_575_350.0 to getSkytilsResource("splashes/jamcat.gif")
     )
