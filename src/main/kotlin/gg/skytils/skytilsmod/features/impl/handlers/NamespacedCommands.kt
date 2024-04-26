@@ -29,6 +29,7 @@ import gg.skytils.skytilsmod.utils.ObservableSet
 import net.minecraft.command.ICommand
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.Loader
+import net.minecraftforge.fml.common.ModContainer
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
@@ -75,7 +76,7 @@ object NamespacedCommands {
      * This method takes a command and registers the command's namespaced version.
      */
     fun registerCommandHelper(command: ICommand) {
-        val owners = Loader.instance().modList.filter { command.javaClass.`package`.name in  it.ownedPackages }
+        val owners = getCommandModOwner(command.javaClass)
         if (owners.size != 1) {
             println("WARNING! Command ${command.commandName} has ${owners.size}; owners: $owners")
         }
@@ -88,6 +89,11 @@ object NamespacedCommands {
         cch.commandMap[helper] = command
 
         aliasMap[command] = helper
+    }
+
+    fun getCommandModOwner(command: Class<*>) : List<ModContainer> {
+        val packageName = command.`package`.name ?: return emptyList()
+        return Loader.instance().modList.filter { packageName in it.ownedPackages }
     }
 
     /**
