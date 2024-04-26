@@ -262,7 +262,7 @@ class Skytils {
 
         const val prefix = "§9§lSkytils §8»"
         const val successPrefix = "§a§lSkytils §8»"
-        const val failPrefix = "§c§lSkytils §8»"
+        const val failPrefix = "§c§lSkytils (${Reference.VERSION}) §8»"
 
         var trustClientTime = false
     }
