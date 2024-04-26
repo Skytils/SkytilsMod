@@ -166,7 +166,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                             }
                         }
 
-                        else -> UChat.chat("$prefix §b/skytils reload <aliases/data/slayer>")
+                        else -> UChat.chat("$prefix §b/skytils reload <data/mayor/slayer>")
                     }
                 }
             }
@@ -182,13 +182,19 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                         #  §3/skytils help §l➡ §bShows this help menu.
                         #  §3/skytils reload <data/mayor/slayer> §l➡ §bForces a refresh of data.
                         #  §3/skytils update §l➡ §bChecks for updates in-game.
-                        #  §3/skytils editlocations §l➡ §bOpens the location editing GUI.
+                        #  §3/skytils editlocations §l➡ §bOpens the location editing GUI. This uses a new GUI and the previous GUI can be accessed using §3/skytils oldgui§b.
+                        #  §3/skytils resetelement <name> §l➡ §bResets the size of an element and sets its position to the middle of the screen..
                         #  §3/skytils aliases §l➡ §bOpens the command alias editing GUI.
+                        #  §3/skytils shortcuts §l➡ §bOpens the command Key Shortcut editing GUI.
                         #  §3/skytils spamhider §l➡ §bOpens the command spam hider editing GUI.
-                        #  §3/skytils enchant §l➡ §bOpens a GUI allowing you to rename enchants.
+                        #  §3/skytils enchant §l➡ §bOpens a GUI allowing you to rename enchantments.
                         #  §3/skytils waypoints §l➡ §bOpens a GUI allowing you to modify waypoints.
+                        #  §3/skytils localapi <on/off> §l➡ §bTurns the Skytils LocalAPI on and off. Used for Web Waypoint editor.
+                        #  §3/skytils spiritleapnames §l➡ §bOpens a GUI allowing you to customize the spirit leap menu.
+                        #  §3/skytils notifications §l➡ §bOpens a GUI allowing you to modify chat notifications.
+                        #  §3/skytils catlas §l➡ §bOpens a GUI allowing you to modify dungeon map settings.
                         # §9§l➜ Events:
-                        #  §3/skytils griffin refresh §l➡ §bForcefully refreshes Griffin Burrow waypoints.
+                        #  §3/skytils griffin refresh §l➡ §bClears currently marked griffin burrows.
                         #  §3/skytils fetchur §l➡ §bShows the item that Fetchur wants.
                         #  §3/skytils resettracker §l➡ §bResets the specified tracker.
                         # §9§l➜ Color and Glint
@@ -206,6 +212,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                         #  §3/skytilscalcxp <dungeons/skill/zombie_slayer/spider_slayer/wolf_slayer/enderman_slayer> <start level> <end level> §l➡ §bCalculates the xp between two levels
                         #  §3/skytils pv <player> §l➡ §bOpens the profile viewer.
                         #  §3/skytils pricepaid <price> §l➡ §bSets your currently held item to a given price.
+                        #  §3/skytils ping §l➡ §bChecks your current ping to the server.
                     """.trimMargin("#")
                 )
                 return
