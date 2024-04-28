@@ -366,7 +366,7 @@ skytils.config.spam.display.text_shadow=文字陰影
 skytils.config.spam.abilities.implosion_hider=隱藏Implosion技能訊息
 skytils.config.spam.abilities.midas_staff_hider=隱藏Midas Staff訊息
 skytils.config.spam.abilities.spirit_sceptre_hider=隱藏Spirit Sceptre訊息
-skytils.config.spam.abilities.giant_sword_hider隱藏Giant's Sword訊息
+skytils.config.spam.abilities.giant_sword_hider=隱藏Giant's Sword訊息
 skytils.config.spam.abilities.livid_dagger_hider=隱藏Livid Dagger訊息
 skytils.config.spam.abilities.ray_of_hope_hider=隱藏Staff of the Rising Sun訊息
 skytils.config.spam.abilities.mining_ability_hider=隱藏挖礦技能訊息
