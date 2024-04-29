@@ -42,12 +42,12 @@ public abstract class MixinCrashReport {
     @Unique
     private final CrashReportHook hook = new CrashReportHook((CrashReport) (Object) this);
 
-    @Inject(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", args = "ldc=---- Minecraft Crash Report ----\n;captureargs=true", shift = At.Shift.AFTER, remap = false, ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", shift = At.Shift.AFTER, remap = false, ordinal = 0), locals = LocalCapture.CAPTURE_FAILHARD)
     private void thereIsNoOtherWay(CallbackInfoReturnable<String> cir, StringBuilder stringbuilder) {
         hook.checkSkytilsCrash(cir, stringbuilder);
     }
 
-    @ModifyArg(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", remap = false, ordinal = 10, args = "matches=method::getCauseStackTraceOrString"))
+    @ModifyArg(method = "getCompleteReport", at = @At(value = "INVOKE", target = "Ljava/lang/StringBuilder;append(Ljava/lang/String;)Ljava/lang/StringBuilder;", remap = false, ordinal = 10))
     private String otherReplaceCauseForLauncher(String theCauseStackTraceOrString) {
         return hook.generateCauseForLauncher(theCauseStackTraceOrString);
     }
@@ -60,6 +60,6 @@ public abstract class MixinCrashReport {
 
     @Inject(method = "populateEnvironment", at = @At("RETURN"))
     private void addDataToCrashReport(CallbackInfo ci) {
-        hook.addDataToCrashReport(theReportCategory);
+        hook.addDataToCrashReport(this.theReportCategory);
     }
 }

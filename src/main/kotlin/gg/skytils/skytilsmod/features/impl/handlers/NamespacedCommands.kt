@@ -84,7 +84,7 @@ object NamespacedCommands {
         val owner = owners.firstOrNull()
 
         val prefix = owner?.modId ?: owner?.name ?: "unknown"
-
+        
         val helper = "${prefix}:${command.commandName}"
         cch.commandMap[helper] = command
 
@@ -92,7 +92,9 @@ object NamespacedCommands {
     }
 
     fun getCommandModOwner(command: Class<*>) : List<ModContainer> {
-        val packageName = command.`package`.name ?: return emptyList()
+        val idx = command.name.lastIndexOf(".")
+        if (idx == -1) return emptyList()
+        val packageName = command.name.substring(0, idx)
         return Loader.instance().modList.filter { packageName in it.ownedPackages }
     }
 

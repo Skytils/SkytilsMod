@@ -40,7 +40,7 @@ public abstract class MixinRenderItem {
         RenderItemHookKt.renderItemOverlayPost(fr, stack, xPosition, yPosition, text, ci);
     }
 
-    @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/resources/model/IBakedModel;)V", at = @At(value = "INVOKE", target = "net/minecraft/client/renderer/GlStateManager.scale(FFF)V", shift = At.Shift.AFTER))
+    @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/resources/model/IBakedModel;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;scale(FFF)V", shift = At.Shift.AFTER))
     private void renderItemPre(ItemStack stack, IBakedModel model, CallbackInfo ci) {
         RenderItemHookKt.renderItemPre(stack, model, ci);
     }

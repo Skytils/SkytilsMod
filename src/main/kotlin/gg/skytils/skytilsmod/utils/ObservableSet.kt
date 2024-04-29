@@ -36,6 +36,7 @@ class ObservableSet<E>(val backingSet: MutableSet<E>) : MutableSet<E> by backing
     override fun addAll(elements: Collection<E>): Boolean {
         return backingSet.addAll(elements).also {
             if (it) {
+                setChanged()
                 elements.forEach {
                     notifyObservers(ObservableAddEvent(it))
                 }
@@ -46,6 +47,7 @@ class ObservableSet<E>(val backingSet: MutableSet<E>) : MutableSet<E> by backing
     override fun remove(element: E): Boolean {
         return backingSet.remove(element).also {
             if (it) {
+                setChanged()
                 notifyObservers(ObservableRemoveEvent(element))
             }
         }
@@ -54,6 +56,7 @@ class ObservableSet<E>(val backingSet: MutableSet<E>) : MutableSet<E> by backing
     override fun removeAll(elements: Collection<E>): Boolean {
         return backingSet.removeAll(elements).also {
             if (it) {
+                setChanged()
                 elements.forEach {
                     notifyObservers(ObservableRemoveEvent(it))
                 }
@@ -64,6 +67,7 @@ class ObservableSet<E>(val backingSet: MutableSet<E>) : MutableSet<E> by backing
     override fun retainAll(elements: Collection<E>): Boolean {
         return backingSet.retainAll(elements).also {
             if (it) {
+                setChanged()
                 backingSet.forEach {
                     notifyObservers(ObservableRemoveEvent(it))
                 }
