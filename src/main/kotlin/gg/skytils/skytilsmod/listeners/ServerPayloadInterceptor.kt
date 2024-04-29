@@ -31,6 +31,7 @@ import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.error.ErrorReason
 import net.hypixel.modapi.packet.ClientboundHypixelPacket
 import net.hypixel.modapi.packet.HypixelPacket
+import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import net.hypixel.modapi.serializer.PacketSerializer
 import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.network.PacketBuffer
@@ -75,14 +76,14 @@ object ServerPayloadInterceptor {
         }
     }
 
-    fun HypixelPacket.toCustomPayload(): C17PacketCustomPayload {
+    fun ServerboundVersionedPacket.toCustomPayload(): C17PacketCustomPayload {
         val buffer = PacketBuffer(Unpooled.buffer())
         val serializer = PacketSerializer(buffer)
         this.write(serializer)
         return C17PacketCustomPayload(this.identifier, buffer)
     }
 
-    suspend fun <T : ClientboundHypixelPacket> HypixelPacket.getResponse(handler: NetHandlerPlayClient): T = withTimeout(1.minutes) {
+    suspend fun <T : ClientboundHypixelPacket> ServerboundVersionedPacket.getResponse(handler: NetHandlerPlayClient): T = withTimeout(1.minutes) {
         val packet: C17PacketCustomPayload = this@getResponse.toCustomPayload()
         handler.addToSendQueue(packet)
         return@withTimeout receivedPackets.filter { it.identifier == this@getResponse.identifier }.first() as T

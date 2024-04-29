@@ -61,6 +61,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.packet.ClientboundHypixelPacket
+import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.command.WrongUsageException
@@ -389,9 +390,9 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     UChat.chat("$failPrefix §cPacket not found!")
                 } else {
                     registry as AccessorHypixelPacketRegistry
-                    val packetClass = registry.classToIdentifier.entries.find { it.value == id && !ClientboundHypixelPacket::class.java.isAssignableFrom(it.key) }
+                    val packetClass = registry.classToIdentifier.entries.find { it.value == id && ServerboundVersionedPacket::class.java.isAssignableFrom(it.key) }
                         ?: return UChat.chat("$failPrefix §cPacket not found!")
-                    val packet = packetClass.key.newInstance()
+                    val packet = packetClass.key.newInstance() as ServerboundVersionedPacket
                     UChat.chat("$successPrefix §aPacket created: $packet")
                     Skytils.IO.launch {
                         runCatching {
