@@ -24,7 +24,6 @@ plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.serialization") version "1.9.22"
     id("com.github.johnrengelman.shadow")
-    id("net.kyori.blossom") version "2.1.0"
     id("gg.essential.multi-version")
     id("gg.essential.defaults")
     idea
@@ -161,15 +160,6 @@ dependencies {
 sourceSets {
     main {
         output.setResourcesDir(kotlin.classesDirectory)
-        blossom {
-            javaSources {
-                property("version", project.version.toString())
-            }
-            resources {
-                property("version", project.version.toString())
-                property("mcversion", "1.8.9")
-            }
-        }
     }
 }
 
@@ -179,6 +169,12 @@ val javaVersion = if (platform.isLegacyForge) JavaVersion.VERSION_1_8 else JavaV
 tasks {
     processResources {
         dependsOn(compileJava)
+        filesMatching("mcmod.info") {
+            expand(mapOf(
+                "version" to rootProject.version,
+                "mcversion" to platform.mcVersionStr
+            ))
+        }
     }
     named<Jar>("jar") {
         manifest {

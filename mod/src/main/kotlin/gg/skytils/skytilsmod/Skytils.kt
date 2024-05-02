@@ -125,7 +125,6 @@ import kotlin.math.abs
 @Mod(
     modid = Skytils.MOD_ID,
     name = Skytils.MOD_NAME,
-    version = Skytils.VERSION,
     acceptedMinecraftVersions = "[1.8.9]",
     clientSideOnly = true,
     guiFactory = "gg.skytils.skytilsmod.core.ForgeGuiFactory"
@@ -135,7 +134,7 @@ class Skytils {
     companion object : CoroutineScope {
         const val MOD_ID = Reference.MOD_ID
         const val MOD_NAME = Reference.MOD_NAME
-        const val VERSION = Reference.VERSION
+        val VERSION = Reference.VERSION
 
         @JvmStatic
         val mc: Minecraft by lazy {
@@ -260,9 +259,9 @@ class Skytils {
 
         var domain = "api.skytils.gg"
 
-        const val prefix = "§9§lSkytils §8»"
-        const val successPrefix = "§a§lSkytils §8»"
-        const val failPrefix = "§c§lSkytils (${Reference.VERSION}) §8»"
+        val prefix = "§9§lSkytils §8»"
+        val successPrefix = "§a§lSkytils §8»"
+        val failPrefix = "§c§lSkytils (${Reference.VERSION}) §8»"
 
         var trustClientTime = false
     }
