@@ -43,7 +43,7 @@ public abstract class MixinGuiIngameForge extends GuiIngame {
 
     @ModifyArgs(method = "renderToolHightlight", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/FontRenderer;drawStringWithShadow(Ljava/lang/String;FFI)I"))
     private void modifyItemHighlightPosition(Args args) {
-        GuiIngameForgeHookKt.modifyItemHighlightPosition(args, highlightingItemStack);
+        GuiIngameForgeHookKt.modifyItemHighlightPosition(args, this.highlightingItemStack);
     }
 
     @ModifyArgs(method = "renderRecordOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;translate(FFF)V"))
