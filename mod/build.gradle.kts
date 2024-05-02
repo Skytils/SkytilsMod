@@ -51,7 +51,7 @@ repositories {
 
 loom {
     if (isLegacyFabric) {
-        intermediaryUrl.set("https://repo.legacyfabric.net/repository/legacyfabric/net/legacyfabric/intermediary/%1\$s/intermediary-%1\$s-v2.jar")
+        intermediaryUrl.set("https://repo.legacyfabric.net/repository/legacyfabric/net/legacyfabric/v2/intermediary/%1\$s/intermediary-%1\$s-v2.jar")
     }
     silentMojangMappingsLicense()
     runConfigs {
