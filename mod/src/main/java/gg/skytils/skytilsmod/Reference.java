@@ -31,25 +31,7 @@ public class Reference {
     public static String dataUrl = "https://data.skytils.gg/";
     public static final String MOD_ID = "skytils";
     public static final String MOD_NAME = "Skytils";
-    @NotNull
-    public static final String VERSION = getVersion();
-    public static final String UNKNOWN_VERSION = "unknown";
-
-    private static String getVersion() {
-        URL url = Skytils.class.getResource("mcmod.info");
-        if (url == null) return UNKNOWN_VERSION;
-        try (InputStream input = url.openStream()) {
-            MetadataCollection metadataCollection = MetadataCollection.from(input, "skytils");
-            ModMetadata metadata = metadataCollection.getMetadataForId("skytils",
-                    new HashMap<String, Object>() {{
-                    put("name", "Skytils");
-                    put("version", UNKNOWN_VERSION);
-                }});
-            return metadata.version;
-        } catch (IOException e) {
-            return UNKNOWN_VERSION;
-        }
-    }
+    public static final String VERSION = "@version@";
 
     public static final int apiVersion = 5;
 }

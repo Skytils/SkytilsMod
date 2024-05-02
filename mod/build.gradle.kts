@@ -17,6 +17,7 @@
  */
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import net.fabricmc.loom.task.RemapJarTask
+import org.apache.tools.ant.filters.ReplaceTokens
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
 
@@ -239,8 +240,19 @@ tasks {
         isPreserveFileTimestamps = false
         isReproducibleFileOrder = true
     }
-    withType<JavaCompile> {
+    register<Sync>("processSource") {
+        from(sourceSets.main.get().java)
+        inputs.property("version", rootProject.version)
+        filter<ReplaceTokens>(
+            "tokens" to mapOf(
+                "version" to version
+            )
+        )
+        into("${layout.buildDirectory.get()}/src")
+    }
+    compileJava {
         options.encoding = "UTF-8"
+        source = named("processSource").get().outputs.files.asFileTree
     }
     withType<KotlinCompile> {
         kotlinOptions {
