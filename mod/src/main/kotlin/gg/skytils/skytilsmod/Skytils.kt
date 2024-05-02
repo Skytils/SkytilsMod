@@ -134,6 +134,7 @@ class Skytils {
     companion object : CoroutineScope {
         const val MOD_ID = Reference.MOD_ID
         const val MOD_NAME = Reference.MOD_NAME
+        @JvmField
         val VERSION = Reference.VERSION
 
         @JvmStatic
