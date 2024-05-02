@@ -107,7 +107,7 @@ dependencies {
         exclude(module = "gson")
         exclude(module = "vigilance")
     }
-    shadowMe("com.github.Skytils.Vigilance:vigilance-$platform:afb0909442") {
+    shadowMe("com.github.Skytils.Vigilance:vigilance-${if (platform.mcVersion >= 11801) "1.18.1-${platform.loaderStr}" else platform.toString()}:afb0909442") {
         isTransitive = false
     }
 
