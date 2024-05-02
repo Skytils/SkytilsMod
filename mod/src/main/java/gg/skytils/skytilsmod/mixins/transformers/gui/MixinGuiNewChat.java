@@ -65,7 +65,7 @@ public abstract class MixinGuiNewChat extends Gui {
 
     @Inject(method = "getChatComponent", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/GuiNewChat;scrollPos:I"), cancellable = true, locals = LocalCapture.CAPTURE_FAILSOFT)
     private void stopOutsideWindow(int mouseX, int mouseY, CallbackInfoReturnable<IChatComponent> cir, ScaledResolution scaledresolution, int i, float f, int j, int k, int l) {
-        int line = k / mc.fontRendererObj.FONT_HEIGHT;
+        int line = k / this.mc.fontRendererObj.FONT_HEIGHT;
         if (line >= getLineCount()) cir.setReturnValue(null);
     }
 
