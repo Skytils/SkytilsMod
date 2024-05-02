@@ -32,8 +32,36 @@ pluginManagement {
             }
         }
     }
+
+    plugins {
+        val kotlinVersion = "1.9.22"
+        kotlin("jvm") version kotlinVersion apply false
+        kotlin("plugin.serialization") version kotlinVersion apply false
+        id("gg.essential.multi-version.root") version "0.4.1"
+        id("gg.essential.loom") apply false
+        id("gg.essential.defaults") apply false
+    }
 }
 
 rootProject.name = "SkytilsMod"
-include("events")
-include("hypixel-api:types")
+rootProject.buildFileName = "root.gradle.kts"
+
+include(":mod")
+project(":mod").apply {
+    projectDir = file("./mod")
+    buildFileName = "root.gradle.kts"
+}
+listOf(
+    "1.8.9-forge",
+    "1.16.2-forge",
+    "1.16.2-fabric",
+    "1.20.4-fabric",
+).forEach { version ->
+    include(":mod:$version")
+    project(":mod:$version").apply {
+        projectDir = file("./mod/versions/$version")
+        buildFileName = "../../build.gradle.kts"
+    }
+}
+includeBuild("events")
+includeBuild("hypixel-api/types")
