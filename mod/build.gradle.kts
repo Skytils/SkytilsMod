@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -23,18 +23,16 @@ import java.security.MessageDigest
 plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.serialization") version "1.9.22"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.github.johnrengelman.shadow")
     id("net.kyori.blossom") version "2.1.0"
-    id("io.github.juuxel.loom-vineflower") version "1.11.0"
-    id("gg.essential.loom") version "1.3.12"
-    id("gg.essential.defaults") version "0.3.0"
+    id("gg.essential.multi-version")
+    id("gg.essential.defaults")
     idea
     id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
 
     signing
 }
 
-version = "1.9.4"
 group = "gg.skytils"
 
 repositories {
@@ -49,16 +47,11 @@ repositories {
     }
 }
 
-vineflower {
-    toolVersion.set("1.9.3")
-}
-
 loom {
     silentMojangMappingsLicense()
     runConfigs {
         getByName("client") {
             isIdeConfigGenerated = true
-            property("fml.coreMods.load", "gg.skytils.skytilsmod.tweaker.SkytilsLoadingPlugin")
             property("elementa.dev", "true")
             property("elementa.debug", "true")
             property("elementa.invalid_usage", "warn")
@@ -66,18 +59,27 @@ loom {
             property("mixin.debug.verbose", "true")
             property("mixin.debug.export", "true")
             property("mixin.dumpTargetOnFailure", "true")
-            property("fml.debugAccessTransformer", "true")
-            property("legacy.debugClassLoading", "true")
-            property("legacy.debugClassLoadingSave", "true")
-            property("legacy.debugClassLoadingFiner", "true")
-            programArgs("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
-            programArgs("--mixin", "mixins.skytils.json")
-            programArgs("--mixin", "mixins.skytils-events.json")
+
+            if (project.platform.isLegacyForge) {
+                property("fml.coreMods.load", "gg.skytils.skytilsmod.tweaker.SkytilsLoadingPlugin")
+                property("legacy.debugClassLoading", "true")
+                property("legacy.debugClassLoadingSave", "true")
+                property("legacy.debugClassLoadingFiner", "true")
+                programArgs("--tweakClass", "gg.skytils.skytilsmod.tweaker.SkytilsTweaker")
+            }
+            if (project.platform.isForge) {
+                property("fml.debugAccessTransformer", "true")
+
+                programArgs("--mixin", "mixins.skytils.json")
+                programArgs("--mixin", "mixins.skytils-events.json")
+            }
         }
         remove(getByName("server"))
     }
-    forge {
-        mixinConfig("mixins.skytils.json", "mixins.skytils-events.json")
+    if (project.platform.isForge) {
+        forge {
+            mixinConfig("mixins.skytils.json", "mixins.skytils-events.json")
+        }
     }
     mixin {
         defaultRefmapName = "mixins.skytils.refmap.json"
@@ -93,15 +95,19 @@ val shadowMeMod: Configuration by configurations.creating {
 }
 
 dependencies {
-    shadowMe("gg.essential:loader-launchwrapper:1.2.2")
-    implementation("gg.essential:essential-1.8.9-forge:16425+g3a090c5c88") {
+    if (platform.isForge) {
+        shadowMe("gg.essential:loader-launchwrapper:1.2.2")
+    } else {
+        runtimeOnly("gg.essential:loader-fabric:1.0.0")
+    }
+    implementation("gg.essential:essential-$platform:16425+g3a090c5c88") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
         exclude(module = "gson")
         exclude(module = "vigilance")
     }
-    shadowMe("com.github.Skytils.Vigilance:vigilance-1.8.9-forge:afb0909442") {
+    shadowMe("com.github.Skytils.Vigilance:vigilance-$platform:afb0909442") {
         isTransitive = false
     }
 
@@ -144,9 +150,8 @@ dependencies {
     shadowMe("org.brotli:dec:0.1.2")
     shadowMe("com.aayushatharva.brotli4j:brotli4j:1.16.0")
 
-    shadowMe(project(":events"))
-    shadowMe(project(":hypixel-api:types"))
-
+    shadowMe("gg.skytils:events")
+    shadowMe("gg.skytils.hypixel.types:types")
 
     shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")!!)
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
@@ -167,6 +172,9 @@ sourceSets {
         }
     }
 }
+
+val javaVersion = if (platform.isLegacyForge) JavaVersion.VERSION_1_8 else JavaVersion.VERSION_17
+
 
 tasks {
     processResources {
@@ -227,8 +235,7 @@ tasks {
             "META-INF/proguard/**",
             "META-INF/maven/**",
             "META-INF/versions/**",
-            "META-INF/com.android.tools/**",
-            "fabric.mod.json"
+            "META-INF/com.android.tools/**"
         )
         mergeServiceFiles()
     }
@@ -241,7 +248,7 @@ tasks {
     }
     withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "1.8"
+            jvmTarget = javaVersion.toString()
             freeCompilerArgs =
                 listOf(
                     /*"-opt-in=kotlin.RequiresOptIn", */
@@ -262,25 +269,30 @@ tasks {
             )
         )
     }
-    register<Delete>("deleteClassloader") {
-        delete(
-            "${project.projectDir}/run/CLASSLOADER_TEMP",
-            "${project.projectDir}/run/CLASSLOADER_TEMP1",
-            "${project.projectDir}/run/CLASSLOADER_TEMP2",
-            "${project.projectDir}/run/CLASSLOADER_TEMP3",
-            "${project.projectDir}/run/CLASSLOADER_TEMP4",
-            "${project.projectDir}/run/CLASSLOADER_TEMP5",
-            "${project.projectDir}/run/CLASSLOADER_TEMP6",
-            "${project.projectDir}/run/CLASSLOADER_TEMP7",
-            "${project.projectDir}/run/CLASSLOADER_TEMP8",
-            "${project.projectDir}/run/CLASSLOADER_TEMP9",
-            "${project.projectDir}/run/CLASSLOADER_TEMP10"
-        )
+    if (platform.isLegacyForge) {
+        register<Delete>("deleteClassloader") {
+            delete(
+                "${project.projectDir}/run/CLASSLOADER_TEMP",
+                "${project.projectDir}/run/CLASSLOADER_TEMP1",
+                "${project.projectDir}/run/CLASSLOADER_TEMP2",
+                "${project.projectDir}/run/CLASSLOADER_TEMP3",
+                "${project.projectDir}/run/CLASSLOADER_TEMP4",
+                "${project.projectDir}/run/CLASSLOADER_TEMP5",
+                "${project.projectDir}/run/CLASSLOADER_TEMP6",
+                "${project.projectDir}/run/CLASSLOADER_TEMP7",
+                "${project.projectDir}/run/CLASSLOADER_TEMP8",
+                "${project.projectDir}/run/CLASSLOADER_TEMP9",
+                "${project.projectDir}/run/CLASSLOADER_TEMP10"
+            )
+        }
     }
 }
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain {
+        check(this is JavaToolchainSpec)
+        languageVersion.set(JavaLanguageVersion.of(javaVersion.asInt()))
+    }
 }
 
 signing {
@@ -302,3 +314,5 @@ fun DependencyHandler.ktor(module: String, version: String? = null, addSuffix: B
 fun DependencyHandler.ktorClient(module: String, version: String? = null) = ktor("client-${module}", version)
 
 fun DependencyHandler.ktorServer(module: String, version: String? = null) = ktor("server-${module}", version)
+
+fun JavaVersion.asInt() = this.ordinal + 1

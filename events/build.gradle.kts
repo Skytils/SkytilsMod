@@ -19,8 +19,8 @@ import org.apache.tools.ant.filters.FixCrLfFilter
 
 plugins {
     kotlin("jvm") version "1.9.22"
-    id("gg.essential.loom") version "1.3.12"
-    id("gg.essential.defaults") version "0.3.0"
+    id("gg.essential.loom") version "1.4.13"
+    id("gg.essential.defaults") version "0.4.1"
 }
 
 dependencies {
@@ -29,6 +29,8 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
 }
+
+group = "gg.skytils"
 
 java.toolchain {
     languageVersion = JavaLanguageVersion.of(8)
