@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod;
 
 import net.minecraftforge.fml.common.MetadataCollection;
 import net.minecraftforge.fml.common.ModMetadata;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +31,7 @@ public class Reference {
     public static String dataUrl = "https://data.skytils.gg/";
     public static final String MOD_ID = "skytils";
     public static final String MOD_NAME = "Skytils";
+    @NotNull
     public static final String VERSION = getVersion();
     public static final String UNKNOWN_VERSION = "unknown";
 
