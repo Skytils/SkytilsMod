@@ -34,6 +34,8 @@ plugins {
 
 group = "gg.skytils"
 
+val isLegacyFabric = project.platform.isFabric && project.platform.mcVersion == 10809
+
 repositories {
     mavenLocal()
     mavenCentral()
@@ -44,9 +46,13 @@ repositories {
             includeGroupAndSubgroups("com.github")
         }
     }
+    if (isLegacyFabric) maven("https://repo.legacyfabric.net/repository/legacyfabric/")
 }
 
 loom {
+    if (isLegacyFabric) {
+        intermediaryUrl.set("https://repo.legacyfabric.net/repository/legacyfabric/net/legacyfabric/intermediary/%1\$s/intermediary-%1\$s-v2.jar")
+    }
     silentMojangMappingsLicense()
     runConfigs {
         getByName("client") {
@@ -99,14 +105,14 @@ dependencies {
     } else {
         runtimeOnly("gg.essential:loader-fabric:1.0.0")
     }
-    implementation("gg.essential:essential-$platform:16425+g3a090c5c88") {
+    implementation("gg.essential:essential-${if (!isLegacyFabric) platform.toString() else "${platform.mcVersionStr}-forge"}:16425+g3a090c5c88") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
         exclude(module = "gson")
         exclude(module = "vigilance")
     }
-    shadowMe("com.github.Skytils.Vigilance:vigilance-${if (platform.mcVersion >= 11801) "1.18.1-${platform.loaderStr}" else platform.toString()}:afb0909442") {
+    shadowMe("com.github.Skytils.Vigilance:vigilance-${if (!isLegacyFabric) if (platform.mcVersion >= 11801) "1.18.1-${platform.loaderStr}" else platform.toString() else "${platform.mcVersionStr}-forge"}:afb0909442") {
         isTransitive = false
     }
 

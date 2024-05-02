@@ -53,8 +53,7 @@ project(":mod").apply {
 }
 listOf(
     "1.8.9-forge",
-    "1.16.2-forge",
-    "1.16.2-fabric",
+    "1.8.9-fabric",
     "1.20.4-fabric",
 ).forEach { version ->
     include(":mod:$version")

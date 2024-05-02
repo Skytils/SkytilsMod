@@ -24,11 +24,9 @@ version = "2.0.0"
 
 preprocess {
     val forge10809 = createNode("1.8.9-forge", 10809, "mcp")
-    val forge11602 = createNode("1.16.2-forge", 11602, "mcp")
-    val fabric11602 = createNode("1.16.2-fabric", 11602, "yarn")
+    val fabric10809 = createNode("1.8.9-fabric", 10809, "yarn")
     val fabric12004 = createNode("1.20.4-fabric", 12004, "yarn")
 
-    fabric12004.link(fabric11602)
-    fabric11602.link(forge11602)
-    forge11602.link(forge10809)
+    fabric12004.link(fabric10809)
+    fabric10809.link(forge10809)
 }
