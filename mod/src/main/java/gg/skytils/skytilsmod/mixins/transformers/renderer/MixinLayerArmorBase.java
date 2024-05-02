@@ -74,6 +74,6 @@ public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerR
 
     @Inject(method = "renderLayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/layers/LayerArmorBase;renderGlint(Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/client/model/ModelBase;FFFFFFF)V"), cancellable = true)
     private void replaceArmorGlint(EntityLivingBase entitylivingbaseIn, float p_177182_2_, float p_177182_3_, float partialTicks, float p_177182_5_, float p_177182_6_, float p_177182_7_, float scale, int armorSlot, CallbackInfo ci) {
-        LayerArmorBaseHookKt.replaceArmorGlint(this, renderer, entitylivingbaseIn, p_177182_2_, p_177182_3_, partialTicks, p_177182_5_, p_177182_6_, p_177182_7_, scale, armorSlot, ci);
+        LayerArmorBaseHookKt.replaceArmorGlint(this, this.renderer, entitylivingbaseIn, p_177182_2_, p_177182_3_, partialTicks, p_177182_5_, p_177182_6_, p_177182_7_, scale, armorSlot, ci);
     }
 }

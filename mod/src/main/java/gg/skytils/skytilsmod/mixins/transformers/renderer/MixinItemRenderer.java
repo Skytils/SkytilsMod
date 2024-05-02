@@ -37,7 +37,7 @@ public class MixinItemRenderer {
 
     @WrapOperation(method = "renderItemInFirstPerson", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/AbstractClientPlayer;getItemInUseCount()I"))
     private int getItemInUseCountForFirstPerson(AbstractClientPlayer abstractClientPlayer, Operation<Integer> original) {
-        return ItemRendererHookKt.getItemInUseCountForFirstPerson(abstractClientPlayer, itemToRender, original);
+        return ItemRendererHookKt.getItemInUseCountForFirstPerson(abstractClientPlayer, this.itemToRender, original);
     }
 
     @Inject(method = "transformFirstPersonItem", at = @At(value = "TAIL"))
