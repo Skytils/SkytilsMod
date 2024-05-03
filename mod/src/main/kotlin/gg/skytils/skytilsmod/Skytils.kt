@@ -99,7 +99,6 @@ import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.Loader
-import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
@@ -122,6 +121,12 @@ import javax.net.ssl.X509TrustManager
 import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 
+//#if FORGE
+import net.minecraftforge.fml.common.Mod
+//#endif
+
+//#if FORGE
+//#if MC<11400
 @Mod(
     modid = Skytils.MOD_ID,
     name = Skytils.MOD_NAME,
@@ -129,6 +134,10 @@ import kotlin.math.abs
     clientSideOnly = true,
     guiFactory = "gg.skytils.skytilsmod.core.ForgeGuiFactory"
 )
+//#else
+//$$ @Mod(Skytils.MOD_ID)
+//#endif
+//#endif
 class Skytils {
 
     companion object : CoroutineScope {
