@@ -15,20 +15,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-plugins {
-    kotlin("jvm") apply false
-    id("gg.essential.multi-version.root")
+
+package gg.skytils.skytilsmod.utils
+
+import net.minecraft.launchwrapper.Launch
+import net.minecraftforge.fml.common.Loader
+
+val isDeobfuscatedEnvironment by lazy {
+    //#if FORGE
+    //#if MC<11400
+    Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", false) as Boolean
+    //#else
+    //$$ (System.getenv("target") ?: "").lowercase() == "fmluserdevclient"
+    //#endif
+    //#endif
 }
 
-version = "2.0.0"
-
-preprocess {
-    val forge10809 = createNode("1.8.9-forge", 10809, "mcp")
-    val forge11602 = createNode("1.16.2-forge", 11602, "mcp")
-    val fabric11602 = createNode("1.16.2-fabric", 11602, "yarn")
-    val fabric12004 = createNode("1.20.4-fabric", 12004, "yarn")
-
-    fabric12004.link(fabric11602)
-    fabric11602.link(forge11602)
-    forge11602.link(forge10809, file("versions/1.16.2-1.8.9.txt"))
-}
+fun isModLoaded(id: String) =
+    //#if FORGE
+    //#if MC<11400
+    Loader.isModLoaded(id)
+    //#else
+    //$$ FMLLoader.getLoadingModList().getModFileById(id)
+    //#endif
+    //#endif

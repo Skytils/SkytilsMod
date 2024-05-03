@@ -18,8 +18,10 @@
 
 package gg.skytils.skytilsmod
 
+import codes.som.anthony.koffee.modifiers.open
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
+import gg.essential.universal.UDesktop
 import gg.essential.universal.UKeyboard
 import gg.skytils.skytilsmod.commands.impl.*
 import gg.skytils.skytilsmod.commands.stats.impl.CataCommand
@@ -88,25 +90,15 @@ import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiGameOver
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.launchwrapper.Launch
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.*
-import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.Loader
-import net.minecraftforge.fml.common.event.FMLInitializationEvent
-import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import sun.misc.Unsafe
 import java.io.File
 import java.net.DatagramPacket
@@ -123,6 +115,19 @@ import kotlin.math.abs
 
 //#if FORGE
 import net.minecraftforge.fml.common.Mod
+//#if MC<11400
+import net.minecraftforge.client.ClientCommandHandler
+import net.minecraftforge.fml.common.event.FMLInitializationEvent
+import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
+import net.minecraftforge.fml.common.eventhandler.EventPriority
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraftforge.fml.common.gameevent.TickEvent
+import net.minecraftforge.fml.common.network.FMLNetworkEvent
+//#else
+//$$ import net.minecraft.util.text.StringTextComponent
+//#endif
 //#endif
 
 //#if FORGE
@@ -196,9 +201,8 @@ class Skytils {
 
         override val coroutineContext: CoroutineContext = dispatcher + SupervisorJob() + CoroutineName("Skytils")
 
-        val deobfEnvironment by lazy {
-            Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", false) as Boolean
-        }
+        val deobfEnvironment: Boolean
+            get() = isDeobfuscatedEnvironment
 
         val unsafe by lazy {
             Unsafe::class.java.getDeclaredField("theUnsafe").apply {
@@ -393,9 +397,9 @@ class Skytils {
 
     @Mod.EventHandler
     fun postInit(event: FMLPostInitializationEvent) {
-        usingLabymod = Loader.isModLoaded("labymod")
-        usingNEU = Loader.isModLoaded("notenoughupdates")
-        usingSBA = Loader.isModLoaded("skyblockaddons")
+        usingLabymod = isModLoaded("labymod")
+        usingNEU = isModLoaded("notenoughupdates")
+        usingSBA = isModLoaded("skyblockaddons")
 
         MayorInfo.fetchMayorData()
 
@@ -495,26 +499,39 @@ class Skytils {
 
         if (mc.thePlayer != null && sendMessageQueue.isNotEmpty() && System.currentTimeMillis() - lastChatMessage > 250) {
             val msg = sendMessageQueue.pollFirst()
-            if (!msg.isNullOrBlank()) mc.thePlayer.sendChatMessage(msg)
+            if (!msg.isNullOrBlank()) mc.thePlayer?.sendChatMessage(msg)
         }
         if (Utils.inSkyblock && DevTools.getToggle("copydetails") && UKeyboard.isCtrlKeyDown()) {
             if (UKeyboard.isKeyDown(UKeyboard.KEY_TAB)) {
                 UChat.chat("Copied tab data to clipboard")
-                GuiScreen.setClipboardString(TabListUtils.tabEntries.map { it.second }.toString())
+                UDesktop.setClipboardString(TabListUtils.tabEntries.map { it.second }.toString())
             }
             if (UKeyboard.isKeyDown(UKeyboard.KEY_CAPITAL)) {
                 UChat.chat("Copied scoreboard data to clipboard")
-                GuiScreen.setClipboardString(ScoreboardUtil.sidebarLines.toString())
+                UDesktop.setClipboardString(ScoreboardUtil.sidebarLines.toString())
             }
-            val container = mc.thePlayer?.openContainer
-            if (UKeyboard.isKeyDown(UKeyboard.KEY_LMETA) && container is ContainerChest) {
-                UChat.chat("Copied container data to clipboard")
-                GuiScreen.setClipboardString(
-                    "Name: '${container.lowerChestInventory.name}', Items: ${
-                        container.inventorySlots.filter { it.inventory == container.lowerChestInventory }
-                            .map { it.stack?.serializeNBT() }
-                    }"
-                )
+            val openScreen = mc.currentScreen
+            if (UKeyboard.isKeyDown(UKeyboard.KEY_LMETA) && openScreen is GuiChest) {
+                //#if MC<11400
+                val container = openScreen.inventorySlots
+                //#else
+                //$$ val container = openScreen.getContainer()
+                //#endif
+                (container as? ContainerChest)?.let { chest ->
+                    UChat.chat("Copied container data to clipboard")
+                    //#if MC<11400
+                    val name = chest.lowerChestInventory.name
+                    //#else
+                    //$$ val name = openScreen.title.string
+                    //#endif
+                    UDesktop.setClipboardString(
+                        "Name: '${name}', Items: ${
+                            chest.inventorySlots.filter { it.inventory == chest.lowerChestInventory }
+                                .map { it.stack?.serializeNBT() }
+                        }"
+                    )
+
+                }
             }
         }
     }
@@ -536,7 +553,12 @@ class Skytils {
     @SubscribeEvent
     fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
         Utils.isOnHypixel = mc.runCatching {
-            !event.isLocal && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
+            //#if MC<11400
+            val brand = thePlayer?.clientBrand
+            //#else
+            //$$ val brand = player?.serverBrand
+            //#endif
+            !event.isLocal && (brand?.lowercase()?.contains("hypixel")
                 ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
         }.onFailure { it.printStackTrace() }.getOrDefault(false)
 
@@ -557,14 +579,18 @@ class Skytils {
             printDevMessage("sb ${Utils.inSkyblock}", "utils")
         }
         if (event.packet is S1CPacketEntityMetadata && mc.thePlayer != null) {
-            val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 } ?: return
-            val entity = mc.theWorld.getEntityByID(event.packet.entityId)
+            //#if MC<11400
+            val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 }?.`object` ?: return
+            //#else
+            //$$ val nameObj = event.packet.dataManagerEntries?.find { it.key.id == 2 }.value ?: return
+            //#endif
+            val entity = mc.theWorld?.getEntityByID(event.packet.entityId)
 
             if (entity is ExtensionEntityLivingBase) {
-                entity.skytilsHook.onNewDisplayName(nameObj.`object` as String)
+                entity.skytilsHook.onNewDisplayName(nameObj as String)
             }
         }
-        if (!Utils.isOnHypixel && event.packet is S3FPacketCustomPayload && event.packet.channelName == "MC|Brand") {
+        if (!Utils.isOnHypixel && event.packet is S3FPacketCustomPayload && event.packet.channelName.toString() == "MC|Brand") {
             if (event.packet.bufferData.readStringFromBuffer(Short.MAX_VALUE.toInt()).lowercase().contains("hypixel"))
                 Utils.isOnHypixel = true
         }
@@ -612,7 +638,11 @@ class Skytils {
             val x2 = x + 100
             var y = event.gui.height - 22
             var y2 = y + 20
+            //#if MC<11400
             val sorted = event.buttonList.sortedWith { a, b -> b.yPosition + b.height - a.yPosition + a.height }
+            //#else
+            //$$ val sorted = event.widgetList.sortedWith { a, b -> b.y + b.heightRealms - a.y + a.heightRealms }
+            //#endif
             for (button in sorted) {
                 val otherX = button.xPosition
                 val otherX2 = button.xPosition + button.width
@@ -623,16 +653,24 @@ class Skytils {
                     y2 = y + 20
                 }
             }
+            //#if MC<11400
             event.buttonList.add(GuiButton(6969420, x, 0.coerceAtLeast(y), 100, 20, "Skytils"))
+            //#else
+            //$$ event.widgetList.add(Button(x, 0.coerceAtLeast(y), 100, 20, StringTextComponent("Skytils")) {
+            //$$     displayScreen = OptionsGui()
+            //$$ })
+            //#endif
         }
     }
 
+    //#if MC<11400
     @SubscribeEvent
     fun onGuiAction(event: GuiScreenEvent.ActionPerformedEvent.Post) {
         if (config.configButtonOnPause && event.gui is GuiIngameMenu && event.button.id == 6969420) {
             displayScreen = OptionsGui()
         }
     }
+    //#endif
 
     @SubscribeEvent
     fun onGuiChange(event: GuiOpenEvent) {
