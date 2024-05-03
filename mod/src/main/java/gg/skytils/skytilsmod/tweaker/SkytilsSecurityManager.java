@@ -19,7 +19,6 @@
 package gg.skytils.skytilsmod.tweaker;
 
 import net.minecraftforge.fml.relauncher.FMLSecurityManager;
-import sun.security.util.SecurityConstants;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,6 +27,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.security.AccessController;
+import java.security.AllPermission;
 import java.security.Permission;
 import java.security.PrivilegedAction;
 
@@ -124,7 +124,7 @@ public class SkytilsSecurityManager extends SecurityManager {
             if (s.getClass().getClassLoader() != null) {
                 AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
                     s.getClass().getProtectionDomain().implies
-                            (SecurityConstants.ALL_PERMISSION);
+                            (new AllPermission());
                     return null;
                 });
             }
