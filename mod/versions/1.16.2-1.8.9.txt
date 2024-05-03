@@ -1,0 +1,19 @@
+net.minecraft.client.gui.widget.button.Button net.minecraft.client.gui.GuiButton
+net.minecraft.client.gui.screen.Screen net.minecraft.client.gui.GuiScreen
+net.minecraft.entity.player.PlayerEntity container net.minecraft.entity.player.EntityPlayer inventoryContainer
+net.minecraft.inventory.container.ChestContainer net.minecraft.inventory.ContainerChest
+net.minecraft.client.gui.screen.inventory.ChestScreen net.minecraft.client.gui.inventory.GuiChest
+net.minecraft.network.play.server.SJoinGamePacket net.minecraft.network.play.server.S01PacketJoinGame
+net.minecraft.network.play.server.SDisplayObjectivePacket net.minecraft.network.play.server.S3DPacketDisplayScoreboard
+net.minecraft.network.play.server.SDisplayObjectivePacket getName() net.minecraft.network.play.server.S3DPacketDisplayScoreboard func_149370_d()
+net.minecraft.network.play.server.SEntityMetadataPacket net.minecraft.network.play.server.S1CPacketEntityMetadata
+net.minecraft.network.play.server.SEntityMetadataPacket getDataManagerEntries() net.minecraft.network.play.server.S1CPacketEntityMetadata func_149376_c()
+net.minecraft.network.play.server.SCustomPayloadPlayPacket net.minecraft.network.play.server.S3FPacketCustomPayload
+net.minecraft.network.play.server.SPlayerListItemPacket net.minecraft.network.play.server.S38PacketPlayerListItem
+net.minecraft.util.text.ITextComponent getString() net.minecraft.util.IChatComponent getFormattedText()
+net.minecraft.network.play.client.CChatMessagePacket net.minecraft.network.play.client.C01PacketChatMessage
+net.minecraft.client.gui.screen.IngameMenuScreen net.minecraft.client.gui.GuiIngameMenu
+net.minecraft.client.gui.widget.Widget heightRealms net.minecraft.client.gui.GuiButton height
+net.minecraft.client.gui.widget.Widget x net.minecraft.client.gui.GuiButton xPosition
+net.minecraft.client.gui.widget.Widget y net.minecraft.client.gui.GuiButton yPosition
+net.minecraft.client.gui.screen.DeathScreen net.minecraft.client.gui.GuiGameOver
