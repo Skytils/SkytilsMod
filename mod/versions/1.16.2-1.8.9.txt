@@ -123,7 +123,6 @@ net.minecraft.network.play.server.SMountEntityPacket vehicleEntityId net.minecra
 net.minecraft.network.play.server.SMountEntityPacket entityId net.minecraft.network.play.server.S1BPacketEntityAttach leash
 net.minecraft.network.NettyVarint21FrameEncoder net.minecraft.util.MessageSerializer2
 net.minecraft.network.NettyVarint21FrameEncoder encode() net.minecraft.util.MessageSerializer2 encode()
-net.minecraft.network.NettyVarint21FrameEncoder encode() net.minecraft.util.MessageSerializer2 encode()
 net.minecraft.world.gen.DebugChunkGenerator net.minecraft.world.gen.ChunkProviderDebug
 net.minecraft.block.StemBlock net.minecraft.block.BlockStem
 net.minecraft.block.StemBlock getSeedItem() net.minecraft.block.BlockStem getSeedItem()
@@ -306,6 +305,8 @@ net.minecraft.entity.item.HangingEntity facingDirection net.minecraft.entity.Ent
 net.minecraft.entity.item.HangingEntity tickCounter1 net.minecraft.entity.EntityHanging tickCounter1
 net.minecraft.block.CactusBlock net.minecraft.block.BlockCactus
 net.minecraft.block.CactusBlock AGE net.minecraft.block.BlockCactus AGE
+net.minecraft.pathfinding.ClimberPathNavigator net.minecraft.pathfinding.PathNavigateClimber
+net.minecraft.pathfinding.ClimberPathNavigator targetPosition net.minecraft.pathfinding.PathNavigateClimber targetPosition
 net.minecraft.world.chunk.ChunkSection net.minecraft.world.chunk.storage.ExtendedBlockStorage
 net.minecraft.world.chunk.ChunkSection needsRandomTickFluid() net.minecraft.world.chunk.storage.ExtendedBlockStorage getNeedsRandomTick()
 net.minecraft.world.chunk.ChunkSection isEmpty() net.minecraft.world.chunk.storage.ExtendedBlockStorage isEmpty()
@@ -315,8 +316,6 @@ net.minecraft.world.chunk.ChunkSection data net.minecraft.world.chunk.storage.Ex
 net.minecraft.world.chunk.ChunkSection yBase net.minecraft.world.chunk.storage.ExtendedBlockStorage yBase
 net.minecraft.world.chunk.ChunkSection blockRefCount net.minecraft.world.chunk.storage.ExtendedBlockStorage blockRefCount
 net.minecraft.world.chunk.ChunkSection fluidRefCount net.minecraft.world.chunk.storage.ExtendedBlockStorage tickRefCount
-net.minecraft.pathfinding.ClimberPathNavigator net.minecraft.pathfinding.PathNavigateClimber
-net.minecraft.pathfinding.ClimberPathNavigator targetPosition net.minecraft.pathfinding.PathNavigateClimber targetPosition
 net.minecraft.item.ExperienceBottleItem net.minecraft.item.ItemExpBottle
 net.minecraft.enchantment.RespirationEnchantment net.minecraft.enchantment.EnchantmentOxygen
 net.minecraft.client.gui.screen.DisconnectedScreen net.minecraft.client.gui.GuiDisconnected
@@ -558,7 +557,6 @@ net.minecraft.nbt.CompoundNBT putBoolean() net.minecraft.nbt.NBTTagCompound setB
 net.minecraft.nbt.CompoundNBT keySet() net.minecraft.nbt.NBTTagCompound getKeySet()
 net.minecraft.nbt.CompoundNBT getLong() net.minecraft.nbt.NBTTagCompound getLong()
 net.minecraft.nbt.CompoundNBT putByteArray() net.minecraft.nbt.NBTTagCompound setByteArray()
-net.minecraft.nbt.CompoundNBT contains() net.minecraft.nbt.NBTTagCompound hasKey()
 net.minecraft.nbt.CompoundNBT getBoolean() net.minecraft.nbt.NBTTagCompound getBoolean()
 net.minecraft.nbt.CompoundNBT getString() net.minecraft.nbt.NBTTagCompound getString()
 net.minecraft.nbt.CompoundNBT equals() net.minecraft.nbt.NBTTagCompound equals()
@@ -686,6 +684,9 @@ net.minecraft.entity.passive.BatEntity getIsBatHanging() net.minecraft.entity.pa
 net.minecraft.entity.passive.BatEntity setIsBatHanging() net.minecraft.entity.passive.EntityBat setIsBatHanging()
 net.minecraft.entity.passive.BatEntity spawnPosition net.minecraft.entity.passive.EntityBat spawnPosition
 net.minecraft.entity.passive.SnowGolemEntity net.minecraft.entity.monster.EntitySnowman
+net.minecraft.client.renderer.entity.model.SquidModel net.minecraft.client.model.ModelSquid
+net.minecraft.client.renderer.entity.model.SquidModel legs net.minecraft.client.model.ModelSquid squidTentacles
+net.minecraft.client.renderer.entity.model.SquidModel body net.minecraft.client.model.ModelSquid squidBody
 net.minecraft.entity.item.minecart.FurnaceMinecartEntity net.minecraft.entity.item.EntityMinecartFurnace
 net.minecraft.entity.item.minecart.FurnaceMinecartEntity setMinecartPowered() net.minecraft.entity.item.EntityMinecartFurnace setMinecartPowered()
 net.minecraft.entity.item.minecart.FurnaceMinecartEntity isMinecartPowered() net.minecraft.entity.item.EntityMinecartFurnace isMinecartPowered()
@@ -693,9 +694,6 @@ net.minecraft.entity.item.minecart.FurnaceMinecartEntity fuel net.minecraft.enti
 net.minecraft.entity.item.minecart.FurnaceMinecartEntity pushX net.minecraft.entity.item.EntityMinecartFurnace pushX
 net.minecraft.entity.item.minecart.FurnaceMinecartEntity pushZ net.minecraft.entity.item.EntityMinecartFurnace pushZ
 net.minecraft.enchantment.LootBonusEnchantment net.minecraft.enchantment.EnchantmentLootBonus
-net.minecraft.client.renderer.entity.model.SquidModel net.minecraft.client.model.ModelSquid
-net.minecraft.client.renderer.entity.model.SquidModel legs net.minecraft.client.model.ModelSquid squidTentacles
-net.minecraft.client.renderer.entity.model.SquidModel body net.minecraft.client.model.ModelSquid squidBody
 net.minecraft.entity.item.ItemFrameEntity net.minecraft.entity.item.EntityItemFrame
 net.minecraft.entity.item.ItemFrameEntity setDisplayedItem() net.minecraft.entity.item.EntityItemFrame setDisplayedItem()
 net.minecraft.entity.item.ItemFrameEntity dropItemOrSelf() net.minecraft.entity.item.EntityItemFrame dropItemOrSelf()
@@ -2421,28 +2419,15 @@ net.minecraft.util.JSONUtils net.minecraft.util.JsonUtils
 net.minecraft.util.JSONUtils isBoolean() net.minecraft.util.JsonUtils isBoolean()
 net.minecraft.util.JSONUtils getBoolean() net.minecraft.util.JsonUtils getBoolean()
 net.minecraft.util.JSONUtils getJsonObject() net.minecraft.util.JsonUtils getJsonObject()
-net.minecraft.util.JSONUtils getJsonObject() net.minecraft.util.JsonUtils getJsonObject()
 net.minecraft.util.JSONUtils getInt() net.minecraft.util.JsonUtils getInt()
 net.minecraft.util.JSONUtils getJsonArray() net.minecraft.util.JsonUtils getJsonArray()
-net.minecraft.util.JSONUtils getBoolean() net.minecraft.util.JsonUtils getBoolean()
-net.minecraft.util.JSONUtils getInt() net.minecraft.util.JsonUtils getInt()
 net.minecraft.util.JSONUtils getString() net.minecraft.util.JsonUtils getString()
 net.minecraft.util.JSONUtils isString() net.minecraft.util.JsonUtils isString()
-net.minecraft.util.JSONUtils isString() net.minecraft.util.JsonUtils isString()
 net.minecraft.util.JSONUtils getFloat() net.minecraft.util.JsonUtils getFloat()
-net.minecraft.util.JSONUtils getJsonArray() net.minecraft.util.JsonUtils getJsonArray()
 net.minecraft.util.JSONUtils isJsonArray() net.minecraft.util.JsonUtils isJsonArray()
 net.minecraft.util.JSONUtils isJsonPrimitive() net.minecraft.util.JsonUtils isJsonPrimitive()
 net.minecraft.util.JSONUtils toString() net.minecraft.util.JsonUtils toString()
-net.minecraft.util.JSONUtils getString() net.minecraft.util.JsonUtils getString()
 net.minecraft.util.JSONUtils hasField() net.minecraft.util.JsonUtils hasField()
-net.minecraft.util.JSONUtils getJsonArray() net.minecraft.util.JsonUtils getJsonArray()
-net.minecraft.util.JSONUtils getFloat() net.minecraft.util.JsonUtils getFloat()
-net.minecraft.util.JSONUtils getFloat() net.minecraft.util.JsonUtils getFloat()
-net.minecraft.util.JSONUtils getInt() net.minecraft.util.JsonUtils getInt()
-net.minecraft.util.JSONUtils getBoolean() net.minecraft.util.JsonUtils getBoolean()
-net.minecraft.util.JSONUtils getJsonObject() net.minecraft.util.JsonUtils getJsonObject()
-net.minecraft.util.JSONUtils getString() net.minecraft.util.JsonUtils getString()
 net.minecraft.entity.ai.goal.NearestAttackableTargetGoal net.minecraft.entity.ai.EntityAINearestAttackableTarget
 net.minecraft.entity.ai.goal.NearestAttackableTargetGoal nearestTarget net.minecraft.entity.ai.EntityAINearestAttackableTarget targetEntity
 net.minecraft.entity.ai.goal.NearestAttackableTargetGoal targetClass net.minecraft.entity.ai.EntityAINearestAttackableTarget targetClass
@@ -2478,7 +2463,6 @@ net.minecraft.client.renderer.entity.CowRenderer COW_TEXTURES net.minecraft.clie
 net.minecraft.network.play.ServerPlayNetHandler net.minecraft.network.NetHandlerPlayServer
 net.minecraft.network.play.ServerPlayNetHandler isMovePlayerPacketInvalid() net.minecraft.network.NetHandlerPlayServer func_183006_b()
 net.minecraft.network.play.ServerPlayNetHandler handleSlashCommand() net.minecraft.network.NetHandlerPlayServer handleSlashCommand()
-net.minecraft.network.play.ServerPlayNetHandler setPlayerLocation() net.minecraft.network.NetHandlerPlayServer setPlayerLocation()
 net.minecraft.network.play.ServerPlayNetHandler setPlayerLocation() net.minecraft.network.NetHandlerPlayServer setPlayerLocation()
 net.minecraft.network.play.ServerPlayNetHandler server net.minecraft.network.NetHandlerPlayServer serverController
 net.minecraft.network.play.ServerPlayNetHandler LOGGER net.minecraft.network.NetHandlerPlayServer logger
@@ -2572,7 +2556,6 @@ net.minecraft.client.network.play.ClientPlayNetHandler net.minecraft.client.netw
 net.minecraft.client.network.play.ClientPlayNetHandler getPlayerInfoMap() net.minecraft.client.network.NetHandlerPlayClient getPlayerInfoMap()
 net.minecraft.client.network.play.ClientPlayNetHandler getPlayerInfo() net.minecraft.client.network.NetHandlerPlayClient getPlayerInfo()
 net.minecraft.client.network.play.ClientPlayNetHandler cleanup() net.minecraft.client.network.NetHandlerPlayClient cleanup()
-net.minecraft.client.network.play.ClientPlayNetHandler getPlayerInfo() net.minecraft.client.network.NetHandlerPlayClient getPlayerInfo()
 net.minecraft.client.network.play.ClientPlayNetHandler sendPacket() net.minecraft.client.network.NetHandlerPlayClient addToSendQueue()
 net.minecraft.client.network.play.ClientPlayNetHandler getGameProfile() net.minecraft.client.network.NetHandlerPlayClient getGameProfile()
 net.minecraft.client.network.play.ClientPlayNetHandler doneLoadingTerrain net.minecraft.client.network.NetHandlerPlayClient doneLoadingTerrain
@@ -2639,7 +2622,6 @@ net.minecraft.util.math.vector.Vector3d normalize() net.minecraft.util.Vec3 norm
 net.minecraft.util.math.vector.Vector3d toString() net.minecraft.util.Vec3 toString()
 net.minecraft.util.math.vector.Vector3d distanceTo() net.minecraft.util.Vec3 distanceTo()
 net.minecraft.util.math.vector.Vector3d squareDistanceTo() net.minecraft.util.Vec3 squareDistanceTo()
-net.minecraft.util.math.vector.Vector3d subtract() net.minecraft.util.Vec3 subtract()
 net.minecraft.util.math.vector.Vector3d subtract() net.minecraft.util.Vec3 subtract()
 net.minecraft.util.math.vector.Vector3d crossProduct() net.minecraft.util.Vec3 crossProduct()
 net.minecraft.util.math.vector.Vector3d dotProduct() net.minecraft.util.Vec3 dotProduct()
@@ -2893,7 +2875,6 @@ net.minecraft.client.entity.player.AbstractClientPlayerEntity getLocationSkin() 
 net.minecraft.client.entity.player.AbstractClientPlayerEntity getDownloadImageSkin() net.minecraft.client.entity.AbstractClientPlayer getDownloadImageSkin()
 net.minecraft.client.entity.player.AbstractClientPlayerEntity hasSkin() net.minecraft.client.entity.AbstractClientPlayer hasSkin()
 net.minecraft.client.entity.player.AbstractClientPlayerEntity hasPlayerInfo() net.minecraft.client.entity.AbstractClientPlayer hasPlayerInfo()
-net.minecraft.client.entity.player.AbstractClientPlayerEntity getLocationSkin() net.minecraft.client.entity.AbstractClientPlayer getLocationSkin()
 net.minecraft.client.entity.player.AbstractClientPlayerEntity getFovModifier() net.minecraft.client.entity.AbstractClientPlayer getFovModifier()
 net.minecraft.client.entity.player.AbstractClientPlayerEntity playerInfo net.minecraft.client.entity.AbstractClientPlayer playerInfo
 net.minecraft.util.SharedConstants net.minecraft.util.ChatAllowedCharacters
@@ -2935,11 +2916,11 @@ net.minecraft.util.math.Tuple3d net.minecraft.util.Vector3d
 net.minecraft.util.math.Tuple3d x net.minecraft.util.Vector3d x
 net.minecraft.util.math.Tuple3d y net.minecraft.util.Vector3d y
 net.minecraft.util.math.Tuple3d z net.minecraft.util.Vector3d z
-net.minecraft.command.impl.SaveOnCommand net.minecraft.command.server.CommandSaveOn
 net.minecraft.network.IPacket net.minecraft.network.Packet
 net.minecraft.network.IPacket readPacketData() net.minecraft.network.Packet readPacketData()
 net.minecraft.network.IPacket processPacket() net.minecraft.network.Packet processPacket()
 net.minecraft.network.IPacket writePacketData() net.minecraft.network.Packet writePacketData()
+net.minecraft.command.impl.SaveOnCommand net.minecraft.command.server.CommandSaveOn
 net.minecraft.client.particle.MobAppearanceParticle net.minecraft.client.particle.MobAppearance
 net.minecraft.util.text.event.ClickEvent net.minecraft.event.ClickEvent
 net.minecraft.util.text.event.ClickEvent hashCode() net.minecraft.event.ClickEvent hashCode()
@@ -2973,7 +2954,6 @@ net.minecraft.dispenser.ProxyBlockSource net.minecraft.block.BlockSourceImpl
 net.minecraft.dispenser.ProxyBlockSource world net.minecraft.block.BlockSourceImpl worldObj
 net.minecraft.dispenser.ProxyBlockSource pos net.minecraft.block.BlockSourceImpl pos
 net.minecraft.state.Property net.minecraft.block.properties.IProperty
-net.minecraft.state.Property getName() net.minecraft.block.properties.IProperty getName()
 net.minecraft.state.Property getName() net.minecraft.block.properties.IProperty getName()
 net.minecraft.state.Property hashCode() net.minecraft.block.properties.IProperty hashCode()
 net.minecraft.state.Property toString() net.minecraft.block.properties.IProperty toString()
@@ -3025,11 +3005,6 @@ net.minecraft.entity.ai.goal.HurtByTargetGoal excludedReinforcementTypes net.min
 net.minecraft.entity.ai.goal.HurtByTargetGoal revengeTimerOld net.minecraft.entity.ai.EntityAIHurtByTarget revengeTimerOld
 net.minecraft.client.particle.CloudParticle net.minecraft.client.particle.EntityCloudFX
 net.minecraft.potion.AbsorptionEffect net.minecraft.potion.PotionAbsorption
-net.minecraft.network.play.server.SWindowItemsPacket net.minecraft.network.play.server.S30PacketWindowItems
-net.minecraft.network.play.server.SWindowItemsPacket getWindowId() net.minecraft.network.play.server.S30PacketWindowItems func_148911_c()
-net.minecraft.network.play.server.SWindowItemsPacket processPacket() net.minecraft.network.play.server.S30PacketWindowItems processPacket()
-net.minecraft.network.play.server.SWindowItemsPacket windowId net.minecraft.network.play.server.S30PacketWindowItems windowId
-net.minecraft.network.play.server.SWindowItemsPacket itemStacks net.minecraft.network.play.server.S30PacketWindowItems itemStacks
 net.minecraft.block.FireBlock net.minecraft.block.BlockFire
 net.minecraft.block.FireBlock setFireInfo() net.minecraft.block.BlockFire setFireInfo()
 net.minecraft.block.FireBlock canDie() net.minecraft.block.BlockFire canDie()
@@ -3043,6 +3018,11 @@ net.minecraft.block.FireBlock flammabilities net.minecraft.block.BlockFire flamm
 net.minecraft.block.FireBlock NORTH net.minecraft.block.BlockFire NORTH
 net.minecraft.block.FireBlock WEST net.minecraft.block.BlockFire SOUTH
 net.minecraft.block.FireBlock UP net.minecraft.block.BlockFire WEST
+net.minecraft.network.play.server.SWindowItemsPacket net.minecraft.network.play.server.S30PacketWindowItems
+net.minecraft.network.play.server.SWindowItemsPacket getWindowId() net.minecraft.network.play.server.S30PacketWindowItems func_148911_c()
+net.minecraft.network.play.server.SWindowItemsPacket processPacket() net.minecraft.network.play.server.S30PacketWindowItems processPacket()
+net.minecraft.network.play.server.SWindowItemsPacket windowId net.minecraft.network.play.server.S30PacketWindowItems windowId
+net.minecraft.network.play.server.SWindowItemsPacket itemStacks net.minecraft.network.play.server.S30PacketWindowItems itemStacks
 net.minecraft.command.impl.PublishCommand net.minecraft.command.server.CommandPublishLocalServer
 net.minecraft.network.play.client.CHeldItemChangePacket net.minecraft.network.play.client.C09PacketHeldItemChange
 net.minecraft.network.play.client.CHeldItemChangePacket getSlotId() net.minecraft.network.play.client.C09PacketHeldItemChange getSlotId()
@@ -3733,19 +3713,10 @@ net.minecraft.util.math.BlockPos offset() net.minecraft.util.BlockPos offset()
 net.minecraft.util.math.BlockPos add() net.minecraft.util.BlockPos add()
 net.minecraft.util.math.BlockPos crossProduct() net.minecraft.util.BlockPos crossProduct()
 net.minecraft.util.math.BlockPos south() net.minecraft.util.BlockPos south()
-net.minecraft.util.math.BlockPos add() net.minecraft.util.BlockPos add()
 net.minecraft.util.math.BlockPos north() net.minecraft.util.BlockPos north()
-net.minecraft.util.math.BlockPos south() net.minecraft.util.BlockPos south()
-net.minecraft.util.math.BlockPos up() net.minecraft.util.BlockPos up()
-net.minecraft.util.math.BlockPos west() net.minecraft.util.BlockPos west()
-net.minecraft.util.math.BlockPos north() net.minecraft.util.BlockPos north()
-net.minecraft.util.math.BlockPos east() net.minecraft.util.BlockPos east()
-net.minecraft.util.math.BlockPos add() net.minecraft.util.BlockPos add()
-net.minecraft.util.math.BlockPos offset() net.minecraft.util.BlockPos offset()
-net.minecraft.util.math.BlockPos down() net.minecraft.util.BlockPos down()
-net.minecraft.util.math.BlockPos down() net.minecraft.util.BlockPos down()
 net.minecraft.util.math.BlockPos up() net.minecraft.util.BlockPos up()
 net.minecraft.util.math.BlockPos east() net.minecraft.util.BlockPos east()
+net.minecraft.util.math.BlockPos down() net.minecraft.util.BlockPos down()
 net.minecraft.util.math.BlockPos ZERO net.minecraft.util.BlockPos ORIGIN
 net.minecraft.util.math.BlockPos NUM_Y_BITS net.minecraft.util.BlockPos NUM_Y_BITS
 net.minecraft.util.math.BlockPos NUM_X_BITS net.minecraft.util.BlockPos NUM_X_BITS
@@ -4063,7 +4034,6 @@ net.minecraft.client.renderer.model.BlockModel deserialize() net.minecraft.clien
 net.minecraft.client.renderer.model.BlockModel isTexturePresent() net.minecraft.client.renderer.block.model.ModelBlock isTexturePresent()
 net.minecraft.client.renderer.model.BlockModel getAllTransforms() net.minecraft.client.renderer.block.model.ModelBlock getAllTransforms()
 net.minecraft.client.renderer.model.BlockModel getElements() net.minecraft.client.renderer.block.model.ModelBlock getElements()
-net.minecraft.client.renderer.model.BlockModel deserialize() net.minecraft.client.renderer.block.model.ModelBlock deserialize()
 net.minecraft.client.renderer.model.BlockModel startsWithHash() net.minecraft.client.renderer.block.model.ModelBlock startsWithHash()
 net.minecraft.client.renderer.model.BlockModel parentLocation net.minecraft.client.renderer.block.model.ModelBlock parentLocation
 net.minecraft.client.renderer.model.BlockModel LOGGER net.minecraft.client.renderer.block.model.ModelBlock LOGGER
@@ -4149,9 +4119,9 @@ net.minecraft.util.text.TranslationTextComponent STRING_VARIABLE_PATTERN net.min
 net.minecraft.util.text.TranslationTextComponent formatArgs net.minecraft.util.ChatComponentTranslation formatArgs
 net.minecraft.util.text.TranslationTextComponent children net.minecraft.util.ChatComponentTranslation children
 net.minecraft.util.text.TranslationTextComponent key net.minecraft.util.ChatComponentTranslation key
-net.minecraft.client.renderer.entity.model.BoatModel net.minecraft.client.model.ModelBoat
 net.minecraft.block.SpongeBlock net.minecraft.block.BlockSponge
 net.minecraft.block.SpongeBlock absorb() net.minecraft.block.BlockSponge absorb()
+net.minecraft.client.renderer.entity.model.BoatModel net.minecraft.client.model.ModelBoat
 net.minecraft.item.HangingEntityItem net.minecraft.item.ItemHangingEntity
 net.minecraft.item.HangingEntityItem hangingEntity net.minecraft.item.ItemHangingEntity hangingEntityClass
 net.minecraft.block.FenceGateBlock net.minecraft.block.BlockFenceGate
@@ -4213,7 +4183,6 @@ net.minecraft.util.math.MutableBoundingBox getNewBoundingBox() net.minecraft.wor
 net.minecraft.util.math.MutableBoundingBox toString() net.minecraft.world.gen.structure.StructureBoundingBox toString()
 net.minecraft.util.math.MutableBoundingBox toNBTTagIntArray() net.minecraft.world.gen.structure.StructureBoundingBox toNBTTagIntArray()
 net.minecraft.util.math.MutableBoundingBox getComponentToAddBoundingBox() net.minecraft.world.gen.structure.StructureBoundingBox getComponentToAddBoundingBox()
-net.minecraft.util.math.MutableBoundingBox intersectsWith() net.minecraft.world.gen.structure.StructureBoundingBox intersectsWith()
 net.minecraft.util.math.MutableBoundingBox maxX net.minecraft.world.gen.structure.StructureBoundingBox maxX
 net.minecraft.util.math.MutableBoundingBox minZ net.minecraft.world.gen.structure.StructureBoundingBox minZ
 net.minecraft.util.math.MutableBoundingBox minY net.minecraft.world.gen.structure.StructureBoundingBox minY
@@ -4229,7 +4198,6 @@ net.minecraft.inventory.container.Slot isItemValid() net.minecraft.inventory.Slo
 net.minecraft.inventory.container.Slot onSlotChange() net.minecraft.inventory.Slot onSlotChange()
 net.minecraft.inventory.container.Slot getStack() net.minecraft.inventory.Slot getStack()
 net.minecraft.inventory.container.Slot decrStackSize() net.minecraft.inventory.Slot decrStackSize()
-net.minecraft.inventory.container.Slot onCrafting() net.minecraft.inventory.Slot onCrafting()
 net.minecraft.inventory.container.Slot onCrafting() net.minecraft.inventory.Slot onCrafting()
 net.minecraft.inventory.container.Slot getItemStackLimit() net.minecraft.inventory.Slot getItemStackLimit()
 net.minecraft.inventory.container.Slot onSlotChanged() net.minecraft.inventory.Slot onSlotChanged()
@@ -4275,7 +4243,6 @@ net.minecraft.util.math.vector.Vector3i getX() net.minecraft.util.Vec3i getX()
 net.minecraft.util.math.vector.Vector3i toString() net.minecraft.util.Vec3i toString()
 net.minecraft.util.math.vector.Vector3i compareTo() net.minecraft.util.Vec3i compareTo()
 net.minecraft.util.math.vector.Vector3i getY() net.minecraft.util.Vec3i getY()
-net.minecraft.util.math.vector.Vector3i compareTo() net.minecraft.util.Vec3i compareTo()
 net.minecraft.util.math.vector.Vector3i hashCode() net.minecraft.util.Vec3i hashCode()
 net.minecraft.util.math.vector.Vector3i distanceSq() net.minecraft.util.Vec3i distanceSq()
 net.minecraft.util.math.vector.Vector3i equals() net.minecraft.util.Vec3i equals()
@@ -4334,7 +4301,6 @@ net.minecraft.nbt.ListNBT getFloat() net.minecraft.nbt.NBTTagList getFloatAt()
 net.minecraft.nbt.ListNBT getIntArray() net.minecraft.nbt.NBTTagList getIntArrayAt()
 net.minecraft.nbt.ListNBT getDouble() net.minecraft.nbt.NBTTagList getDoubleAt()
 net.minecraft.nbt.ListNBT isEmpty() net.minecraft.nbt.NBTTagList isEmpty()
-net.minecraft.nbt.ListNBT get() net.minecraft.nbt.NBTTagList get()
 net.minecraft.nbt.ListNBT get() net.minecraft.nbt.NBTTagList get()
 net.minecraft.nbt.ListNBT hashCode() net.minecraft.nbt.NBTTagList hashCode()
 net.minecraft.nbt.ListNBT clear() net.minecraft.nbt.NBTTagList clear()
@@ -5593,7 +5559,6 @@ net.minecraft.world.storage.WorldSummary getCheatsEnabled() net.minecraft.world.
 net.minecraft.world.storage.WorldSummary requiresConversion() net.minecraft.world.storage.SaveFormatComparator requiresConversion()
 net.minecraft.world.storage.WorldSummary getLastTimePlayed() net.minecraft.world.storage.SaveFormatComparator getLastTimePlayed()
 net.minecraft.world.storage.WorldSummary compareTo() net.minecraft.world.storage.SaveFormatComparator compareTo()
-net.minecraft.world.storage.WorldSummary compareTo() net.minecraft.world.storage.SaveFormatComparator compareTo()
 net.minecraft.world.storage.WorldSummary getDisplayName() net.minecraft.world.storage.SaveFormatComparator getDisplayName()
 net.minecraft.world.storage.WorldSummary getFileName() net.minecraft.world.storage.SaveFormatComparator getFileName()
 net.minecraft.world.storage.WorldSummary requiresConversion net.minecraft.world.storage.SaveFormatComparator requiresConversion
@@ -5852,7 +5817,6 @@ net.minecraft.item.FlintAndSteelItem net.minecraft.item.ItemFlintAndSteel
 net.minecraft.world.gen.feature.GlowstoneBlobFeature net.minecraft.world.gen.feature.WorldGenGlowStone1
 net.minecraft.network.NettyPacketEncoder net.minecraft.util.MessageSerializer
 net.minecraft.network.NettyPacketEncoder encode() net.minecraft.util.MessageSerializer encode()
-net.minecraft.network.NettyPacketEncoder encode() net.minecraft.util.MessageSerializer encode()
 net.minecraft.network.NettyPacketEncoder direction net.minecraft.util.MessageSerializer direction
 net.minecraft.network.NettyPacketEncoder RECEIVED_PACKET_MARKER net.minecraft.util.MessageSerializer RECEIVED_PACKET_MARKER
 net.minecraft.network.NettyPacketEncoder LOGGER net.minecraft.util.MessageSerializer logger
@@ -6069,12 +6033,599 @@ net.minecraft.entity.LivingEntity arrowHitTimer net.minecraft.entity.EntityLivin
 net.minecraft.entity.LivingEntity lastDamage net.minecraft.entity.EntityLivingBase lastDamage
 net.minecraft.state.EnumProperty net.minecraft.block.properties.PropertyEnum
 net.minecraft.state.EnumProperty create() net.minecraft.block.properties.PropertyEnum create()
-net.minecraft.state.EnumProperty create() net.minecraft.block.properties.PropertyEnum create()
 net.minecraft.state.EnumProperty getName() net.minecraft.block.properties.PropertyEnum getName()
-net.minecraft.state.EnumProperty create() net.minecraft.block.properties.PropertyEnum create()
 net.minecraft.state.EnumProperty nameToValue net.minecraft.block.properties.PropertyEnum nameToValue
 net.minecraft.state.EnumProperty allowedValues net.minecraft.block.properties.PropertyEnum allowedValues
 net.minecraft.entity.effect.LightningBoltEntity net.minecraft.entity.effect.EntityLightningBolt
 net.minecraft.entity.effect.LightningBoltEntity boltVertex net.minecraft.entity.effect.EntityLightningBolt boltVertex
 net.minecraft.entity.effect.LightningBoltEntity boltLivingTime net.minecraft.entity.effect.EntityLightningBolt boltLivingTime
 net.minecraft.entity.effect.LightningBoltEntity lightningState net.minecraft.entity.effect.EntityLightningBolt lightningState
+net.minecraft.util.math.BlockPos$1 net.minecraft.util.BlockPos$1
+net.minecraft.util.math.BlockPos$2 net.minecraft.util.BlockPos$2
+net.minecraft.util.Direction$Axis net.minecraft.util.EnumFacing$Axis
+net.minecraft.util.Direction$Plane net.minecraft.util.EnumFacing$Plane
+net.minecraft.util.Direction$AxisDirection net.minecraft.util.EnumFacing$AxisDirection
+net.minecraft.util.text.event.ClickEvent$Action net.minecraft.event.ClickEvent$Action
+net.minecraft.util.text.event.HoverEvent$Action net.minecraft.event.HoverEvent$Action
+net.minecraft.item.MinecartItem$1 net.minecraft.item.ItemMinecart$1
+net.minecraft.util.text.ITextComponent$Serializer net.minecraft.util.IChatComponent$Serializer
+net.minecraft.util.EntityPredicates$ArmoredMob net.minecraft.util.EntitySelectors$ArmoredMob
+net.minecraft.client.gui.screen.LanguageScreen$List net.minecraft.client.gui.GuiLanguage$List
+net.minecraft.block.RedstoneTorchBlock$Toggle net.minecraft.block.BlockRedstoneTorch$Toggle
+net.minecraft.entity.monster.SpiderEntity$GroupData net.minecraft.entity.monster.EntitySpider$GroupData
+net.minecraft.entity.monster.ZombieEntity$GroupData net.minecraft.entity.monster.EntityZombie$GroupData
+net.minecraft.tileentity.BeaconTileEntity$BeamSegment net.minecraft.tileentity.TileEntityBeacon$BeamSegment
+net.minecraft.client.gui.widget.list.KeyBindingList$KeyEntry net.minecraft.client.gui.GuiKeyBindingList$KeyEntry
+net.minecraft.client.gui.widget.list.KeyBindingList$CategoryEntry net.minecraft.client.gui.GuiKeyBindingList$CategoryEntry
+net.minecraft.network.rcon.QueryThread$Auth net.minecraft.network.rcon.RConThreadQuery$Auth
+net.minecraft.client.GameConfiguration$GameInformation net.minecraft.client.main.GameConfiguration$GameInformation
+net.minecraft.client.GameConfiguration$UserInformation net.minecraft.client.main.GameConfiguration$UserInformation
+net.minecraft.client.GameConfiguration$FolderInformation net.minecraft.client.main.GameConfiguration$FolderInformation
+net.minecraft.client.GameConfiguration$ServerInformation net.minecraft.client.main.GameConfiguration$ServerInformation
+net.minecraft.client.renderer.BufferBuilder$State net.minecraft.client.renderer.WorldRenderer$State
+net.minecraft.world.chunk.storage.ChunkLoaderUtil$AnvilConverterData net.minecraft.world.chunk.storage.ChunkLoader$AnvilConverterData
+net.minecraft.block.pattern.BlockPattern$CacheLoader net.minecraft.block.state.pattern.BlockPattern$CacheLoader
+net.minecraft.block.pattern.BlockPattern$PatternHelper net.minecraft.block.state.pattern.BlockPattern$PatternHelper
+net.minecraft.client.renderer.FaceDirection$Constants net.minecraft.client.renderer.EnumFaceDirection$Constants
+net.minecraft.client.renderer.FaceDirection$VertexInformation net.minecraft.client.renderer.EnumFaceDirection$VertexInformation
+net.minecraft.client.renderer.model.BlockPart$Deserializer net.minecraft.client.renderer.block.model.BlockPart$Deserializer
+net.minecraft.client.renderer.model.BlockModel$Deserializer net.minecraft.client.renderer.block.model.ModelBlock$Deserializer
+net.minecraft.world.gen.feature.structure.StructurePiece$BlockSelector net.minecraft.world.gen.structure.StructureComponent$BlockSelector
+net.minecraft.client.renderer.model.BlockFaceUV$Deserializer net.minecraft.client.renderer.block.model.BlockFaceUV$Deserializer
+net.minecraft.client.renderer.model.SimpleBakedModel$Builder net.minecraft.client.resources.model.SimpleBakedModel$Builder
+net.minecraft.client.gui.screen.inventory.CreativeScreen$CreativeSlot net.minecraft.client.gui.inventory.GuiContainerCreative$CreativeSlot
+net.minecraft.client.renderer.model.BlockPartFace$Deserializer net.minecraft.client.renderer.block.model.BlockPartFace$Deserializer
+net.minecraft.client.renderer.model.WeightedBakedModel$Builder net.minecraft.client.resources.model.WeightedBakedModel$Builder
+net.minecraft.network.play.server.SPlayerListItemPacket$AddPlayerData net.minecraft.network.play.server.S38PacketPlayerListItem$AddPlayerData
+net.minecraft.world.gen.feature.structure.MineshaftPieces$Room net.minecraft.world.gen.structure.StructureMineshaftPieces$Room
+net.minecraft.world.gen.feature.structure.MineshaftPieces$Cross net.minecraft.world.gen.structure.StructureMineshaftPieces$Cross
+net.minecraft.world.gen.feature.structure.MineshaftPieces$Corridor net.minecraft.world.gen.structure.StructureMineshaftPieces$Corridor
+net.minecraft.world.gen.feature.structure.StrongholdPieces$Library net.minecraft.world.gen.structure.StructureStrongholdPieces$Library
+net.minecraft.world.gen.feature.structure.StrongholdPieces$Stairs2 net.minecraft.world.gen.structure.StructureStrongholdPieces$Stairs2
+net.minecraft.world.gen.feature.structure.StrongholdPieces$Straight net.minecraft.world.gen.structure.StructureStrongholdPieces$Straight
+net.minecraft.world.gen.feature.structure.StrongholdPieces$PortalRoom net.minecraft.world.gen.structure.StructureStrongholdPieces$PortalRoom
+net.minecraft.world.gen.feature.structure.StrongholdPieces$Stronghold net.minecraft.world.gen.structure.StructureStrongholdPieces$Stronghold
+net.minecraft.world.gen.feature.structure.StrongholdPieces$PieceWeight net.minecraft.world.gen.structure.StructureStrongholdPieces$PieceWeight
+net.minecraft.world.gen.feature.structure.StrongholdPieces$RoomCrossing net.minecraft.world.gen.structure.StructureStrongholdPieces$RoomCrossing
+net.minecraft.world.gen.feature.structure.StrongholdPieces$ChestCorridor net.minecraft.world.gen.structure.StructureStrongholdPieces$ChestCorridor
+net.minecraft.client.renderer.model.ItemModelGenerator$Span net.minecraft.client.renderer.block.model.ItemModelGenerator$Span
+net.minecraft.client.renderer.model.ItemModelGenerator$SpanFacing net.minecraft.client.renderer.block.model.ItemModelGenerator$SpanFacing
+net.minecraft.client.renderer.model.ItemTransformVec3f$Deserializer net.minecraft.client.renderer.block.model.ItemTransformVec3f$Deserializer
+net.minecraft.world.gen.feature.structure.FortressPieces$End net.minecraft.world.gen.structure.StructureNetherBridgePieces$End
+net.minecraft.world.gen.feature.structure.FortressPieces$Piece net.minecraft.world.gen.structure.StructureNetherBridgePieces$Piece
+net.minecraft.world.gen.feature.structure.FortressPieces$Start net.minecraft.world.gen.structure.StructureNetherBridgePieces$Start
+net.minecraft.world.gen.feature.structure.FortressPieces$Throne net.minecraft.world.gen.structure.StructureNetherBridgePieces$Throne
+net.minecraft.world.gen.feature.structure.FortressPieces$PieceWeight net.minecraft.world.gen.structure.StructureNetherBridgePieces$PieceWeight
+net.minecraft.client.renderer.model.BlockModelDefinition$Deserializer net.minecraft.client.renderer.block.model.ModelBlockDefinition$Deserializer
+net.minecraft.item.Item ATTACK_DAMAGE_MODIFIER net.minecraft.item.Item itemModifierUUID
+net.minecraft.item.Item random net.minecraft.item.Item itemRand
+net.minecraft.item.Item group net.minecraft.item.Item tabToDisplayOn
+net.minecraft.item.Item translationKey net.minecraft.item.Item unlocalizedName
+net.minecraft.item.Items OAK_BOAT net.minecraft.init.Items boat
+net.minecraft.block.Block stateContainer net.minecraft.block.Block blockState
+net.minecraft.block.Block translationKey net.minecraft.block.Block unlocalizedName
+net.minecraft.block.Blocks ACACIA_DOOR net.minecraft.init.Blocks acacia_door
+net.minecraft.block.Blocks ACACIA_FENCE net.minecraft.init.Blocks acacia_fence
+net.minecraft.block.Blocks ACACIA_FENCE_GATE net.minecraft.init.Blocks acacia_fence_gate
+net.minecraft.block.Blocks ACACIA_STAIRS net.minecraft.init.Blocks acacia_stairs
+net.minecraft.block.Blocks ACTIVATOR_RAIL net.minecraft.init.Blocks activator_rail
+net.minecraft.block.Blocks AIR net.minecraft.init.Blocks air
+net.minecraft.block.Blocks ANVIL net.minecraft.init.Blocks anvil
+net.minecraft.block.Blocks BARRIER net.minecraft.init.Blocks barrier
+net.minecraft.block.Blocks BEACON net.minecraft.init.Blocks beacon
+net.minecraft.block.Blocks BEDROCK net.minecraft.init.Blocks bedrock
+net.minecraft.block.Blocks BIRCH_DOOR net.minecraft.init.Blocks birch_door
+net.minecraft.block.Blocks BIRCH_FENCE net.minecraft.init.Blocks birch_fence
+net.minecraft.block.Blocks BIRCH_FENCE_GATE net.minecraft.init.Blocks birch_fence_gate
+net.minecraft.block.Blocks BIRCH_STAIRS net.minecraft.init.Blocks birch_stairs
+net.minecraft.block.Blocks BOOKSHELF net.minecraft.init.Blocks bookshelf
+net.minecraft.block.Blocks BREWING_STAND net.minecraft.init.Blocks brewing_stand
+net.minecraft.block.Blocks BRICK_STAIRS net.minecraft.init.Blocks brick_stairs
+net.minecraft.block.Blocks BROWN_MUSHROOM net.minecraft.init.Blocks brown_mushroom
+net.minecraft.block.Blocks BROWN_MUSHROOM_BLOCK net.minecraft.init.Blocks brown_mushroom_block
+net.minecraft.block.Blocks CACTUS net.minecraft.init.Blocks cactus
+net.minecraft.block.Blocks CAKE net.minecraft.init.Blocks cake
+net.minecraft.block.Blocks CARROTS net.minecraft.init.Blocks carrots
+net.minecraft.block.Blocks CAULDRON net.minecraft.init.Blocks cauldron
+net.minecraft.block.Blocks CHEST net.minecraft.init.Blocks chest
+net.minecraft.block.Blocks CLAY net.minecraft.init.Blocks clay
+net.minecraft.block.Blocks COAL_BLOCK net.minecraft.init.Blocks coal_block
+net.minecraft.block.Blocks COAL_ORE net.minecraft.init.Blocks coal_ore
+net.minecraft.block.Blocks COBBLESTONE net.minecraft.init.Blocks cobblestone
+net.minecraft.block.Blocks COBBLESTONE_WALL net.minecraft.init.Blocks cobblestone_wall
+net.minecraft.block.Blocks COCOA net.minecraft.init.Blocks cocoa
+net.minecraft.block.Blocks COMMAND_BLOCK net.minecraft.init.Blocks command_block
+net.minecraft.block.Blocks CRAFTING_TABLE net.minecraft.init.Blocks crafting_table
+net.minecraft.block.Blocks DARK_OAK_DOOR net.minecraft.init.Blocks dark_oak_door
+net.minecraft.block.Blocks DARK_OAK_FENCE net.minecraft.init.Blocks dark_oak_fence
+net.minecraft.block.Blocks DARK_OAK_FENCE_GATE net.minecraft.init.Blocks dark_oak_fence_gate
+net.minecraft.block.Blocks DARK_OAK_STAIRS net.minecraft.init.Blocks dark_oak_stairs
+net.minecraft.block.Blocks DAYLIGHT_DETECTOR net.minecraft.init.Blocks daylight_detector
+net.minecraft.block.Blocks DETECTOR_RAIL net.minecraft.init.Blocks detector_rail
+net.minecraft.block.Blocks DIAMOND_BLOCK net.minecraft.init.Blocks diamond_block
+net.minecraft.block.Blocks DIAMOND_ORE net.minecraft.init.Blocks diamond_ore
+net.minecraft.block.Blocks DIRT net.minecraft.init.Blocks dirt
+net.minecraft.block.Blocks DISPENSER net.minecraft.init.Blocks dispenser
+net.minecraft.block.Blocks DRAGON_EGG net.minecraft.init.Blocks dragon_egg
+net.minecraft.block.Blocks DROPPER net.minecraft.init.Blocks dropper
+net.minecraft.block.Blocks EMERALD_BLOCK net.minecraft.init.Blocks emerald_block
+net.minecraft.block.Blocks EMERALD_ORE net.minecraft.init.Blocks emerald_ore
+net.minecraft.block.Blocks ENCHANTING_TABLE net.minecraft.init.Blocks enchanting_table
+net.minecraft.block.Blocks END_PORTAL net.minecraft.init.Blocks end_portal
+net.minecraft.block.Blocks END_PORTAL_FRAME net.minecraft.init.Blocks end_portal_frame
+net.minecraft.block.Blocks END_STONE net.minecraft.init.Blocks end_stone
+net.minecraft.block.Blocks ENDER_CHEST net.minecraft.init.Blocks ender_chest
+net.minecraft.block.Blocks FARMLAND net.minecraft.init.Blocks farmland
+net.minecraft.block.Blocks FIRE net.minecraft.init.Blocks fire
+net.minecraft.block.Blocks FLOWER_POT net.minecraft.init.Blocks flower_pot
+net.minecraft.block.Blocks FURNACE net.minecraft.init.Blocks furnace
+net.minecraft.block.Blocks GLASS net.minecraft.init.Blocks glass
+net.minecraft.block.Blocks GLASS_PANE net.minecraft.init.Blocks glass_pane
+net.minecraft.block.Blocks GLOWSTONE net.minecraft.init.Blocks glowstone
+net.minecraft.block.Blocks GOLD_BLOCK net.minecraft.init.Blocks gold_block
+net.minecraft.block.Blocks GOLD_ORE net.minecraft.init.Blocks gold_ore
+net.minecraft.block.Blocks GRASS net.minecraft.init.Blocks grass
+net.minecraft.block.Blocks GRAVEL net.minecraft.init.Blocks gravel
+net.minecraft.block.Blocks TERRACOTTA net.minecraft.init.Blocks hardened_clay
+net.minecraft.block.Blocks HAY_BLOCK net.minecraft.init.Blocks hay_block
+net.minecraft.block.Blocks HEAVY_WEIGHTED_PRESSURE_PLATE net.minecraft.init.Blocks heavy_weighted_pressure_plate
+net.minecraft.block.Blocks HOPPER net.minecraft.init.Blocks hopper
+net.minecraft.block.Blocks ICE net.minecraft.init.Blocks ice
+net.minecraft.block.Blocks IRON_BARS net.minecraft.init.Blocks iron_bars
+net.minecraft.block.Blocks IRON_BLOCK net.minecraft.init.Blocks iron_block
+net.minecraft.block.Blocks IRON_DOOR net.minecraft.init.Blocks iron_door
+net.minecraft.block.Blocks IRON_ORE net.minecraft.init.Blocks iron_ore
+net.minecraft.block.Blocks IRON_TRAPDOOR net.minecraft.init.Blocks iron_trapdoor
+net.minecraft.block.Blocks JUKEBOX net.minecraft.init.Blocks jukebox
+net.minecraft.block.Blocks JUNGLE_DOOR net.minecraft.init.Blocks jungle_door
+net.minecraft.block.Blocks JUNGLE_FENCE net.minecraft.init.Blocks jungle_fence
+net.minecraft.block.Blocks JUNGLE_FENCE_GATE net.minecraft.init.Blocks jungle_fence_gate
+net.minecraft.block.Blocks JUNGLE_STAIRS net.minecraft.init.Blocks jungle_stairs
+net.minecraft.block.Blocks LADDER net.minecraft.init.Blocks ladder
+net.minecraft.block.Blocks LAPIS_BLOCK net.minecraft.init.Blocks lapis_block
+net.minecraft.block.Blocks LAPIS_ORE net.minecraft.init.Blocks lapis_ore
+net.minecraft.block.Blocks LAVA net.minecraft.init.Blocks lava
+net.minecraft.block.Blocks LEVER net.minecraft.init.Blocks lever
+net.minecraft.block.Blocks LIGHT_WEIGHTED_PRESSURE_PLATE net.minecraft.init.Blocks light_weighted_pressure_plate
+net.minecraft.block.Blocks MELON net.minecraft.init.Blocks melon_block
+net.minecraft.block.Blocks MELON_STEM net.minecraft.init.Blocks melon_stem
+net.minecraft.block.Blocks SPAWNER net.minecraft.init.Blocks mob_spawner
+net.minecraft.block.Blocks MOSSY_COBBLESTONE net.minecraft.init.Blocks mossy_cobblestone
+net.minecraft.block.Blocks MYCELIUM net.minecraft.init.Blocks mycelium
+net.minecraft.block.Blocks NETHER_BRICK_FENCE net.minecraft.init.Blocks nether_brick_fence
+net.minecraft.block.Blocks NETHER_BRICK_STAIRS net.minecraft.init.Blocks nether_brick_stairs
+net.minecraft.block.Blocks NETHER_WART net.minecraft.init.Blocks nether_wart
+net.minecraft.block.Blocks NETHERRACK net.minecraft.init.Blocks netherrack
+net.minecraft.block.Blocks OAK_DOOR net.minecraft.init.Blocks oak_door
+net.minecraft.block.Blocks OAK_FENCE net.minecraft.init.Blocks oak_fence
+net.minecraft.block.Blocks OAK_FENCE_GATE net.minecraft.init.Blocks oak_fence_gate
+net.minecraft.block.Blocks OAK_STAIRS net.minecraft.init.Blocks oak_stairs
+net.minecraft.block.Blocks OBSIDIAN net.minecraft.init.Blocks obsidian
+net.minecraft.block.Blocks PACKED_ICE net.minecraft.init.Blocks packed_ice
+net.minecraft.block.Blocks PISTON net.minecraft.init.Blocks piston
+net.minecraft.block.Blocks PISTON_HEAD net.minecraft.init.Blocks piston_head
+net.minecraft.block.Blocks NETHER_PORTAL net.minecraft.init.Blocks portal
+net.minecraft.block.Blocks POTATOES net.minecraft.init.Blocks potatoes
+net.minecraft.block.Blocks PRISMARINE net.minecraft.init.Blocks prismarine
+net.minecraft.block.Blocks PUMPKIN net.minecraft.init.Blocks pumpkin
+net.minecraft.block.Blocks PUMPKIN_STEM net.minecraft.init.Blocks pumpkin_stem
+net.minecraft.block.Blocks QUARTZ_BLOCK net.minecraft.init.Blocks quartz_block
+net.minecraft.block.Blocks QUARTZ_STAIRS net.minecraft.init.Blocks quartz_stairs
+net.minecraft.block.Blocks RAIL net.minecraft.init.Blocks rail
+net.minecraft.block.Blocks RED_MUSHROOM net.minecraft.init.Blocks red_mushroom
+net.minecraft.block.Blocks RED_MUSHROOM_BLOCK net.minecraft.init.Blocks red_mushroom_block
+net.minecraft.block.Blocks RED_SANDSTONE net.minecraft.init.Blocks red_sandstone
+net.minecraft.block.Blocks RED_SANDSTONE_STAIRS net.minecraft.init.Blocks red_sandstone_stairs
+net.minecraft.block.Blocks REDSTONE_BLOCK net.minecraft.init.Blocks redstone_block
+net.minecraft.block.Blocks REDSTONE_LAMP net.minecraft.init.Blocks redstone_lamp
+net.minecraft.block.Blocks REDSTONE_ORE net.minecraft.init.Blocks redstone_ore
+net.minecraft.block.Blocks REDSTONE_TORCH net.minecraft.init.Blocks redstone_torch
+net.minecraft.block.Blocks REDSTONE_WIRE net.minecraft.init.Blocks redstone_wire
+net.minecraft.block.Blocks SAND net.minecraft.init.Blocks sand
+net.minecraft.block.Blocks SANDSTONE net.minecraft.init.Blocks sandstone
+net.minecraft.block.Blocks SANDSTONE_STAIRS net.minecraft.init.Blocks sandstone_stairs
+net.minecraft.block.Blocks SEA_LANTERN net.minecraft.init.Blocks sea_lantern
+net.minecraft.block.Blocks SLIME_BLOCK net.minecraft.init.Blocks slime_block
+net.minecraft.block.Blocks SNOW net.minecraft.init.Blocks snow
+net.minecraft.block.Blocks SOUL_SAND net.minecraft.init.Blocks soul_sand
+net.minecraft.block.Blocks SPONGE net.minecraft.init.Blocks sponge
+net.minecraft.block.Blocks SPRUCE_DOOR net.minecraft.init.Blocks spruce_door
+net.minecraft.block.Blocks SPRUCE_FENCE net.minecraft.init.Blocks spruce_fence
+net.minecraft.block.Blocks SPRUCE_FENCE_GATE net.minecraft.init.Blocks spruce_fence_gate
+net.minecraft.block.Blocks SPRUCE_STAIRS net.minecraft.init.Blocks spruce_stairs
+net.minecraft.block.Blocks STICKY_PISTON net.minecraft.init.Blocks sticky_piston
+net.minecraft.block.Blocks STONE net.minecraft.init.Blocks stone
+net.minecraft.block.Blocks STONE_BRICK_STAIRS net.minecraft.init.Blocks stone_brick_stairs
+net.minecraft.block.Blocks STONE_BUTTON net.minecraft.init.Blocks stone_button
+net.minecraft.block.Blocks STONE_PRESSURE_PLATE net.minecraft.init.Blocks stone_pressure_plate
+net.minecraft.block.Blocks STONE_SLAB net.minecraft.init.Blocks stone_slab
+net.minecraft.block.Blocks TNT net.minecraft.init.Blocks tnt
+net.minecraft.block.Blocks TORCH net.minecraft.init.Blocks torch
+net.minecraft.block.Blocks TRAPPED_CHEST net.minecraft.init.Blocks trapped_chest
+net.minecraft.block.Blocks TRIPWIRE net.minecraft.init.Blocks tripwire
+net.minecraft.block.Blocks TRIPWIRE_HOOK net.minecraft.init.Blocks tripwire_hook
+net.minecraft.block.Blocks VINE net.minecraft.init.Blocks vine
+net.minecraft.block.Blocks WATER net.minecraft.init.Blocks water
+net.minecraft.block.Blocks WHEAT net.minecraft.init.Blocks wheat
+net.minecraft.world.World dimension net.minecraft.world.World provider
+net.minecraft.world.World profiler net.minecraft.world.World theProfiler
+net.minecraft.entity.Entity dataManager net.minecraft.entity.Entity dataWatcher
+net.minecraft.entity.Entity collidedHorizontally net.minecraft.entity.Entity isCollidedHorizontally
+net.minecraft.entity.Entity collidedVertically net.minecraft.entity.Entity isCollidedVertically
+net.minecraft.entity.Entity removed net.minecraft.entity.Entity isDead
+net.minecraft.entity.Entity world net.minecraft.entity.Entity worldObj
+net.minecraft.item.ItemStack count net.minecraft.item.ItemStack stackSize
+net.minecraft.item.ItemStack tag net.minecraft.item.ItemStack stackTagCompound
+net.minecraft.stats.Stats ITEM_USED net.minecraft.stats.StatList objectUseStats
+net.minecraft.block.FireBlock UP net.minecraft.block.BlockFire UPPER
+net.minecraft.util.Direction BY_INDEX net.minecraft.util.EnumFacing VALUES
+net.minecraft.world.Explosion random net.minecraft.world.Explosion explosionRNG
+net.minecraft.world.Explosion size net.minecraft.world.Explosion explosionSize
+net.minecraft.world.Explosion x net.minecraft.world.Explosion explosionX
+net.minecraft.world.Explosion y net.minecraft.world.Explosion explosionY
+net.minecraft.world.Explosion z net.minecraft.world.Explosion explosionZ
+net.minecraft.world.Explosion causesFire net.minecraft.world.Explosion isFlaming
+net.minecraft.world.Explosion world net.minecraft.world.Explosion worldObj
+net.minecraft.world.GameRules rules net.minecraft.world.GameRules theGameRules
+net.minecraft.client.Minecraft particles net.minecraft.client.Minecraft effectRenderer
+net.minecraft.client.Minecraft gameRenderer net.minecraft.client.Minecraft entityRenderer
+net.minecraft.client.Minecraft fontRenderer net.minecraft.client.Minecraft fontRendererObj
+net.minecraft.client.Minecraft framebuffer net.minecraft.client.Minecraft framebufferMc
+net.minecraft.client.Minecraft IS_RUNNING_ON_MAC net.minecraft.client.Minecraft isRunningOnMac
+net.minecraft.client.Minecraft firstPersonRenderer net.minecraft.client.Minecraft itemRenderer
+net.minecraft.client.Minecraft LOGGER net.minecraft.client.Minecraft logger
+net.minecraft.client.Minecraft gameDir net.minecraft.client.Minecraft mcDataDir
+net.minecraft.client.Minecraft languageManager net.minecraft.client.Minecraft mcLanguageManager
+net.minecraft.client.Minecraft musicTicker net.minecraft.client.Minecraft mcMusicTicker
+net.minecraft.client.Minecraft profiler net.minecraft.client.Minecraft mcProfiler
+net.minecraft.client.Minecraft resourceManager net.minecraft.client.Minecraft mcResourceManager
+net.minecraft.client.Minecraft resourcePackRepository net.minecraft.client.Minecraft mcResourcePackRepository
+net.minecraft.client.Minecraft soundHandler net.minecraft.client.Minecraft mcSoundHandler
+net.minecraft.client.Minecraft thread net.minecraft.client.Minecraft mcThread
+net.minecraft.client.Minecraft networkManager net.minecraft.client.Minecraft myNetworkManager
+net.minecraft.client.Minecraft textureManager net.minecraft.client.Minecraft renderEngine
+net.minecraft.client.Minecraft worldRenderer net.minecraft.client.Minecraft renderGlobal
+net.minecraft.client.Minecraft itemRenderer net.minecraft.client.Minecraft renderItem
+net.minecraft.client.Minecraft saveFormat net.minecraft.client.Minecraft saveLoader
+net.minecraft.client.Minecraft integratedServer net.minecraft.client.Minecraft theIntegratedServer
+net.minecraft.client.Minecraft instance net.minecraft.client.Minecraft theMinecraft
+net.minecraft.client.Minecraft player net.minecraft.client.Minecraft thePlayer
+net.minecraft.client.Minecraft world net.minecraft.client.Minecraft theWorld
+net.minecraft.client.Minecraft snooper net.minecraft.client.Minecraft usageSnooper
+net.minecraft.util.text.event.ClickEvent$Action NAME_MAPPING net.minecraft.event.ClickEvent$Action nameMapping
+net.minecraft.util.text.event.HoverEvent$Action NAME_MAPPING net.minecraft.event.HoverEvent$Action nameMapping
+net.minecraft.scoreboard.Score SCORE_COMPARATOR net.minecraft.scoreboard.Score scoreComparator
+net.minecraft.scoreboard.Score objective net.minecraft.scoreboard.Score theScoreObjective
+net.minecraft.scoreboard.Score scoreboard net.minecraft.scoreboard.Score theScoreboard
+net.minecraft.util.StringUtils PATTERN_CONTROL_CODE net.minecraft.util.StringUtils patternControlCode
+net.minecraft.world.Teleporter world net.minecraft.world.Teleporter worldServerInstance
+net.minecraft.crash.CrashReport LOGGER net.minecraft.crash.CrashReport logger
+net.minecraft.crash.CrashReport systemDetailsCategory net.minecraft.crash.CrashReport theReportCategory
+net.minecraft.item.DyeColor translationKey net.minecraft.item.EnumDyeColor unlocalizedName
+net.minecraft.profiler.Profiler LOGGER net.minecraft.profiler.Profiler logger
+net.minecraft.profiler.Profiler timeStack net.minecraft.profiler.Profiler timestampList
+net.minecraft.util.DamageSource ANVIL net.minecraft.util.DamageSource anvil
+net.minecraft.util.DamageSource CACTUS net.minecraft.util.DamageSource cactus
+net.minecraft.util.DamageSource DROWN net.minecraft.util.DamageSource drown
+net.minecraft.util.DamageSource FALL net.minecraft.util.DamageSource fall
+net.minecraft.util.DamageSource FALLING_BLOCK net.minecraft.util.DamageSource fallingBlock
+net.minecraft.util.DamageSource GENERIC net.minecraft.util.DamageSource generic
+net.minecraft.util.DamageSource IN_FIRE net.minecraft.util.DamageSource inFire
+net.minecraft.util.DamageSource IN_WALL net.minecraft.util.DamageSource inWall
+net.minecraft.util.DamageSource LAVA net.minecraft.util.DamageSource lava
+net.minecraft.util.DamageSource LIGHTNING_BOLT net.minecraft.util.DamageSource lightningBolt
+net.minecraft.util.DamageSource MAGIC net.minecraft.util.DamageSource magic
+net.minecraft.util.DamageSource ON_FIRE net.minecraft.util.DamageSource onFire
+net.minecraft.util.DamageSource OUT_OF_WORLD net.minecraft.util.DamageSource outOfWorld
+net.minecraft.util.DamageSource STARVE net.minecraft.util.DamageSource starve
+net.minecraft.util.DamageSource WITHER net.minecraft.util.DamageSource wither
+net.minecraft.world.server.ServerWorld pendingBlockTicks net.minecraft.world.WorldServer pendingTickListEntriesThisTick
+net.minecraft.world.chunk.Chunk tileEntities net.minecraft.world.chunk.Chunk chunkTileEntityMap
+net.minecraft.world.chunk.Chunk loaded net.minecraft.world.chunk.Chunk isChunkLoaded
+net.minecraft.world.chunk.Chunk dirty net.minecraft.world.chunk.Chunk isModified
+net.minecraft.world.chunk.Chunk LOGGER net.minecraft.world.chunk.Chunk logger
+net.minecraft.world.chunk.Chunk sections net.minecraft.world.chunk.Chunk storageArrays
+net.minecraft.world.chunk.Chunk world net.minecraft.world.chunk.Chunk worldObj
+net.minecraft.entity.MobEntity inventoryHandsDropChances net.minecraft.entity.EntityLiving equipmentDropChances
+net.minecraft.world.WorldSettings gameType net.minecraft.world.WorldSettings theGameType
+net.minecraft.client.gui.widget.Widget heightRealms net.minecraft.client.gui.GuiButton height
+net.minecraft.client.gui.widget.Widget x net.minecraft.client.gui.GuiButton xPosition
+net.minecraft.client.gui.widget.Widget y net.minecraft.client.gui.GuiButton yPosition
+net.minecraft.network.NetworkSystem SERVER_NIO_EVENTLOOP net.minecraft.network.NetworkSystem eventLoops
+net.minecraft.network.NetworkSystem LOGGER net.minecraft.network.NetworkSystem logger
+net.minecraft.network.NetworkSystem server net.minecraft.network.NetworkSystem mcServer
+net.minecraft.pathfinding.PathPoint x net.minecraft.pathfinding.PathPoint xCoord
+net.minecraft.pathfinding.PathPoint y net.minecraft.pathfinding.PathPoint yCoord
+net.minecraft.pathfinding.PathPoint z net.minecraft.pathfinding.PathPoint zCoord
+net.minecraft.tileentity.TileEntity LOGGER net.minecraft.tileentity.TileEntity logger
+net.minecraft.tileentity.TileEntity removed net.minecraft.tileentity.TileEntity tileEntityInvalid
+net.minecraft.tileentity.TileEntity world net.minecraft.tileentity.TileEntity worldObj
+net.minecraft.util.ResourceLocation namespace net.minecraft.util.ResourceLocation resourceDomain
+net.minecraft.util.ResourceLocation path net.minecraft.util.ResourceLocation resourcePath
+net.minecraft.util.ScreenShotHelper DATE_FORMAT net.minecraft.util.ScreenShotHelper dateFormat
+net.minecraft.util.ScreenShotHelper LOGGER net.minecraft.util.ScreenShotHelper logger
+net.minecraft.world.storage.MapData$MapInfo player net.minecraft.world.storage.MapData$MapInfo entityplayerObj
+net.minecraft.entity.ai.EntitySenses entity net.minecraft.entity.ai.EntitySenses entityObj
+net.minecraft.entity.item.BoatEntity lerpX net.minecraft.entity.item.EntityBoat boatPitch
+net.minecraft.entity.item.BoatEntity lerpYaw net.minecraft.entity.item.EntityBoat boatYaw
+net.minecraft.network.NetworkManager PROTOCOL_ATTRIBUTE_KEY net.minecraft.network.NetworkManager attrKeyConnectionState
+net.minecraft.network.NetworkManager NETWORK_MARKER net.minecraft.network.NetworkManager logMarkerNetwork
+net.minecraft.network.NetworkManager NETWORK_PACKETS_MARKER net.minecraft.network.NetworkManager logMarkerPackets
+net.minecraft.network.NetworkManager LOGGER net.minecraft.network.NetworkManager logger
+net.minecraft.network.rcon.RConUtils HEX_DIGITS net.minecraft.network.rcon.RConUtils hexDigits
+net.minecraft.server.MinecraftServer LOGGER net.minecraft.server.MinecraftServer logger
+net.minecraft.server.MinecraftServer tickables net.minecraft.server.MinecraftServer playersOnline
+net.minecraft.server.MinecraftServer playerList net.minecraft.server.MinecraftServer serverConfigManager
+net.minecraft.server.MinecraftServer profiler net.minecraft.server.MinecraftServer theProfiler
+net.minecraft.server.MinecraftServer snooper net.minecraft.server.MinecraftServer usageSnooper
+net.minecraft.server.MinecraftServer worlds net.minecraft.server.MinecraftServer worldServers
+net.minecraft.block.material.MaterialColor DIAMOND net.minecraft.block.material.MapColor diamondColor
+net.minecraft.block.material.MaterialColor EMERALD net.minecraft.block.material.MapColor emeraldColor
+net.minecraft.block.material.MaterialColor GOLD net.minecraft.block.material.MapColor goldColor
+net.minecraft.block.material.MaterialColor LAPIS net.minecraft.block.material.MapColor lapisColor
+net.minecraft.block.material.MaterialColor NETHERRACK net.minecraft.block.material.MapColor netherrackColor
+net.minecraft.block.material.MaterialColor OBSIDIAN net.minecraft.block.material.MapColor obsidianColor
+net.minecraft.block.material.MaterialColor QUARTZ net.minecraft.block.material.MapColor quartzColor
+net.minecraft.block.material.Material AIR net.minecraft.block.material.Material air
+net.minecraft.block.material.Material ANVIL net.minecraft.block.material.Material anvil
+net.minecraft.block.material.Material BARRIER net.minecraft.block.material.Material barrier
+net.minecraft.block.material.Material CACTUS net.minecraft.block.material.Material cactus
+net.minecraft.block.material.Material CAKE net.minecraft.block.material.Material cake
+net.minecraft.block.material.Material flammable net.minecraft.block.material.Material canBurn
+net.minecraft.block.material.Material CARPET net.minecraft.block.material.Material carpet
+net.minecraft.block.material.Material MISCELLANEOUS net.minecraft.block.material.Material circuits
+net.minecraft.block.material.Material CLAY net.minecraft.block.material.Material clay
+net.minecraft.block.material.Material WOOL net.minecraft.block.material.Material cloth
+net.minecraft.block.material.Material CORAL net.minecraft.block.material.Material coral
+net.minecraft.block.material.Material SNOW_BLOCK net.minecraft.block.material.Material craftedSnow
+net.minecraft.block.material.Material DRAGON_EGG net.minecraft.block.material.Material dragonEgg
+net.minecraft.block.material.Material FIRE net.minecraft.block.material.Material fire
+net.minecraft.block.material.Material GLASS net.minecraft.block.material.Material glass
+net.minecraft.block.material.Material GOURD net.minecraft.block.material.Material gourd
+net.minecraft.block.material.Material ORGANIC net.minecraft.block.material.Material grass
+net.minecraft.block.material.Material EARTH net.minecraft.block.material.Material ground
+net.minecraft.block.material.Material ICE net.minecraft.block.material.Material ice
+net.minecraft.block.material.Material IRON net.minecraft.block.material.Material iron
+net.minecraft.block.material.Material LAVA net.minecraft.block.material.Material lava
+net.minecraft.block.material.Material LEAVES net.minecraft.block.material.Material leaves
+net.minecraft.block.material.Material color net.minecraft.block.material.Material materialMapColor
+net.minecraft.block.material.Material pushReaction net.minecraft.block.material.Material mobilityFlag
+net.minecraft.block.material.Material PACKED_ICE net.minecraft.block.material.Material packedIce
+net.minecraft.block.material.Material PISTON net.minecraft.block.material.Material piston
+net.minecraft.block.material.Material PLANTS net.minecraft.block.material.Material plants
+net.minecraft.block.material.Material PORTAL net.minecraft.block.material.Material portal
+net.minecraft.block.material.Material REDSTONE_LIGHT net.minecraft.block.material.Material redstoneLight
+net.minecraft.block.material.Material ROCK net.minecraft.block.material.Material rock
+net.minecraft.block.material.Material SAND net.minecraft.block.material.Material sand
+net.minecraft.block.material.Material SNOW net.minecraft.block.material.Material snow
+net.minecraft.block.material.Material SPONGE net.minecraft.block.material.Material sponge
+net.minecraft.block.material.Material TNT net.minecraft.block.material.Material tnt
+net.minecraft.block.material.Material TALL_PLANTS net.minecraft.block.material.Material vine
+net.minecraft.block.material.Material WATER net.minecraft.block.material.Material water
+net.minecraft.block.material.Material WEB net.minecraft.block.material.Material web
+net.minecraft.block.material.Material WOOD net.minecraft.block.material.Material wood
+net.minecraft.client.gui.FontRenderer random net.minecraft.client.gui.FontRenderer fontRandom
+net.minecraft.enchantment.Enchantment rarity net.minecraft.enchantment.Enchantment weight
+net.minecraft.entity.LivingEntity moveVertical net.minecraft.entity.EntityLivingBase moveForward
+net.minecraft.entity.LivingEntity interpTargetPitch net.minecraft.entity.EntityLivingBase newPosX
+net.minecraft.world.NextTickListEntry target net.minecraft.world.NextTickListEntry block
+net.minecraft.client.audio.MusicTicker client net.minecraft.client.audio.MusicTicker mc
+net.minecraft.client.audio.MusicTicker random net.minecraft.client.audio.MusicTicker rand
+net.minecraft.item.ItemGroup MATERIALS net.minecraft.creativetab.CreativeTabs tabMaterials
+net.minecraft.world.biome.Biome scale net.minecraft.world.biome.BiomeGenBase maxHeight
+net.minecraft.world.biome.Biome depth net.minecraft.world.biome.BiomeGenBase minHeight
+net.minecraft.world.border.WorldBorder damagePerBlock net.minecraft.world.border.WorldBorder damageAmount
+net.minecraft.client.audio.SoundHandler LOGGER net.minecraft.client.audio.SoundHandler logger
+net.minecraft.client.audio.SoundHandler MISSING_SOUND net.minecraft.client.audio.SoundHandler missing_sound
+net.minecraft.client.audio.SoundHandler soundRegistry net.minecraft.client.audio.SoundHandler sndRegistry
+net.minecraft.client.gui.IProgressMeter LOADING_STRINGS net.minecraft.client.gui.IProgressMeter lanSearchStates
+net.minecraft.scoreboard.ScoreObjective scoreboard net.minecraft.scoreboard.ScoreObjective theScoreboard
+net.minecraft.util.EnchantmentNameParts INSTANCE net.minecraft.util.EnchantmentNameParts instance
+net.minecraft.client.gui.MapItemRenderer TEXTURE_MAP_ICONS net.minecraft.client.gui.MapItemRenderer mapIcons
+net.minecraft.client.settings.KeyBinding HASH net.minecraft.client.settings.KeyBinding hash
+net.minecraft.client.settings.KeyBinding KEYBIND_ARRAY net.minecraft.client.settings.KeyBinding keybindArray
+net.minecraft.client.settings.KeyBinding KEYBIND_SET net.minecraft.client.settings.KeyBinding keybindSet
+net.minecraft.scoreboard.ScorePlayerTeam color net.minecraft.scoreboard.ScorePlayerTeam chatFormat
+net.minecraft.scoreboard.ScorePlayerTeam name net.minecraft.scoreboard.ScorePlayerTeam registeredName
+net.minecraft.scoreboard.ScorePlayerTeam displayName net.minecraft.scoreboard.ScorePlayerTeam teamNameSPT
+net.minecraft.scoreboard.ScorePlayerTeam scoreboard net.minecraft.scoreboard.ScorePlayerTeam theScoreboard
+net.minecraft.server.management.BanEntry DATE_FORMAT net.minecraft.server.management.BanEntry dateFormat
+net.minecraft.server.management.UserList LOGGER net.minecraft.server.management.UserList logger
+net.minecraft.client.renderer.Tessellator INSTANCE net.minecraft.client.renderer.Tessellator instance
+net.minecraft.client.renderer.Tessellator buffer net.minecraft.client.renderer.Tessellator worldRenderer
+net.minecraft.client.shader.ShaderUniform LOGGER net.minecraft.client.shader.ShaderUniform logger
+net.minecraft.enchantment.EnchantmentData enchantment net.minecraft.enchantment.EnchantmentData enchantmentobj
+net.minecraft.scoreboard.ServerScoreboard server net.minecraft.scoreboard.ServerScoreboard scoreboardMCServer
+net.minecraft.network.ServerStatusResponse players net.minecraft.network.ServerStatusResponse playerCount
+net.minecraft.network.ServerStatusResponse version net.minecraft.network.ServerStatusResponse protocolVersion
+net.minecraft.network.ServerStatusResponse description net.minecraft.network.ServerStatusResponse serverMotd
+net.minecraft.world.biome.BiomeColors WATER_COLOR net.minecraft.world.biome.BiomeColorHelper WATER_COLOR_MULTIPLIER
+net.minecraft.client.GameConfiguration$FolderInformation gameDir net.minecraft.client.main.GameConfiguration$FolderInformation mcDataDir
+net.minecraft.client.multiplayer.ServerList LOGGER net.minecraft.client.multiplayer.ServerList logger
+net.minecraft.entity.projectile.AbstractArrowEntity pickupStatus net.minecraft.entity.projectile.EntityArrow canBePickedUp
+net.minecraft.scoreboard.ScoreboardSaveData LOGGER net.minecraft.scoreboard.ScoreboardSaveData logger
+net.minecraft.scoreboard.ScoreboardSaveData scoreboard net.minecraft.scoreboard.ScoreboardSaveData theScoreboard
+net.minecraft.server.gui.MinecraftServerGui SERVER_GUI_FONT net.minecraft.server.gui.MinecraftServerGui serverGuiFont
+net.minecraft.client.resources.ResourceIndex LOGGER net.minecraft.client.resources.ResourceIndex logger
+net.minecraft.client.shader.ShaderLinkHelper LOGGER net.minecraft.client.shader.ShaderLinkHelper logger
+net.minecraft.world.storage.DerivedWorldInfo delegate net.minecraft.world.storage.DerivedWorldInfo theWorldInfo
+net.minecraft.network.NettyCompressionDecoder threshold net.minecraft.network.NettyCompressionDecoder treshold
+net.minecraft.network.NettyCompressionEncoder threshold net.minecraft.network.NettyCompressionEncoder treshold
+net.minecraft.block.pattern.BlockPattern$PatternHelper forwards net.minecraft.block.state.pattern.BlockPattern$PatternHelper finger
+net.minecraft.block.pattern.BlockPattern$PatternHelper frontTopLeft net.minecraft.block.state.pattern.BlockPattern$PatternHelper pos
+net.minecraft.block.pattern.BlockPattern$PatternHelper up net.minecraft.block.state.pattern.BlockPattern$PatternHelper thumb
+net.minecraft.client.network.LanServerDetector LOGGER net.minecraft.client.network.LanServerDetector logger
+net.minecraft.client.resources.LanguageManager LOGGER net.minecraft.client.resources.LanguageManager logger
+net.minecraft.server.dedicated.DedicatedServer LOGGER net.minecraft.server.dedicated.DedicatedServer logger
+net.minecraft.server.dedicated.DedicatedServer rconThread net.minecraft.server.dedicated.DedicatedServer theRConThreadMain
+net.minecraft.server.dedicated.DedicatedServer rconQueryThread net.minecraft.server.dedicated.DedicatedServer theRConThreadQuery
+net.minecraft.client.renderer.entity.BoatRenderer BOAT_TEXTURES net.minecraft.client.renderer.entity.RenderBoat boatTextures
+net.minecraft.tileentity.BrewingStandTileEntity OUTPUT_SLOTS net.minecraft.tileentity.TileEntityBrewingStand outputSlots
+net.minecraft.server.integrated.IntegratedServer LOGGER net.minecraft.server.integrated.IntegratedServer logger
+net.minecraft.client.renderer.vertex.VertexFormat vertexSize net.minecraft.client.renderer.vertex.VertexFormat nextOffset
+net.minecraft.client.renderer.texture.SimpleTexture LOGGER net.minecraft.client.renderer.texture.SimpleTexture logger
+net.minecraft.client.multiplayer.ClientChunkProvider LOGGER net.minecraft.client.multiplayer.ChunkProviderClient logger
+net.minecraft.client.multiplayer.ClientChunkProvider world net.minecraft.client.multiplayer.ChunkProviderClient worldObj
+net.minecraft.client.renderer.texture.TextureManager LOGGER net.minecraft.client.renderer.texture.TextureManager logger
+net.minecraft.client.renderer.texture.TextureManager resourceManager net.minecraft.client.renderer.texture.TextureManager theResourceManager
+net.minecraft.client.renderer.RegionRenderCacheBuilder builders net.minecraft.client.renderer.RegionRenderCacheBuilder worldRenderers
+net.minecraft.world.chunk.ChunkSection blockTickRefCount net.minecraft.world.chunk.storage.ExtendedBlockStorage tickRefCount
+net.minecraft.client.resources.GrassColorReloadListener GRASS_LOCATION net.minecraft.client.resources.GrassColorReloadListener LOC_GRASS_PNG
+net.minecraft.client.renderer.texture.TextureAtlasSprite x net.minecraft.client.renderer.texture.TextureAtlasSprite originX
+net.minecraft.client.renderer.texture.TextureAtlasSprite y net.minecraft.client.renderer.texture.TextureAtlasSprite originY
+net.minecraft.client.renderer.chunk.ChunkRenderDispatcher LOGGER net.minecraft.client.renderer.chunk.ChunkRenderDispatcher logger
+net.minecraft.client.renderer.entity.LivingRenderer LOGGER net.minecraft.client.renderer.entity.RendererLivingEntity logger
+net.minecraft.client.resources.FoliageColorReloadListener FOLIAGE_LOCATION net.minecraft.client.resources.FoliageColorReloadListener LOC_FOLIAGE_PNG
+net.minecraft.world.gen.feature.structure.MineshaftPieces$Room connectedRooms net.minecraft.world.gen.structure.StructureMineshaftPieces$Room roomsLinkedToTheRoom
+net.minecraft.world.gen.feature.structure.StrongholdPieces$Stairs2 lastPlaced net.minecraft.world.gen.structure.StructureStrongholdPieces$Stairs2 strongholdPieceWeight
+net.minecraft.world.gen.feature.structure.FortressPieces$Start lastPlaced net.minecraft.world.gen.structure.StructureNetherBridgePieces$Start theNetherBridgePieceWeight
+net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher renderers net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher mapSpecialRenderers
+net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher textureManager net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher renderEngine
+net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher world net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher worldObj
+net.minecraft.item.Item getGroup() net.minecraft.item.Item getCreativeTab()
+net.minecraft.item.Item getMaxStackSize() net.minecraft.item.Item getItemStackLimit()
+net.minecraft.item.Item getUseAction() net.minecraft.item.Item getItemUseAction()
+net.minecraft.item.Item getUseDuration() net.minecraft.item.Item getMaxItemUseDuration()
+net.minecraft.item.Item shouldSyncTag() net.minecraft.item.Item getShareTag()
+net.minecraft.item.Item getTranslationKey() net.minecraft.item.Item getUnlocalizedName()
+net.minecraft.item.Item isEnchantable() net.minecraft.item.Item isItemTool()
+net.minecraft.item.Item isComplex() net.minecraft.item.Item isMap()
+net.minecraft.item.Item inventoryTick() net.minecraft.item.Item onUpdate()
+net.minecraft.util.Tuple getA() net.minecraft.util.Tuple getFirst()
+net.minecraft.util.Tuple getB() net.minecraft.util.Tuple getSecond()
+net.minecraft.block.Block getStateContainer() net.minecraft.block.Block getBlockState()
+net.minecraft.block.Block getTranslationKey() net.minecraft.block.Block getUnlocalizedName()
+net.minecraft.block.Block onExplosionDestroy() net.minecraft.block.Block onBlockDestroyedByExplosion()
+net.minecraft.block.Block onEntityWalk() net.minecraft.block.Block onEntityCollidedWithBlock()
+net.minecraft.nbt.NBTUtil readGameProfile() net.minecraft.nbt.NBTUtil readGameProfileFromNBT()
+net.minecraft.world.World fillCrashReport() net.minecraft.world.World addWorldInfoToCrashReport()
+net.minecraft.world.World getChunkAt() net.minecraft.world.World getChunkFromBlockCoords()
+net.minecraft.world.World getGameTime() net.minecraft.world.World getTotalWorldTime()
+net.minecraft.world.World getDayTime() net.minecraft.world.World getWorldTime()
+net.minecraft.world.World getRedstonePowerFromNeighbors() net.minecraft.world.World isBlockIndirectlyGettingPowered()
+net.minecraft.entity.Entity fillCrashReport() net.minecraft.entity.Entity addEntityCrashInfo()
+net.minecraft.entity.Entity canBeAttackedWithItem() net.minecraft.entity.Entity canAttackWithItem()
+net.minecraft.entity.Entity registerData() net.minecraft.entity.Entity entityInit()
+net.minecraft.entity.Entity isCustomNameVisible() net.minecraft.entity.Entity getAlwaysRenderNameTag()
+net.minecraft.entity.Entity getDistanceSq() net.minecraft.entity.Entity getDistanceSqToEntity()
+net.minecraft.entity.Entity getDistance() net.minecraft.entity.Entity getDistanceToEntity()
+net.minecraft.entity.Entity getBoundingBox() net.minecraft.entity.Entity getEntityBoundingBox()
+net.minecraft.entity.Entity getEyePosition() net.minecraft.entity.Entity getPositionEyes()
+net.minecraft.entity.Entity isAlive() net.minecraft.entity.Entity isEntityAlive()
+net.minecraft.entity.Entity isInvulnerableTo() net.minecraft.entity.Entity isEntityInvulnerable()
+net.minecraft.entity.Entity outOfWorld() net.minecraft.entity.Entity kill()
+net.minecraft.entity.Entity baseTick() net.minecraft.entity.Entity onEntityUpdate()
+net.minecraft.entity.Entity tick() net.minecraft.entity.Entity onUpdate()
+net.minecraft.entity.Entity readAdditional() net.minecraft.entity.Entity readEntityFromNBT()
+net.minecraft.entity.Entity read() net.minecraft.entity.Entity readFromNBT()
+net.minecraft.entity.Entity doWaterSplashEffect() net.minecraft.entity.Entity resetHeight()
+net.minecraft.entity.Entity setCustomNameVisible() net.minecraft.entity.Entity setAlwaysRenderNameTag()
+net.minecraft.entity.Entity markVelocityChanged() net.minecraft.entity.Entity setBeenAttacked()
+net.minecraft.entity.Entity remove() net.minecraft.entity.Entity setDead()
+net.minecraft.entity.Entity setBoundingBox() net.minecraft.entity.Entity setEntityBoundingBox()
+net.minecraft.entity.Entity setPositionAndRotationDirect() net.minecraft.entity.Entity setPositionAndRotation2()
+net.minecraft.entity.Entity writeUnlessPassenger() net.minecraft.entity.Entity writeToNBTOptional()
+net.minecraft.item.ItemStack getTextComponent() net.minecraft.item.ItemStack getChatComponent()
+net.minecraft.item.ItemStack getDamage() net.minecraft.item.ItemStack getItemDamage()
+net.minecraft.item.ItemStack getUseAction() net.minecraft.item.ItemStack getItemUseAction()
+net.minecraft.item.ItemStack getUseDuration() net.minecraft.item.ItemStack getMaxItemUseDuration()
+net.minecraft.item.ItemStack getTag() net.minecraft.item.ItemStack getTagCompound()
+net.minecraft.item.ItemStack getTranslationKey() net.minecraft.item.ItemStack getUnlocalizedName()
+net.minecraft.item.ItemStack hasTag() net.minecraft.item.ItemStack hasTagCompound()
+net.minecraft.item.ItemStack isDamaged() net.minecraft.item.ItemStack isItemDamaged()
+net.minecraft.item.ItemStack isEnchantable() net.minecraft.item.ItemStack isItemEnchantable()
+net.minecraft.item.ItemStack isEnchanted() net.minecraft.item.ItemStack isItemEnchanted()
+net.minecraft.item.ItemStack isDamageable() net.minecraft.item.ItemStack isItemStackDamageable()
+net.minecraft.item.ItemStack setTag() net.minecraft.item.ItemStack setTagCompound()
+net.minecraft.item.ItemStack split() net.minecraft.item.ItemStack splitStack()
+net.minecraft.item.ItemStack inventoryTick() net.minecraft.item.ItemStack updateAnimation()
+net.minecraft.item.ItemStack write() net.minecraft.item.ItemStack writeToNBT()
+net.minecraft.util.FoodStats tick() net.minecraft.util.FoodStats onUpdate()
+net.minecraft.util.FoodStats read() net.minecraft.util.FoodStats readNBT()
+net.minecraft.util.FoodStats write() net.minecraft.util.FoodStats writeNBT()
+net.minecraft.tileentity.ITickableTileEntity tick() net.minecraft.util.ITickable update()
+net.minecraft.world.LockCode read() net.minecraft.world.LockCode fromNBT()
+net.minecraft.world.LockCode write() net.minecraft.world.LockCode toNBT()
+net.minecraft.scoreboard.Team getName() net.minecraft.scoreboard.Team getRegisteredName()
+net.minecraft.world.GameRules write() net.minecraft.world.GameRules writeToNBT()
+net.minecraft.client.Minecraft getFirstPersonRenderer() net.minecraft.client.Minecraft getItemRenderer()
+net.minecraft.client.Minecraft getInstance() net.minecraft.client.Minecraft getMinecraft()
+net.minecraft.client.Minecraft getConnection() net.minecraft.client.Minecraft getNetHandler()
+net.minecraft.client.Minecraft getSnooper() net.minecraft.client.Minecraft getPlayerUsageSnooper()
+net.minecraft.client.main.Main isNotEmpty() net.minecraft.client.main.Main isNullOrEmpty()
+net.minecraft.scoreboard.Score increaseScore() net.minecraft.scoreboard.Score increseScore()
+net.minecraft.item.DyeColor getTranslationKey() net.minecraft.item.EnumDyeColor getUnlocalizedName()
+net.minecraft.util.DamageSource getTrueSource() net.minecraft.util.DamageSource getEntity()
+net.minecraft.util.DamageSource getImmediateSource() net.minecraft.util.DamageSource getSourceOfDamage()
+net.minecraft.util.DamageSource causeExplosionDamage() net.minecraft.util.DamageSource setExplosionSource()
+net.minecraft.world.chunk.Chunk setLoaded() net.minecraft.world.chunk.Chunk setChunkLoaded()
+net.minecraft.world.chunk.Chunk markDirty() net.minecraft.world.chunk.Chunk setChunkModified()
+net.minecraft.entity.MobEntity setMoveVertical() net.minecraft.entity.EntityLiving setMoveForward()
+net.minecraft.util.text.ITextComponent$Serializer toJson() net.minecraft.util.IChatComponent$Serializer componentToJson()
+net.minecraft.util.text.ITextComponent getString() net.minecraft.util.IChatComponent getFormattedText()
+net.minecraft.client.shader.Shader render() net.minecraft.client.shader.Shader loadShader()
+net.minecraft.inventory.IInventory isUsableByPlayer() net.minecraft.inventory.IInventory isUseableByPlayer()
+net.minecraft.network.PacketBuffer readTextComponent() net.minecraft.network.PacketBuffer readChatComponent()
+net.minecraft.network.PacketBuffer readItemStack() net.minecraft.network.PacketBuffer readItemStackFromBuffer()
+net.minecraft.network.PacketBuffer readCompoundTag() net.minecraft.network.PacketBuffer readNBTTagCompoundFromBuffer()
+net.minecraft.network.PacketBuffer readString() net.minecraft.network.PacketBuffer readStringFromBuffer()
+net.minecraft.network.PacketBuffer readUniqueId() net.minecraft.network.PacketBuffer readUuid()
+net.minecraft.network.PacketBuffer readVarInt() net.minecraft.network.PacketBuffer readVarIntFromBuffer()
+net.minecraft.network.rcon.IServer getOnlinePlayerNames() net.minecraft.network.rcon.IServer getAllUsernames()
+net.minecraft.network.NetworkSystem addEndpoint() net.minecraft.network.NetworkSystem addLanEndpoint()
+net.minecraft.network.NetworkSystem tick() net.minecraft.network.NetworkSystem networkTick()
+net.minecraft.scoreboard.Scoreboard onTeamAdded() net.minecraft.scoreboard.Scoreboard broadcastTeamCreated()
+net.minecraft.scoreboard.Scoreboard getOrCreateScore() net.minecraft.scoreboard.Scoreboard getValueFromObjective()
+net.minecraft.scoreboard.Scoreboard onObjectiveAdded() net.minecraft.scoreboard.Scoreboard onScoreObjectiveAdded()
+net.minecraft.scoreboard.Scoreboard onObjectiveRemoved() net.minecraft.scoreboard.Scoreboard onScoreObjectiveRemoved()
+net.minecraft.scoreboard.Scoreboard onTeamChanged() net.minecraft.scoreboard.Scoreboard sendTeamUpdate()
+net.minecraft.tileentity.TileEntity hasWorld() net.minecraft.tileentity.TileEntity hasWorldObj()
+net.minecraft.tileentity.TileEntity remove() net.minecraft.tileentity.TileEntity invalidate()
+net.minecraft.tileentity.TileEntity isRemoved() net.minecraft.tileentity.TileEntity isInvalid()
+net.minecraft.util.ResourceLocation getNamespace() net.minecraft.util.ResourceLocation getResourceDomain()
+net.minecraft.util.ResourceLocation getPath() net.minecraft.util.ResourceLocation getResourcePath()
+net.minecraft.entity.ai.EntitySenses tick() net.minecraft.entity.ai.EntitySenses clearSensingCache()
+net.minecraft.network.NetworkManager handleDisconnection() net.minecraft.network.NetworkManager checkDisconnected()
+net.minecraft.network.NetworkManager isEncrypted() net.minecraft.network.NetworkManager getIsencrypted()
+net.minecraft.network.NetworkManager tick() net.minecraft.network.NetworkManager processReceivedPackets()
+net.minecraft.network.NetworkManager setCompressionThreshold() net.minecraft.network.NetworkManager setCompressionTreshold()
+net.minecraft.server.MinecraftServer getOnlinePlayerNames() net.minecraft.server.MinecraftServer getAllUsernames()
+net.minecraft.server.MinecraftServer getNetworkCompressionThreshold() net.minecraft.server.MinecraftServer getNetworkCompressionTreshold()
+net.minecraft.server.MinecraftServer getSnooper() net.minecraft.server.MinecraftServer getPlayerUsageSnooper()
+net.minecraft.server.MinecraftServer init() net.minecraft.server.MinecraftServer startServer()
+net.minecraft.block.material.Material isFlammable() net.minecraft.block.material.Material getCanBurn()
+net.minecraft.block.material.Material getColor() net.minecraft.block.material.Material getMaterialMapColor()
+net.minecraft.client.gui.FontRenderer getWordWrappedHeight() net.minecraft.client.gui.FontRenderer splitStringWidth()
+net.minecraft.util.IStringSerializable getString() net.minecraft.util.IStringSerializable getName()
+net.minecraft.world.border.WorldBorder getDamagePerBlock() net.minecraft.world.border.WorldBorder getDamageAmount()
+net.minecraft.world.border.WorldBorder setDamagePerBlock() net.minecraft.world.border.WorldBorder setDamageAmount()
+net.minecraft.client.audio.SoundHandler pause() net.minecraft.client.audio.SoundHandler pauseSounds()
+net.minecraft.client.audio.SoundHandler playDelayed() net.minecraft.client.audio.SoundHandler playDelayedSound()
+net.minecraft.client.audio.SoundHandler play() net.minecraft.client.audio.SoundHandler playSound()
+net.minecraft.client.audio.SoundHandler resume() net.minecraft.client.audio.SoundHandler resumeSounds()
+net.minecraft.client.audio.SoundHandler stop() net.minecraft.client.audio.SoundHandler stopSound()
+net.minecraft.client.audio.SoundHandler stop() net.minecraft.client.audio.SoundHandler stopSounds()
+net.minecraft.client.audio.SoundEngine pause() net.minecraft.client.audio.SoundManager pauseAllSounds()
+net.minecraft.client.audio.SoundEngine resume() net.minecraft.client.audio.SoundManager resumeAllSounds()
+net.minecraft.client.audio.SoundEngine stop() net.minecraft.client.audio.SoundManager stopSound()
+net.minecraft.client.shader.ShaderGroup render() net.minecraft.client.shader.ShaderGroup loadShaderGroup()
+net.minecraft.scoreboard.ScorePlayerTeam setColor() net.minecraft.scoreboard.ScorePlayerTeam setChatFormat()
+net.minecraft.client.renderer.Tessellator getBuffer() net.minecraft.client.renderer.Tessellator getWorldRenderer()
+net.minecraft.entity.merchant.villager.VillagerEntity levelUp() net.minecraft.entity.passive.EntityVillager populateBuyingList()
+net.minecraft.network.NettyCompressionDecoder setCompressionThreshold() net.minecraft.network.NettyCompressionDecoder setCompressionTreshold()
+net.minecraft.network.NettyCompressionEncoder setCompressionThreshold() net.minecraft.network.NettyCompressionEncoder setCompressionTreshold()
+net.minecraft.block.pattern.BlockPattern$PatternHelper getForwards() net.minecraft.block.state.pattern.BlockPattern$PatternHelper getFinger()
+net.minecraft.block.pattern.BlockPattern$PatternHelper getFrontTopLeft() net.minecraft.block.state.pattern.BlockPattern$PatternHelper getPos()
+net.minecraft.block.pattern.BlockPattern$PatternHelper getUp() net.minecraft.block.state.pattern.BlockPattern$PatternHelper getThumb()
+net.minecraft.client.multiplayer.ServerAddress getInt() net.minecraft.client.multiplayer.ServerAddress parseIntWithDefault()
+net.minecraft.world.gen.feature.structure.StructureStart isValid() net.minecraft.world.gen.structure.StructureStart isSizeableStructure()
+net.minecraft.client.renderer.vertex.VertexFormat getSize() net.minecraft.client.renderer.vertex.VertexFormat getNextOffset()
+net.minecraft.client.renderer.entity.EntityRendererManager getRenderer() net.minecraft.client.renderer.entity.RenderManager getEntityRenderObject()
+net.minecraft.server.dedicated.DedicatedPlayerList getServer() net.minecraft.server.dedicated.DedicatedPlayerList getServerInstance()
+net.minecraft.server.integrated.IntegratedPlayerList getServer() net.minecraft.server.integrated.IntegratedPlayerList getServerInstance()
+net.minecraft.world.gen.feature.structure.StructurePiece readAdditional() net.minecraft.world.gen.structure.StructureComponent readStructureFromNBT()
+net.minecraft.client.renderer.model.SimpleBakedModel$Builder build() net.minecraft.client.resources.model.SimpleBakedModel$Builder makeBakedModel()
+net.minecraft.world.chunk.ChunkSection needsRandomTick() net.minecraft.world.chunk.storage.ExtendedBlockStorage getNeedsRandomTick()
+net.minecraft.client.renderer.texture.TextureAtlasSprite getHeight() net.minecraft.client.renderer.texture.TextureAtlasSprite getIconHeight()
+net.minecraft.client.renderer.texture.TextureAtlasSprite getWidth() net.minecraft.client.renderer.texture.TextureAtlasSprite getIconWidth()
+net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher getRenderer() net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher getSpecialRenderer()
