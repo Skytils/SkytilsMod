@@ -117,10 +117,9 @@ import kotlin.math.abs
 import net.minecraftforge.fml.common.Mod
 //#if MC<11400
 import net.minecraftforge.client.ClientCommandHandler
+import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
@@ -281,15 +280,12 @@ class Skytils {
     }
 
     @Mod.EventHandler
-    fun preInit(event: FMLPreInitializationEvent) {
+    fun init(event: FMLInitializationEvent) {
         DataFetcher.preload()
         guiManager = GuiManager
-        jarFile = event.sourceFile
+        jarFile = Loader.instance().modList.find { it.modId == MOD_ID }?.source
         mc.framebuffer.enableStencil()
-    }
 
-    @Mod.EventHandler
-    fun init(event: FMLInitializationEvent) {
         config.init()
         CatlasConfig
         UpdateChecker.downloadDeleteTask()
@@ -396,7 +392,7 @@ class Skytils {
     }
 
     @Mod.EventHandler
-    fun postInit(event: FMLPostInitializationEvent) {
+    fun loadComplete(event: FMLLoadCompleteEvent) {
         usingLabymod = isModLoaded("labymod")
         usingNEU = isModLoaded("notenoughupdates")
         usingSBA = isModLoaded("skyblockaddons")
@@ -408,10 +404,8 @@ class Skytils {
         ModChecker.checkModdedForge()
 
         ScreenRenderer.init()
-    }
 
-    @Mod.EventHandler
-    fun loadComplete(event: FMLLoadCompleteEvent) {
+
         val cch = ClientCommandHandler.instance
 
         if (cch !is AccessorCommandHandler) throw RuntimeException(
