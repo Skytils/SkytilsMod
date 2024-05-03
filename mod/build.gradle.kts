@@ -171,8 +171,17 @@ sourceSets {
 
 val javaVersion = if (platform.isLegacyForge) JavaVersion.VERSION_1_8 else JavaVersion.VERSION_17
 
+val enabledVersions = setOf(
+    "1.8.9-forge",
+    "1.20.4-fabric"
+)
 
 tasks {
+    build {
+        if (platform.mcVersionStr !in enabledVersions) {
+            enabled = false
+        }
+    }
     processResources {
         dependsOn(compileJava)
         filesMatching("mcmod.info") {
