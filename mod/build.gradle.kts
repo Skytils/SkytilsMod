@@ -180,7 +180,7 @@ tasks {
         dependsOn(compileJava)
         filesMatching("mcmod.info") {
             expand(mapOf(
-                "version" to rootProject.version,
+                "version" to version,
                 "mcversion" to platform.mcVersionStr
             ))
         }
