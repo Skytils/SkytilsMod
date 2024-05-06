@@ -546,11 +546,6 @@ class Skytils {
 
     @SubscribeEvent
     fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
-        Utils.isOnHypixel = mc.runCatching {
-            !event.isLocal && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
-                ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
-        }.onFailure { it.printStackTrace() }.getOrDefault(false)
-
         IO.launch {
             TrophyFish.loadFromApi()
         }
