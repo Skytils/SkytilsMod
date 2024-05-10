@@ -37,7 +37,7 @@ pluginManagement {
         val kotlinVersion = "1.9.22"
         kotlin("jvm") version kotlinVersion apply false
         kotlin("plugin.serialization") version kotlinVersion apply false
-        id("gg.essential.multi-version.root") version "0.4.1"
+        id("gg.essential.multi-version.root") version "0.6.0"
         id("gg.essential.loom") apply false
         id("gg.essential.defaults") apply false
     }
