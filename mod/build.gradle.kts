@@ -23,7 +23,7 @@ import java.security.MessageDigest
 plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.serialization") version "1.9.22"
-    id("com.github.johnrengelman.shadow")
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     id("gg.essential.multi-version")
     id("gg.essential.defaults")
     idea
