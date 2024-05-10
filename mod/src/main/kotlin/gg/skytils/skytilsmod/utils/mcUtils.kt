@@ -18,8 +18,14 @@
 
 package gg.skytils.skytilsmod.utils
 
+//#if FORGE
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.Loader
+//#endif
+
+//#if FABRIC
+//$$ import net.fabricmc.loader.api.FabricLoader
+//#endif
 
 val isDeobfuscatedEnvironment by lazy {
     //#if FORGE
@@ -28,6 +34,7 @@ val isDeobfuscatedEnvironment by lazy {
     //#else
     //$$ (System.getenv("target") ?: "").lowercase() == "fmluserdevclient"
     //#endif
+    //$$ FabricLoader.getInstance().isDevelopmentEnvironment
     //#endif
 }
 
@@ -38,4 +45,5 @@ fun isModLoaded(id: String) =
     //#else
     //$$ FMLLoader.getLoadingModList().getModFileById(id)
     //#endif
+    //$$ FabricLoader.getInstance().isModLoaded(id)
     //#endif
