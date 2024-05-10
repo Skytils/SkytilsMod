@@ -1,0 +1,3 @@
+net.minecraft.entity.data.DataTracker$SerializedEntry net.minecraft.entity.data.DataTracker$Entry
+net.minecraft.entity.data.DataTracker$SerializedEntry id() net.minecraft.entity.data.DataTracker$Entry method_12797()
+net.minecraft.entity.data.DataTracker$SerializedEntry value() net.minecraft.entity.data.DataTracker$Entry get()

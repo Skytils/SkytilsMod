@@ -34,6 +34,7 @@ val isDeobfuscatedEnvironment by lazy {
     //#else
     //$$ (System.getenv("target") ?: "").lowercase() == "fmluserdevclient"
     //#endif
+    //#else
     //$$ FabricLoader.getInstance().isDevelopmentEnvironment
     //#endif
 }
@@ -45,5 +46,6 @@ fun isModLoaded(id: String) =
     //#else
     //$$ FMLLoader.getLoadingModList().getModFileById(id)
     //#endif
+    //#else
     //$$ FabricLoader.getInstance().isModLoaded(id)
     //#endif

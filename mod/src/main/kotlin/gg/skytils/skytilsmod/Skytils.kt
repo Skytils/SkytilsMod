@@ -18,7 +18,6 @@
 
 package gg.skytils.skytilsmod
 
-import codes.som.anthony.koffee.modifiers.open
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UDesktop
@@ -93,12 +92,12 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.inventory.ContainerChest
+import net.minecraft.inventory.ContainerPlayer
 import net.minecraft.network.play.client.C01PacketChatMessage
-import net.minecraft.network.play.server.*
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.common.MinecraftForge
+import net.minecraft.network.play.server.S01PacketJoinGame
+import net.minecraft.network.play.server.S1CPacketEntityMetadata
+import net.minecraft.network.play.server.S3DPacketDisplayScoreboard
+import net.minecraft.network.play.server.S3FPacketCustomPayload
 import sun.misc.Unsafe
 import java.io.File
 import java.net.DatagramPacket
@@ -115,6 +114,10 @@ import kotlin.math.abs
 
 //#if FORGE
 import net.minecraftforge.fml.common.Mod
+import net.minecraftforge.client.event.GuiOpenEvent
+import net.minecraftforge.client.event.GuiScreenEvent
+import net.minecraftforge.client.event.RenderGameOverlayEvent
+import net.minecraftforge.common.MinecraftForge
 //#if MC<11400
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.Loader
@@ -127,6 +130,13 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 //#else
 //$$ import net.minecraft.util.text.StringTextComponent
 //#endif
+//#endif
+
+//#if FABRIC
+//$$ import net.fabricmc.loader.api.FabricLoader
+//$$ import net.minecraft.client.gui.widget.ButtonWidget
+//$$ import net.minecraft.network.packet.BrandCustomPayload
+//$$ import net.minecraft.text.Text
 //#endif
 
 //#if FORGE
@@ -283,8 +293,12 @@ class Skytils {
     fun init(event: FMLInitializationEvent) {
         DataFetcher.preload()
         guiManager = GuiManager
+        //#if FORGE
         jarFile = Loader.instance().modList.find { it.modId == MOD_ID }?.source
         mc.framebuffer.enableStencil()
+        //#else
+        //$$ jarFile = FabricLoader.getInstance().allMods.find { it.metadata.id == MOD_ID }?.origin?.paths?.firstOrNull()?.toFile()
+        //#endif
 
         config.init()
         CatlasConfig
@@ -485,7 +499,7 @@ class Skytils {
         ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { ScoreboardUtil.cleanSB(it) }
         TabListUtils.tabEntries = TabListUtils.fetchTabEntries().map { it to it.text }
         if (displayScreen != null) {
-            if (mc.thePlayer?.openContainer == mc.thePlayer?.inventoryContainer) {
+            if (mc.thePlayer?.openContainer is ContainerPlayer) {
                 mc.displayGuiScreen(displayScreen)
                 displayScreen = null
             }
@@ -493,7 +507,7 @@ class Skytils {
 
         if (mc.thePlayer != null && sendMessageQueue.isNotEmpty() && System.currentTimeMillis() - lastChatMessage > 250) {
             val msg = sendMessageQueue.pollFirst()
-            if (!msg.isNullOrBlank()) mc.thePlayer?.sendChatMessage(msg)
+            if (!msg.isNullOrBlank()) UChat.say(msg)
         }
         if (Utils.inSkyblock && DevTools.getToggle("copydetails") && UKeyboard.isCtrlKeyDown()) {
             if (UKeyboard.isKeyDown(UKeyboard.KEY_TAB)) {
@@ -509,7 +523,7 @@ class Skytils {
                 //#if MC<11400
                 val container = openScreen.inventorySlots
                 //#else
-                //$$ val container = openScreen.getContainer()
+                //$$ val container = openScreen.screenHandler
                 //#endif
                 (container as? ContainerChest)?.let { chest ->
                     UChat.chat("Copied container data to clipboard")
@@ -538,8 +552,14 @@ class Skytils {
                     if (DevTools.toggles.getOrDefault("forceskyblock", false)) Utils.skyblock = true
                     if (DevTools.toggles.getOrDefault("forcedungeons", false)) Utils.dungeons = true
                 }
-                if (DevTools.getToggle("sprint"))
+                if (DevTools.getToggle("sprint")) {
+                    //#if MC<11400
                     KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.keyCode, true)
+                    //#else
+                    //$$ mc.options.sprintKey?.isPressed = true
+                    //#endif
+
+                }
             }
         }
     }
@@ -563,34 +583,21 @@ class Skytils {
             printDevMessage("sb ${Utils.inSkyblock}", "utils")
         }
         if (event.packet is S1CPacketEntityMetadata && mc.thePlayer != null) {
-            //#if MC<11400
             val nameObj = event.packet.func_149376_c()?.find { it.dataValueId == 2 }?.`object` ?: return
-            //#else
-            //$$ val nameObj = event.packet.dataManagerEntries?.find { it.key.id == 2 }.value ?: return
-            //#endif
             val entity = mc.theWorld?.getEntityByID(event.packet.entityId)
 
             if (entity is ExtensionEntityLivingBase) {
                 entity.skytilsHook.onNewDisplayName(nameObj as String)
             }
         }
-        if (!Utils.isOnHypixel && event.packet is S3FPacketCustomPayload && event.packet.channelName.toString() == "MC|Brand") {
-            if (event.packet.bufferData.readStringFromBuffer(Short.MAX_VALUE.toInt()).lowercase().contains("hypixel"))
-                Utils.isOnHypixel = true
-        }
-        if (Utils.inDungeons || !Utils.isOnHypixel || event.packet !is S38PacketPlayerListItem ||
-            (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME &&
-                    event.packet.action != S38PacketPlayerListItem.Action.ADD_PLAYER)
-        ) return
-        event.packet.entries.forEach { playerData ->
-            val name = playerData?.displayName?.formattedText ?: playerData?.profile?.name ?: return@forEach
-            areaRegex.matchEntire(name)?.let { result ->
-                Utils.dungeons = Utils.inSkyblock && result.groups["area"]?.value == "Dungeon"
-                printDevMessage("dungeons ${Utils.inDungeons} action ${event.packet.action}", "utils")
-                if (Utils.inDungeons)
-                    ScoreCalculation.updateText(ScoreCalculation.totalScore.get())
-                return@forEach
+        if (!Utils.isOnHypixel && event.packet is S3FPacketCustomPayload) {
+            //#if MC<11400
+            if (event.packet.channelName.toString() == "MC|Brand") {
+                Utils.isOnHypixel = event.packet.bufferData.readStringFromBuffer(Short.MAX_VALUE.toInt()).lowercase().contains("hypixel")
             }
+            //#else
+            //$$ Utils.isOnHypixel = (event.packet.payload as? BrandCustomPayload)?.brand?.contains("hypixel") == true
+            //#endif
         }
     }
 
@@ -640,9 +647,14 @@ class Skytils {
             //#if MC<11400
             event.buttonList.add(GuiButton(6969420, x, 0.coerceAtLeast(y), 100, 20, "Skytils"))
             //#else
-            //$$ event.widgetList.add(Button(x, 0.coerceAtLeast(y), 100, 20, StringTextComponent("Skytils")) {
-            //$$     displayScreen = OptionsGui()
-            //$$ })
+            //$$ event.widgetList.add(
+            //$$     ButtonWidget
+            //$$         .Builder(Text.of("Skytils")) {
+            //$$             displayScreen = OptionsGui()
+            //$$         }
+            //$$         .position(x, 0.coerceAtLeast(y))
+            //$$         .build()
+            //$$ )
             //#endif
         }
     }
@@ -664,7 +676,7 @@ class Skytils {
         } else if (event.gui == null && config.reopenOptionsMenu) {
             if (old is ReopenableGUI || (old is AccessorSettingsGui && old.config is Config)) {
                 tickTimer(1) {
-                    if (mc.thePlayer?.openContainer == mc.thePlayer?.inventoryContainer)
+                    if (mc.thePlayer?.openContainer is ContainerPlayer)
                         displayScreen = OptionsGui()
                 }
             }
