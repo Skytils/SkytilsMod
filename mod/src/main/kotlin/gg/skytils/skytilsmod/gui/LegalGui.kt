@@ -28,7 +28,7 @@ import gg.essential.elementa.constraints.CenterConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.IO
+import gg.skytils.skytilsmod.Skytils.IO
 import gg.skytils.skytilsmod.gui.components.SimpleButton
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

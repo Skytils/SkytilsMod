@@ -18,7 +18,7 @@
 package gg.skytils.skytilsmod.mixins.hooks.entity
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.events.impl.AddChatMessageEvent
 import gg.skytils.skytilsmod.events.impl.ItemTossEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent

@@ -22,10 +22,10 @@ import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
-import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.Skytils.Companion.prefix
-import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
+import gg.skytils.skytilsmod.Skytils.failPrefix
+import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod.Skytils.prefix
+import gg.skytils.skytilsmod.Skytils.successPrefix
 import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
 import gg.skytils.skytilsmod.utils.append

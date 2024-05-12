@@ -17,7 +17,7 @@
  */
 package gg.skytils.skytilsmod.core
 
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.features.impl.misc.damagesplash.FakeEntity
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderGlobal

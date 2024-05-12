@@ -21,7 +21,7 @@ import gg.essential.universal.UChat
 import gg.essential.vigilance.data.PropertyItem
 import gg.essential.vigilance.data.PropertyType
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
+import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.structure.GuiElement

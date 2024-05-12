@@ -21,9 +21,9 @@ import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
-import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.Skytils.Companion.prefix
+import gg.skytils.skytilsmod.Skytils.failPrefix
+import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod.Skytils.prefix
 import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.structure.GuiElement

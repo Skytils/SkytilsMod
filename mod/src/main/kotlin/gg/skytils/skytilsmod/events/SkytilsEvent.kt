@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.events
 
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
+import gg.skytils.skytilsmod.Skytils.failPrefix
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 

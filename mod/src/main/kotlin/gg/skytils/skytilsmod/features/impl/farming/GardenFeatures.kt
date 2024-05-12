@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.features.impl.farming
 
 import gg.essential.api.EssentialAPI
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.init.Blocks

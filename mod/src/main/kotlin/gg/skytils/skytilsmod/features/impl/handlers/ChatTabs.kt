@@ -22,8 +22,8 @@ import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.failPrefix
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.gui.elements.CleanButton
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionChatLine

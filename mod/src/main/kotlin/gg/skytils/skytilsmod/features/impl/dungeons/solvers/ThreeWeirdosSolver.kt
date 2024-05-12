@@ -19,9 +19,9 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
-import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.Skytils.Companion.prefix
+import gg.skytils.skytilsmod.Skytils.failPrefix
+import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod.Skytils.prefix
 import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.SuperSecretSettings

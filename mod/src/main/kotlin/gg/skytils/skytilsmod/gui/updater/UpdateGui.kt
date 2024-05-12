@@ -18,8 +18,8 @@
 package gg.skytils.skytilsmod.gui.updater
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.IO
-import gg.skytils.skytilsmod.Skytils.Companion.client
+import gg.skytils.skytilsmod.Skytils.IO
+import gg.skytils.skytilsmod.Skytils.client
 import gg.skytils.skytilsmod.core.UpdateChecker
 import gg.skytils.skytilsmod.utils.MathUtil
 import io.ktor.client.plugins.*

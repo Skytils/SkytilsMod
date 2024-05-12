@@ -18,7 +18,7 @@
 
 package gg.skytils.skytilsmod.features.impl.funny.skytilsplus
 
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntity
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntitySlime

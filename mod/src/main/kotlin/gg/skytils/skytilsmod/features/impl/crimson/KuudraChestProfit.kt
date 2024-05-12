@@ -19,7 +19,7 @@ package gg.skytils.skytilsmod.features.impl.crimson
 
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.IO
+import gg.skytils.skytilsmod.Skytils.IO
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData

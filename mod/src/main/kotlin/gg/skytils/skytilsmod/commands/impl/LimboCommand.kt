@@ -19,7 +19,7 @@
 package gg.skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
+import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.client.entity.EntityPlayerSP

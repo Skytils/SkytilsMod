@@ -21,7 +21,7 @@ package gg.skytils.skytilsmod.features.impl.funny.skytilsplus
 import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.gui.SettingsGui
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.gui.PaywallGui

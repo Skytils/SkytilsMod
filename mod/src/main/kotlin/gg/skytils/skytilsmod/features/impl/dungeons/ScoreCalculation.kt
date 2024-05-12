@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.elementa.state.BasicState
 import gg.essential.elementa.state.State
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer

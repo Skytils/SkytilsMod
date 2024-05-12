@@ -20,8 +20,8 @@ package gg.skytils.skytilsmod.features.impl.farming
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
-import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
+import gg.skytils.skytilsmod.Skytils.failPrefix
+import gg.skytils.skytilsmod.Skytils.successPrefix
 import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.renderer.GlStateManager

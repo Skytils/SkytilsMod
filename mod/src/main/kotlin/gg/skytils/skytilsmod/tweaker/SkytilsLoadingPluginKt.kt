@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.tweaker
 
 import SkytilsInstallerFrame
 import gg.essential.universal.UDesktop
-import gg.skytils.skytilsmod.Skytils.Companion.client
+import gg.skytils.skytilsmod.Skytils.client
 import gg.skytils.skytilsmod.asm.SkytilsTransformer
 import gg.skytils.skytilsmod.tweaker.TweakerUtil.exit
 import gg.skytils.skytilsmod.tweaker.TweakerUtil.showMessage

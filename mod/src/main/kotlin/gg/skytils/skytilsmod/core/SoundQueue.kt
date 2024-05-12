@@ -21,7 +21,7 @@ package gg.skytils.skytilsmod.core
 import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.TickEvent
 import gg.skytils.event.register
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.utils.Utils
 import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentLinkedQueue

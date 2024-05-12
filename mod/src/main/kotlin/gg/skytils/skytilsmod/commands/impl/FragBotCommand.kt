@@ -20,8 +20,8 @@ package gg.skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.client
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.client
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.commands.BaseCommand
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*

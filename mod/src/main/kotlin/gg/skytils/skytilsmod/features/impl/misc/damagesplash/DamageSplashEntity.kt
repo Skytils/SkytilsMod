@@ -19,7 +19,7 @@ package gg.skytils.skytilsmod.features.impl.misc.damagesplash
 
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
+import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.NumberUtil.format
 import gg.skytils.skytilsmod.utils.Utils.random

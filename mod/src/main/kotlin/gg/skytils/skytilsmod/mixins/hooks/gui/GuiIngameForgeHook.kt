@@ -18,7 +18,7 @@
 package gg.skytils.skytilsmod.mixins.hooks.gui
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.features.impl.misc.MiscFeatures
 import gg.skytils.skytilsmod.utils.Utils

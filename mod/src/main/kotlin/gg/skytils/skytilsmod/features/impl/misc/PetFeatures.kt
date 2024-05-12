@@ -20,9 +20,9 @@ package gg.skytils.skytilsmod.features.impl.misc
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
-import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.Skytils.Companion.prefix
+import gg.skytils.skytilsmod.Skytils.failPrefix
+import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod.Skytils.prefix
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.SendEvent

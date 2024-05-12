@@ -19,7 +19,7 @@
 package gg.skytils.skytilsmod.features.impl.trackers.impl
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.client
+import gg.skytils.skytilsmod.Skytils.client
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker

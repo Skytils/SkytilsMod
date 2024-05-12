@@ -19,7 +19,7 @@ package gg.skytils.skytilsmod.mixins.hooks.renderer
 
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.entity.Entity
 import net.minecraft.util.Vec3

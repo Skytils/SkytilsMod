@@ -18,8 +18,8 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils
 
-import gg.skytils.skytilsmod.Skytils.Companion.json
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.json
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Room
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.RoomData
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo

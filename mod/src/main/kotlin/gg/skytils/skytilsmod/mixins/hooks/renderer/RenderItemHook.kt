@@ -18,7 +18,7 @@
 package gg.skytils.skytilsmod.mixins.hooks.renderer
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.events.impl.GuiRenderItemEvent
 import gg.skytils.skytilsmod.features.impl.handlers.GlintCustomizer
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorRenderItem

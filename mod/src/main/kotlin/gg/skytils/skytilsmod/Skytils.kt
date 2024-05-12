@@ -147,148 +147,148 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
     name = Skytils.MOD_NAME,
     acceptedMinecraftVersions = "[1.8.9]",
     clientSideOnly = true,
-    guiFactory = "gg.skytils.skytilsmod.core.ForgeGuiFactory"
+    guiFactory = "gg.skytils.skytilsmod.core.ForgeGuiFactory",
+    modLanguageAdapter = "gg.essential.api.utils.KotlinAdapter"
 )
 //#else
 //$$ @Mod(Skytils.MOD_ID)
 //#endif
 //#endif
-class Skytils {
+object Skytils : CoroutineScope {
+    const val MOD_ID = Reference.MOD_ID
+    const val MOD_NAME = Reference.MOD_NAME
+    @JvmField
+    val VERSION = Reference.VERSION
 
-    companion object : CoroutineScope {
-        const val MOD_ID = Reference.MOD_ID
-        const val MOD_NAME = Reference.MOD_NAME
-        @JvmField
-        val VERSION = Reference.VERSION
-
-        @JvmStatic
-        val mc: Minecraft by lazy {
-            Minecraft.getMinecraft()
-        }
-
-        val config by lazy {
-            Config
-        }
-
-        val modDir by lazy {
-            File(File(mc.mcDataDir, "config"), "skytils").also {
-                it.mkdirs()
-                File(it, "trackers").mkdirs()
-            }
-        }
-
-        @JvmStatic
-        lateinit var guiManager: GuiManager
-
-        @JvmField
-        val sendMessageQueue = ArrayDeque<String>()
-
-        @JvmField
-        var usingLabymod = false
-
-        @JvmField
-        var usingNEU = false
-
-        @JvmField
-        var usingSBA = false
-
-        @JvmField
-        var jarFile: File? = null
-        private var lastChatMessage = 0L
-
-        @JvmField
-        var displayScreen: GuiScreen? = null
-
-        @JvmField
-        val threadPool = Executors.newFixedThreadPool(10) as ThreadPoolExecutor
-
-        @JvmField
-        val dispatcher = threadPool.asCoroutineDispatcher()
-
-        val IO = object : CoroutineScope {
-            override val coroutineContext = Dispatchers.IO + SupervisorJob() + CoroutineName("Skytils IO")
-        }
-
-        override val coroutineContext: CoroutineContext = dispatcher + SupervisorJob() + CoroutineName("Skytils")
-
-        val deobfEnvironment: Boolean
-            get() = isDeobfuscatedEnvironment
-
-        val unsafe by lazy {
-            Unsafe::class.java.getDeclaredField("theUnsafe").apply {
-                isAccessible = true
-            }.get(null) as Unsafe
-        }
-
-        val json = Json {
-            prettyPrint = true
-            isLenient = true
-            ignoreUnknownKeys = true
-            serializersModule = SerializersModule {
-                include(serializersModule)
-                contextual(CustomColor::class, CustomColor.Serializer)
-                contextual(Regex::class, RegexAsString)
-                contextual(UUID::class, UUIDAsString)
-            }
-        }
-
-        val client = HttpClient(CIO) {
-            install(ContentEncoding) {
-                customEncoder(BrotliEncoder, 1.0F)
-                deflate(1.0F)
-                gzip(0.9F)
-                identity(0.1F)
-            }
-            install(ContentNegotiation) {
-                json(json)
-                json(json, ContentType.Text.Plain)
-            }
-            install(HttpCache)
-            install(HttpRequestRetry) {
-                retryOnServerErrors(maxRetries = 3)
-                exponentialDelay()
-            }
-            install(HttpTimeout)
-            install(UserAgent) {
-                agent = "Skytils/$VERSION"
-            }
-
-            engine {
-                endpoint {
-                    connectTimeout = 10000
-                    keepAliveTime = 5000
-                    requestTimeout = 10000
-                    socketTimeout = 10000
-                }
-                https {
-                    val backingManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
-                        init(null as KeyStore?)
-                    }.trustManagers.first { it is X509TrustManager } as X509TrustManager
-
-                    val ourManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
-                        Skytils::class.java.getResourceAsStream("/skytilscacerts.jks").use {
-                            val ourKs = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
-                                load(it, "skytilsontop".toCharArray())
-                            }
-                            init(ourKs)
-                        }
-                    }.trustManagers.first { it is X509TrustManager } as X509TrustManager
-
-                    trustManager = UnionX509TrustManager(backingManager, ourManager)
-                }
-            }
-        }
-
-        val areaRegex = Regex("§r§b§l(?<area>[\\w]+): §r§7(?<loc>[\\w ]+)§r")
-
-        var domain = "api.skytils.gg"
-
-        val prefix = "§9§lSkytils §8»"
-        val successPrefix = "§a§lSkytils §8»"
-        val failPrefix = "§c§lSkytils (${Reference.VERSION}) §8»"
-
-        var trustClientTime = false
+    @JvmStatic
+    val mc: Minecraft by lazy {
+        Minecraft.getMinecraft()
     }
+
+    @JvmStatic
+    val config by lazy {
+        Config
+    }
+
+    val modDir by lazy {
+        File(File(mc.mcDataDir, "config"), "skytils").also {
+            it.mkdirs()
+            File(it, "trackers").mkdirs()
+        }
+    }
+
+    @JvmStatic
+    lateinit var guiManager: GuiManager
+
+    @JvmField
+    val sendMessageQueue = ArrayDeque<String>()
+
+    @JvmField
+    var usingLabymod = false
+
+    @JvmField
+    var usingNEU = false
+
+    @JvmField
+    var usingSBA = false
+
+    @JvmField
+    var jarFile: File? = null
+    private var lastChatMessage = 0L
+
+    @JvmField
+    var displayScreen: GuiScreen? = null
+
+    @JvmField
+    val threadPool = Executors.newFixedThreadPool(10) as ThreadPoolExecutor
+
+    @JvmField
+    val dispatcher = threadPool.asCoroutineDispatcher()
+
+    val IO = object : CoroutineScope {
+        override val coroutineContext = Dispatchers.IO + SupervisorJob() + CoroutineName("Skytils IO")
+    }
+
+    override val coroutineContext: CoroutineContext = dispatcher + SupervisorJob() + CoroutineName("Skytils")
+
+    val deobfEnvironment: Boolean
+        get() = isDeobfuscatedEnvironment
+
+    val unsafe by lazy {
+        Unsafe::class.java.getDeclaredField("theUnsafe").apply {
+            isAccessible = true
+        }.get(null) as Unsafe
+    }
+
+    @JvmStatic
+    val json = Json {
+        prettyPrint = true
+        isLenient = true
+        ignoreUnknownKeys = true
+        serializersModule = SerializersModule {
+            include(serializersModule)
+            contextual(CustomColor::class, CustomColor.Serializer)
+            contextual(Regex::class, RegexAsString)
+            contextual(UUID::class, UUIDAsString)
+        }
+    }
+
+    val client = HttpClient(CIO) {
+        install(ContentEncoding) {
+            customEncoder(BrotliEncoder, 1.0F)
+            deflate(1.0F)
+            gzip(0.9F)
+            identity(0.1F)
+        }
+        install(ContentNegotiation) {
+            json(json)
+            json(json, ContentType.Text.Plain)
+        }
+        install(HttpCache)
+        install(HttpRequestRetry) {
+            retryOnServerErrors(maxRetries = 3)
+            exponentialDelay()
+        }
+        install(HttpTimeout)
+        install(UserAgent) {
+            agent = "Skytils/$VERSION"
+        }
+
+        engine {
+            endpoint {
+                connectTimeout = 10000
+                keepAliveTime = 5000
+                requestTimeout = 10000
+                socketTimeout = 10000
+            }
+            https {
+                val backingManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
+                    init(null as KeyStore?)
+                }.trustManagers.first { it is X509TrustManager } as X509TrustManager
+
+                val ourManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
+                    Skytils::class.java.getResourceAsStream("/skytilscacerts.jks").use {
+                        val ourKs = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
+                            load(it, "skytilsontop".toCharArray())
+                        }
+                        init(ourKs)
+                    }
+                }.trustManagers.first { it is X509TrustManager } as X509TrustManager
+
+                trustManager = UnionX509TrustManager(backingManager, ourManager)
+            }
+        }
+    }
+
+    val areaRegex = Regex("§r§b§l(?<area>[\\w]+): §r§7(?<loc>[\\w ]+)§r")
+
+    var domain = "api.skytils.gg"
+
+    val prefix = "§9§lSkytils §8»"
+    val successPrefix = "§a§lSkytils §8»"
+    val failPrefix = "§c§lSkytils (${Reference.VERSION}) §8»"
+
+    var trustClientTime = false
 
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {

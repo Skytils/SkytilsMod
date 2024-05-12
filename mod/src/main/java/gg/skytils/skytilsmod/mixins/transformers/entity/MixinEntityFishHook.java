@@ -40,7 +40,7 @@ public abstract class MixinEntityFishHook extends Entity {
     @WrapOperation(method = "onUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;isAABBInMaterial(Lnet/minecraft/util/AxisAlignedBB;Lnet/minecraft/block/material/Material;)Z"))
     private boolean allowLavaBobber(World world, AxisAlignedBB aabb, Material materialIn, Operation<Boolean> original) {
         boolean orig = original.call(world, aabb, materialIn);
-        if (!Utils.INSTANCE.getInSkyblock() || !Skytils.Companion.getConfig().getLavaBobber()) return orig;
+        if (!Utils.INSTANCE.getInSkyblock() || !Skytils.getConfig().getLavaBobber()) return orig;
         return this.worldObj.isAABBInMaterial(aabb, Material.lava) || orig;
     }
 }

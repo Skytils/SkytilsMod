@@ -19,7 +19,7 @@
 package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent

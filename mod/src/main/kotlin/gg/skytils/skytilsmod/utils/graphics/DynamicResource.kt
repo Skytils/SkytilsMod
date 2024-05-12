@@ -18,7 +18,7 @@
 
 package gg.skytils.skytilsmod.utils.graphics
 
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.util.ResourceLocation
 import java.awt.image.BufferedImage

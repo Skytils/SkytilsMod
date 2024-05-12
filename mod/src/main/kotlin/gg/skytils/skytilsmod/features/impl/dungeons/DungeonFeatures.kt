@@ -21,8 +21,8 @@ import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
-import gg.skytils.skytilsmod.Skytils.Companion.prefix
+import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod.Skytils.prefix
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.*

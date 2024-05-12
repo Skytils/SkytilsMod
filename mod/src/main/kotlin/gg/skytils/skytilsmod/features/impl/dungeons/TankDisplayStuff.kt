@@ -19,7 +19,7 @@
 package gg.skytils.skytilsmod.features.impl.dungeons
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.DungeonClass
 import gg.skytils.skytilsmod.utils.RenderUtil

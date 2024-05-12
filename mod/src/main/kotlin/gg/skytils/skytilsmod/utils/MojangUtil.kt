@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.utils
 
 import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.lib.caffeine.cache.Caffeine
-import gg.skytils.skytilsmod.Skytils.Companion.client
+import gg.skytils.skytilsmod.Skytils.client
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*

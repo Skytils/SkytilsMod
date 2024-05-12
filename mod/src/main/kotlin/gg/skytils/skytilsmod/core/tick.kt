@@ -22,7 +22,7 @@ import gg.essential.universal.UChat
 import gg.skytils.event.await
 import gg.skytils.event.impl.TickEvent
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect

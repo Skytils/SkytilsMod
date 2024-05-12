@@ -21,7 +21,7 @@ package gg.skytils.skytilsmod.features.impl.handlers
 import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.lib.caffeine.cache.Caffeine
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.IO
+import gg.skytils.skytilsmod.Skytils.IO
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.ifNull
 import gg.skytils.skytilsmod.utils.set

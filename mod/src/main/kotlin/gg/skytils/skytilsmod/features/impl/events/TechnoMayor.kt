@@ -19,7 +19,7 @@ package gg.skytils.skytilsmod.features.impl.events
 
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity

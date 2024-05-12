@@ -19,7 +19,7 @@
 package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.client
+import gg.skytils.skytilsmod.Skytils.client
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.DynamicResource
 import io.ktor.client.request.*

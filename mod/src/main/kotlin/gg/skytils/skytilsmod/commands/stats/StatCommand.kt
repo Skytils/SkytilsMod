@@ -20,8 +20,8 @@ package gg.skytils.skytilsmod.commands.stats
 import gg.essential.universal.wrappers.message.UMessage
 import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.failPrefix
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.utils.MojangUtil

@@ -20,10 +20,10 @@ package gg.skytils.skytilsmod.core
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Reference.dataUrl
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.client
-import gg.skytils.skytilsmod.Skytils.Companion.domain
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
-import gg.skytils.skytilsmod.Skytils.Companion.json
+import gg.skytils.skytilsmod.Skytils.client
+import gg.skytils.skytilsmod.Skytils.domain
+import gg.skytils.skytilsmod.Skytils.failPrefix
+import gg.skytils.skytilsmod.Skytils.json
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver
 import gg.skytils.skytilsmod.features.impl.farming.FarmingFeatures

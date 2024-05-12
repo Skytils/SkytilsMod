@@ -19,7 +19,7 @@ package gg.skytils.skytilsmod.utils
 
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.world.WorldSettings

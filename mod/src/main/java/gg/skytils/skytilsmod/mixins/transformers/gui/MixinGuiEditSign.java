@@ -34,7 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGuiEditSign {
     @Inject(method = "keyTyped", at = @At("TAIL"))
     public void skytils$enterToConfirmSign(char typedChar, int keyCode, CallbackInfo ci) {
-        if (!Skytils.Companion.getConfig().getPressEnterToConfirmSignQuestion()) return;
+        if (!Skytils.getConfig().getPressEnterToConfirmSignQuestion()) return;
         if (!Utils.INSTANCE.getInSkyblock()) return;
         if (keyCode != UKeyboard.KEY_ENTER) return;
         if (!GuiEditSignHookKt.isConfirmableSign((AccessorGuiEditSign) this)) return;

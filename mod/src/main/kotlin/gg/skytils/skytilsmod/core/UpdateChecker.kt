@@ -19,7 +19,7 @@ package gg.skytils.skytilsmod.core
 
 import gg.essential.universal.UDesktop
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.client
+import gg.skytils.skytilsmod.Skytils.client
 import gg.skytils.skytilsmod.gui.updater.RequestUpdateGui
 import gg.skytils.skytilsmod.gui.updater.UpdateGui
 import gg.skytils.skytilsmod.utils.GithubRelease

@@ -18,7 +18,7 @@
 package gg.skytils.skytilsmod.mixins.hooks.renderer
 
 import com.mojang.authlib.GameProfile
-import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.features.impl.handlers.GlintCustomizer
 import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import gg.skytils.skytilsmod.utils.RenderUtil.getPartialTicks

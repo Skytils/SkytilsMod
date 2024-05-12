@@ -20,8 +20,8 @@ package gg.skytils.skytilsmod.features.impl.handlers
 import gg.essential.universal.UChat
 import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.client
-import gg.skytils.skytilsmod.Skytils.Companion.json
+import gg.skytils.skytilsmod.Skytils.client
+import gg.skytils.skytilsmod.Skytils.json
 import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.toStringIfTrue

@@ -20,8 +20,8 @@ package gg.skytils.skytilsmod.commands.stats.impl
 
 import gg.essential.universal.wrappers.message.UMessage
 import gg.skytils.hypixel.types.skyblock.Member
-import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
-import gg.skytils.skytilsmod.Skytils.Companion.prefix
+import gg.skytils.skytilsmod.Skytils.failPrefix
+import gg.skytils.skytilsmod.Skytils.prefix
 import gg.skytils.skytilsmod.commands.stats.StatCommand
 import gg.skytils.skytilsmod.utils.*
 import java.util.*
