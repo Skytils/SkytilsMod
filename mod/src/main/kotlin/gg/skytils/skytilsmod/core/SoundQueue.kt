@@ -18,21 +18,28 @@
 
 package gg.skytils.skytilsmod.core
 
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.utils.Utils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
+import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentLinkedQueue
 
 /**
  * Hopefully thread safe way to queue sounds with a delay
  */
-object SoundQueue {
+object SoundQueue : EventSubscriber {
     private val soundQueue = ConcurrentLinkedQueue<QueuedSound>()
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || soundQueue.isEmpty()) return
+    override fun setup() {
+        mcScope.launch {
+            register(::onTick)
+        }
+    }
+
+    fun onTick(event: TickEvent) {
+        if (mc.thePlayer == null || soundQueue.isEmpty()) return
         for (sound in soundQueue) {
             if (--sound.ticks <= 0) {
                 if (sound.isLoud) {

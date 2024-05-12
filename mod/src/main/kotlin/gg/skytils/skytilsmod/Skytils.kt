@@ -22,6 +22,7 @@ import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UDesktop
 import gg.essential.universal.UKeyboard
+import gg.skytils.event.EventSubscriber
 import gg.skytils.skytilsmod.commands.impl.*
 import gg.skytils.skytilsmod.commands.stats.impl.CataCommand
 import gg.skytils.skytilsmod.commands.stats.impl.SlayerCommand
@@ -312,7 +313,6 @@ class Skytils {
             LocalAPI,
             MayorInfo,
             SBInfo,
-            SoundQueue,
             UpdateChecker,
 
             AlignmentTaskSolver,
@@ -403,6 +403,10 @@ class Skytils {
             EntityPlayerSPHook,
             MouseHelperHook
         ).forEach(MinecraftForge.EVENT_BUS::register)
+
+        arrayOf(
+            SoundQueue
+        ).forEach(EventSubscriber::setup)
     }
 
     @Mod.EventHandler
