@@ -198,10 +198,10 @@ object GriffinBurrows {
                 }
             }
             is S04PacketEntityEquipment -> {
-                val entity = UMinecraft.getMinecraft().theWorld.getEntityByID(event.packet.entityID)
+                val entity = mc.theWorld?.getEntityByID(event.packet.entityID)
                 (entity as? EntityArmorStand)?.let { armorStand ->
-                    if (event.packet.itemStack.item != Items.arrow) return
-                    if (armorStand.getDistanceSq(UPlayer.getPlayer()?.position) >= 27) return
+                    if (event.packet.itemStack?.item != Items.arrow) return
+                    if (armorStand.getDistanceSq(mc.thePlayer?.position) >= 27) return
                     printDevMessage("Found armor stand with arrow", "griffin", "griffinguess")
                     val yaw = Math.toRadians(armorStand.rotationYaw.toDouble())
                     val lookVec = Vec3(
