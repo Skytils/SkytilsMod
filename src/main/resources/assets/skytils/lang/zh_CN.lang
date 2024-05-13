@@ -217,6 +217,7 @@ skytils.config.miscellaneous.items.etherwarp_teleport_position_color=Etherwarp�
 skytils.config.miscellaneous.items.show_gemstones=显示宝石
 skytils.config.miscellaneous.items.show_head_floor_number=显示金头/钻头所属地牢层数
 skytils.config.miscellaneous.items.show_item_origin=显示物品来源
+skytils.config.miscellaneous.items.show_new_year_cake_year=显示新年蛋糕年份
 skytils.config.miscellaneous.items.show_npc_sell_price=显示NPC出售价格
 skytils.config.miscellaneous.items.show_potion_tier=显示药水等级
 skytils.config.miscellaneous.items.show_pet_candies=显示宠物使用糖果数

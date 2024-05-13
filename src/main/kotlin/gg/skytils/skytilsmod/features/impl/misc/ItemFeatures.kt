@@ -687,6 +687,9 @@ object ItemFeatures {
                         UGraphics.enableDepth()
                     }
             }
+            if (Skytils.config.showNYCakeYear && extraAttributes.hasKey("new_years_cake")) {
+                stackTip = extraAttributes.getInteger("new_years_cake").toString()
+            }
         }
         if (Skytils.config.showPetCandies && item.item === Items.skull) {
             val petInfoString = getExtraAttributes(item)?.getString("petInfo")

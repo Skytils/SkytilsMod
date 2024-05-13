@@ -2301,6 +2301,16 @@ object Config : Vigilant(
     var showOrigin = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Show New Year Cake Year",
+        description = "Shows the year of a New Year Cake as the stack size.",
+        category = "Miscellaneous", subcategory = "Items",
+        i18nName = "skytils.config.miscellaneous.items.show_new_year_cake_year",
+        i18nCategory = "skytils.config.miscellaneous",
+        i18nSubcategory = "skytils.config.miscellaneous.items"
+    )
+    var showNYCakeYear = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Show NPC Sell Price",
         description = "Shows the NPC Sell Price on certain items.",
         category = "Miscellaneous", subcategory = "Items",
