@@ -19,20 +19,27 @@ package gg.skytils.skytilsmod.features.impl.events
 
 import com.google.common.collect.EvictingQueue
 import gg.essential.universal.UMatrixStack
+import gg.essential.universal.UMinecraft
+import gg.essential.universal.wrappers.UPlayer
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+import net.minecraft.network.play.server.S04PacketEntityEquipment
+import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumParticleTypes
+import net.minecraft.util.Vec3
 import net.minecraft.util.Vec3i
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
@@ -42,6 +49,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
+import java.time.Duration
+import java.time.Instant
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 object GriffinBurrows {
     val particleBurrows = hashMapOf<BlockPos, ParticleBurrow>()
@@ -50,12 +62,31 @@ object GriffinBurrows {
 
     var hasSpadeInHotbar = false
 
+    object BurrowEstimation {
+        val arrows = mutableMapOf<Arrow, Instant>()
+        val guesses = mutableMapOf<BurrowGuess, Instant>()
+        fun getDistanceFromPitch(pitch: Double) =
+            2805 * pitch + 1375
+
+        val grassData by lazy {
+            this::class.java.getResource("/assets/skytils/grassdata.txt")!!.readBytes()
+        }
+
+        class Arrow(val directionVector: Vec3, val pos: Vec3)
+    }
+
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START) return
         hasSpadeInHotbar = mc.thePlayer != null && Utils.inSkyblock && (0..7).any {
             mc.thePlayer.inventory.getStackInSlot(it).isSpade
+        }
+        BurrowEstimation.guesses.entries.removeIf { (_, instant) ->
+            Duration.between(instant, Instant.now()).toMinutes() > 30
+        }
+        BurrowEstimation.arrows.entries.removeIf { (_, instant) ->
+            Duration.between(instant, Instant.now()).toMinutes() > 5
         }
     }
 
@@ -106,6 +137,23 @@ object GriffinBurrows {
                     pb.drawWaypoint(event.partialTicks, matrixStack)
                 }
             }
+            for (bg in BurrowEstimation.guesses.keys) {
+                bg.drawWaypoint(event.partialTicks, matrixStack)
+            }
+            for (arrow in BurrowEstimation.arrows.keys) {
+                RenderUtil.drawCircle(
+                    matrixStack,
+                    arrow.pos.x,
+                    arrow.pos.y + 0.2,
+                    arrow.pos.z,
+                    event.partialTicks,
+                    5.0,
+                    100,
+                    255,
+                    128,
+                    0,
+                )
+            }
         }
     }
 
@@ -118,22 +166,80 @@ object GriffinBurrows {
     @SubscribeEvent
     fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inSkyblock) return
-        if (Skytils.config.showGriffinBurrows && hasSpadeInHotbar && event.packet is S2APacketParticles) {
-            if (SBInfo.mode != SkyblockIsland.Hub.mode) return
-            event.packet.apply {
-                val type = ParticleType.getParticleType(this) ?: return
-                val pos = BlockPos(x, y, z).down()
-                if (recentlyDugParticleBurrows.contains(pos)) return
-                val burrow = particleBurrows.getOrPut(pos) {
-                    ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
+        when (event.packet) {
+            is S2APacketParticles -> {
+                if (Skytils.config.showGriffinBurrows && hasSpadeInHotbar) {
+                    if (SBInfo.mode != SkyblockIsland.Hub.mode) return
+                    event.packet.apply {
+                        val type = ParticleType.getParticleType(this) ?: return
+                        val pos = BlockPos(x, y, z).down()
+                        if (recentlyDugParticleBurrows.contains(pos)) return
+                        BurrowEstimation.guesses.keys.associateWith { guess ->
+                            pos.distanceSq(
+                                guess.x.toDouble(),
+                                guess.y.toDouble(),
+                                guess.z.toDouble()
+                            )
+                        }.minByOrNull { it.value }?.let { (guess, distance) ->
+                            printDevMessage("Nearest guess is $distance blocks away", "griffin", "griffinguess")
+                            if (distance <= 625) {
+                                BurrowEstimation.guesses.remove(guess)
+                            }
+                        }
+                        val burrow = particleBurrows.getOrPut(pos) {
+                            ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
+                        }
+                        when (type) {
+                            ParticleType.FOOTSTEP -> burrow.hasFootstep = true
+                            ParticleType.ENCHANT -> burrow.hasEnchant = true
+                            ParticleType.EMPTY -> burrow.type = 0
+                            ParticleType.MOB -> burrow.type = 1
+                            ParticleType.TREASURE -> burrow.type = 2
+                        }
+                    }
                 }
-                when (type) {
-                    ParticleType.FOOTSTEP -> burrow.hasFootstep = true
-                    ParticleType.ENCHANT -> burrow.hasEnchant = true
-                    ParticleType.EMPTY -> burrow.type = 0
-                    ParticleType.MOB -> burrow.type = 1
-                    ParticleType.TREASURE -> burrow.type = 2
+            }
+            is S04PacketEntityEquipment -> {
+                val entity = UMinecraft.getMinecraft().theWorld.getEntityByID(event.packet.entityID)
+                (entity as? EntityArmorStand)?.let { armorStand ->
+                    if (event.packet.itemStack.item != Items.arrow) return
+                    if (armorStand.getDistanceSq(UPlayer.getPlayer()?.position) >= 27) return
+                    printDevMessage("Found armor stand with arrow", "griffin", "griffinguess")
+                    val yaw = Math.toRadians(armorStand.rotationYaw.toDouble())
+                    val lookVec = Vec3(
+                        -sin(yaw),
+                        0.0,
+                        cos(yaw)
+                    )
+                    val offset = Vec3(-sin(yaw + PI/2), 0.0, cos(yaw + PI/2)) * 0.9
+                    val origin = armorStand.positionVector.add(offset)
+                    BurrowEstimation.arrows.put(BurrowEstimation.Arrow(lookVec, origin), Instant.now())
                 }
+            }
+            is S29PacketSoundEffect -> {
+                if (event.packet.soundName != "note.harp") return
+                val (arrow, distance) = BurrowEstimation.arrows.keys
+                    .associateWith { arrow ->
+                        arrow.pos.squareDistanceTo(event.packet.x, event.packet.y, event.packet.z)
+                    }.minByOrNull { it.value } ?: return
+                printDevMessage("Nearest arrow is $distance blocks away ${arrow.pos}", "griffin", "griffinguess")
+                if (distance > 25) return
+                val guessPos = arrow.pos.add(
+                    arrow.directionVector * BurrowEstimation.getDistanceFromPitch(event.packet.pitch.toDouble())
+                )
+
+                var y: Int
+                var x = guessPos.x.toInt()
+                var z = guessPos.z.toInt()
+                // offset of 300 blocks for both x and z
+                // x ranges from 195 to -281
+                // z ranges from 207 to -233
+                do {
+                    y = BurrowEstimation.grassData.get((x++ % 507) * 507 + (z++ % 495)).toInt()
+                } while (y < 2)
+                val guess = BurrowGuess(guessPos.x.toInt(), y, guessPos.z.toInt())
+                BurrowEstimation.arrows.remove(arrow)
+                BurrowEstimation.guesses[guess] = Instant.now()
             }
         }
     }
@@ -179,6 +285,16 @@ object GriffinBurrows {
             GlStateManager.enableDepth()
             GlStateManager.enableCull()
         }
+    }
+
+    data class BurrowGuess(
+        override val x: Int,
+        override val y: Int,
+        override val z: Int
+    ) : Diggable() {
+        override var type = 0
+        override val waypointText = "§aBurrow §6(Guess)"
+        override val color = Color.ORANGE
     }
 
     data class ParticleBurrow(
