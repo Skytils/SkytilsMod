@@ -18,6 +18,8 @@
 package gg.skytils.skytilsmod.features.impl.events
 
 import com.google.common.collect.EvictingQueue
+import gg.essential.elementa.state.BasicState
+import gg.essential.elementa.state.State
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UMinecraft
 import gg.essential.universal.wrappers.UPlayer
@@ -36,11 +38,7 @@ import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.server.S04PacketEntityEquipment
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraft.util.AxisAlignedBB
-import net.minecraft.util.BlockPos
-import net.minecraft.util.EnumParticleTypes
-import net.minecraft.util.Vec3
-import net.minecraft.util.Vec3i
+import net.minecraft.util.*
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.world.WorldEvent
@@ -133,7 +131,7 @@ object GriffinBurrows {
         if (Skytils.config.showGriffinBurrows) {
             val matrixStack = UMatrixStack()
             for (pb in particleBurrows.values) {
-                if (pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
+                if (pb.hasEnchant && pb.hasFootstep && pb.type.get() != -1) {
                     pb.drawWaypoint(event.partialTicks, matrixStack)
                 }
             }
@@ -187,14 +185,14 @@ object GriffinBurrows {
                             }
                         }
                         val burrow = particleBurrows.getOrPut(pos) {
-                            ParticleBurrow(pos, hasFootstep = false, hasEnchant = false, type = -1)
+                            ParticleBurrow(pos, hasFootstep = false, hasEnchant = false)
                         }
                         when (type) {
                             ParticleType.FOOTSTEP -> burrow.hasFootstep = true
                             ParticleType.ENCHANT -> burrow.hasEnchant = true
-                            ParticleType.EMPTY -> burrow.type = 0
-                            ParticleType.MOB -> burrow.type = 1
-                            ParticleType.TREASURE -> burrow.type = 2
+                            ParticleType.EMPTY -> burrow.type.set(0)
+                            ParticleType.MOB -> burrow.type.set(1)
+                            ParticleType.TREASURE -> burrow.type.set(2)
                         }
                     }
                 }
@@ -235,7 +233,7 @@ object GriffinBurrows {
                 // x ranges from 195 to -281
                 // z ranges from 207 to -233
                 do {
-                    y = BurrowEstimation.grassData.get((x++ % 507) * 507 + (z++ % 495)).toInt()
+                    y = BurrowEstimation.grassData[(x++ % 507) * 507 + (z++ % 495)].toInt()
                 } while (y < 2)
                 val guess = BurrowGuess(guessPos.x.toInt(), y, guessPos.z.toInt())
                 BurrowEstimation.arrows.remove(arrow)
@@ -248,35 +246,33 @@ object GriffinBurrows {
         abstract val x: Int
         abstract val y: Int
         abstract val z: Int
-        abstract var type: Int
         val blockPos: BlockPos by lazy {
             BlockPos(x, y, z)
         }
 
-        protected abstract val waypointText: String
-        protected abstract val color: Color
+        protected abstract val waypointText: State<String>
+        protected abstract val color: State<Color>
         fun drawWaypoint(partialTicks: Float, matrixStack: UMatrixStack) {
             val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
-            val pos = blockPos
-            val x = pos.x - viewerX
-            val y = pos.y - viewerY
-            val z = pos.z - viewerZ
-            val distSq = x * x + y * y + z * z
+            val renderX = this.x - viewerX
+            val renderY = this.y - viewerY
+            val renderZ = this.z - viewerZ
+            val distSq = renderX * renderX + renderY * renderY + renderZ * renderZ
             GlStateManager.disableDepth()
             GlStateManager.disableCull()
             RenderUtil.drawFilledBoundingBox(
                 matrixStack,
-                AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expandBlock(),
-                this.color,
+                AxisAlignedBB(renderX, renderY, renderZ, renderX + 1, renderY + 1, renderZ + 1).expandBlock(),
+                this.color.get(),
                 (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
             )
             GlStateManager.disableTexture2D()
-            if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(x, y + 1, z, this.color.rgb, 1.0f, partialTicks)
+            if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(renderX, renderY + 1, renderZ, this.color.get().rgb, 1.0f, partialTicks)
             RenderUtil.renderWaypointText(
-                waypointText,
-                blockPos.x + 0.5,
-                blockPos.y + 5.0,
-                blockPos.z + 0.5,
+                waypointText.get(),
+                x + 0.5,
+                y + 5.0,
+                z + 0.5,
                 partialTicks,
                 matrixStack
             )
@@ -292,9 +288,8 @@ object GriffinBurrows {
         override val y: Int,
         override val z: Int
     ) : Diggable() {
-        override var type = 0
-        override val waypointText = "§aBurrow §6(Guess)"
-        override val color = Color.ORANGE
+        override val waypointText = BasicState("§aBurrow §6(Guess)")
+        override val color = BasicState(Color.ORANGE)
     }
 
     data class ParticleBurrow(
@@ -302,37 +297,36 @@ object GriffinBurrows {
         override val y: Int,
         override val z: Int,
         var hasFootstep: Boolean,
-        var hasEnchant: Boolean,
-        override var type: Int
+        var hasEnchant: Boolean
     ) : Diggable() {
-        constructor(vec3: Vec3i, hasFootstep: Boolean, hasEnchant: Boolean, type: Int) : this(
+        constructor(vec3: Vec3i, hasFootstep: Boolean, hasEnchant: Boolean) : this(
             vec3.x,
             vec3.y,
             vec3.z,
             hasFootstep,
-            hasEnchant,
-            type
+            hasEnchant
         )
 
-        override val waypointText: String
-            get() {
-                var type = "Burrow"
-                when (this.type) {
-                    0 -> type = "§aStart"
-                    1 -> type = "§cMob"
-                    2 -> type = "§6Treasure"
+        val type = BasicState(-1)
+
+        override val waypointText = type.map {
+            "${
+                when (it) {
+                    0 -> "§aStart"
+                    1 -> "§cMob"
+                    2 -> "§6Treasure"
+                    else -> "§7Unknown"
                 }
-                return "$type §a(Particle)"
+            } §a(Particle)"
+        }
+        override val color = type.map {
+            when (it) {
+                0 -> Skytils.config.emptyBurrowColor
+                1 -> Skytils.config.mobBurrowColor
+                2 -> Skytils.config.treasureBurrowColor
+                else -> Color.WHITE
             }
-        override val color: Color
-            get() {
-                return when (this.type) {
-                    0 -> Skytils.config.emptyBurrowColor
-                    1 -> Skytils.config.mobBurrowColor
-                    2 -> Skytils.config.treasureBurrowColor
-                    else -> Color.WHITE
-                }
-            }
+        }
     }
 
     private val ItemStack?.isSpade
@@ -359,12 +353,9 @@ object GriffinBurrows {
         companion object {
             fun getParticleType(packet: S2APacketParticles): ParticleType? {
                 if (!packet.isLongDistance) return null
-                for (type in entries) {
-                    if (type.check(packet)) {
-                        return type
-                    }
+                return entries.find {
+                    it.check(packet)
                 }
-                return null
             }
         }
     }
