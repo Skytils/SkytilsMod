@@ -64,7 +64,7 @@ object GriffinBurrows {
         val arrows = mutableMapOf<Arrow, Instant>()
         val guesses = mutableMapOf<BurrowGuess, Instant>()
         fun getDistanceFromPitch(pitch: Double) =
-            2805 * pitch + 1375
+            2805 * pitch - 1375
 
         val grassData by lazy {
             this::class.java.getResource("/assets/skytils/grassdata.txt")!!.readBytes()
