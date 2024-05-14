@@ -82,10 +82,10 @@ object GriffinBurrows {
         }
         if (!Skytils.config.burrowEstimation) return
         BurrowEstimation.guesses.entries.removeIf { (_, instant) ->
-            Duration.between(instant, Instant.now()).toMinutes() > 30
+            Duration.between(instant, Instant.now()).toMinutes() > 2
         }
         BurrowEstimation.arrows.entries.removeIf { (_, instant) ->
-            Duration.between(instant, Instant.now()).toMinutes() > 5
+            Duration.between(instant, Instant.now()).toMillis() > 30_000L
         }
     }
 
