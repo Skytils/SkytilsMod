@@ -1562,6 +1562,14 @@ object Config : Vigilant(
     )
     var treasureBurrowColor = Color(173, 216, 230)
 
+    // TODO: Add translations
+    @Property(
+        type = PropertyType.SWITCH, name = "Griffin Burrow Estimation",
+        description = "Estimates griffin burrow position after using spade near the previous burrow.",
+        category = "Events", subcategory = "Mythological"
+    )
+    var burrowEstimation = false
+
     @Property(
         type = PropertyType.SWITCH, name = "Broadcast Rare Drop Notifications",
         description = "Sends rare drop notification when you obtain a rare drop from a Mythological Creature.",

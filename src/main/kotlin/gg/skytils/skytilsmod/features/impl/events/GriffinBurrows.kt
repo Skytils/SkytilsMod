@@ -80,6 +80,7 @@ object GriffinBurrows {
         hasSpadeInHotbar = mc.thePlayer != null && Utils.inSkyblock && (0..7).any {
             mc.thePlayer.inventory.getStackInSlot(it).isSpade
         }
+        if (!Skytils.config.burrowEstimation) return
         BurrowEstimation.guesses.entries.removeIf { (_, instant) ->
             Duration.between(instant, Instant.now()).toMinutes() > 30
         }
@@ -135,22 +136,24 @@ object GriffinBurrows {
                     pb.drawWaypoint(event.partialTicks, matrixStack)
                 }
             }
-            for (bg in BurrowEstimation.guesses.keys) {
-                bg.drawWaypoint(event.partialTicks, matrixStack)
-            }
-            for (arrow in BurrowEstimation.arrows.keys) {
-                RenderUtil.drawCircle(
-                    matrixStack,
-                    arrow.pos.x,
-                    arrow.pos.y + 0.2,
-                    arrow.pos.z,
-                    event.partialTicks,
-                    5.0,
-                    100,
-                    255,
-                    128,
-                    0,
-                )
+            if (Skytils.config.burrowEstimation) {
+                for (bg in BurrowEstimation.guesses.keys) {
+                    bg.drawWaypoint(event.partialTicks, matrixStack)
+                }
+                for (arrow in BurrowEstimation.arrows.keys) {
+                    RenderUtil.drawCircle(
+                        matrixStack,
+                        arrow.pos.x,
+                        arrow.pos.y + 0.2,
+                        arrow.pos.z,
+                        event.partialTicks,
+                        5.0,
+                        100,
+                        255,
+                        128,
+                        0,
+                    )
+                }
             }
         }
     }
@@ -198,6 +201,7 @@ object GriffinBurrows {
                 }
             }
             is S04PacketEntityEquipment -> {
+                if (!Skytils.config.burrowEstimation) return
                 val entity = mc.theWorld?.getEntityByID(event.packet.entityID)
                 (entity as? EntityArmorStand)?.let { armorStand ->
                     if (event.packet.itemStack?.item != Items.arrow) return
@@ -215,6 +219,7 @@ object GriffinBurrows {
                 }
             }
             is S29PacketSoundEffect -> {
+                if (!Skytils.config.burrowEstimation) return
                 if (event.packet.soundName != "note.harp") return
                 val (arrow, distance) = BurrowEstimation.arrows.keys
                     .associateWith { arrow ->
@@ -233,7 +238,7 @@ object GriffinBurrows {
                 // x ranges from 195 to -281
                 // z ranges from 207 to -233
                 do {
-                    y = BurrowEstimation.grassData[(x++ % 507) * 507 + (z++ % 495)].toInt()
+                    y = BurrowEstimation.grassData.getOrNull((x++ % 507) * 507 + (z++ % 495))?.toInt() ?: 0
                 } while (y < 2)
                 val guess = BurrowGuess(guessPos.x.toInt(), y, guessPos.z.toInt())
                 BurrowEstimation.arrows.remove(arrow)
