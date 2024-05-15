@@ -35,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(NetworkManager.class)
-public class ClientDisconnectEvent_MixinNetworkManager {
+public class MixinNetworkManager {
 
     @Shadow private INetHandler packetListener;
 

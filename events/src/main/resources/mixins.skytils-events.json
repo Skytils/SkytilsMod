@@ -5,8 +5,8 @@
   "refmap": "mixins.skytils-events.refmap.json",
   "client": [
     "MixinMinecraft",
-    "network.ClientConnectEvent_MixinNetHandlerPlayClient",
-    "network.ClientDisconnectEvent_MixinNetworkManager"
+    "network.MixinNetHandlerPlayClient",
+    "network.MixinNetworkManager"
   ],
   "verbose": true
 }
