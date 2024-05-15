@@ -4,7 +4,9 @@
   "package": "gg.skytils.event.mixins",
   "refmap": "mixins.skytils-events.refmap.json",
   "client": [
-    "MixinMinecraft"
+    "MixinMinecraft",
+    "network.ClientConnectEvent_MixinNetHandlerPlayClient",
+    "network.ClientDisconnectEvent_MixinNetworkManager"
   ],
   "verbose": true
 }
