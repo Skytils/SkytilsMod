@@ -104,6 +104,13 @@ object GriffinBurrows {
                 lastDugParticleBurrow = null
             }
         }
+        if (event.message.formattedText == "§r§6Poof! §r§eYou have cleared your griffin burrows!§r") {
+            particleBurrows.clear()
+            recentlyDugParticleBurrows.clear()
+            lastDugParticleBurrow = null
+            BurrowEstimation.guesses.clear()
+            BurrowEstimation.arrows.clear()
+        }
     }
 
     @SubscribeEvent
