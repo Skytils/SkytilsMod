@@ -132,7 +132,7 @@ object GriffinBurrows {
         if (Skytils.config.showGriffinBurrows) {
             val matrixStack = UMatrixStack()
             for (pb in particleBurrows.values) {
-                if (pb.hasEnchant && pb.hasFootstep && pb.type.get() != -1) {
+                if (pb.hasEnchant && pb.hasFootstep && pb.type != -1) {
                     pb.drawWaypoint(event.partialTicks, matrixStack)
                 }
             }
@@ -193,15 +193,15 @@ object GriffinBurrows {
                         when (type) {
                             ParticleType.FOOTSTEP -> burrow.hasFootstep = true
                             ParticleType.ENCHANT -> burrow.hasEnchant = true
-                            ParticleType.EMPTY -> burrow.type.set(0)
-                            ParticleType.MOB -> burrow.type.set(1)
-                            ParticleType.TREASURE -> burrow.type.set(2)
+                            ParticleType.EMPTY -> burrow.type = 0
+                            ParticleType.MOB -> burrow.type = 1
+                            ParticleType.TREASURE -> burrow.type = 2
                         }
                     }
                 }
             }
             is S04PacketEntityEquipment -> {
-                if (!Skytils.config.burrowEstimation) return
+                if (!Skytils.config.burrowEstimation || SBInfo.mode != SkyblockIsland.Hub.mode) return
                 val entity = mc.theWorld?.getEntityByID(event.packet.entityID)
                 (entity as? EntityArmorStand)?.let { armorStand ->
                     if (event.packet.itemStack?.item != Items.arrow) return
@@ -219,7 +219,7 @@ object GriffinBurrows {
                 }
             }
             is S29PacketSoundEffect -> {
-                if (!Skytils.config.burrowEstimation) return
+                if (!Skytils.config.burrowEstimation || SBInfo.mode != SkyblockIsland.Hub.mode) return
                 if (event.packet.soundName != "note.harp") return
                 val (arrow, distance) = BurrowEstimation.arrows.keys
                     .associateWith { arrow ->
@@ -255,8 +255,8 @@ object GriffinBurrows {
             BlockPos(x, y, z)
         }
 
-        protected abstract val waypointText: State<String>
-        protected abstract val color: State<Color>
+        protected abstract val waypointText: String
+        protected abstract val color: Color
         fun drawWaypoint(partialTicks: Float, matrixStack: UMatrixStack) {
             val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(partialTicks)
             val renderX = this.x - viewerX
@@ -268,13 +268,13 @@ object GriffinBurrows {
             RenderUtil.drawFilledBoundingBox(
                 matrixStack,
                 AxisAlignedBB(renderX, renderY, renderZ, renderX + 1, renderY + 1, renderZ + 1).expandBlock(),
-                this.color.get(),
+                this.color,
                 (0.1f + 0.005f * distSq.toFloat()).coerceAtLeast(0.2f)
             )
             GlStateManager.disableTexture2D()
-            if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(renderX, renderY + 1, renderZ, this.color.get().rgb, 1.0f, partialTicks)
+            if (distSq > 5 * 5) RenderUtil.renderBeaconBeam(renderX, renderY + 1, renderZ, this.color.rgb, 1.0f, partialTicks)
             RenderUtil.renderWaypointText(
-                waypointText.get(),
+                waypointText,
                 x + 0.5,
                 y + 5.0,
                 z + 0.5,
@@ -293,8 +293,8 @@ object GriffinBurrows {
         override val y: Int,
         override val z: Int
     ) : Diggable() {
-        override val waypointText = BasicState("§aBurrow §6(Guess)")
-        override val color = BasicState(Color.ORANGE)
+        override val waypointText = "§aBurrow §6(Guess)"
+        override val color = Color.ORANGE
     }
 
     data class ParticleBurrow(
@@ -312,26 +312,30 @@ object GriffinBurrows {
             hasEnchant
         )
 
-        val type = BasicState(-1)
-
-        override val waypointText = type.map {
-            "${
-                when (it) {
-                    0 -> "§aStart"
-                    1 -> "§cMob"
-                    2 -> "§6Treasure"
-                    else -> "§7Unknown"
+        var type = -1
+            set(value) {
+                field = value
+                when (value) {
+                    0 -> {
+                        waypointText = "§aStart §a(Particle)"
+                        color = Skytils.config.emptyBurrowColor
+                    }
+                    1 -> {
+                        waypointText = "§cMob §a(Particle)"
+                        color = Skytils.config.mobBurrowColor
+                    }
+                    2 -> {
+                        waypointText = "§6Treasure §a(Particle)"
+                        color = Skytils.config.treasureBurrowColor
+                    }
                 }
-            } §a(Particle)"
-        }
-        override val color = type.map {
-            when (it) {
-                0 -> Skytils.config.emptyBurrowColor
-                1 -> Skytils.config.mobBurrowColor
-                2 -> Skytils.config.treasureBurrowColor
-                else -> Color.WHITE
             }
-        }
+
+        override var waypointText = "§7Unknown §a(Particle)"
+            private set
+
+        override var color = Color.WHITE
+            private set
     }
 
     private val ItemStack?.isSpade
