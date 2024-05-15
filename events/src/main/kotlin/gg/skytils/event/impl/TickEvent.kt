@@ -20,5 +20,8 @@ package gg.skytils.event.impl
 
 import gg.skytils.event.Event
 
+/**
+ * [gg.skytils.event.mixins.MixinMinecraft.tick]
+ */
 class TickEvent : Event() {
 }

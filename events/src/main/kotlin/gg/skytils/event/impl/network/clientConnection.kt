@@ -20,6 +20,14 @@ package gg.skytils.event.impl.network
 
 import gg.skytils.event.Event
 
+/**
+ * [gg.skytils.event.mixins.network.MixinNetHandlerPlayClient.onConnect]
+ */
 class ClientConnectEvent : Event()
 
+/**
+ * [gg.skytils.event.mixins.network.MixinNetworkManager.channelInactive]
+ *
+ * [gg.skytils.event.mixins.network.MixinNetworkManager.onDisconnect]
+ */
 class ClientDisconnectEvent : Event()
