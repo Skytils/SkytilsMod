@@ -110,6 +110,9 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     "refresh" -> {
                         GriffinBurrows.particleBurrows.clear()
                     }
+                    "clearguess" -> {
+                        GriffinBurrows.BurrowEstimation.guesses.clear()
+                    }
 
                     else -> UChat.chat("$prefix §b/skytils griffin <refresh>")
                 }
