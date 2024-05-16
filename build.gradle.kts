@@ -115,7 +115,7 @@ dependencies {
     }
 
     shadowMe(platform(kotlin("bom")))
-    shadowMe(platform(ktor("bom", "2.3.9", addSuffix = false)))
+    shadowMe(platform(ktor("bom", "2.3.11", addSuffix = false)))
 
     shadowMe(ktor("serialization-kotlinx-json"))
 
@@ -147,6 +147,7 @@ dependencies {
 
     shadowMe(project(":events"))
     shadowMe(project(":hypixel-api:types"))
+    shadowMe(project(":ws-shared"))
 
     shadowMe("org.bouncycastle:bcpg-jdk18on:1.78.1") {
         exclude(module = "bcprov-jdk18on")
