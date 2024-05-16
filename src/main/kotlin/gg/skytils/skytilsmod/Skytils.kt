@@ -92,7 +92,11 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
+import net.hypixel.data.region.Environment
+import net.hypixel.modapi.HypixelModAPI
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPingPacket
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
@@ -618,6 +622,7 @@ class Skytils {
     }
 
     fun onJoinHypixel(handler: NetHandlerPlayClient) = IO.launch {
+        HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket::class.java)
         ServerboundPingPacket().getResponse<ClientboundPingPacket>(handler).let { packet ->
             println("Hypixel Pong: ${packet.response}, version ${packet.version}")
         }

@@ -25,14 +25,9 @@ import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner.scan
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.ScanUtils
 import gg.skytils.skytilsmod.listeners.DungeonListener
-import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor.getResponse
 import gg.skytils.skytilsmod.utils.SBInfo
-import gg.skytils.skytilsws.client.WSClient
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoom
-import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoomSecret
 import kotlinx.coroutines.launch
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundLocationPacket
-import net.hypixel.modapi.packet.impl.serverbound.ServerboundLocationPacket
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 

@@ -19,13 +19,11 @@ package gg.skytils.skytilsmod.utils
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.HypixelPacketEvent
-import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor.toCustomPayload
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundLocationPacket
-import net.hypixel.modapi.packet.impl.serverbound.ServerboundLocationPacket
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -59,7 +57,6 @@ object SBInfo {
 
     @JvmField
     var lastOpenContainerName: String? = null
-    var lastLocationRequest: Long = -1
     private var joinedWorld: Long = -1
     private val junkRegex = Regex("[^\u0020-\u0127û]")
 
@@ -79,7 +76,6 @@ object SBInfo {
         mode = null
         server = null
         lastOpenContainerName = null
-        lastLocationRequest = -1
     }
 
     @SubscribeEvent
@@ -100,10 +96,6 @@ object SBInfo {
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null || !Utils.inSkyblock) return
         val currentTime = System.currentTimeMillis()
-        if (server == null && currentTime - joinedWorld > 1300 && currentTime - lastLocationRequest > 3000) {
-            lastLocationRequest = currentTime
-            mc.netHandler.addToSendQueue(ServerboundLocationPacket().toCustomPayload())
-        }
         try {
             val lines = ScoreboardUtil.fetchScoreboardLines().map { it.stripControlCodes() }
             if (lines.size >= 5) {

@@ -153,7 +153,7 @@ dependencies {
         exclude(module = "bcprov-jdk18on")
     }
     compileOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
-    shadowMe("net.hypixel:mod-api:0.3.2")
+    shadowMe("net.hypixel:mod-api:0.4.0")
 
 
     shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")!!)

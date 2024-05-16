@@ -55,9 +55,7 @@ import gg.skytils.skytilsws.shared.packet.C2SPacketStartDungeon
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundLocationPacket
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket
-import net.hypixel.modapi.packet.impl.serverbound.ServerboundLocationPacket
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPartyInfoPacket
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
@@ -204,16 +202,13 @@ object DungeonListener {
                     IO.launch {
                         delay(2000)
                         if (DungeonTimer.dungeonStartTime != -1L) {
-                            val location = async {
-                                ServerboundLocationPacket().getResponse<ClientboundLocationPacket>(mc.netHandler)
-                            }
                             val party = async {
                                 ServerboundPartyInfoPacket().getResponse<ClientboundPartyInfoPacket>(mc.netHandler)
                             }
                             val partyMembers = party.await().members.ifEmpty { setOf(mc.thePlayer.uniqueID) }.mapTo(hashSetOf()) { it.toString() }
                             val entrance = DungeonInfo.uniqueRooms.first { it.mainRoom.data.type == RoomType.ENTRANCE }
                             WSClient.sendPacket(C2SPacketStartDungeon(
-                                serverId = location.await().serverName,
+                                serverId = SBInfo.server ?: return@launch,
                                 floor = DungeonFeatures.dungeonFloor!!,
                                 members = partyMembers,
                                 startTime = DungeonTimer.dungeonStartTime,
