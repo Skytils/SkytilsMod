@@ -1,3 +1,7 @@
 [submodule "hypixel-api"]
 	path = hypixel-api
 	url = https://github.com/Skytils/hypixel-api
+
+[submodule "ws-shared"]
+    path = ws-shared
+    url = https://github.com/Skytils/ws-shared
