@@ -53,6 +53,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object DungeonListener {
     val team = hashMapOf<String, DungeonTeammate>()
+    private val teamCached = hashMapOf<String, Pair<DungeonClass, Int>>()
     val deads = hashSetOf<DungeonTeammate>()
     val disconnected = hashSetOf<String>()
     val missingPuzzles = hashSetOf<String>()
@@ -106,6 +107,7 @@ object DungeonListener {
         disconnected.clear()
         missingPuzzles.clear()
         completedPuzzles.clear()
+        teamCached.clear()
     }
 
     @SubscribeEvent
@@ -236,20 +238,22 @@ object DungeonListener {
             if (Utils.inDungeons && mc.thePlayer != null && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
                 val tabEntries = TabListUtils.tabEntries
                 var partyCount: Int? = null
-                var oldTeam: Map<String, DungeonTeammate>? = null
-
                 if (tabEntries.isNotEmpty() && tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
                     partyCount = partyCountPattern.find(tabEntries[0].second)?.groupValues?.get(1)?.toIntOrNull()
                     if (partyCount != null) {
                         // we can just keep disconnected players here i think
                         if (team.size != partyCount) {
                             println("Recomputing team as party size has changed ${team.size} -> $partyCount")
-                            oldTeam = team.clone() as Map<String, DungeonTeammate>
+                            team.values.filter { it.dungeonClass != DungeonClass.EMPTY }.forEach {
+                                teamCached[it.playerName] = it.dungeonClass to it.classLevel
+                            }
                             team.clear()
                         } else if (team.size > 5) {
                             UChat.chat("$failPrefix §cSomething isn't right! I got more than 5 members. Expected $partyCount members but got ${team.size}")
                             println("Got more than 5 players on the team??")
-                            oldTeam = team.clone() as Map<String, DungeonTeammate>
+                            team.values.filter { it.dungeonClass != DungeonClass.EMPTY }.forEach {
+                                teamCached[it.playerName] = it.dungeonClass to it.classLevel
+                            }
                             team.clear()
                         }
                     } else {
@@ -295,10 +299,15 @@ object DungeonListener {
                                 )
                         } else {
                             println("Parsed teammate $name with value EMPTY, $text")
-                            if (oldTeam != null && name in oldTeam) {
-                                val old = oldTeam[name]!!
-                                team[name] = old.copy(tabEntryIndex = pos)
-                                println("Got old teammate $name with value EMPTY, using $old instead")
+                            if (name in teamCached) {
+                                val cache = teamCached[name]!!
+                                team[name] = DungeonTeammate(
+                                    name,
+                                    cache.first, cache.second,
+                                    pos,
+                                    entry.locationSkin
+                                )
+                                println("Got old teammate $name with value EMPTY, using values from cache instead ${cache}")
                             } else {
                                 team[name] = DungeonTeammate(
                                     name,
