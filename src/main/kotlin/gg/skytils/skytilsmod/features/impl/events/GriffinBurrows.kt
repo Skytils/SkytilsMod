@@ -24,6 +24,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
+import gg.skytils.skytilsmod.features.impl.events.GriffinBurrows.BurrowEstimation.otherGrassData
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
@@ -68,6 +69,10 @@ object GriffinBurrows {
 
         val grassData by lazy {
             this::class.java.getResource("/assets/skytils/grassdata.txt")!!.readBytes()
+        }
+
+        val otherGrassData by lazy {
+            this::class.java.getResource("/assets/skytils/hub_grass_heights.bin")!!.readBytes()
         }
 
         class Arrow(val directionVector: Vec3, val pos: Vec3)
@@ -131,18 +136,13 @@ object GriffinBurrows {
                 }
             }")
 
-            var y: Int
-            var x = guessPos.x.toInt()
-            var z = guessPos.z.toInt()
             // offset of 300 blocks for both x and z
             // x ranges from 195 to -281
             // z ranges from 207 to -233
 
-            // TODO: this y thing is wrong and puts them in the air sometimes
-            do {
-                y = BurrowEstimation.grassData.getOrNull((x++ % 507) * 507 + (z++ % 495))?.toInt() ?: 0
-            } while (y < 2)
-            val guess = BurrowGuess(guessPos.x.toInt(), y, guessPos.z.toInt())
+            fun getIndex(x: Int, z: Int) = (x - -281) + (z - -233) * (195 - -281 + 1)
+
+            val guess = BurrowGuess(guessPos.x.toInt(), otherGrassData.getOrNull(getIndex(guessPos.x.toInt(), guessPos.z.toInt()))?.toInt() ?: 0, guessPos.z.toInt())
             BurrowEstimation.guesses[guess] = Instant.now()
 
             BurrowEstimation.lastTrail.clear()
@@ -264,14 +264,10 @@ object GriffinBurrows {
                             val pos = BlockPos(x, y, z).down()
                             if (recentlyDugParticleBurrows.contains(pos)) return
                             BurrowEstimation.guesses.keys.associateWith { guess ->
-                                pos.distanceSq(
-                                    guess.x.toDouble(),
-                                    guess.y.toDouble(),
-                                    guess.z.toDouble()
-                                )
+                                (pos.x - guess.x) * (pos.x - guess.x) + (pos.z - guess.z) * (pos.z - guess.z)
                             }.minByOrNull { it.value }?.let { (guess, distance) ->
                                 // printDevMessage("Nearest guess is $distance blocks^2 away", "griffin", "griffinguess")
-                                if (distance <= 625) {
+                                if (distance <= 25 * 25) {
                                     BurrowEstimation.guesses.remove(guess)
                                 }
                             }
