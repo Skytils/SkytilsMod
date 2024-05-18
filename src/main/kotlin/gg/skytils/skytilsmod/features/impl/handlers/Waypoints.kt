@@ -60,6 +60,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     private val sbeWaypointFormat =
         Regex("(?:\\.?\\/?crystalwaypoint parse )?(?<name>[a-zA-Z\\d]+)@-(?<x>[-\\d]+),(?<y>[-\\d]+),(?<z>[-\\d]+)\\\\?n?")
     private var visibleWaypoints = emptyList<Waypoint>()
+    var needsRefresh = false
 
     @OptIn(ExperimentalSerializationApi::class)
     fun getWaypointsFromString(str: String): Set<WaypointCategory> {
@@ -231,17 +232,17 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Unload) {
         visibleWaypoints = emptyList()
-    }
-
-    @SubscribeEvent
-    fun onLocraw(event: LocrawReceivedEvent) {
-        tickTimer(20, task = ::computeVisibleWaypoints)
+        needsRefresh = true
     }
 
     @SubscribeEvent
     fun onPlayerMove(event: ClientTickEvent) {
-        if (event.phase == TickEvent.Phase.END || mc.thePlayer?.hasMoved != true) return
-        if (SBInfo.mode != null && OrderedWaypointCommand.trackedIsland?.mode == SBInfo.mode) {
+        if (event.phase == TickEvent.Phase.END) return
+        if (needsRefresh && SBInfo.mode != null) {
+            computeVisibleWaypoints()
+            needsRefresh = false
+        }
+        if (mc.thePlayer?.hasMoved == true && SBInfo.mode != null && OrderedWaypointCommand.trackedIsland?.mode == SBInfo.mode) {
             val tracked = OrderedWaypointCommand.trackedSet?.firstOrNull()
             if (tracked == null) {
                 OrderedWaypointCommand.doneTracking()
