@@ -613,6 +613,10 @@ class Skytils {
         Utils.isOnHypixel = false
         Utils.skyblock = false
         Utils.dungeons = false
+
+        IO.launch {
+            WSClient.closeConnection()
+        }
     }
 
     @SubscribeEvent
