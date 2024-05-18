@@ -19,8 +19,12 @@
 package gg.skytils.skytilsmod.listeners
 
 import gg.skytils.skytilsmod.Skytils.Companion.IO
+import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.HypixelPacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorHypixelModAPI
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorPlayerControllerMP
+import gg.skytils.skytilsmod.utils.Utils
 import io.netty.buffer.Unpooled
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
@@ -30,7 +34,8 @@ import kotlinx.coroutines.withTimeout
 import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.error.ErrorReason
 import net.hypixel.modapi.packet.ClientboundHypixelPacket
-import net.hypixel.modapi.packet.HypixelPacket
+import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import net.hypixel.modapi.serializer.PacketSerializer
 import net.minecraft.client.network.NetHandlerPlayClient
@@ -51,6 +56,7 @@ object ServerPayloadInterceptor {
                 val registry = HypixelModAPI.getInstance().registry
                 val id = event.packet.channelName
                 if (registry.isRegistered(id)) {
+                    println("Received Hypixel packet $id")
                     val packetSerializer = PacketSerializer(event.packet.bufferData.duplicate())
                     if (!packetSerializer.readBoolean()) {
                         val reason = ErrorReason.getById(packetSerializer.readVarInt())
@@ -71,8 +77,26 @@ object ServerPayloadInterceptor {
             val registry = HypixelModAPI.getInstance().registry
             val id = event.packet.channelName
             if (registry.isRegistered(id)) {
+                println("Sent Hypixel packet $id")
                 HypixelPacketEvent.SendEvent(id).postAndCatch()
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onHypixelPacket(event: HypixelPacketEvent.ReceiveEvent) {
+        if (event.packet is ClientboundHelloPacket) {
+            val modAPI = HypixelModAPI.getInstance()
+            modAPI as AccessorHypixelModAPI
+            if (modAPI.packetSender == null) {
+                println("Hypixel Mod API packet sender is not set, Skytils will set the packet sender.")
+                modAPI.setPacketSender {
+                    getNetClientHandler()?.addToSendQueue((it as ServerboundVersionedPacket).toCustomPayload()) ?: return@setPacketSender false
+                    return@setPacketSender true
+                }
+            }
+            modAPI.subscribeToEventPacket(ClientboundLocationPacket::class.java)
+            modAPI.invokeSendRegisterPacket(true)
         }
     }
 
@@ -83,9 +107,11 @@ object ServerPayloadInterceptor {
         return C17PacketCustomPayload(this.identifier, buffer)
     }
 
-    suspend fun <T : ClientboundHypixelPacket> ServerboundVersionedPacket.getResponse(handler: NetHandlerPlayClient): T = withTimeout(1.minutes) {
+    suspend fun <T : ClientboundHypixelPacket> ServerboundVersionedPacket.getResponse(): T = withTimeout(1.minutes) {
         val packet: C17PacketCustomPayload = this@getResponse.toCustomPayload()
-        handler.addToSendQueue(packet)
+        getNetClientHandler()?.addToSendQueue(packet)
         return@withTimeout receivedPackets.filter { it.identifier == this@getResponse.identifier }.first() as T
     }
+
+    private fun getNetClientHandler() = (mc.playerController as AccessorPlayerControllerMP?)?.netClientHandler ?: Utils.lastNetworkManager?.netHandler as? NetHandlerPlayClient
 }

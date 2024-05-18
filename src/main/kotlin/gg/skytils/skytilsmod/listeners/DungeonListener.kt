@@ -203,7 +203,7 @@ object DungeonListener {
                         delay(2000)
                         if (DungeonTimer.dungeonStartTime != -1L) {
                             val party = async {
-                                ServerboundPartyInfoPacket().getResponse<ClientboundPartyInfoPacket>(mc.netHandler)
+                                ServerboundPartyInfoPacket().getResponse<ClientboundPartyInfoPacket>()
                             }
                             val partyMembers = party.await().members.ifEmpty { setOf(mc.thePlayer.uniqueID) }.mapTo(hashSetOf()) { it.toString() }
                             val entrance = DungeonInfo.uniqueRooms.first { it.mainRoom.data.type == RoomType.ENTRANCE }

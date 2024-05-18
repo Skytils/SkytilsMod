@@ -63,7 +63,6 @@ import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.listeners.ChatListener
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor
-import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor.getResponse
 import gg.skytils.skytilsmod.localapi.LocalAPI
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import gg.skytils.skytilsmod.mixins.hooks.entity.EntityPlayerSPHook
@@ -92,18 +91,11 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
-import net.hypixel.data.region.Environment
-import net.hypixel.modapi.HypixelModAPI
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket
-import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
-import net.hypixel.modapi.packet.impl.serverbound.ServerboundPingPacket
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiGameOver
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.launchwrapper.Launch
@@ -561,10 +553,6 @@ class Skytils {
                 ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
         }.onFailure { it.printStackTrace() }.getOrDefault(false)
 
-        if (Utils.isOnHypixel) {
-            onJoinHypixel(event.handler as NetHandlerPlayClient)
-        }
-
         IO.launch {
             TrophyFish.loadFromApi()
         }
@@ -602,7 +590,6 @@ class Skytils {
             val brand = event.packet.bufferData.readStringFromBuffer(Short.MAX_VALUE.toInt())
             if (brand.lowercase().contains("hypixel")) {
                 Utils.isOnHypixel = true
-                onJoinHypixel(event.handler as NetHandlerPlayClient)
             }
         }
         if (Utils.inDungeons || !Utils.isOnHypixel || event.packet !is S38PacketPlayerListItem ||
@@ -618,13 +605,6 @@ class Skytils {
                     ScoreCalculation.updateText(ScoreCalculation.totalScore.get())
                 return@forEach
             }
-        }
-    }
-
-    fun onJoinHypixel(handler: NetHandlerPlayClient) = IO.launch {
-        HypixelModAPI.getInstance().subscribeToEventPacket(ClientboundLocationPacket::class.java)
-        ServerboundPingPacket().getResponse<ClientboundPingPacket>(handler).let { packet ->
-            println("Hypixel Pong: ${packet.response}, version ${packet.version}")
         }
     }
 

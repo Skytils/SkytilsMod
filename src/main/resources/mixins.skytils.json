@@ -20,6 +20,7 @@
     "accessors.AccessorGuiMainMenu",
     "accessors.AccessorGuiNewChat",
     "accessors.AccessorGuiStreamUnavailable",
+    "accessors.AccessorHypixelModAPI",
     "accessors.AccessorHypixelPacketRegistry",
     "accessors.AccessorMinecraft",
     "accessors.AccessorModelDragon",
@@ -96,6 +97,7 @@
   ],
   "verbose": true,
   "client": [
+    "accessors.AccessorPlayerControllerMP",
     "gui.MixinGuiEditSign",
     "util.MixinMouseHelper"
   ]

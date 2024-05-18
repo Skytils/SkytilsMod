@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.mixins.transformers.network;
 
 import gg.skytils.skytilsmod.mixins.hooks.network.NetworkManagerHookKt;
+import gg.skytils.skytilsmod.utils.Utils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import net.minecraft.network.EnumPacketDirection;
@@ -34,6 +35,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(value = NetworkManager.class, priority = 1001)
 public abstract class MixinNetworkManager extends SimpleChannelInboundHandler<Packet<?>> {
     @Shadow @Final private EnumPacketDirection direction;
+
+
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void onInit(CallbackInfo ci) {
+        if (this.direction == EnumPacketDirection.CLIENTBOUND) {
+            Utils.INSTANCE.setLastNetworkManager((NetworkManager) (Object) this);
+        }
+    }
 
     @Inject(method = "channelRead0", at = @At("HEAD"), cancellable = true)
     private void onReceivePacket(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {

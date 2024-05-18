@@ -396,7 +396,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     UChat.chat("$successPrefix §aPacket created: $packet")
                     Skytils.IO.launch {
                         runCatching {
-                            packet.getResponse<ClientboundHypixelPacket>(mc.netHandler)
+                            packet.getResponse<ClientboundHypixelPacket>()
                         }.onFailure {
                             UChat.chat("$failPrefix §cFailed to get packet response: ${it.message}")
                         }.onSuccess { response ->
