@@ -37,3 +37,4 @@ pluginManagement {
 rootProject.name = "SkytilsMod"
 include("events")
 include("hypixel-api:types")
+include("ws-shared")

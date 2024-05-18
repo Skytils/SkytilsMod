@@ -25,8 +25,6 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.commands.impl.OrderedWaypointCommand
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
 import gg.skytils.skytilsmod.tweaker.DependencyLoader
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.serialization.EncodeDefault

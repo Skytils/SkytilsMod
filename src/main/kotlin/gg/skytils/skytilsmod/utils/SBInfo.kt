@@ -64,7 +64,7 @@ object SBInfo {
     private var lastManualLocRaw: Long = -1
     private var lastLocRaw: Long = -1
     private var joinedWorld: Long = -1
-    private var locraw: LocrawObject? = null
+    var locraw: LocrawObject? = null
     private val junkRegex = Regex("[^\u0020-\u0127û]")
 
     @SubscribeEvent
