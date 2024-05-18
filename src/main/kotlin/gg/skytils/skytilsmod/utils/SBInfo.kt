@@ -23,6 +23,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -32,6 +33,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -57,7 +59,6 @@ object SBInfo {
 
     @JvmField
     var lastOpenContainerName: String? = null
-    private var joinedWorld: Long = -1
     private val junkRegex = Regex("[^\u0020-\u0127û]")
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -73,29 +74,31 @@ object SBInfo {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Unload) {
-        mode = null
-        server = null
         lastOpenContainerName = null
     }
 
     @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Load) {
-        joinedWorld = System.currentTimeMillis()
+    fun onDisconnect(event: ClientDisconnectionFromServerEvent)  {
+        mode = null
+        server = null
+        lastLocationPacket = null
     }
 
     @SubscribeEvent
     fun onHypixelPacket(event: HypixelPacketEvent.ReceiveEvent) {
         if (event.packet is ClientboundLocationPacket) {
-            mode = event.packet.mode.orElse(null)
-            server = event.packet.serverName
-            lastLocationPacket = event.packet
+            Utils.checkThreadAndQueue {
+                mode = event.packet.mode.orElse(null)
+                server = event.packet.serverName
+                lastLocationPacket = event.packet
+                println(event.packet)
+            }
         }
     }
 
     @SubscribeEvent
     fun onTick(event: ClientTickEvent) {
         if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null || !Utils.inSkyblock) return
-        val currentTime = System.currentTimeMillis()
         try {
             val lines = ScoreboardUtil.fetchScoreboardLines().map { it.stripControlCodes() }
             if (lines.size >= 5) {
