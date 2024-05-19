@@ -63,7 +63,6 @@ import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.listeners.ChatListener
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor
-import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor.getResponse
 import gg.skytils.skytilsmod.localapi.LocalAPI
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import gg.skytils.skytilsmod.mixins.hooks.entity.EntityPlayerSPHook
@@ -92,8 +91,6 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
-import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket
-import net.hypixel.modapi.packet.impl.serverbound.ServerboundPingPacket
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiGameOver
@@ -552,14 +549,11 @@ class Skytils {
 
     @SubscribeEvent
     fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
+        Utils.lastNHPC = event.handler as? NetHandlerPlayClient
         Utils.isOnHypixel = mc.runCatching {
             !event.isLocal && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
                 ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
         }.onFailure { it.printStackTrace() }.getOrDefault(false)
-
-        if (Utils.isOnHypixel) {
-            onJoinHypixel(event.handler as NetHandlerPlayClient)
-        }
 
         IO.launch {
             TrophyFish.loadFromApi()
@@ -598,7 +592,6 @@ class Skytils {
             val brand = event.packet.bufferData.readStringFromBuffer(Short.MAX_VALUE.toInt())
             if (brand.lowercase().contains("hypixel")) {
                 Utils.isOnHypixel = true
-                onJoinHypixel(event.handler as NetHandlerPlayClient)
             }
         }
         if (Utils.inDungeons || !Utils.isOnHypixel || event.packet !is S38PacketPlayerListItem ||
@@ -617,14 +610,9 @@ class Skytils {
         }
     }
 
-    fun onJoinHypixel(handler: NetHandlerPlayClient) = IO.launch {
-        ServerboundPingPacket().getResponse<ClientboundPingPacket>(handler).let { packet ->
-            println("Hypixel Pong: ${packet.response}, version ${packet.version}")
-        }
-    }
-
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+        Utils.lastNHPC = null
         Utils.isOnHypixel = false
         Utils.skyblock = false
         Utils.dungeons = false

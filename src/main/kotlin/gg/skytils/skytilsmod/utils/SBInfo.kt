@@ -19,12 +19,10 @@ package gg.skytils.skytilsmod.utils
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.HypixelPacketEvent
-import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor.toCustomPayload
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
-import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -76,7 +74,6 @@ object SBInfo {
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Unload) {
         lastOpenContainerName = null
-        lastLocationRequest = -1
     }
 
     @SubscribeEvent
