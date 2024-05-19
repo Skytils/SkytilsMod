@@ -18,16 +18,19 @@
 
 package gg.skytils.event
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.flow.*
+import java.util.concurrent.CopyOnWriteArrayList
+
+private typealias Handler<T> = suspend (T) -> Unit
 
 enum class EventPriority {
     Lowest {
         override val next: EventPriority = this
 
         override suspend fun <T : Event> post(event: T) {
-            flow.emit(event)
+            handlers[event.javaClass]?.forEach { handler ->
+                @Suppress("UNCHECKED_CAST")
+                (handler as Handler<T>).invoke(event)
+            }
         }
     },
     Low {
@@ -44,15 +47,23 @@ enum class EventPriority {
     };
 
     @PublishedApi
-    internal val flow: MutableSharedFlow<Event> = MutableSharedFlow()
+    internal val handlers = mutableMapOf<Class<out Event>, MutableList<Handler<*>>>()
     internal abstract val next: EventPriority
 
     @PublishedApi
-    internal suspend inline fun <reified T : Event> subscribe(noinline block: suspend (T) -> Unit) =
-        flow.filterIsInstance<T>().onEach(block).launchIn(CoroutineScope(currentCoroutineContext()))
+    internal inline fun <reified T : Event> subscribe(noinline block: Handler<T>) =
+        handlers.getOrPut(T::class.java, ::CopyOnWriteArrayList).run {
+            add(block)
+            return@run {
+                remove(block)
+            }
+        }
 
     internal open suspend fun <T : Event> post(event: T) {
-        flow.emit(event)
+        handlers[event.javaClass]?.forEach { handler ->
+            @Suppress("UNCHECKED_CAST")
+            (handler as Handler<T>).invoke(event)
+        }
         if (!event.continuePropagation()) return
         next.post(event)
     }

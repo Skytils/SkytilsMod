@@ -19,9 +19,9 @@
 package gg.skytils.event
 
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 suspend fun <T : Event> post(event: T) =
     EventPriority.Highest.post(event)
@@ -42,14 +42,21 @@ fun <T : CancellableEvent> postCancellableSync(event: T) =
         postCancellable(event)
     }
 
-suspend inline fun <reified T : Event> on(priority: EventPriority = EventPriority.Normal, noinline block: suspend (T) -> Unit) =
+inline fun <reified T : Event> on(priority: EventPriority = EventPriority.Normal, noinline block: suspend (T) -> Unit) =
     priority.subscribe<T>(block)
 
 suspend inline fun <reified T : Event> await(priority: EventPriority = EventPriority.Normal) =
-    priority.flow.filterIsInstance<T>().first()
+    suspendCancellableCoroutine { coroutine ->
+        var deregister = { true }
+        deregister = priority.subscribe<T> { event ->
+            deregister()
+            coroutine.resume(event)
+        }
+    }
 
 suspend inline fun <reified T : Event> await(repetitions: Int, priority: EventPriority = EventPriority.Normal) = run {
     assert(repetitions >= 1) { "Expected repetitions to be at least 1 but received $repetitions" }
-    var counter = 0
-    priority.flow.filterIsInstance<T>().first { counter++ == repetitions }
+    repeat(repetitions) {
+        await<T>(priority)
+    }
 }
