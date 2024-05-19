@@ -27,7 +27,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 fun markTerminalItems(slot: Slot, cir: CallbackInfoReturnable<ItemStack?>) {
     if (!Utils.inSkyblock) return
-    // TODO check if in dungeon
     val original = slot.inventory.getStackInSlot(slot.slotIndex) ?: return
     if (!original.isItemEnchanted && (SelectAllColorSolver.shouldClick.contains(slot.slotNumber) ||
                 StartsWithSequenceSolver.shouldClick.contains(slot.slotNumber))
