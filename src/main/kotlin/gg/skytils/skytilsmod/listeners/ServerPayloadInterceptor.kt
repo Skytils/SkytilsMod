@@ -57,14 +57,18 @@ object ServerPayloadInterceptor {
                 val id = event.packet.channelName
                 if (registry.isRegistered(id)) {
                     println("Received Hypixel packet $id")
-                    val packetSerializer = PacketSerializer(event.packet.bufferData.duplicate())
-                    if (!packetSerializer.readBoolean()) {
-                        val reason = ErrorReason.getById(packetSerializer.readVarInt())
-                        HypixelPacketEvent.FailedEvent(id, reason).postAndCatch()
-                    } else {
-                        val packet = registry.createClientboundPacket(id, packetSerializer)
-                        receivedPackets.emit(packet)
-                        HypixelPacketEvent.ReceiveEvent(packet).postAndCatch()
+                    runCatching {
+                        val packetSerializer = PacketSerializer(Unpooled.copiedBuffer(event.packet.bufferData))
+                        if (!packetSerializer.readBoolean()) {
+                            val reason = ErrorReason.getById(packetSerializer.readVarInt())
+                            HypixelPacketEvent.FailedEvent(id, reason).postAndCatch()
+                        } else {
+                            val packet = registry.createClientboundPacket(id, packetSerializer)
+                            receivedPackets.emit(packet)
+                            HypixelPacketEvent.ReceiveEvent(packet).postAndCatch()
+                        }
+                    }.onFailure {
+                        it.printStackTrace()
                     }
                 }
             }
