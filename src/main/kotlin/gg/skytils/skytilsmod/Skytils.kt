@@ -96,6 +96,7 @@ import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiGameOver
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
+import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.launchwrapper.Launch
@@ -548,6 +549,7 @@ class Skytils {
 
     @SubscribeEvent
     fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
+        Utils.lastNHPC = event.handler as? NetHandlerPlayClient
         Utils.isOnHypixel = mc.runCatching {
             !event.isLocal && (thePlayer?.clientBrand?.lowercase()?.contains("hypixel")
                 ?: currentServerData?.serverIP?.lowercase()?.contains("hypixel") ?: false)
@@ -610,6 +612,7 @@ class Skytils {
 
     @SubscribeEvent
     fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+        Utils.lastNHPC = null
         Utils.isOnHypixel = false
         Utils.skyblock = false
         Utils.dungeons = false

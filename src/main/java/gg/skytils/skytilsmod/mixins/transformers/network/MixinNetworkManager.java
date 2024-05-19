@@ -36,14 +36,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinNetworkManager extends SimpleChannelInboundHandler<Packet<?>> {
     @Shadow @Final private EnumPacketDirection direction;
 
-
-    @Inject(method = "<init>", at = @At("RETURN"))
-    private void onInit(CallbackInfo ci) {
-        if (this.direction == EnumPacketDirection.CLIENTBOUND) {
-            Utils.INSTANCE.setLastNetworkManager((NetworkManager) (Object) this);
-        }
-    }
-
     @Inject(method = "channelRead0", at = @At("HEAD"), cancellable = true)
     private void onReceivePacket(ChannelHandlerContext context, Packet<?> packet, CallbackInfo ci) {
         if (this.direction == EnumPacketDirection.CLIENTBOUND)

@@ -42,6 +42,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
+import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.client.settings.GameSettings
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -50,7 +51,6 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagList
-import net.minecraft.network.NetworkManager
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.*
@@ -90,6 +90,8 @@ object Utils {
     @JvmField
     var lastRenderedSkullEntity: EntityLivingBase? = null
 
+    var lastNHPC: NetHandlerPlayClient? = null
+
     @JvmStatic
     var random = Random()
 
@@ -97,8 +99,6 @@ object Utils {
         val cal = Calendar.getInstance()
         return@lazy cal.get(Calendar.MONTH) == Calendar.APRIL && cal.get(Calendar.DAY_OF_MONTH) == 1
     }
-
-    var lastNetworkManager: NetworkManager? = null
 
     fun getBlocksWithinRangeAtSameY(center: BlockPos, radius: Int, y: Int): Iterable<BlockPos> {
         val corner1 = BlockPos(center.x - radius, y, center.z - radius)

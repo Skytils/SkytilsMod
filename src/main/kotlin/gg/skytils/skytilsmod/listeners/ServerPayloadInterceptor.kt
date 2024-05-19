@@ -25,7 +25,9 @@ import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorHypixelModAPI
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorPlayerControllerMP
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.ifNull
 import io.netty.buffer.Unpooled
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -52,24 +54,29 @@ object ServerPayloadInterceptor {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
         if (event.packet is S3FPacketCustomPayload) {
-            IO.launch {
-                val registry = HypixelModAPI.getInstance().registry
-                val id = event.packet.channelName
-                if (registry.isRegistered(id)) {
-                    println("Received Hypixel packet $id")
+            val registry = HypixelModAPI.getInstance().registry
+            val id = event.packet.channelName
+            if (registry.isRegistered(id)) {
+                println("Received Hypixel packet $id")
+                val data = event.packet.bufferData
+                synchronized(data) {
+                    data.retain()
                     runCatching {
-                        val packetSerializer = PacketSerializer(Unpooled.copiedBuffer(event.packet.bufferData))
+                        val packetSerializer = PacketSerializer(data.duplicate())
                         if (!packetSerializer.readBoolean()) {
                             val reason = ErrorReason.getById(packetSerializer.readVarInt())
                             HypixelPacketEvent.FailedEvent(id, reason).postAndCatch()
                         } else {
                             val packet = registry.createClientboundPacket(id, packetSerializer)
-                            receivedPackets.emit(packet)
+                            IO.launch {
+                                receivedPackets.emit(packet)
+                            }
                             HypixelPacketEvent.ReceiveEvent(packet).postAndCatch()
                         }
                     }.onFailure {
                         it.printStackTrace()
                     }
+                    data.release()
                 }
             }
         }
@@ -95,12 +102,19 @@ object ServerPayloadInterceptor {
             if (modAPI.packetSender == null) {
                 println("Hypixel Mod API packet sender is not set, Skytils will set the packet sender.")
                 modAPI.setPacketSender {
-                    getNetClientHandler()?.addToSendQueue((it as ServerboundVersionedPacket).toCustomPayload()) ?: return@setPacketSender false
-                    return@setPacketSender true
+                    return@setPacketSender getNetClientHandler()?.addToSendQueue((it as ServerboundVersionedPacket).toCustomPayload()).ifNull {
+                        println("Failed to send packet ${it.identifier}")
+                    } != null
                 }
             }
-            modAPI.subscribeToEventPacket(ClientboundLocationPacket::class.java)
-            modAPI.invokeSendRegisterPacket(true)
+            IO.launch {
+                while (getNetClientHandler() == null) {
+                    println("Waiting for client handler to be set.")
+                    delay(50L)
+                }
+                modAPI.subscribeToEventPacket(ClientboundLocationPacket::class.java)
+                modAPI.invokeSendRegisterPacket(true)
+            }
         }
     }
 
@@ -117,5 +131,5 @@ object ServerPayloadInterceptor {
         return@withTimeout receivedPackets.filter { it.identifier == this@getResponse.identifier }.first() as T
     }
 
-    private fun getNetClientHandler() = (mc.playerController as AccessorPlayerControllerMP?)?.netClientHandler ?: Utils.lastNetworkManager?.netHandler as? NetHandlerPlayClient
+    private fun getNetClientHandler() = (mc.playerController as AccessorPlayerControllerMP?)?.netClientHandler ?: Utils.lastNHPC
 }
