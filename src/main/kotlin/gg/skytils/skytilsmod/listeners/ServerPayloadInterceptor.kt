@@ -18,21 +18,20 @@
 
 package gg.skytils.skytilsmod.listeners
 
+import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.IO
 import gg.skytils.skytilsmod.Skytils.Companion.mc
+import gg.skytils.skytilsmod.core.MC
 import gg.skytils.skytilsmod.events.impl.HypixelPacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorHypixelModAPI
-import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorPlayerControllerMP
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.ifNull
 import io.netty.buffer.Unpooled
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.error.ErrorReason
 import net.hypixel.modapi.packet.ClientboundHypixelPacket
@@ -40,7 +39,6 @@ import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import net.hypixel.modapi.serializer.PacketSerializer
-import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.network.PacketBuffer
 import net.minecraft.network.play.client.C17PacketCustomPayload
 import net.minecraft.network.play.server.S3FPacketCustomPayload
@@ -107,13 +105,15 @@ object ServerPayloadInterceptor {
                     } != null
                 }
             }
-            IO.launch {
+            Skytils.launch {
                 while (getNetClientHandler() == null) {
                     println("Waiting for client handler to be set.")
                     delay(50L)
                 }
-                modAPI.subscribeToEventPacket(ClientboundLocationPacket::class.java)
-                modAPI.invokeSendRegisterPacket(true)
+                withContext(Dispatchers.MC) {
+                    modAPI.subscribeToEventPacket(ClientboundLocationPacket::class.java)
+                    modAPI.invokeSendRegisterPacket(true)
+                }
             }
         }
     }
@@ -131,5 +131,5 @@ object ServerPayloadInterceptor {
         return@withTimeout receivedPackets.filter { it.identifier == this@getResponse.identifier }.first() as T
     }
 
-    private fun getNetClientHandler() = (mc.playerController as AccessorPlayerControllerMP?)?.netClientHandler ?: Utils.lastNHPC
+    private fun getNetClientHandler() = mc.netHandler ?: Utils.lastNHPC
 }
