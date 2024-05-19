@@ -27,11 +27,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 fun markTerminalItems(slot: Slot, cir: CallbackInfoReturnable<ItemStack?>) {
     if (!Utils.inSkyblock) return
-    val item: ItemStack = (slot.inventory.getStackInSlot(slot.slotIndex) ?: return).copy()
-    if (!item.isItemEnchanted && (SelectAllColorSolver.shouldClick.contains(slot.slotNumber) || StartsWithSequenceSolver.shouldClick.contains(
-            slot.slotNumber
-        ))
+    // TODO check if in dungeon
+    val original = slot.inventory.getStackInSlot(slot.slotIndex) ?: return
+    if (!original.isItemEnchanted && (SelectAllColorSolver.shouldClick.contains(slot.slotNumber) ||
+                StartsWithSequenceSolver.shouldClick.contains(slot.slotNumber))
     ) {
+        val item = original.copy()
         if (item.tagCompound == null) {
             item.tagCompound = NBTTagCompound()
         }
