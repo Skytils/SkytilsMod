@@ -282,8 +282,7 @@ object MiningFeatures {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
         if (!event.slot.hasStack) return
         if (Skytils.config.highlightDisabledHOTMPerks && SBInfo.lastOpenContainerName == "Heart of the Mountain") {
-            val item = event.slot.stack
-            if (ItemUtil.getItemLore(item).any { it == "§c§lDISABLED" }) {
+            if (ItemUtil.getItemLore(event.slot.stack).any { it == "§c§lDISABLED" }) {
                 event.slot highlight Color(255, 0, 0)
             }
         }
