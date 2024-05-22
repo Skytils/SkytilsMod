@@ -143,15 +143,14 @@ object DungeonListener {
                     DungeonFeatures.DungeonSecretDisplay.secrets = sec
                     DungeonFeatures.DungeonSecretDisplay.maxSecrets = max
 
-                    if (team.size > 1) {
-                        IO.launch {
-                            val tile = ScanUtils.getRoomFromPos(mc.thePlayer.position)
-                            if (tile is Room && tile.data.name != "Unknown") {
-                                val room = DungeonInfo.uniqueRooms.find { tile in it.tiles } ?: return@launch
-                                if (room.foundSecrets != sec) {
-                                    room.foundSecrets = sec
+                    IO.launch {
+                        val tile = ScanUtils.getRoomFromPos(mc.thePlayer.position)
+                        if (tile is Room && tile.data.name != "Unknown") {
+                            val room = DungeonInfo.uniqueRooms.find { tile in it.tiles } ?: return@launch
+                            if (room.foundSecrets != sec) {
+                                room.foundSecrets = sec
+                                if (team.size > 1)
                                     WSClient.sendPacket(C2SPacketDungeonRoomSecret(SBInfo.server ?: return@launch, room.mainRoom.data.name, sec))
-                                }
                             }
                         }
                     }

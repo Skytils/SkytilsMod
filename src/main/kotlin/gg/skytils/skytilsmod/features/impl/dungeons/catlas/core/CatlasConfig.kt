@@ -226,6 +226,17 @@ object CatlasConfig : Vigilant(
     )
     var mapRoomSecrets = 0
 
+    // TODO: Add translation
+    @Property(
+        name = "Found Room Secrets",
+        type = PropertyType.SELECTOR,
+        description = "Shows found secrets of rooms on map.",
+        category = "Rooms",
+        options = ["Off", "On", "Replace Total"],
+        i18nCategory = "catlas.config.rooms"
+    )
+    var foundRoomSecrets = 0
+
     @Property(
         name = "Color Text",
         type = PropertyType.SWITCH,
