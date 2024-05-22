@@ -19,6 +19,8 @@
 package gg.skytils.skytilsmod.mixins.transformers.gui;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import gg.essential.universal.UScreen;
+import gg.skytils.skytilsmod.gui.OptionsGui;
 import gg.skytils.skytilsmod.mixins.hooks.gui.GuiIngameForgeHookKt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiIngame;
@@ -26,8 +28,10 @@ import net.minecraftforge.client.GuiIngameForge;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(GuiIngameForge.class)
@@ -54,5 +58,12 @@ public abstract class MixinGuiIngameForge extends GuiIngame {
     @ModifyVariable(method = "renderHealth", at = @At(value = "STORE"), ordinal = 1, remap = false)
     private float removeAbsorption(float absorption) {
         return GuiIngameForgeHookKt.setAbsorptionAmount(absorption);
+    }
+
+    @Inject(method = "renderGameOverlay", at = @At("HEAD"))
+    private void renderOverlay(CallbackInfo ci) {
+        if (UScreen.getCurrentScreen() instanceof OptionsGui) {
+            GuiIngameForge.renderCrosshairs = false;
+        }
     }
 }

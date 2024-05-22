@@ -620,13 +620,6 @@ object Skytils : CoroutineScope {
     }
 
     @SubscribeEvent
-    fun onRenderGameOverlay(event: RenderGameOverlayEvent) {
-        if (mc.currentScreen is OptionsGui && event.type == RenderGameOverlayEvent.ElementType.CROSSHAIRS) {
-            event.isCanceled = true
-        }
-    }
-
-    @SubscribeEvent
     fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
         if (config.configButtonOnPause && event.gui is GuiIngameMenu) {
             val x = event.gui.width - 105
