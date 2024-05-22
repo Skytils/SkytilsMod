@@ -31,11 +31,10 @@ fun <T : Event> postSync(event: T) =
         post(event)
     }
 
-suspend fun <T : CancellableEvent> postCancellable(event: T) =
-    coroutineScope {
-        EventPriority.Highest.post(event)
-        return@coroutineScope event.cancelled
-    }
+suspend fun <T : CancellableEvent> postCancellable(event: T) : Boolean {
+    EventPriority.Highest.post(event)
+    return event.cancelled
+}
 
 fun <T : CancellableEvent> postCancellableSync(event: T) =
     runBlocking {
