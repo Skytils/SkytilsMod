@@ -46,6 +46,7 @@ import gg.skytils.skytilsmod.features.impl.farming.TreasureHunter
 import gg.skytils.skytilsmod.features.impl.farming.VisitorHelper
 import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.features.impl.handlers.*
+import gg.skytils.skytilsmod.features.impl.mining.CHWaypoints
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
 import gg.skytils.skytilsmod.features.impl.mining.StupidTreasureChestOpeningThing
 import gg.skytils.skytilsmod.features.impl.misc.*
@@ -328,6 +329,7 @@ class Skytils {
             BoulderSolver,
             ChatTabs,
             ChangeAllToSameColorSolver,
+            CHWaypoints,
             DungeonChestProfit,
             ClickInOrderSolver,
             NamespacedCommands,
