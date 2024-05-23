@@ -19,16 +19,50 @@
 package gg.skytils.skytilsws.client
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.Companion.client
 import gg.skytils.skytilsws.shared.SkytilsWS
 import gg.skytils.skytilsws.shared.packet.C2SPacketConnect
 import gg.skytils.skytilsws.shared.packet.Packet
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.websocket.*
+import io.ktor.serialization.kotlinx.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
+import kotlinx.serialization.ExperimentalSerializationApi
+import java.util.zip.Deflater
 
 object WSClient {
     var session: DefaultClientWebSocketSession? = null
+    val wsClient by lazy {
+        HttpClient(CIO) {
+            install(UserAgent) {
+                agent = "Skytils/${Skytils.VERSION} SkytilsWS/${SkytilsWS.version}"
+            }
+
+            install(WebSockets) {
+                pingInterval = 59_000L
+                @OptIn(ExperimentalSerializationApi::class)
+                contentConverter = KotlinxWebsocketSerializationConverter(SkytilsWS.packetSerializer)
+                extensions {
+                    install(WebSocketDeflateExtension) {
+                        compressionLevel = Deflater.DEFAULT_COMPRESSION
+                        compressIfBiggerThan(bytes = 4 * 1024)
+                    }
+                }
+            }
+
+            engine {
+                endpoint {
+                    connectTimeout = 10000
+                    keepAliveTime = 60000
+                }
+                https {
+                    trustManager = Skytils.trustManager
+                }
+            }
+        }
+    }
 
     suspend fun openConnection() {
         if (session != null) error("Session already open")

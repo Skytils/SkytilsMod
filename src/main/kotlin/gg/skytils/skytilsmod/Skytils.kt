@@ -76,20 +76,15 @@ import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
 import gg.skytils.skytilsws.client.WSClient
-import gg.skytils.skytilsws.shared.SkytilsWS
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.cache.*
 import io.ktor.client.plugins.compression.*
 import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.websocket.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.websocket.*
 import kotlinx.coroutines.*
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import net.minecraft.client.Minecraft
@@ -127,7 +122,6 @@ import java.security.KeyStore
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
-import java.util.zip.Deflater
 import javax.net.ssl.TrustManagerFactory
 import javax.net.ssl.X509TrustManager
 import kotlin.coroutines.CoroutineContext
@@ -220,6 +214,23 @@ class Skytils {
             }
         }
 
+        val trustManager by lazy {
+            val backingManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
+                init(null as KeyStore?)
+            }.trustManagers.first { it is X509TrustManager } as X509TrustManager
+
+            val ourManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
+                Skytils::class.java.getResourceAsStream("/skytilscacerts.jks").use {
+                    val ourKs = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
+                        load(it, "skytilsontop".toCharArray())
+                    }
+                    init(ourKs)
+                }
+            }.trustManagers.first { it is X509TrustManager } as X509TrustManager
+
+            UnionX509TrustManager(backingManager, ourManager)
+        }
+
         val client = HttpClient(CIO) {
             install(ContentEncoding) {
                 customEncoder(BrotliEncoder, 1.0F)
@@ -249,32 +260,7 @@ class Skytils {
                     socketTimeout = 10000
                 }
                 https {
-                    val backingManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
-                        init(null as KeyStore?)
-                    }.trustManagers.first { it is X509TrustManager } as X509TrustManager
-
-                    val ourManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
-                        Skytils::class.java.getResourceAsStream("/skytilscacerts.jks").use {
-                            val ourKs = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
-                                load(it, "skytilsontop".toCharArray())
-                            }
-                            init(ourKs)
-                        }
-                    }.trustManagers.first { it is X509TrustManager } as X509TrustManager
-
-                    trustManager = UnionX509TrustManager(backingManager, ourManager)
-                }
-            }
-
-            install(WebSockets) {
-                pingInterval = 5_000L
-                @OptIn(ExperimentalSerializationApi::class)
-                contentConverter = KotlinxWebsocketSerializationConverter(SkytilsWS.packetSerializer)
-                extensions {
-                    install(WebSocketDeflateExtension) {
-                        compressionLevel = Deflater.DEFAULT_COMPRESSION
-                        compressIfBiggerThan(bytes = 4 * 1024)
-                    }
+                    trustManager = Skytils.trustManager
                 }
             }
         }
