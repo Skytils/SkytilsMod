@@ -28,10 +28,17 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.events.impl.HypixelPacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory
+import gg.skytils.skytilsws.client.WSClient
+import gg.skytils.skytilsws.shared.packet.C2SPacketCHWaypoint
+import gg.skytils.skytilsws.shared.packet.C2SPacketCHWaypointsSubscribe
+import gg.skytils.skytilsws.shared.structs.CHWaypointType
+import kotlinx.coroutines.launch
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
@@ -47,6 +54,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
+import kotlin.jvm.optionals.getOrNull
 
 object CHWaypoints {
     var lastTPLoc: BlockPos? = null
@@ -58,6 +66,22 @@ object CHWaypoints {
         Regex(".*?(?<user>[a-zA-Z0-9_]{3,16}):.*?(?<x>[0-9]{1,3}),? (?:y: )?(?<y>[0-9]{1,3}),? (?:z: )?(?<z>[0-9]{1,3}).*?")
     private val xzPattern =
         Regex(".*(?<user>[a-zA-Z0-9_]{3,16}):.* (?<x>[0-9]{1,3}),? (?<z>[0-9]{1,3}).*")
+    val chWaypointsList = hashMapOf<String, CHInstance>()
+    class CHInstance {
+        val waypoints = hashMapOf<CHWaypointType, BlockPos>()
+    }
+
+
+    @SubscribeEvent
+    fun onHypixelPacket(event: HypixelPacketEvent.ReceiveEvent) {
+        if (event.packet is ClientboundLocationPacket) {
+            if (event.packet.mode.getOrNull() == SkyblockIsland.CrystalHollows.mode) {
+                Skytils.IO.launch {
+                    WSClient.sendPacket(C2SPacketCHWaypointsSubscribe(event.packet.serverName))
+                }
+            }
+        }
+    }
 
     @SubscribeEvent
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
@@ -187,7 +211,14 @@ object CHWaypoints {
             mc.thePlayer.canEntityBeSeen(event.entity) &&
             event.entity.baseMaxHealth == if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2_000_000.0 else 1_000_000.0
         ) {
-            waypoints["Corleone"] = event.entity.position
+            if (!CrystalHollowsMap.Locations.Corleone.loc.exists()) {
+                CrystalHollowsMap.Locations.Corleone.apply {
+                    loc.set()
+                    Skytils.IO.launch {
+                        WSClient.sendPacket(C2SPacketCHWaypoint(serverId = SBInfo.location, serverTime = mc.theWorld.worldTime, packetType, loc.locX!!.toInt(), loc.locY!!.toInt(), loc.locZ!!.toInt()))
+                    }
+                }
+            } else CrystalHollowsMap.Locations.Corleone.loc.set()
         }
     }
 
@@ -197,14 +228,27 @@ object CHWaypoints {
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
             && waypointDelayTicks == 0 && mc.thePlayer != null
         ) {
-            CrystalHollowsMap.Locations.cleanNameToLocation[SBInfo.location]?.loc?.set()
+            CrystalHollowsMap.Locations.cleanNameToLocation[SBInfo.location]?.let {
+                if (!it.loc.exists()) {
+                    it.loc.set()
+                    Skytils.IO.launch {
+                        WSClient.sendPacket(C2SPacketCHWaypoint(serverId = SBInfo.location, serverTime = mc.theWorld.worldTime, it.packetType, it.loc.locX!!.toInt(), it.loc.locY!!.toInt(), it.loc.locZ!!.toInt()))
+                    }
+                } else it.loc.set()
+            }
         } else if (waypointDelayTicks > 0)
             waypointDelayTicks--
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onWorldChange(event: WorldEvent.Unload) {
-        CrystalHollowsMap.Locations.entries.forEach { it.loc.reset() }
+        val instance = chWaypointsList.getOrPut(SBInfo.server ?: "") { CHInstance() }
+        CrystalHollowsMap.Locations.entries.forEach {
+            if (it.loc.exists()) {
+                instance.waypoints[it.packetType] = BlockPos(it.loc.locX!!, it.loc.locY!!, it.loc.locZ!!)
+            }
+            it.loc.reset()
+        }
         waypoints.clear()
     }
 
@@ -212,15 +256,15 @@ object CHWaypoints {
     class CrystalHollowsMap : GuiElement(name = "Crystal Hollows Map", x = 0, y = 0) {
         val mapLocation = ResourceLocation("skytils", "crystalhollowsmap.png")
 
-        enum class Locations(val displayName: String, val id: String, val color: Int, val size: Int = 50) {
-            LostPrecursorCity("§fLost Precursor City", "internal_city", ColorFactory.WHITE.rgb),
-            JungleTemple("§aJungle Temple", "internal_temple", ColorFactory.GREEN.rgb),
-            GoblinQueensDen("§eGoblin Queen's Den", "internal_den", ColorFactory.YELLOW.rgb),
-            MinesOfDivan("§9Mines of Divan", "internal_mines", ColorFactory.BLUE.rgb),
-            KingYolkar("§6King Yolkar", "internal_king", ColorFactory.ORANGE.rgb, 25),
-            KhazadDum("§cKhazad-dûm", "internal_bal", ColorFactory.RED.rgb),
-            FairyGrotto("§dFairy Grotto", "internal_fairy", ColorFactory.PINK.rgb, 26),
-            Corleone("§bCorleone", "internal_corleone", ColorFactory.AQUA.rgb, 26);
+        enum class Locations(val displayName: String, val id: String, val color: Int, val packetType: CHWaypointType, val size: Int = 50) {
+            LostPrecursorCity("§fLost Precursor City", "internal_city", ColorFactory.WHITE.rgb, CHWaypointType.LostPrecursorCity),
+            JungleTemple("§aJungle Temple", "internal_temple", ColorFactory.GREEN.rgb, CHWaypointType.JungleTemple),
+            GoblinQueensDen("§eGoblin Queen's Den", "internal_den", ColorFactory.YELLOW.rgb, CHWaypointType.GoblinQueensDen),
+            MinesOfDivan("§9Mines of Divan", "internal_mines", ColorFactory.BLUE.rgb, CHWaypointType.MinesOfDivan),
+            KingYolkar("§6King Yolkar", "internal_king", ColorFactory.ORANGE.rgb, CHWaypointType.KingYolkar,25),
+            KhazadDum("§cKhazad-dûm", "internal_bal", ColorFactory.RED.rgb, CHWaypointType.KhazadDum),
+            FairyGrotto("§dFairy Grotto", "internal_fairy", ColorFactory.PINK.rgb, CHWaypointType.FairyGrotto, 26),
+            Corleone("§bCorleone", "internal_corleone", ColorFactory.AQUA.rgb, CHWaypointType.Corleone, 26);
 
             val loc = LocationObject()
             val cleanName = displayName.stripControlCodes()

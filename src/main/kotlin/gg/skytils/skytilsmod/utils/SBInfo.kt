@@ -23,7 +23,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
-import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -84,7 +83,7 @@ object SBInfo {
         lastLocationPacket = null
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onHypixelPacket(event: HypixelPacketEvent.ReceiveEvent) {
         if (event.packet is ClientboundLocationPacket) {
             Utils.checkThreadAndQueue {
