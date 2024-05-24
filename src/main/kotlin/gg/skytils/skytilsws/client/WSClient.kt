@@ -67,7 +67,7 @@ object WSClient {
     suspend fun openConnection() {
         if (session != null) error("Session already open")
 
-        wsClient.webSocketSession("ws://localhost:9998/ws").apply {
+        wsClient.webSocketSession(System.getProperty("skytils.websocketURL", "wss://ws.skytils.gg/ws")).apply {
             session = this
             try {
                 sendSerialized<Packet>(C2SPacketConnect(SkytilsWS.version, Skytils.VERSION))
