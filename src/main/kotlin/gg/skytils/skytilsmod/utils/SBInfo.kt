@@ -83,7 +83,7 @@ object SBInfo {
         lastLocationPacket = null
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onHypixelPacket(event: HypixelPacketEvent.ReceiveEvent) {
         if (event.packet is ClientboundLocationPacket) {
             Utils.checkThreadAndQueue {

@@ -51,7 +51,7 @@ import gg.skytils.skytilsws.client.WSClient
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonEnd
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoom
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoomSecret
-import gg.skytils.skytilsws.shared.packet.C2SPacketStartDungeon
+import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -212,7 +212,7 @@ object DungeonListener {
                             }
                             val partyMembers = party.await().members.ifEmpty { setOf(mc.thePlayer.uniqueID) }.mapTo(hashSetOf()) { it.toString() }
                             val entrance = DungeonInfo.uniqueRooms.first { it.mainRoom.data.type == RoomType.ENTRANCE }
-                            WSClient.sendPacket(C2SPacketStartDungeon(
+                            WSClient.sendPacket(C2SPacketDungeonStart(
                                 serverId = SBInfo.server ?: return@launch,
                                 floor = DungeonFeatures.dungeonFloor!!,
                                 members = partyMembers,

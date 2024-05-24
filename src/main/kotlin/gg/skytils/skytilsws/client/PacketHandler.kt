@@ -24,11 +24,16 @@ import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Room
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Unknown
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.ScanUtils
+import gg.skytils.skytilsmod.features.impl.mining.CHWaypoints
+import gg.skytils.skytilsmod.features.impl.mining.CHWaypoints.CHInstance
+import gg.skytils.skytilsmod.features.impl.mining.CHWaypoints.chWaypointsList
+import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsws.shared.IPacketHandler
 import gg.skytils.skytilsws.shared.SkytilsWS
 import gg.skytils.skytilsws.shared.packet.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.coroutineScope
+import net.minecraft.util.BlockPos
 import java.util.*
 
 object PacketHandler : IPacketHandler {
@@ -66,6 +71,27 @@ object PacketHandler : IPacketHandler {
                         core = packet.core
                         addToUnique(packet.row, packet.col)
                     }
+                }
+            }
+            is S2CPacketCHReset -> {
+                CHWaypoints.waypoints.remove(packet.serverId)
+            }
+            is S2CPacketCHWaypoint -> {
+                if (SBInfo.server == packet.serverId) {
+                    if (mc.theWorld.worldTime < packet.serverTime) {
+                        WSClient.sendPacket(C2SPacketCHReset(packet.serverId))
+                    } else {
+                        CHWaypoints.CrystalHollowsMap.Locations.entries.find { it.packetType == packet.type }?.let {
+                            if (!it.loc.exists()) {
+                                it.loc.locX = packet.x.toDouble()
+                                it.loc.locY = packet.y.toDouble()
+                                it.loc.locZ = packet.z.toDouble()
+                            }
+                        }
+                    }
+                } else {
+                    val instance = chWaypointsList.getOrPut(SBInfo.server ?: "") { CHInstance() }
+                    instance.waypoints[packet.type] = BlockPos(packet.x, packet.y, packet.z)
                 }
             }
             else -> {
