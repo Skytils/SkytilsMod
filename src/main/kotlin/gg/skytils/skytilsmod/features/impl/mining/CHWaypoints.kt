@@ -215,7 +215,7 @@ object CHWaypoints {
                 CrystalHollowsMap.Locations.Corleone.apply {
                     loc.set()
                     Skytils.IO.launch {
-                        WSClient.sendPacket(C2SPacketCHWaypoint(serverId = SBInfo.location, serverTime = mc.theWorld.worldTime, packetType, loc.locX!!.toInt(), loc.locY!!.toInt(), loc.locZ!!.toInt()))
+                        WSClient.sendPacket(C2SPacketCHWaypoint(serverId = SBInfo.server ?: "", serverTime = mc.theWorld.worldTime, packetType, loc.locX!!.toInt(), loc.locY!!.toInt(), loc.locZ!!.toInt()))
                     }
                 }
             } else CrystalHollowsMap.Locations.Corleone.loc.set()
@@ -232,7 +232,7 @@ object CHWaypoints {
                 if (!it.loc.exists()) {
                     it.loc.set()
                     Skytils.IO.launch {
-                        WSClient.sendPacket(C2SPacketCHWaypoint(serverId = SBInfo.location, serverTime = mc.theWorld.worldTime, it.packetType, it.loc.locX!!.toInt(), it.loc.locY!!.toInt(), it.loc.locZ!!.toInt()))
+                        WSClient.sendPacket(C2SPacketCHWaypoint(serverId = SBInfo.server ?: "", serverTime = mc.theWorld.worldTime, it.packetType, it.loc.locX!!.toInt(), it.loc.locY!!.toInt(), it.loc.locZ!!.toInt()))
                     }
                 } else it.loc.set()
             }
