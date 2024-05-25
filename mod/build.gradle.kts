@@ -105,12 +105,13 @@ dependencies {
     } else {
         runtimeOnly("gg.essential:loader-fabric:1.0.0")
     }
-    implementation("gg.essential:essential-${if (!isLegacyFabric) platform.toString() else "${platform.mcVersionStr}-forge"}:16425+g3a090c5c88") {
+    modCompileOnly("gg.essential:essential-${if (!isLegacyFabric) platform.toString() else "${platform.mcVersionStr}-forge"}:16425+g3a090c5c88") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
         exclude(module = "gson")
         exclude(module = "vigilance")
+        exclude(module = "kotlinx-coroutines-core-jvm")
     }
     shadowMe("com.github.Skytils.Vigilance:vigilance-${if (!isLegacyFabric) if (platform.mcVersion >= 11801) "1.18.1-${platform.loaderStr}" else platform.toString() else "${platform.mcVersionStr}-forge"}:afb0909442") {
         isTransitive = false
