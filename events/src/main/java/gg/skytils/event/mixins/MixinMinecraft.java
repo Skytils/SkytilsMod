@@ -18,9 +18,13 @@
 
 package gg.skytils.event.mixins;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.TickEvent;
+import gg.skytils.event.impl.screen.OpenScreenEvent;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -38,5 +42,14 @@ public class MixinMinecraft {
     )
     private void tick(CallbackInfo ci) {
         EventsKt.postSync(new TickEvent());
+    }
+
+    @Inject(method = "displayGuiScreen", at = @At("HEAD"), cancellable = true)
+    private void openScreen(CallbackInfo ci, @Local(argsOnly = true) LocalRef<GuiScreen> screen) {
+        OpenScreenEvent event = new OpenScreenEvent(screen.get());
+        if (EventsKt.postCancellableSync(event)) {
+            ci.cancel();
+        }
+        screen.set(event.getScreen());
     }
 }
