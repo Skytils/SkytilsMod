@@ -27,7 +27,7 @@ interface EventSubscriber{
 }
 
 @Suppress("UnusedReceiverParameter")
-suspend inline fun <reified T: Event> EventSubscriber.register(
+inline fun <reified T: Event> EventSubscriber.register(
     subscriber: EventHandler<T>,
     priority: EventPriority = EventPriority.Normal
 ) =
