@@ -5,6 +5,7 @@
   "refmap": "mixins.skytils-events.refmap.json",
   "client": [
     "MixinMinecraft",
+    "gui.MixinGuiContainer",
     "network.MixinNetHandlerPlayClient",
     "network.MixinNetworkManager"
   ],
