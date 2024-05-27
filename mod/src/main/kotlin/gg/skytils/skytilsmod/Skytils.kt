@@ -23,13 +23,17 @@ import gg.essential.universal.UChat
 import gg.essential.universal.UDesktop
 import gg.essential.universal.UKeyboard
 import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.network.ClientDisconnectEvent
+import gg.skytils.event.impl.screen.OpenScreenEvent
+import gg.skytils.event.register
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.commands.impl.*
 import gg.skytils.skytilsmod.commands.stats.impl.CataCommand
 import gg.skytils.skytilsmod.commands.stats.impl.SlayerCommand
 import gg.skytils.skytilsmod.core.*
 import gg.skytils.skytilsmod.tweaker.DependencyLoader
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.crimson.KuudraChestProfit
 import gg.skytils.skytilsmod.features.impl.crimson.KuudraFeatures
 import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
@@ -86,9 +90,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiGameOver
-import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.settings.KeyBinding
@@ -115,19 +117,12 @@ import kotlin.math.abs
 
 //#if FORGE
 import net.minecraftforge.fml.common.Mod
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.common.MinecraftForge
 //#if MC<11400
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
 //#else
 //$$ import net.minecraft.util.text.StringTextComponent
 //#endif
@@ -135,9 +130,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 
 //#if FABRIC
 //$$ import net.fabricmc.loader.api.FabricLoader
-//$$ import net.minecraft.client.gui.widget.ButtonWidget
 //$$ import net.minecraft.network.packet.BrandCustomPayload
-//$$ import net.minecraft.text.Text
 //#endif
 
 //#if FORGE
@@ -154,7 +147,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent
 //$$ @Mod(Skytils.MOD_ID)
 //#endif
 //#endif
-object Skytils : CoroutineScope {
+object Skytils : CoroutineScope, EventSubscriber {
     const val MOD_ID = Reference.MOD_ID
     const val MOD_NAME = Reference.MOD_NAME
     @JvmField
@@ -290,6 +283,7 @@ object Skytils : CoroutineScope {
 
     var trustClientTime = false
 
+    //FIXME
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
         DataFetcher.preload()
@@ -405,10 +399,12 @@ object Skytils : CoroutineScope {
         ).forEach(MinecraftForge.EVENT_BUS::register)
 
         arrayOf(
+            this,
             SoundQueue
         ).forEach(EventSubscriber::setup)
     }
 
+    //FIXME
     @Mod.EventHandler
     fun loadComplete(event: FMLLoadCompleteEvent) {
         usingLabymod = isModLoaded("labymod")
@@ -424,6 +420,7 @@ object Skytils : CoroutineScope {
         ScreenRenderer.init()
 
 
+        //FIXME
         val cch = ClientCommandHandler.instance
 
         if (cch !is AccessorCommandHandler) throw RuntimeException(
@@ -493,15 +490,12 @@ object Skytils : CoroutineScope {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
-
+    fun onTick(event: TickEvent) {
         ScreenRenderer.refresh()
         EntityManager.tickEntities()
 
-        ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { ScoreboardUtil.cleanSB(it) }
-        TabListUtils.tabEntries = TabListUtils.fetchTabEntries().map { it to it.text }
+        ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { ScoreboardUtil.cleanSB(it) } //FIXME
+        TabListUtils.tabEntries = TabListUtils.fetchTabEntries().map { it to it.text } //FIXME
         if (displayScreen != null) {
             if (mc.thePlayer?.openContainer is ContainerPlayer) {
                 mc.displayGuiScreen(displayScreen)
@@ -568,18 +562,13 @@ object Skytils : CoroutineScope {
         }
     }
 
-    @SubscribeEvent
-    fun onConnect(event: FMLNetworkEvent.ClientConnectedToServerEvent) {
-        IO.launch {
-            TrophyFish.loadFromApi()
-        }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onPacket(event: MainReceivePacketEvent<*, *>) {
+    fun onPacket(event: MainThreadPacketReceiveEvent<*>) {
         if (event.packet is S01PacketJoinGame) {
             Utils.skyblock = false
             Utils.dungeons = false
+            IO.launch {
+                TrophyFish.loadFromApi()
+            }
         }
         if (!Utils.inSkyblock && Utils.isOnHypixel && event.packet is S3DPacketDisplayScoreboard && event.packet.func_149371_c() == 1) {
             Utils.skyblock = event.packet.func_149370_d() == "SBScoreboard"
@@ -605,72 +594,23 @@ object Skytils : CoroutineScope {
         }
     }
 
-    @SubscribeEvent
-    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+    fun onDisconnect(event: ClientDisconnectEvent) {
         Utils.isOnHypixel = false
         Utils.skyblock = false
         Utils.dungeons = false
     }
 
-    @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
+    fun onSendPacket(event: PacketSendEvent<*>) {
         if (event.packet is C01PacketChatMessage) {
             lastChatMessage = System.currentTimeMillis()
         }
     }
 
-    @SubscribeEvent
-    fun onGuiInitPost(event: GuiScreenEvent.InitGuiEvent.Post) {
-        if (config.configButtonOnPause && event.gui is GuiIngameMenu) {
-            val x = event.gui.width - 105
-            val x2 = x + 100
-            var y = event.gui.height - 22
-            var y2 = y + 20
-            //#if MC<11400
-            val sorted = event.buttonList.sortedWith { a, b -> b.yPosition + b.height - a.yPosition + a.height }
-            //#else
-            //$$ val sorted = event.widgetList.sortedWith { a, b -> b.y + b.heightRealms - a.y + a.heightRealms }
-            //#endif
-            for (button in sorted) {
-                val otherX = button.xPosition
-                val otherX2 = button.xPosition + button.width
-                val otherY = button.yPosition
-                val otherY2 = button.yPosition + button.height
-                if (otherX2 > x && otherX < x2 && otherY2 > y && otherY < y2) {
-                    y = otherY - 20 - 2
-                    y2 = y + 20
-                }
-            }
-            //#if MC<11400
-            event.buttonList.add(GuiButton(6969420, x, 0.coerceAtLeast(y), 100, 20, "Skytils"))
-            //#else
-            //$$ event.widgetList.add(
-            //$$     ButtonWidget
-            //$$         .Builder(Text.of("Skytils")) {
-            //$$             displayScreen = OptionsGui()
-            //$$         }
-            //$$         .position(x, 0.coerceAtLeast(y))
-            //$$         .build()
-            //$$ )
-            //#endif
-        }
-    }
-
-    //#if MC<11400
-    @SubscribeEvent
-    fun onGuiAction(event: GuiScreenEvent.ActionPerformedEvent.Post) {
-        if (config.configButtonOnPause && event.gui is GuiIngameMenu && event.button.id == 6969420) {
-            displayScreen = OptionsGui()
-        }
-    }
-    //#endif
-
-    @SubscribeEvent
-    fun onGuiChange(event: GuiOpenEvent) {
+    fun onGuiChange(event: OpenScreenEvent) {
         val old = mc.currentScreen
-        if (event.gui == null && old is OptionsGui && old.parent != null) {
+        if (event.screen == null && old is OptionsGui && old.parent != null) {
             displayScreen = old.parent
-        } else if (event.gui == null && config.reopenOptionsMenu) {
+        } else if (event.screen == null && config.reopenOptionsMenu) {
             if (old is ReopenableGUI || (old is AccessorSettingsGui && old.config is Config)) {
                 tickTimer(1) {
                     if (mc.thePlayer?.openContainer is ContainerPlayer)
@@ -679,8 +619,8 @@ object Skytils : CoroutineScope {
             }
         }
         if (old is AccessorGuiStreamUnavailable) {
-            if (config.twitchFix && event.gui == null && !(Utils.inSkyblock && old.parentScreen is GuiGameOver)) {
-                event.gui = old.parentScreen
+            if (config.twitchFix && event.screen == null && !(Utils.inSkyblock && old.parentScreen is GuiGameOver)) {
+                event.screen = old.parentScreen
             }
         }
     }
@@ -713,5 +653,13 @@ object Skytils : CoroutineScope {
                 }
             }
         }
+    }
+
+    override fun setup() {
+        register(::onTick, gg.skytils.event.EventPriority.Highest)
+        register(::onDisconnect)
+        register(::onPacket)
+        register(::onSendPacket)
+        register(::onGuiChange)
     }
 }
