@@ -44,7 +44,7 @@ public class MixinMinecraft {
         EventsKt.postSync(new TickEvent());
     }
 
-    @Inject(method = "displayGuiScreen", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "displayGuiScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;currentScreen:Lnet/minecraft/client/gui/GuiScreen;", opcode = 181), cancellable = true)
     private void openScreen(CallbackInfo ci, @Local(argsOnly = true) LocalRef<GuiScreen> screen) {
         OpenScreenEvent event = new OpenScreenEvent(screen.get());
         if (EventsKt.postCancellableSync(event)) {
