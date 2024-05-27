@@ -20,13 +20,10 @@ package gg.skytils.event.mixins.network;
 
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.network.ClientDisconnectEvent;
-import io.netty.channel.local.LocalEventLoopGroup;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.util.LazyLoadBase;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -38,8 +35,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinNetworkManager {
 
     @Shadow private INetHandler packetListener;
-
-    @Shadow @Final public static LazyLoadBase<LocalEventLoopGroup> CLIENT_LOCAL_EVENTLOOP;
 
     @Inject(method = "channelInactive", at = @At("HEAD"), remap = false)
     public void channelInactive(CallbackInfo ci) {

@@ -54,7 +54,6 @@
     "item.MixinItemBow",
     "item.MixinItemStack",
     "model.MixinModelBlaze",
-    "multiplayer.MixinPlayerControllerMP",
     "network.MixinNetHandlerPlayClient",
     "network.MixinNetworkManager",
     "neu.MixinCustomAH",
