@@ -99,6 +99,7 @@
     "events.MixinNetworkManager",
     "events.MixinPacketThreadUtil",
     "gui.MixinGuiEditSign",
+    "gui.MixinGuiIngameMenu",
     "util.MixinMouseHelper"
   ]
 }
