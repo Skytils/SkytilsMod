@@ -61,4 +61,4 @@ fun <T> tickTask(ticks: Int, repeats: Boolean = false, task: () -> T) =
             e.printStackTrace()
             UChat.chat("${Skytils.failPrefix} §cSkytils ${Skytils.VERSION} caught and logged an ${e::class.simpleName ?: "error"} on a tick task. Please report this on the Discord server at discord.gg/skytils.")
         } else throw e
-    }.flowOn(Tick.dispatcher)
+    }
