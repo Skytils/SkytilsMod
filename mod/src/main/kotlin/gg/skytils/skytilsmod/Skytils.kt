@@ -301,7 +301,6 @@ object Skytils : CoroutineScope, EventSubscriber {
 
         arrayOf(
             this,
-            DungeonListener,
             guiManager,
             LocalAPI,
             MayorInfo,
@@ -400,6 +399,7 @@ object Skytils : CoroutineScope, EventSubscriber {
         arrayOf(
             this,
             ChatListener,
+            DungeonListener,
             SoundQueue
         ).forEach(EventSubscriber::setup)
     }

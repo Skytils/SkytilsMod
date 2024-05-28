@@ -22,14 +22,19 @@ import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.lib.caffeine.cache.Caffeine
 import gg.essential.lib.caffeine.cache.Expiry
 import gg.essential.universal.UChat
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ActionBarReceivedEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.register
 import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
@@ -46,12 +51,8 @@ import kotlinx.coroutines.launch
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object DungeonListener {
+object DungeonListener : EventSubscriber {
     val team = hashMapOf<String, DungeonTeammate>()
     val deads = hashSetOf<DungeonTeammate>()
     val disconnected = hashSetOf<String>()
@@ -99,8 +100,7 @@ object DungeonListener {
     private val witherDoorOpenedRegex = Regex("^(?:\\[.+?] )?(?<name>\\w+) opened a WITHER door!$")
     private const val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
 
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Unload) {
+    fun onWorldLoad(event: WorldUnloadEvent) {
         team.clear()
         deads.clear()
         disconnected.clear()
@@ -108,8 +108,7 @@ object DungeonListener {
         completedPuzzles.clear()
     }
 
-    @SubscribeEvent
-    fun onPacket(event: MainReceivePacketEvent<*, *>) {
+    fun onPacket(event: MainThreadPacketReceiveEvent<*>) {
         if (!Utils.inDungeons) return
         if (event.packet is S02PacketChat) {
             val text = event.packet.chatComponent.formattedText
@@ -183,9 +182,8 @@ object DungeonListener {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onChatLow(event: ClientChatReceivedEvent) {
-        if (Skytils.config.dungeonSecretDisplay && Utils.inDungeons && event.type == 2.toByte()) {
+    fun onChatLow(event: ActionBarReceivedEvent) {
+        if (Skytils.config.dungeonSecretDisplay && Utils.inDungeons) {
             if (event.message is AccessorChatComponentText) {
                 (event.message as AccessorChatComponentText).text = (event.message as AccessorChatComponentText).text.replace(secretsRegex, "")
             }
@@ -446,5 +444,11 @@ object DungeonListener {
         val mapPlayer = DungeonMapPlayer(this, skin)
 
         fun canRender() = player != null && player!!.health > 0 && !dead
+    }
+
+    override fun setup() {
+        register(::onPacket)
+        register(::onChatLow, EventPriority.Low)
+        register(::onWorldLoad)
     }
 }
