@@ -18,8 +18,11 @@
 
 package gg.skytils.skytilsmod.utils
 
+import gg.essential.universal.wrappers.UPlayer
+
 //#if FORGE
 import net.minecraft.launchwrapper.Launch
+import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.Loader
 //#endif
 
@@ -48,4 +51,11 @@ fun isModLoaded(id: String) =
     //#endif
     //#else
     //$$ FabricLoader.getInstance().isModLoaded(id)
+    //#endif
+
+fun runCommand(command: String) =
+    //#if MC<11400
+    ClientCommandHandler.instance.executeCommand(UPlayer.getPlayer(), command)
+    //#else
+    //$$ true //TODO: implement using fabric api
     //#endif
