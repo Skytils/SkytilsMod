@@ -64,6 +64,8 @@ public abstract class MixinGuiIngameForge extends GuiIngame {
     private void renderOverlay(CallbackInfo ci) {
         if (UScreen.getCurrentScreen() instanceof OptionsGui) {
             GuiIngameForge.renderCrosshairs = false;
+        } else {
+            GuiIngameForge.renderCrosshairs = true;
         }
     }
 }
