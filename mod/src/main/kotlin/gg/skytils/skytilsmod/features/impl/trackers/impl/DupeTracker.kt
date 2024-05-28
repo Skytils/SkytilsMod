@@ -18,50 +18,49 @@
 
 package gg.skytils.skytilsmod.features.impl.trackers.impl
 
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerPostDrawSlotEvent
+import gg.skytils.event.impl.screen.OpenScreenEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.client
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.*
-import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.Reader
 import java.io.Writer
-import kotlin.concurrent.fixedRateTimer
 
-object DupeTracker : Tracker("duped_items") {
+object DupeTracker : Tracker("duped_items"), EventSubscriber {
     val dupedUUIDs = hashSetOf<IdentifiableItem>()
     val dupeChecking = hashMapOf<IdentifiableItem, Int>()
     var inAuctionBrowser = false
 
+    override fun setup() {
+        register(::onWindowChange)
+        register(::onPacket)
+        register(::onSlotDraw)
+    }
 
-    @SubscribeEvent
-    fun onWindowChange(event: GuiOpenEvent) {
-        if (event.gui is GuiContainer) return
+    fun onWindowChange(event: OpenScreenEvent) {
+        if (event.screen is GuiContainer) return
         inAuctionBrowser = false
         dupeChecking.clear()
         printDevMessage("Cleared dupe check", "dupecheck")
         printDevMessage("Cleared auction", "dupecheck")
-        if (event.gui is GuiChat && DevTools.getToggle("dupecheck")) dupedUUIDs.clear()
+        if (event.screen is GuiChat && DevTools.getToggle("dupecheck")) dupedUUIDs.clear()
     }
 
-    @SubscribeEvent
-    fun onPacket(event: MainReceivePacketEvent<*, *>) {
+    fun onPacket(event: MainThreadPacketReceiveEvent<*>) {
         when (val packet = event.packet) {
             is S01PacketJoinGame -> {
                 inAuctionBrowser = false
@@ -131,8 +130,7 @@ object DupeTracker : Tracker("duped_items") {
         }
     }
 
-    @SubscribeEvent
-    fun onSlotDraw(event: GuiContainerEvent.DrawSlotEvent.Post) {
+    fun onSlotDraw(event: GuiContainerPostDrawSlotEvent) {
         if (!Utils.inSkyblock || !Skytils.config.dupeTracker) return
         val stack = event.slot.stack
         val uuid = stack.getUUID() ?: return
@@ -144,7 +142,6 @@ object DupeTracker : Tracker("duped_items") {
             event.slot highlight Skytils.config.dupeTrackerOverlayColor
             GlStateManager.popMatrix()
         }
-
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)

@@ -18,9 +18,12 @@
 
 package gg.skytils.skytilsmod.features.impl.handlers
 
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.screen.GuiContainerForegroundDrawnEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.DungeonClass
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
@@ -34,15 +37,12 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
 import java.util.*
 
-object SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
+object SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")), EventSubscriber {
 
     private val playerPattern = Regex("(?:\\[.+?] )?(?<name>\\w+)")
     var doorOpener: String? = null
@@ -52,8 +52,12 @@ object SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
     private val shortenedNameCache = WeakHashMap<String, String>()
     private val nameSlotCache = HashMap<Int, String>()
 
-    @SubscribeEvent
-    fun onGuiDrawPost(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    override fun setup() {
+        register(::onGuiDrawPost)
+        register(::onWorldLoad)
+    }
+
+    fun onGuiDrawPost(event: GuiContainerForegroundDrawnEvent) {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
             if ((Skytils.config.spiritLeapNames && event.chestName == "Spirit Leap") || (Skytils.config.reviveStoneNames && event.chestName == "Revive A Teammate") || (Skytils.config.ghostTeleportMenuNames && event.chestName == "Teleport to Player")) {
@@ -121,8 +125,7 @@ object SpiritLeap : PersistentSave(File(Skytils.modDir, "spiritleap.json")) {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Unload) {
+    fun onWorldLoad(event: WorldUnloadEvent) {
         nameSlotCache.clear()
     }
 

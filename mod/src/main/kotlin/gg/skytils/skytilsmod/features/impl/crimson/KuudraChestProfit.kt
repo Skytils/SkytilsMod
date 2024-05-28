@@ -18,10 +18,15 @@
 package gg.skytils.skytilsmod.features.impl.crimson
 
 import gg.essential.universal.UResolution
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.screen.GuiContainerForegroundDrawnEvent
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.IO
 import gg.skytils.skytilsmod.core.structure.GuiElement
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.features.impl.handlers.KuudraPriceData
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
@@ -35,22 +40,24 @@ import kotlinx.coroutines.launch
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 
 /**
  * Modified version of [gg.skytils.skytilsmod.features.impl.dungeons.DungeonChestProfit]
  */
-object KuudraChestProfit {
+object KuudraChestProfit : EventSubscriber {
     private val element = KuudraChestProfitElement()
     private val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")
 
-    @SubscribeEvent
-    fun onGUIDrawnEvent(event: GuiContainerEvent.ForegroundDrawnEvent) {
-        if (!Skytils.config.kuudraChestProfit || !KuudraFeatures.kuudraOver || event.container !is ContainerChest || KuudraFeatures.myFaction == null) return
-        val inv = event.container.lowerChestInventory
+    override fun setup() {
+        register(::onGUIDrawnEvent)
+        register(::onWorldChange)
+        register(::onSlotClick, EventPriority.Highest)
+    }
+
+    fun onGUIDrawnEvent(event: GuiContainerForegroundDrawnEvent) {
+        if (!Skytils.config.kuudraChestProfit || !KuudraFeatures.kuudraOver || KuudraFeatures.myFaction == null) return
+        val inv = (event.container as? ContainerChest ?: return).lowerChestInventory
 
         if (event.chestName.endsWith(" Chest")) {
             val chestType = KuudraChest.getFromName(event.chestName) ?: return
@@ -72,7 +79,11 @@ object KuudraChestProfit {
                 }
             }
             GlStateManager.pushMatrix()
-            GlStateManager.translate((-(event.gui as AccessorGuiContainer).guiLeft).toDouble(), -event.gui.guiTop.toDouble(), 299.0)
+            GlStateManager.translate(
+                (-(event.gui as AccessorGuiContainer).guiLeft).toDouble(),
+                -(event.gui as AccessorGuiContainer).guiTop.toDouble(),
+                299.0
+            )
             drawChestProfit(chestType)
             GlStateManager.popMatrix()
         }
@@ -132,16 +143,14 @@ object KuudraChestProfit {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         KuudraChest.entries.forEach(KuudraChest::reset)
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
         if (SBInfo.mode == SkyblockIsland.KuudraHollow.mode || event.container !is ContainerChest) return
         if (event.slotId in 9..17 && event.chestName.endsWith(" Chest") && KuudraChest.getFromName(event.chestName) != null) {
-            event.isCanceled = true
+            event.cancelled = true
         }
     }
 

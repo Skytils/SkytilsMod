@@ -17,9 +17,14 @@
  */
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
+import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
+import gg.skytils.event.impl.screen.OpenScreenEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.Utils
@@ -28,26 +33,28 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.Item
-import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
-object ClickInOrderSolver {
+object ClickInOrderSolver : EventSubscriber {
 
     private val slotOrder = HashMap<Int, Int>()
     private var neededClick = 0
     private val menuSlots = (10..16) + (19..25)
 
-    @SubscribeEvent
-    fun onGuiOpen(event: GuiOpenEvent) {
+    override fun setup() {
+        register(::onGuiOpen)
+        register(::onBackgroundDrawn)
+        register(::onDrawSlotLow, EventPriority.Low)
+    }
+
+    fun onGuiOpen(event: OpenScreenEvent) {
         neededClick = 0
         slotOrder.clear()
     }
 
-    @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerBackgroundDrawnEvent) {
         if (!Utils.inDungeons || !Skytils.config.clickInOrderTerminalSolver || event.container !is ContainerChest) return
         val invSlots = event.container.inventorySlots
         if (event.chestName == "Click in order!") {
@@ -82,8 +89,7 @@ object ClickInOrderSolver {
         if (lightingState) GlStateManager.enableLighting()
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onDrawSlotLow(event: GuiContainerEvent.DrawSlotEvent.Pre) {
+    fun onDrawSlotLow(event: GuiContainerPreDrawSlotEvent) {
         if (!Utils.inDungeons) return
         if (!Skytils.config.clickInOrderTerminalSolver) return
         if (event.container is ContainerChest) {
@@ -104,14 +110,14 @@ object ClickInOrderSolver {
                         )
                         GlStateManager.enableLighting()
                         GlStateManager.enableDepth()
-                        event.isCanceled = true
+                        event.cancelled = true
                     }
                 }
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = net.minecraftforge.fml.common.eventhandler.EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
         if (event.toolTip == null || !Utils.inDungeons || !Skytils.config.clickInOrderTerminalSolver) return
         val chest = mc.thePlayer.openContainer

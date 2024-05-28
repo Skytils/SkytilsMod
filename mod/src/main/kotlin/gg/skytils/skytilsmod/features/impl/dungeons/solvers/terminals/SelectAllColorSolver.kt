@@ -17,19 +17,23 @@
  */
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
+import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
-object SelectAllColorSolver {
+object SelectAllColorSolver : EventSubscriber {
 
     @JvmField
     val shouldClick = hashSetOf<Int>()
@@ -38,8 +42,14 @@ object SelectAllColorSolver {
         EnumDyeColor.entries.associateWith { it.getName().replace("_", " ").uppercase() }
     }
 
-    @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    override fun setup() {
+        register(::onBackgroundDrawn)
+        register(::onDrawSlot)
+        register(::onSlotClick, EventPriority.High)
+        register(::onTooltip)
+    }
+
+    fun onBackgroundDrawn(event: GuiContainerBackgroundDrawnEvent) {
         if (Skytils.config.selectAllColorTerminalSolver && Utils.inDungeons && event.container is ContainerChest && event.chestName.startsWith(
                 "Select all the"
             )
@@ -75,29 +85,27 @@ object SelectAllColorSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
+    fun onDrawSlot(event: GuiContainerPreDrawSlotEvent) {
         if (!Utils.inDungeons) return
         if (!Skytils.config.selectAllColorTerminalSolver) return
         if (event.container is ContainerChest) {
             if (event.chestName.startsWith("Select all the")) {
                 val slot = event.slot
                 if (shouldClick.isNotEmpty() && slot.slotNumber !in shouldClick && slot.inventory !== mc.thePlayer.inventory) {
-                    event.isCanceled = true
+                    event.cancelled = true
                 }
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
         if (!Utils.inDungeons || !Skytils.config.selectAllColorTerminalSolver || !Skytils.config.blockIncorrectTerminalClicks) return
         if (event.container is ContainerChest && event.chestName.startsWith("Select all the")) {
-            if (shouldClick.isNotEmpty() && !shouldClick.contains(event.slotId)) event.isCanceled = true
+            if (shouldClick.isNotEmpty() && !shouldClick.contains(event.slotId)) event.cancelled = true
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = net.minecraftforge.fml.common.eventhandler.EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
         if (event.toolTip == null || !Utils.inDungeons || !Skytils.config.selectAllColorTerminalSolver) return
         val chest = mc.thePlayer.openContainer

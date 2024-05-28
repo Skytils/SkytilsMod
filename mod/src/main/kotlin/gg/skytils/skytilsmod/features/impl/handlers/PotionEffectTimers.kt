@@ -22,12 +22,15 @@ import gg.essential.universal.UChat
 import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.Utils
@@ -39,7 +42,6 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
@@ -47,7 +49,7 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.set
 
-object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTimers.json")) {
+object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTimers.json")), EventSubscriber {
     private val effectMenuTitle = Regex("^(?:\\((?<currPage>\\d+)\\/(?<lastPage>\\d+)\\) )?Active Effects\$")
     private val duration =
         Regex("(?:§7Remaining: §f(?:(?<hours>\\d+):)?(?:(?<minutes>\\d+):)(?<seconds>\\d+)|(?<infinite>§cInfinite))")
@@ -57,8 +59,13 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
     private var neededPage = 1
     private var lastCommandRun = -1L
 
-    @SubscribeEvent
-    fun onPacket(event: PacketEvent.ReceiveEvent) {
+    override fun setup() {
+        register(::onPacket)
+        register(::onTick)
+        register(::onDrawBackground)
+    }
+
+    fun onPacket(event: PacketReceiveEvent<*>) {
         if (!Utils.inSkyblock || Utils.inDungeons || notifications.size == 0) return
         if (event.packet is S02PacketChat && event.packet.type != 2.toByte()) {
             val message = event.packet.chatComponent.formattedText
@@ -77,9 +84,8 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!Utils.inSkyblock || Utils.inDungeons || event.phase != TickEvent.Phase.START) return
+    fun onTick(event: TickEvent) {
+        if (!Utils.inSkyblock || Utils.inDungeons) return
 
         potionEffectTimers.entries.removeAll { (name, effect) ->
             if (!effect.infinite && effect.duration == (notifications[name] ?: Long.MAX_VALUE)) {
@@ -112,10 +118,9 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
         }
     }
 
-    @SubscribeEvent
-    fun onDrawBackground(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onDrawBackground(event: GuiContainerBackgroundDrawnEvent) {
         if (!shouldReadEffects || event.container !is ContainerChest || !event.chestName.endsWith("Active Effects")) return
-        val lastIndex = event.container.lowerChestInventory.sizeInventory - 1
+        val lastIndex = (event.container as? ContainerChest ?: return).lowerChestInventory.sizeInventory - 1
         for (i in 0..lastIndex) {
             val slot = event.container.getSlot(i)
             val item = slot.stack ?: continue

@@ -17,28 +17,36 @@
  */
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
+import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
-object StartsWithSequenceSolver {
-
+object StartsWithSequenceSolver : EventSubscriber {
 
     @JvmField
     val shouldClick = hashSetOf<Int>()
     private var sequenceNeeded: String? = null
     private val titlePattern = Regex("^What starts with: ['\"](.+)['\"]\\?$")
 
-    @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    override fun setup() {
+        register(::onBackgroundDrawn)
+        register(::onDrawSlot)
+        register(::onSlotClick, EventPriority.High)
+    }
+
+    fun onBackgroundDrawn(event: GuiContainerBackgroundDrawnEvent) {
         if (Utils.inDungeons && Skytils.config.startsWithSequenceTerminalSolver && event.container is ContainerChest && event.chestName.startsWith(
                 "What starts with:"
             )
@@ -71,26 +79,24 @@ object StartsWithSequenceSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
+    fun onDrawSlot(event: GuiContainerPreDrawSlotEvent) {
         if (!Utils.inDungeons || !Skytils.config.startsWithSequenceTerminalSolver) return
         if (event.container is ContainerChest && event.chestName.startsWith("What starts with:")) {
             val slot = event.slot
             if (shouldClick.size > 0 && !shouldClick.contains(slot.slotNumber) && slot.inventory !== mc.thePlayer.inventory) {
-                event.isCanceled = true
+                event.cancelled = true
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
         if (!Utils.inDungeons || !Skytils.config.startsWithSequenceTerminalSolver || !Skytils.config.blockIncorrectTerminalClicks) return
         if (event.container is ContainerChest && event.chestName.startsWith("What starts with:")) {
-            if (shouldClick.isNotEmpty() && !shouldClick.contains(event.slotId)) event.isCanceled = true
+            if (shouldClick.isNotEmpty() && !shouldClick.contains(event.slotId)) event.cancelled = true
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = net.minecraftforge.fml.common.eventhandler.EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
         if (event.toolTip == null || !Utils.inDungeons || !Skytils.config.startsWithSequenceTerminalSolver) return
         val container = mc.thePlayer?.openContainer

@@ -17,9 +17,13 @@
  */
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerForegroundDrawnEvent
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
@@ -29,11 +33,10 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
-object ChangeAllToSameColorSolver {
+object ChangeAllToSameColorSolver : EventSubscriber {
     private val ordering =
         setOf(
             EnumDyeColor.RED,
@@ -46,11 +49,16 @@ object ChangeAllToSameColorSolver {
         }
     private var mostCommon = EnumDyeColor.RED.metadata
 
-    @SubscribeEvent
-    fun onForegroundEvent(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    override fun setup() {
+        register(::onForegroundEvent)
+        register(::onSlotClick, EventPriority.High)
+    }
+
+    fun onForegroundEvent(event: GuiContainerForegroundDrawnEvent) {
         if (!Utils.inDungeons || !Skytils.config.changeAllSameColorTerminalSolver || event.container !is ContainerChest || event.chestName != "Change all to same color!") return
-        val grid = event.container.inventorySlots.filter {
-            it.inventory == event.container.lowerChestInventory && it.stack?.displayName?.startsWith("§a") == true
+        val container = event.container as? ContainerChest ?: return
+        val grid = container.inventorySlots.filter {
+            it.inventory == container.lowerChestInventory && it.stack?.displayName?.startsWith("§a") == true
         }
         val counts = ordering.keys.associateWith { c -> grid.count { it.stack?.metadata == c } }
         val currentPath = counts[mostCommon]!!
@@ -101,15 +109,14 @@ object ChangeAllToSameColorSolver {
         GlStateManager.popMatrix()
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
         if (!Utils.inDungeons || !Skytils.config.changeAllSameColorTerminalSolver || !Skytils.config.blockIncorrectTerminalClicks) return
         if (event.container is ContainerChest && event.chestName == "Change all to same color!") {
-            if (event.slot?.stack?.metadata == mostCommon) event.isCanceled = true
+            if (event.slot?.stack?.metadata == mostCommon) event.cancelled = true
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @SubscribeEvent(priority = net.minecraftforge.fml.common.eventhandler.EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
         if (!Utils.inDungeons) return
         if (!Skytils.config.changeAllSameColorTerminalSolver) return

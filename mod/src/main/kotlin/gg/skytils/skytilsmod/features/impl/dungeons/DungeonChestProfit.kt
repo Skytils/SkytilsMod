@@ -19,10 +19,16 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UResolution
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.screen.GuiContainerForegroundDrawnEvent
+import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.features.impl.misc.ItemFeatures
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
@@ -38,9 +44,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 
@@ -49,18 +52,23 @@ import java.awt.Color
  * Licensed under GNU GPL v3, with permission given from author
  * @author Quantizr
  */
-object DungeonChestProfit {
+object DungeonChestProfit : EventSubscriber {
     private val element = DungeonChestProfitElement()
     private var rerollBypass = false
     private val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")
     private val croesusChestRegex = Regex("^(Master Mode|The)? Catacombs - Floor (IV|V?I{0,3})$")
 
-    @SubscribeEvent
-    fun onGUIDrawnEvent(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    override fun setup() {
+        register(::onGUIDrawnEvent)
+        register(::onDrawSlot)
+        register(::onSlotClick, EventPriority.Highest)
+        register(::onWorldChange)
+    }
+
+    fun onGUIDrawnEvent(event: GuiContainerForegroundDrawnEvent) {
         if (!Skytils.config.dungeonChestProfit) return
         if ((!Utils.inDungeons || DungeonTimer.scoreShownAt == -1L) && SBInfo.mode != SkyblockIsland.DungeonHub.mode) return
-        if (event.container !is ContainerChest) return
-        val inv = event.container.lowerChestInventory
+        val inv = (event.container as? ContainerChest ?: return).lowerChestInventory
 
         if (event.chestName == "Croesus") {
             DungeonChest.entries.forEach(DungeonChest::reset)
@@ -88,7 +96,11 @@ object DungeonChestProfit {
                 }
             }
             GlStateManager.pushMatrix()
-            GlStateManager.translate((-(event.gui as AccessorGuiContainer).guiLeft).toDouble(), -event.gui.guiTop.toDouble(), 299.0)
+            GlStateManager.translate(
+                (-(event.gui as AccessorGuiContainer).guiLeft).toDouble(),
+                -(event.gui as AccessorGuiContainer).guiTop.toDouble(),
+                299.0
+            )
             drawChestProfit(chestType)
             GlStateManager.popMatrix()
         } else if (croesusChestRegex.matches(event.chestName)) {
@@ -118,8 +130,7 @@ object DungeonChestProfit {
         }
     }
 
-    @SubscribeEvent
-    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
+    fun onDrawSlot(event: GuiContainerPreDrawSlotEvent) {
         if (!Skytils.config.croesusChestHighlight) return
         if (SBInfo.mode != SkyblockIsland.DungeonHub.mode) return
         if (event.container !is ContainerChest || event.slot.inventory == mc.thePlayer.inventory) return
@@ -131,7 +142,7 @@ object DungeonChestProfit {
             event.slot highlight when {
                 lore.any { line -> line == "§aNo more Chests to open!" } -> {
                     if (Skytils.config.croesusHideOpened) {
-                        event.isCanceled = true
+                        event.cancelled = true
                         return
                     } else Color(255, 0, 0, 100)
                 }
@@ -226,14 +237,12 @@ object DungeonChestProfit {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         DungeonChest.entries.forEach(DungeonChest::reset)
         rerollBypass = false
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
         if (!Utils.inDungeons || event.container !is ContainerChest) return
         if (Skytils.config.kismetRerollThreshold != 0 && !rerollBypass && event.slotId == 50 && event.chestName.endsWith(
                 " Chest"
@@ -241,7 +250,7 @@ object DungeonChestProfit {
         ) {
             val chestType = DungeonChest.getFromName(event.chestName) ?: return
             if (chestType.value >= Skytils.config.kismetRerollThreshold * 1_000_000) {
-                event.isCanceled = true
+                event.cancelled = true
                 EssentialAPI.getNotifications()
                     .push(
                         "Blocked Chest Reroll",
@@ -252,7 +261,7 @@ object DungeonChestProfit {
                         })
             }
         } else if (event.slotId in 9..17 && event.chestName.endsWith(" Chest") && DungeonChest.getFromName(event.chestName) != null) {
-            event.isCanceled = true
+            event.cancelled = true
         }
     }
 

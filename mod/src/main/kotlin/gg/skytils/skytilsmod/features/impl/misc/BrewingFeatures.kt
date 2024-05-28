@@ -19,11 +19,13 @@
 package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
@@ -33,7 +35,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-object BrewingFeatures {
+object BrewingFeatures : EventSubscriber {
     var lastBrewingStand: TileEntityBrewingStand? = null
     val brewingStandToTimeMap = hashMapOf<BlockPos, Long>()
     val timeRegex = Regex("§a(?<sec>\\d+(?:.\\d)?)s")
@@ -49,16 +51,19 @@ object BrewingFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onPacketSend(event: PacketEvent.SendEvent) {
+    override fun setup() {
+        register(::onPacketSend)
+        register(::onContainerUpdate)
+    }
+
+    fun onPacketSend(event: PacketSendEvent<*>) {
         if (!Skytils.config.colorBrewingStands || !Utils.inSkyblock || SBInfo.mode != SkyblockIsland.PrivateIsland.mode) return
         if (event.packet is C08PacketPlayerBlockPlacement && event.packet.position.y != -1) {
             lastBrewingStand = mc.theWorld.getTileEntity(event.packet.position) as? TileEntityBrewingStand ?: return
         }
     }
 
-    @SubscribeEvent
-    fun onContainerUpdate(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onContainerUpdate(event: GuiContainerBackgroundDrawnEvent) {
         if (!Skytils.config.colorBrewingStands || !Utils.inSkyblock || SBInfo.mode != SkyblockIsland.PrivateIsland.mode) return
         if (lastBrewingStand == null || event.container !is ContainerChest || event.chestName != "Brewing Stand") return
         val timeSlot = event.container.getSlot(22).stack ?: return

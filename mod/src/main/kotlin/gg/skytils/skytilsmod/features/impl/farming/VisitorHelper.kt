@@ -20,11 +20,13 @@ package gg.skytils.skytilsmod.features.impl.farming
 
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerCloseWindowEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.features.impl.misc.ContainerSellValue
 import gg.skytils.skytilsmod.features.impl.misc.ItemFeatures
@@ -38,7 +40,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object VisitorHelper {
+object VisitorHelper : EventSubscriber {
     private val inGarden
         get() = Utils.inSkyblock && SBInfo.mode == SkyblockIsland.TheGarden.mode
 
@@ -48,8 +50,11 @@ object VisitorHelper {
     private val textLines = mutableListOf<String>()
     private var totalItemCost: Double = 0.0
 
-    @SubscribeEvent
-    fun onGuiClose(event: GuiContainerEvent.CloseWindowEvent) {
+    override fun setup() {
+        register(::onGuiClose)
+    }
+
+    fun onGuiClose(event: GuiContainerCloseWindowEvent) {
         textLines.clear()
         totalItemCost = 0.0
     }

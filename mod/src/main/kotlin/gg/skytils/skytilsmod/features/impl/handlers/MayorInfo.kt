@@ -18,14 +18,19 @@
 package gg.skytils.skytilsmod.features.impl.handlers
 
 import com.mojang.authlib.exceptions.AuthenticationException
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerPostDrawSlotEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.client
 import gg.skytils.skytilsmod.Skytils.json
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.ItemUtil
+import gg.skytils.skytilsmod.utils.TabListUtils
+import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.stripControlCodes
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -33,21 +38,18 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
-import net.minecraft.event.HoverEvent
-import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.IOException
-import java.net.URLEncoder
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.round
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
-object MayorInfo {
+object MayorInfo : EventSubscriber {
 
     val mayorData = HashSet<Mayor>()
 
@@ -89,6 +91,10 @@ object MayorInfo {
         }
     }
 
+    override fun setup() {
+        register(::onDrawSlot)
+    }
+
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
         if (!Utils.inSkyblock) return
@@ -97,8 +103,7 @@ object MayorInfo {
         }
     }
 
-    @SubscribeEvent
-    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Post) {
+    fun onDrawSlot(event: GuiContainerPostDrawSlotEvent) {
         if (!Utils.inSkyblock) return
         if (mc.currentServerData?.serverIP?.lowercase()
                 ?.contains("alpha") == true

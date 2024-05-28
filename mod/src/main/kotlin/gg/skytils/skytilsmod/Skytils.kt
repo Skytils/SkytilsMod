@@ -33,7 +33,6 @@ import gg.skytils.skytilsmod.commands.impl.*
 import gg.skytils.skytilsmod.commands.stats.impl.CataCommand
 import gg.skytils.skytilsmod.commands.stats.impl.SlayerCommand
 import gg.skytils.skytilsmod.core.*
-import gg.skytils.skytilsmod.tweaker.DependencyLoader
 import gg.skytils.skytilsmod.features.impl.crimson.KuudraChestProfit
 import gg.skytils.skytilsmod.features.impl.crimson.KuudraFeatures
 import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
@@ -75,6 +74,7 @@ import gg.skytils.skytilsmod.mixins.hooks.util.MouseHelperHook
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandler
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiStreamUnavailable
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
+import gg.skytils.skytilsmod.tweaker.DependencyLoader
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
@@ -127,7 +127,6 @@ import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 //$$ import net.minecraft.util.text.StringTextComponent
 //#endif
 //#endif
-
 //#if FABRIC
 //$$ import net.fabricmc.loader.api.FabricLoader
 //$$ import net.minecraft.network.packet.BrandCustomPayload
@@ -400,7 +399,21 @@ object Skytils : CoroutineScope, EventSubscriber {
             this,
             ChatListener,
             DungeonListener,
-            SoundQueue
+            MayorInfo,
+            SoundQueue,
+
+            BrewingFeatures,
+            ChangeAllToSameColorSolver,
+            ClickInOrderSolver,
+            DungeonChestProfit,
+            DupeTracker,
+            ItemCycle,
+            KuudraChestProfit,
+            PotionEffectTimers,
+            SelectAllColorSolver,
+            SpiritLeap,
+            StartsWithSequenceSolver,
+            VisitorHelper
         ).forEach(EventSubscriber::setup)
     }
 

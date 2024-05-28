@@ -18,9 +18,13 @@
 
 package gg.skytils.skytilsmod.features.impl.handlers
 
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.SkyblockIsland
@@ -30,16 +34,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
 import java.util.*
 
-object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
+object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")), EventSubscriber {
 
     val cycles = hashMapOf<UUID, Cycle>()
     private val itemLocations = hashMapOf<Cycle.ItemIdentifier, Int>()
@@ -57,9 +57,13 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
         writer.write(json.encodeToString(emptyMap<@Contextual UUID, Cycle>()))
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || cycles.isEmpty() || !Utils.inSkyblock || mc.thePlayer == null) return
+    override fun setup() {
+        register(::onTick)
+        register(::onSlotClick, EventPriority.Lowest)
+    }
+
+    fun onTick(event: TickEvent) {
+        if (cycles.isEmpty() || !Utils.inSkyblock || mc.thePlayer == null) return
 
         itemLocations.clear()
         for (slot in mc.thePlayer.inventoryContainer.inventorySlots) {
@@ -69,8 +73,7 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
         if (!Utils.inSkyblock || cycles.isEmpty() || event.clickType == 2 || event.container != mc.thePlayer.inventoryContainer) return
 
         if (event.slotId !in 36..44) return
@@ -85,7 +88,7 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
 
         mc.playerController.windowClick(event.container.windowId, swapTo, event.slotId - 36, 2, mc.thePlayer)
 
-        event.isCanceled = true
+        event.cancelled = true
     }
 
     fun ItemStack?.getIdentifier() = ItemUtil.getExtraAttributes(this).let {
@@ -122,14 +125,14 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
 
         @Serializable
         sealed class Condition(val uuid: @Contextual UUID = UUID.randomUUID()) {
-            abstract fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean
+            abstract fun check(event: GuiContainerSlotClickEvent, clickedItem: ItemIdentifier?): Boolean
 
             abstract fun displayText(): String
 
             @Serializable
             @SerialName("IslandCondition")
             class IslandCondition(var islands: Set<@Serializable(with = SkyblockIsland.ModeSerializer::class) SkyblockIsland>, var negated: Boolean = false) : Condition() {
-                override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
+                override fun check(event: GuiContainerSlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
                     islands.any { SBInfo.mode == it.mode } == !negated
 
                 override fun displayText(): String = "${if (negated) "Not " else ""}${islands.joinToString(", ")}"
@@ -139,7 +142,7 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
             @SerialName("ClickCondition")
             class ClickCondition(var clickedButton: Int, var clickType: Int, var negated: Boolean = false) :
                 Condition() {
-                override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
+                override fun check(event: GuiContainerSlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
                     ((clickedButton == -1000 || event.clickedButton == clickedButton) && (clickType == -1000 || event.clickType == clickType)) == !negated
 
                 override fun displayText(): String =
@@ -149,7 +152,7 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
             @Serializable
             @SerialName("ItemCondition")
             class ItemCondition(var item: ItemIdentifier, var negated: Boolean = false) : Condition() {
-                override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean {
+                override fun check(event: GuiContainerSlotClickEvent, clickedItem: ItemIdentifier?): Boolean {
                     return (clickedItem == item) == !negated
                 }
 
@@ -160,7 +163,7 @@ object ItemCycle : PersistentSave(File(Skytils.modDir, "itemcycle.json")) {
             @SerialName("SlotCondition")
             class SlotCondition(var slotId: Int, var negated: Boolean = false) :
                 Condition() {
-                override fun check(event: GuiContainerEvent.SlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
+                override fun check(event: GuiContainerSlotClickEvent, clickedItem: ItemIdentifier?): Boolean =
                     event.slotId == slotId == !negated
 
                 override fun displayText(): String =
