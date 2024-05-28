@@ -22,16 +22,21 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.TickEvent;
+import gg.skytils.event.impl.play.WorldUnloadEvent;
 import gg.skytils.event.impl.screen.OpenScreenEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.multiplayer.WorldClient;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Minecraft.class)
 public class MixinMinecraft {
+    @Shadow public WorldClient theWorld;
+
     @Inject(
             method = "runTick",
             at = @At(
@@ -51,5 +56,12 @@ public class MixinMinecraft {
             ci.cancel();
         }
         screen.set(event.getScreen());
+    }
+
+    @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At("HEAD"))
+    private void worldChange(WorldClient worldClientIn, String loadingMessage, CallbackInfo ci) {
+        if (this.theWorld != null) {
+            EventsKt.postSync(new WorldUnloadEvent(this.theWorld));
+        }
     }
 }
