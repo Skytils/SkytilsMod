@@ -18,6 +18,10 @@
 package gg.skytils.skytilsmod.listeners
 
 import gg.essential.universal.UChat
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.Skytils.mc
@@ -27,15 +31,12 @@ import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.AdManager
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.runCommand
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import net.minecraftforge.client.ClientCommandHandler
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object ChatListener {
+object ChatListener : EventSubscriber {
     private var lastPartyDisbander = ""
     private val invitePattern = Regex("(?:(?:\\[.+?] )?(?:\\w+) invited )(?:\\[.+?] )?(\\w+)")
     private val playerPattern = Regex("(?:\\[.+?] )?(\\w+)")
@@ -44,9 +45,8 @@ object ChatListener {
     private val members_pattern = Regex(" (?:\\[.+?] )?(\\w+) ●")
     private var awaitingDelimiter = false
 
-    @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.isOnHypixel || event.type == 2.toByte()) return
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (!Utils.isOnHypixel) return
         val formatted = event.message.formattedText
         val unformatted = formatted.stripControlCodes()
         if (Skytils.config.autoReparty) {
@@ -79,7 +79,7 @@ object ChatListener {
 
         // Await delimiter
         if (awaitingDelimiter && unformatted.startsWith("---")) {
-            event.isCanceled = true
+            event.cancelled = true
             awaitingDelimiter = false
             return
         }
@@ -92,7 +92,7 @@ object ChatListener {
                     0 -> {
                         println("Get Party Delimiter Cancelled")
                         RepartyCommand.Delimiter++
-                        event.isCanceled = true
+                        event.cancelled = true
                         return
                     }
 
@@ -100,7 +100,7 @@ object ChatListener {
                         println("Done querying party")
                         RepartyCommand.gettingParty = false
                         RepartyCommand.Delimiter = 0
-                        event.isCanceled = true
+                        event.cancelled = true
                         return
                     }
                 }
@@ -124,7 +124,7 @@ object ChatListener {
                         }
                     }
                 }
-                event.isCanceled = true
+                event.cancelled = true
                 return
             }
         }
@@ -135,7 +135,7 @@ object ChatListener {
                     0 -> {
                         println("Disband Delimiter Cancelled")
                         RepartyCommand.Delimiter++
-                        event.isCanceled = true
+                        event.cancelled = true
                         return
                     }
 
@@ -143,12 +143,12 @@ object ChatListener {
                         println("Done disbanding")
                         RepartyCommand.disbanding = false
                         RepartyCommand.Delimiter = 0
-                        event.isCanceled = true
+                        event.cancelled = true
                         return
                     }
                 }
             } else if (unformatted.endsWith("has disbanded the party!")) {
-                event.isCanceled = true
+                event.cancelled = true
                 return
             }
         }
@@ -161,13 +161,13 @@ object ChatListener {
                 }
                 tryRemoveLineAtIndex(1)
                 awaitingDelimiter = true
-                event.isCanceled = true
+                event.cancelled = true
                 println("Player Invited!")
                 RepartyCommand.inviting = false
                 return
             } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
                 tryRemoveLineAtIndex(1)
-                event.isCanceled = true
+                event.cancelled = true
                 println("Player Invited!")
                 RepartyCommand.inviting = false
                 return
@@ -181,12 +181,12 @@ object ChatListener {
                     println("${invitee.groupValues[1]}: ${RepartyCommand.repartyFailList.remove(invitee.groupValues[1])}")
                 }
                 tryRemoveLineAtIndex(1)
-                event.isCanceled = true
+                event.cancelled = true
                 RepartyCommand.inviting = false
                 return
             } else if (unformatted.contains("Couldn't find a player") || unformatted.contains("You cannot invite that player")) {
                 tryRemoveLineAtIndex(1)
-                event.isCanceled = true
+                event.cancelled = true
                 println("Player Invited!")
                 RepartyCommand.inviting = false
                 return
@@ -195,7 +195,7 @@ object ChatListener {
         if (unformatted == "Welcome to Hypixel SkyBlock!") {
             if (Skytils.config.firstLaunch) {
                 UChat.chat("$prefix §bThank you for downloading Skytils!")
-                ClientCommandHandler.instance.executeCommand(mc.thePlayer, "/skytils help")
+                runCommand("/skytils help")
                 Skytils.config.firstLaunch = false
                 Skytils.config.markDirty()
                 Skytils.config.writeData()
@@ -211,5 +211,9 @@ object ChatListener {
         if (lines.size > index) {
             lines.removeAt(index)
         }
+    }
+
+    override fun setup() {
+        register(::onChat, EventPriority.Highest)
     }
 }
