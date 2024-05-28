@@ -22,6 +22,7 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.network.ClientConnectEvent;
+import gg.skytils.event.impl.play.ActionBarReceivedEvent;
 import gg.skytils.event.impl.play.ChatMessageReceivedEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
@@ -44,6 +45,15 @@ public class MixinNetHandlerPlayClient {
     @Inject(method = "handleChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiNewChat;printChatMessage(Lnet/minecraft/util/IChatComponent;)V"), cancellable = true)
     public void onChat(CallbackInfo ci, @Local(argsOnly = true) LocalRef<S02PacketChat> packet) {
         ChatMessageReceivedEvent event = new ChatMessageReceivedEvent(packet.get().getChatComponent());
+        if (EventsKt.postCancellableSync(event)) {
+            ci.cancel();
+        }
+        packet.set(new S02PacketChat(event.getMessage(), packet.get().getType()));
+    }
+
+    @Inject(method = "handleChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiIngame;setRecordPlaying(Lnet/minecraft/util/IChatComponent;Z)V"), cancellable = true)
+    public void onActionbar(CallbackInfo ci, @Local(argsOnly = true) LocalRef<S02PacketChat> packet) {
+        ActionBarReceivedEvent event = new ActionBarReceivedEvent(packet.get().getChatComponent());
         if (EventsKt.postCancellableSync(event)) {
             ci.cancel();
         }

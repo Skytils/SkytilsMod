@@ -22,3 +22,5 @@ import gg.skytils.event.CancellableEvent
 import net.minecraft.util.IChatComponent
 
 class ChatMessageReceivedEvent(val message: IChatComponent) : CancellableEvent()
+
+class ActionBarReceivedEvent(val message: IChatComponent) : CancellableEvent()
