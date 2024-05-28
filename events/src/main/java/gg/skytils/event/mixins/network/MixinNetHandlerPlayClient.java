@@ -18,10 +18,14 @@
 
 package gg.skytils.event.mixins.network;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.network.ClientConnectEvent;
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.network.play.server.S02PacketChat;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,5 +39,14 @@ public class MixinNetHandlerPlayClient {
         Minecraft.getMinecraft().addScheduledTask(() -> {
             EventsKt.postSync(new ClientConnectEvent());
         });
+    }
+
+    @Inject(method = "handleChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiNewChat;printChatMessage(Lnet/minecraft/util/IChatComponent;)V"), cancellable = true)
+    public void onChat(CallbackInfo ci, @Local(argsOnly = true) LocalRef<S02PacketChat> packet) {
+        ChatMessageReceivedEvent event = new ChatMessageReceivedEvent(packet.get().getChatComponent());
+        if (EventsKt.postCancellableSync(event)) {
+            ci.cancel();
+        }
+        packet.set(new S02PacketChat(event.getMessage(), packet.get().getType()));
     }
 }
