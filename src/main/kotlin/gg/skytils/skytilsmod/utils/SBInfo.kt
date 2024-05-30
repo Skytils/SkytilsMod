@@ -19,6 +19,7 @@ package gg.skytils.skytilsmod.utils
 
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.HypixelPacketEvent
+import gg.skytils.skytilsmod.events.impl.skyblock.LocationChangeEvent
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.*
@@ -91,6 +92,7 @@ object SBInfo {
                 server = event.packet.serverName
                 lastLocationPacket = event.packet
                 println(event.packet)
+                LocationChangeEvent(event.packet).postAndCatch()
             }
         }
     }
