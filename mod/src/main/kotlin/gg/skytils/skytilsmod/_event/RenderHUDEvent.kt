@@ -15,18 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-plugins {
-    kotlin("jvm") apply false
-    id("gg.essential.multi-version.root")
-}
 
-version = "2.0.0"
+package gg.skytils.skytilsmod._event
 
-preprocess {
-    val forge10809 = createNode("1.8.9-forge", 10809, "mcp")
-    val fabric10809 = createNode("1.8.9-fabric", 10809, "yarn")
-    val fabric12004 = createNode("1.20.4-fabric", 12004, "yarn")
+import gg.skytils.event.Event
 
-    fabric12004.link(fabric10809, file("versions/1.20.4-1.8.9.txt"))
-    fabric10809.link(forge10809, file("versions/fabric-forge.txt"))
-}
+class RenderHUDEvent : Event()
