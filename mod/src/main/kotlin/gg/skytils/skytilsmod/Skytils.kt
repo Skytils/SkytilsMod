@@ -300,7 +300,6 @@ object Skytils : CoroutineScope, EventSubscriber {
 
         arrayOf(
             this,
-            guiManager,
             LocalAPI,
             MayorInfo,
             SBInfo,
@@ -400,6 +399,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             ChatListener,
             DungeonListener,
             MayorInfo,
+            guiManager,
             SoundQueue,
 
             BrewingFeatures,

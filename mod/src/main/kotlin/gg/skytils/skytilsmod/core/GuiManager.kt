@@ -23,31 +23,25 @@ import gg.essential.elementa.dsl.pixels
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod._event.RenderHUDEvent
 import gg.skytils.skytilsmod.core.structure.GuiElement
-import gg.skytils.skytilsmod.events.impl.RenderHUDEvent
 import gg.skytils.skytilsmod.gui.editing.VanillaEditingGui
-import gg.skytils.skytilsmod.utils.GlState
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.toast.Toast
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.client.GuiIngameForge
-import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
 
-object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
+object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")), EventSubscriber {
     val elements = hashMapOf<Int, GuiElement>()
     private val names = hashMapOf<String, GuiElement>()
     val elementMetadata = hashMapOf<String, GuiElementMetadata>()
@@ -107,15 +101,6 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
         return names.filter { it.key.contains(query) }.values
     }
 
-    @SubscribeEvent
-    fun renderPlayerInfo(event: RenderGameOverlayEvent.Post) {
-        if (Skytils.usingLabymod && mc.ingameGUI !is GuiIngameForge) return
-        if (event.type != RenderGameOverlayEvent.ElementType.HOTBAR) return
-        GlState.pushState()
-        MinecraftForge.EVENT_BUS.post(RenderHUDEvent(event))
-        GlState.popState()
-    }
-
     @JvmStatic
     fun createTitle(title: String?, ticks: Int) {
         SoundQueue.addToQueue("random.orb", 0.5f, isLoud = true)
@@ -123,17 +108,6 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
         titleDisplayTicks = ticks
     }
 
-    // LabyMod Support
-    @SubscribeEvent
-    fun renderPlayerInfoLabyMod(event: RenderGameOverlayEvent) {
-        if (!Skytils.usingLabymod) return
-        if (event.type != null) return
-        GlState.pushState()
-        MinecraftForge.EVENT_BUS.post(RenderHUDEvent(event))
-        GlState.popState()
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderHUD(event: RenderHUDEvent) {
         if (Minecraft.getMinecraft().currentScreen is VanillaEditingGui) return
         mc.mcProfiler.startSection("SkytilsHUD")
@@ -152,13 +126,11 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
             }
             mc.mcProfiler.endSection()
         }
-        renderTitles(event.event.resolution)
+        renderTitles()
         mc.mcProfiler.endSection()
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: gg.skytils.event.impl.TickEvent) {
         if (titleDisplayTicks > 0) {
             titleDisplayTicks--
         } else {
@@ -178,12 +150,12 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
      * @link https://github.com/BiscuitDevelopment/SkyblockAddons/blob/master/LICENSE
      * @author BiscuitDevelopment
      */
-    private fun renderTitles(scaledResolution: ScaledResolution) {
+    private fun renderTitles() {
         if (mc.theWorld == null || mc.thePlayer == null || !Utils.inSkyblock) {
             return
         }
-        val scaledWidth = scaledResolution.scaledWidth
-        val scaledHeight = scaledResolution.scaledHeight
+        val scaledWidth = UResolution.scaledWidth
+        val scaledHeight = UResolution.scaledHeight
         if (title != null) {
             val stringWidth = mc.fontRendererObj.getStringWidth(title)
             var scale = 4f // Scale is normally 4, but if its larger than the screen, scale it down...
@@ -247,4 +219,9 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")) {
 
     @Serializable
     data class GuiElementMetadata(val x: Float, val y: Float, val scale: Float = 1f, val textShadow: SmartFontRenderer.TextShadow = SmartFontRenderer.TextShadow.NORMAL)
+
+    override fun setup() {
+        register(::onRenderHUD, EventPriority.Highest)
+        register(::onTick)
+    }
 }
