@@ -18,7 +18,9 @@
 package gg.skytils.skytilsmod.features.impl.handlers
 
 import com.mojang.authlib.exceptions.AuthenticationException
+import gg.skytils.event.EventPriority
 import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
 import gg.skytils.event.impl.screen.GuiContainerPostDrawSlotEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
@@ -39,9 +41,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.IOException
 import java.util.*
 import kotlin.math.abs
@@ -93,10 +92,10 @@ object MayorInfo : EventSubscriber {
 
     override fun setup() {
         register(::onDrawSlot)
+        register(::onChat, EventPriority.Highest)
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
+    fun onChat(event: ChatMessageReceivedEvent) {
         if (!Utils.inSkyblock) return
         if (event.message.unformattedText == "§eEverybody unlocks §6exclusive §eperks! §a§l[HOVER TO VIEW]") {
             fetchMayorData()

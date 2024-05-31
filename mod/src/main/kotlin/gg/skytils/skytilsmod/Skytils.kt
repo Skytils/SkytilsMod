@@ -301,7 +301,6 @@ object Skytils : CoroutineScope, EventSubscriber {
         arrayOf(
             this,
             LocalAPI,
-            MayorInfo,
             SBInfo,
             UpdateChecker,
 
