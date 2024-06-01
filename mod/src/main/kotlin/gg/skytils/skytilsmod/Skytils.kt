@@ -301,7 +301,6 @@ object Skytils : CoroutineScope, EventSubscriber {
         arrayOf(
             this,
             LocalAPI,
-            UpdateChecker,
 
             AlignmentTaskSolver,
             AntiFool,
@@ -400,6 +399,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             guiManager,
             SBInfo,
             SoundQueue,
+            UpdateChecker,
 
             BrewingFeatures,
             ChangeAllToSameColorSolver,

@@ -18,6 +18,10 @@
 package gg.skytils.skytilsmod.core
 
 import gg.essential.universal.UDesktop
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.ScreenOpenEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.client
 import gg.skytils.skytilsmod.gui.updater.RequestUpdateGui
@@ -35,13 +39,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.client.gui.GuiMainMenu
 import net.minecraft.util.Util
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.versioning.DefaultArtifactVersion
 import java.io.File
 
-object UpdateChecker {
+object UpdateChecker : EventSubscriber {
     val updateGetter = UpdateGetter()
     val updateAsset
         get() = updateGetter.updateObj!!.assets.first { it.name.endsWith(".jar") }
@@ -141,9 +142,8 @@ object UpdateChecker {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onGuiOpen(e: GuiOpenEvent) {
-        if (e.gui !is GuiMainMenu) return
+    fun onGuiOpen(e: ScreenOpenEvent) {
+        if (e.screen !is GuiMainMenu) return
         if (updateGetter.updateObj == null) return
         if (UpdateGui.complete) return
         Skytils.displayScreen = RequestUpdateGui()
@@ -228,5 +228,9 @@ object UpdateChecker {
         RELEASE(""),
         RELEASECANDIDATE("RC"),
         PRERELEASE("pre"),
+    }
+
+    override fun setup() {
+        register(::onGuiOpen, EventPriority.Highest)
     }
 }
