@@ -6,6 +6,7 @@
   "client": [
     "MixinMinecraft",
     "gui.MixinGuiContainer",
+    "gui.MixinGuiScreen",
     "network.MixinNetHandlerPlayClient",
     "network.MixinNetworkManager"
   ],

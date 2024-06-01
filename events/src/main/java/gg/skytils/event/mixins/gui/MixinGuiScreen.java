@@ -16,13 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.event.impl.play
+package gg.skytils.event.mixins.gui;
 
-import gg.skytils.event.CancellableEvent
-import net.minecraft.util.IChatComponent
+import gg.skytils.event.EventsKt;
+import gg.skytils.event.impl.play.ChatMessageSentEvent;
+import net.minecraft.client.gui.GuiScreen;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-class ChatMessageReceivedEvent(val message: IChatComponent) : CancellableEvent()
-
-class ChatMessageSentEvent(val message: String) : CancellableEvent()
-
-class ActionBarReceivedEvent(val message: IChatComponent) : CancellableEvent()
+@Mixin(GuiScreen.class)
+public class MixinGuiScreen {
+    @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
+    public void onSendChatMessage(String msg, boolean addToChat, CallbackInfo ci) {
+        if (EventsKt.postCancellableSync(new ChatMessageSentEvent(msg))) {
+            ci.cancel();
+        }
+    }
+}
