@@ -17,12 +17,17 @@
  */
 package gg.skytils.skytilsmod.utils
 
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageSentEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.screen.OpenScreenEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.json
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
-import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -32,12 +37,6 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -48,7 +47,7 @@ import java.util.*
  *
  * @author Moulberry
  */
-object SBInfo {
+object SBInfo : EventSubscriber {
 
     private val timePattern = ".+(am|pm)".toRegex()
 
@@ -67,19 +66,17 @@ object SBInfo {
     private var locraw: LocrawObject? = null
     private val junkRegex = Regex("[^\u0020-\u0127û]")
 
-    @SubscribeEvent
-    fun onGuiOpen(event: GuiOpenEvent) {
+    fun onGuiOpen(event: OpenScreenEvent) {
         if (!Utils.inSkyblock) return
-        if (event.gui is GuiChest) {
-            val chest = event.gui as GuiChest
+        if (event.screen is GuiChest) {
+            val chest = event.screen as GuiChest
             val container = chest.inventorySlots as ContainerChest
             val containerName = container.lowerChestInventory.displayName.unformattedText
             lastOpenContainerName = containerName
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         lastLocRaw = -1
         locraw = null
         mode = null
@@ -87,16 +84,14 @@ object SBInfo {
         lastOpenContainerName = null
     }
 
-    @SubscribeEvent
-    fun onSendChatMessage(event: SendChatMessageEvent) {
+    fun onSendChatMessage(event: ChatMessageSentEvent) {
         val msg = event.message
         if (msg.trim().startsWith("/locraw")) {
             lastManualLocRaw = System.currentTimeMillis()
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onChatMessage(event: PacketEvent.ReceiveEvent) {
+    fun onChatMessage(event: PacketReceiveEvent<*>) {
         if (event.packet is S02PacketChat) {
             val unformatted = event.packet.chatComponent.unformattedText
             if (unformatted.startsWith("{") && unformatted.endsWith("}")) {
@@ -115,8 +110,7 @@ object SBInfo {
         }
     }
 
-    @SubscribeEvent
-    fun onPacket(event: PacketEvent.SendEvent) {
+    fun onPacket(event: PacketSendEvent<*>) {
         if (Utils.isOnHypixel && event.packet is C01PacketChatMessage) {
             if (event.packet.message.startsWith("/locraw")) {
                 lastLocRaw = System.currentTimeMillis()
@@ -124,9 +118,8 @@ object SBInfo {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null || !Utils.inSkyblock) return
+    fun onTick(event: gg.skytils.event.impl.TickEvent) {
+        if (mc.thePlayer == null || mc.theWorld == null || !Utils.inSkyblock) return
         val currentTime = System.currentTimeMillis()
         if (locraw == null && currentTime - joinedWorld > 1300 && currentTime - lastLocRaw > 15000) {
             lastLocRaw = System.currentTimeMillis()
@@ -162,6 +155,15 @@ object SBInfo {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    override fun setup() {
+        register(::onGuiOpen)
+        register(::onWorldChange)
+        register(::onSendChatMessage)
+        register(::onChatMessage, gg.skytils.event.EventPriority.Highest)
+        register(::onPacket)
+        register(::onTick)
     }
 }
 

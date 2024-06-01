@@ -301,7 +301,6 @@ object Skytils : CoroutineScope, EventSubscriber {
         arrayOf(
             this,
             LocalAPI,
-            SBInfo,
             UpdateChecker,
 
             AlignmentTaskSolver,
@@ -399,6 +398,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             DungeonListener,
             MayorInfo,
             guiManager,
+            SBInfo,
             SoundQueue,
 
             BrewingFeatures,

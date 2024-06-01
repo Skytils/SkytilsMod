@@ -26,9 +26,12 @@ import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.gui.settings.CheckboxComponent
+import gg.skytils.event.postSync
 import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.asm.SkytilsTransformer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
@@ -183,6 +186,17 @@ object Utils {
         val packet = ReceivePacketEvent.packet
         checkThreadAndQueue {
             MinecraftForge.EVENT_BUS.post(MainReceivePacketEvent(mc.netHandler, ReceivePacketEvent.packet))
+            MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(packet.type, packet.chatComponent))
+        }
+    }
+
+    fun cancelChatPacket(event: PacketReceiveEvent<*>) {
+        if (event.packet !is S02PacketChat) return
+        event.cancelled = true
+        val packet = event.packet
+        checkThreadAndQueue {
+            postSync(MainThreadPacketReceiveEvent(packet))
+            MinecraftForge.EVENT_BUS.post(MainReceivePacketEvent(mc.netHandler, packet))
             MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(packet.type, packet.chatComponent))
         }
     }
