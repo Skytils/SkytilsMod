@@ -1562,6 +1562,28 @@ object Config : Vigilant(
     )
     var treasureBurrowColor = Color(173, 216, 230)
 
+    // TODO: Add translations
+    @Property(
+        type = PropertyType.SWITCH, name = "Ping when Burrow is Nearby",
+        description = "Pings when a burrow is nearby.",
+        category = "Events", subcategory = "Mythological"
+    )
+    var pingNearbyBurrow = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Griffin Burrow Estimation",
+        description = "Estimates griffin burrow position after using spade near the previous burrow.",
+        category = "Events", subcategory = "Mythological"
+    )
+    var burrowEstimation = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Griffin Burrow Estimation (MEOW)",
+        description = "Estimates griffin burrow position after using spade ANYWHERE. Use of this mode will disable the other mode.",
+        category = "Events", subcategory = "Mythological"
+    )
+    var experimentBurrowEstimation = false
+
     @Property(
         type = PropertyType.SWITCH, name = "Broadcast Rare Drop Notifications",
         description = "Sends rare drop notification when you obtain a rare drop from a Mythological Creature.",
@@ -2299,6 +2321,16 @@ object Config : Vigilant(
         i18nSubcategory = "skytils.config.miscellaneous.items"
     )
     var showOrigin = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show New Year Cake Year",
+        description = "Shows the year of a New Year Cake as the stack size.",
+        category = "Miscellaneous", subcategory = "Items",
+        i18nName = "skytils.config.miscellaneous.items.show_new_year_cake_year",
+        i18nCategory = "skytils.config.miscellaneous",
+        i18nSubcategory = "skytils.config.miscellaneous.items"
+    )
+    var showNYCakeYear = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Show NPC Sell Price",
@@ -4358,7 +4390,10 @@ object Config : Vigilant(
         arrayOf(
             "emptyBurrowColor",
             "mobBurrowColor",
-            "treasureBurrowColor"
+            "treasureBurrowColor",
+            "burrowEstimation",
+            "pingNearbyBurrow",
+            "experimentBurrowEstimation"
         ).forEach { propertyName -> addDependency(propertyName, "showGriffinBurrows") }
 
         addDependency("activePetColor", "highlightActivePet")

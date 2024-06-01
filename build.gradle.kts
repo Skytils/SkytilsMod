@@ -34,7 +34,7 @@ plugins {
     signing
 }
 
-version = "1.9.4"
+version = "1.9.7"
 group = "gg.skytils"
 
 repositories {
@@ -147,6 +147,10 @@ dependencies {
     shadowMe(project(":events"))
     shadowMe(project(":hypixel-api:types"))
 
+    shadowMe("org.bouncycastle:bcpg-jdk18on:1.78.1") {
+        exclude(module = "bcprov-jdk18on")
+    }
+    compileOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
 
     shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")!!)
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")

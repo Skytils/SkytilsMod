@@ -217,6 +217,7 @@ skytils.config.miscellaneous.items.etherwarp_teleport_position_color=Etherwarp T
 skytils.config.miscellaneous.items.show_gemstones=Show Gemstones
 skytils.config.miscellaneous.items.show_head_floor_number=Show Head Floor Number
 skytils.config.miscellaneous.items.show_item_origin=Show Item Origin
+skytils.config.miscellaneous.items.show_new_year_cake_year=Show New Year Cake Year
 skytils.config.miscellaneous.items.show_npc_sell_price=Show NPC Sell Price
 skytils.config.miscellaneous.items.show_potion_tier=Show Potion Tier
 skytils.config.miscellaneous.items.show_pet_candies=Show Pet Candies

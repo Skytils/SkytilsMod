@@ -110,6 +110,9 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     "refresh" -> {
                         GriffinBurrows.particleBurrows.clear()
                     }
+                    "clearguess" -> {
+                        GriffinBurrows.BurrowEstimation.guesses.clear()
+                    }
 
                     else -> UChat.chat("$prefix §b/skytils griffin <refresh>")
                 }
@@ -134,7 +137,8 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 } else {
                     when (args[1].lowercase()) {
                         "data" -> {
-                            DataFetcher.reloadData().invokeOnCompletion {
+                            DataFetcher.reloadData()
+                            DataFetcher.job?.invokeOnCompletion {
                                 it?.run {
                                     UChat.chat("$failPrefix §cFailed to reload repository data due to a ${it::class.simpleName ?: "error"}: ${it.message}!")
                                 }.ifNull {

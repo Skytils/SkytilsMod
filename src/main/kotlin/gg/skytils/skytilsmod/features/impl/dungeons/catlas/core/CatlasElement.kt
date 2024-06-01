@@ -243,7 +243,7 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
     private fun renderPlayerHeads() {
         if (DungeonTimer.bossEntryTime != -1L) return
         DungeonListener.team.forEach { (name, teammate) ->
-            if (!teammate.dead) {
+            if (!teammate.dead || teammate.mapPlayer.isOurMarker) {
                 RenderUtils.drawPlayerHead(name, teammate.mapPlayer)
             }
         }

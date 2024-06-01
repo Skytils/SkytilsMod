@@ -44,11 +44,11 @@ public abstract class MixinMinecraft implements Executor {
     @Shadow
     public abstract ListenableFuture<Object> addScheduledTask(Runnable runnableToSchedule);
 
-    @Inject(method = "clickMouse()V", at = @At(value = "INVOKE", target = "net/minecraft/client/entity/EntityPlayerSP.swingItem()V", shift = At.Shift.AFTER))
+    @Inject(method = "clickMouse()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;swingItem()V", shift = At.Shift.AFTER))
     private void clickMouse(CallbackInfo info) {
         if (!Utils.INSTANCE.getInSkyblock()) return;
 
-        ItemStack item = thePlayer.getHeldItem();
+        ItemStack item = this.thePlayer.getHeldItem();
         if (item != null) {
             NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
             String itemId = ItemUtil.getSkyBlockItemID(extraAttr);

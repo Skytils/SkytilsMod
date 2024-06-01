@@ -414,6 +414,9 @@ operator fun Vec3.minus(other: Vec3): Vec3 = subtract(other)
 
 operator fun Vec3.times(scaleValue: Double): Vec3 = Vec3(xCoord * scaleValue, yCoord * scaleValue, zCoord * scaleValue)
 
+fun Vec3.squareDistanceTo(x: Double, y: Double, z: Double)=
+     (x - xCoord) * (x - xCoord) + (y - yCoord) * (y - yCoord) + (z - zCoord) * (z - zCoord)
+
 /**
  * @author Ilya
  * @link https://stackoverflow.com/a/56043547
