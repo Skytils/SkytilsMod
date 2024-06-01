@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.features.impl.trackers.impl
 
 import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.screen.GuiContainerPostDrawSlotEvent
-import gg.skytils.event.impl.screen.OpenScreenEvent
+import gg.skytils.event.impl.screen.ScreenOpenEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
@@ -51,7 +51,7 @@ object DupeTracker : Tracker("duped_items"), EventSubscriber {
         register(::onSlotDraw)
     }
 
-    fun onWindowChange(event: OpenScreenEvent) {
+    fun onWindowChange(event: ScreenOpenEvent) {
         if (event.screen is GuiContainer) return
         inAuctionBrowser = false
         dupeChecking.clear()

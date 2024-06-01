@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.utils
 import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.play.ChatMessageSentEvent
 import gg.skytils.event.impl.play.WorldUnloadEvent
-import gg.skytils.event.impl.screen.OpenScreenEvent
+import gg.skytils.event.impl.screen.ScreenOpenEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.json
@@ -66,7 +66,7 @@ object SBInfo : EventSubscriber {
     private var locraw: LocrawObject? = null
     private val junkRegex = Regex("[^\u0020-\u0127û]")
 
-    fun onGuiOpen(event: OpenScreenEvent) {
+    fun onGuiOpen(event: ScreenOpenEvent) {
         if (!Utils.inSkyblock) return
         if (event.screen is GuiChest) {
             val chest = event.screen as GuiChest

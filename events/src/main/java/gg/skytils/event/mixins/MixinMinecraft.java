@@ -23,7 +23,7 @@ import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.TickEvent;
 import gg.skytils.event.impl.play.WorldUnloadEvent;
-import gg.skytils.event.impl.screen.OpenScreenEvent;
+import gg.skytils.event.impl.screen.ScreenOpenEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -51,7 +51,7 @@ public class MixinMinecraft {
 
     @Inject(method = "displayGuiScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;currentScreen:Lnet/minecraft/client/gui/GuiScreen;", opcode = 181), cancellable = true)
     private void openScreen(CallbackInfo ci, @Local(argsOnly = true) LocalRef<GuiScreen> screen) {
-        OpenScreenEvent event = new OpenScreenEvent(screen.get());
+        ScreenOpenEvent event = new ScreenOpenEvent(screen.get());
         if (EventsKt.postCancellableSync(event)) {
             ci.cancel();
         }

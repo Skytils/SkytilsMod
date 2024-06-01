@@ -25,7 +25,7 @@ import gg.essential.universal.UKeyboard
 import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.TickEvent
 import gg.skytils.event.impl.network.ClientDisconnectEvent
-import gg.skytils.event.impl.screen.OpenScreenEvent
+import gg.skytils.event.impl.screen.ScreenOpenEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod._event.PacketSendEvent
@@ -618,7 +618,7 @@ object Skytils : CoroutineScope, EventSubscriber {
         }
     }
 
-    fun onGuiChange(event: OpenScreenEvent) {
+    fun onGuiChange(event: ScreenOpenEvent) {
         val old = mc.currentScreen
         if (event.screen == null && old is OptionsGui && old.parent != null) {
             displayScreen = old.parent

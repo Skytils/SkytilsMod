@@ -21,7 +21,7 @@ import gg.skytils.event.EventPriority
 import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
 import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
-import gg.skytils.event.impl.screen.OpenScreenEvent
+import gg.skytils.event.impl.screen.ScreenOpenEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
@@ -49,7 +49,7 @@ object ClickInOrderSolver : EventSubscriber {
         register(::onDrawSlotLow, EventPriority.Low)
     }
 
-    fun onGuiOpen(event: OpenScreenEvent) {
+    fun onGuiOpen(event: ScreenOpenEvent) {
         neededClick = 0
         slotOrder.clear()
     }
