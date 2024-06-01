@@ -26,6 +26,9 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 
 
+/**
+ * [gg.skytils.event.mixins.gui.MixinGuiContainer.backgroundDrawn]
+ */
 class GuiContainerBackgroundDrawnEvent(
     val gui: GuiContainer,
     val container: Container,
@@ -38,24 +41,36 @@ class GuiContainerBackgroundDrawnEvent(
     }
 }
 
+/**
+ * [gg.skytils.event.mixins.gui.MixinGuiContainer.closeWindowPressed]
+ */
 class GuiContainerCloseWindowEvent(val gui: GuiContainer, val container: Container) : CancellableEvent() {
     val chestName by lazy {
         getChestName(container)
     }
 }
 
+/**
+ * [gg.skytils.event.mixins.gui.MixinGuiContainer.onDrawSlot]
+ */
 class GuiContainerPreDrawSlotEvent(val gui: GuiContainer, val container: Container, val slot: Slot) : CancellableEvent() {
     val chestName by lazy {
         getChestName(container)
     }
 }
 
+/**
+ * [gg.skytils.event.mixins.gui.MixinGuiContainer.onDrawSlotPost]
+ */
 class GuiContainerPostDrawSlotEvent(val gui: GuiContainer, val container: Container, val slot: Slot) : Event() {
     val chestName by lazy {
         getChestName(container)
     }
 }
 
+/**
+ * [gg.skytils.event.mixins.gui.MixinGuiContainer.onForegroundDraw]
+ */
 class GuiContainerForegroundDrawnEvent(
     val gui: GuiContainer,
     val container: Container,
@@ -68,6 +83,9 @@ class GuiContainerForegroundDrawnEvent(
     }
 }
 
+/**
+ * [gg.skytils.event.mixins.gui.MixinGuiContainer.onMouseClick]
+ */
 class GuiContainerSlotClickEvent(
     val gui: GuiContainer,
     val container: Container,

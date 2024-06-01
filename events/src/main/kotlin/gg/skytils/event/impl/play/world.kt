@@ -21,4 +21,7 @@ package gg.skytils.event.impl.play
 import gg.skytils.event.Event
 import net.minecraft.world.World
 
+/**
+ * [gg.skytils.event.mixins.MixinMinecraft.worldChange]
+ */
 class WorldUnloadEvent(val world: World) : Event()

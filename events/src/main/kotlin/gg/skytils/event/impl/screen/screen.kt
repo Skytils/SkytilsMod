@@ -21,4 +21,7 @@ package gg.skytils.event.impl.screen
 import gg.skytils.event.CancellableEvent
 import net.minecraft.client.gui.GuiScreen
 
+/**
+ * [gg.skytils.event.mixins.MixinMinecraft.openScreen]
+ */
 class ScreenOpenEvent(var screen: GuiScreen?) : CancellableEvent()

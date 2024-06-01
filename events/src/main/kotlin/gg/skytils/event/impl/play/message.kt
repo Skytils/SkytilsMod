@@ -21,8 +21,17 @@ package gg.skytils.event.impl.play
 import gg.skytils.event.CancellableEvent
 import net.minecraft.util.IChatComponent
 
+/**
+ * [gg.skytils.event.mixins.network.MixinNetHandlerPlayClient.onChat]
+ */
 class ChatMessageReceivedEvent(val message: IChatComponent) : CancellableEvent()
 
+/**
+ * [gg.skytils.event.mixins.gui.MixinGuiScreen.onSendChatMessage]
+ */
 class ChatMessageSentEvent(val message: String) : CancellableEvent()
 
+/**
+ * [gg.skytils.event.mixins.network.MixinNetHandlerPlayClient.onActionbar]
+ */
 class ActionBarReceivedEvent(val message: IChatComponent) : CancellableEvent()
