@@ -3287,10 +3287,10 @@ object Config : Vigilant(
     var fishingHookAge = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Tropy Fish Tracker",
+        type = PropertyType.SWITCH, name = "Trophy Fish Tracker",
         description = "Tracks trophy fish caught.",
         category = "Miscellaneous", subcategory = "Quality of Life",
-        i18nName = "skytils.config.miscellaneous.quality_of_life.tropy_fish_tracker",
+        i18nName = "skytils.config.miscellaneous.quality_of_life.trophy_fish_tracker",
         i18nCategory = "skytils.config.miscellaneous",
         i18nSubcategory = "skytils.config.miscellaneous.quality_of_life"
     )
