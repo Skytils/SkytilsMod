@@ -302,7 +302,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             this,
             LocalAPI,
 
-            AntiFool,
             ArmorColor,
             AuctionData,
             AuctionPriceOverlay,
@@ -401,6 +400,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             UpdateChecker,
 
             AlignmentTaskSolver,
+            AntiFool,
             BrewingFeatures,
             ChangeAllToSameColorSolver,
             ClickInOrderSolver,

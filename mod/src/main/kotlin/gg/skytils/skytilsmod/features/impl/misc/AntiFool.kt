@@ -18,29 +18,33 @@
 
 package gg.skytils.skytilsmod.features.impl.misc
 
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.register
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorS3BPacketScoreboardObjective
 import gg.skytils.skytilsmod.utils.ScoreboardUtil
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.network.play.server.S3BPacketScoreboardObjective
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object AntiFool {
+object AntiFool : EventSubscriber {
     private val CHARS = (('0'..'9') + ('a'..'f') + 'z' + 'k')
     private var e = CHARS.random()
 
-    @SubscribeEvent
-    fun changeStuff(event: WorldEvent.Unload) {
+    fun changeStuff(event: WorldUnloadEvent) {
         e = CHARS.random()
     }
 
-    @SubscribeEvent
-    fun fixStuff(event: MainReceivePacketEvent<*, *>) {
+    fun fixStuff(event: MainThreadPacketReceiveEvent<*>) {
         (event.packet as? S3BPacketScoreboardObjective)?.let { packet ->
             if (ScoreboardUtil.cleanSB(packet.func_149337_d().stripControlCodes()).contains("SKIBLOCK")) {
                 (packet as AccessorS3BPacketScoreboardObjective).setObjectiveValue("§${e}§lSKYBLOCK")
             }
         }
+    }
+
+    override fun setup() {
+        register(::changeStuff)
+        register(::fixStuff)
     }
 }
