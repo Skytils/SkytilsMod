@@ -19,11 +19,15 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.RenderWorldPostEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.init.Blocks
@@ -33,18 +37,13 @@ import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 import java.awt.Point
 import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.random.Random
 
-object AlignmentTaskSolver {
+object AlignmentTaskSolver : EventSubscriber {
     // the blocks are on the west side, frames block pos is 1 block higher
     private val topLeft = BlockPos(-2, 124, 79).up()
     private val bottomRight = BlockPos(-2, 120, 75).up()
@@ -65,6 +64,7 @@ object AlignmentTaskSolver {
     init {
         tickTimer(20, repeats = true) {
             computeLayout()
+            computeTurns()
         }
     }
 
@@ -130,13 +130,7 @@ object AlignmentTaskSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase == TickEvent.Phase.END) computeTurns()
-    }
-
-    @SubscribeEvent
-    fun onPacketSend(event: PacketEvent.SendEvent) {
+    fun onPacketSend(event: PacketSendEvent<*>) {
         if (directionSet.isNotEmpty() && Skytils.config.alignmentTerminalSolver && isSolverActive()) {
             if ((Skytils.config.blockIncorrectTerminalClicks || Skytils.config.predictAlignmentClicks) && event.packet is C02PacketUseEntity && event.packet.action == C02PacketUseEntity.Action.INTERACT) {
                 val entity = event.packet.getEntityFromWorld(mc.theWorld) ?: return
@@ -148,18 +142,18 @@ object AlignmentTaskSolver {
                 if (Skytils.config.blockIncorrectTerminalClicks) {
                     if (clicks != null && clicks == pending) {
                         printDevMessage("Click packet on $pos was cancelled, rot: ${entity.rotation}, clicks: ${clicks}, pending: $pending", "predictalignment")
-                        event.isCanceled = true
+                        event.cancelled = true
                     } else {
                         val blockBehind = mc.theWorld.getBlockState(pos.offset(entity.facingDirection.opposite))
                         if (blockBehind.block == Blocks.sea_lantern) {
                             printDevMessage("Click packet on $pos was cancelled, reason: lantern", "predictalignment")
-                            event.isCanceled = true
+                            event.cancelled = true
                         }
                         printDevMessage("Allowed click on ${pos}, rot: ${entity.rotation}, clicks ${clicks}, pending $pending", "predictalignment")
                     }
                 }
 
-                if (!event.isCanceled && Skytils.config.predictAlignmentClicks) {
+                if (!event.cancelled && Skytils.config.predictAlignmentClicks) {
                     pendingClicks[pos] = pending + 1
                     printDevMessage("Pending clicks on $pos: ${pendingClicks[pos]}, rot: ${entity.rotation}", "predictalignment")
                 }
@@ -167,8 +161,7 @@ object AlignmentTaskSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onPacketReceive(event: MainReceivePacketEvent<*, *>) {
+    fun onPacketReceive(event: MainThreadPacketReceiveEvent<*>) {
         if (directionSet.isNotEmpty() && Skytils.config.alignmentTerminalSolver && isSolverActive()) {
             if (Skytils.config.predictAlignmentClicks && event.packet is S1CPacketEntityMetadata) {
                 val entity = mc.theWorld?.getEntityByID(event.packet.entityId) as? EntityItemFrame ?: return
@@ -194,8 +187,7 @@ object AlignmentTaskSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: RenderWorldPostEvent) {
         if (!TerminalFeatures.isInPhase3()) return
         val matrixStack = UMatrixStack()
         for (space in grid) {
@@ -218,8 +210,7 @@ object AlignmentTaskSolver {
         return (needed - current + 8) % 8
     }
 
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Unload) {
+    fun onWorldLoad(event: WorldUnloadEvent) {
         grid.clear()
         directionSet.clear()
         pendingClicks.clear()
@@ -341,5 +332,12 @@ object AlignmentTaskSolver {
             // we've already seen this point
             null
         } else Point(x + i * diffX, y + i * diffY)
+    }
+
+    override fun setup() {
+        register(::onPacketSend)
+        register(::onPacketReceive)
+        register(::onRenderWorld)
+        register(::onWorldLoad)
     }
 }
