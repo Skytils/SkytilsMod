@@ -8,7 +8,8 @@
     "gui.MixinGuiContainer",
     "gui.MixinGuiScreen",
     "network.MixinNetHandlerPlayClient",
-    "network.MixinNetworkManager"
+    "network.MixinNetworkManager",
+    "render.MixinGameRenderer"
   ],
   "verbose": true
 }
