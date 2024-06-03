@@ -26,11 +26,15 @@ import gg.skytils.event.EventPriority
 import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.play.ActionBarReceivedEvent
 import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.postSync
 import gg.skytils.event.register
 import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.DungeonPuzzleCompletedEvent
+import gg.skytils.skytilsmod._event.DungeonPuzzleDiscoveredEvent
+import gg.skytils.skytilsmod._event.DungeonPuzzleResetEvent
 import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.commands.impl.RepartyCommand
 import gg.skytils.skytilsmod.core.API
@@ -217,12 +221,15 @@ object DungeonListener : EventSubscriber {
 
                 resetPuzzles.forEach {
                     DungeonEvent.PuzzleEvent.Reset(it).postAndCatch()
+                    postSync(DungeonPuzzleResetEvent(it))
                 }
                 newPuzzles.forEach {
                     DungeonEvent.PuzzleEvent.Discovered(it).postAndCatch()
+                    postSync(DungeonPuzzleDiscoveredEvent(it))
                 }
                 localCompletedPuzzles.forEach {
                     DungeonEvent.PuzzleEvent.Completed(it).postAndCatch()
+                    postSync(DungeonPuzzleCompletedEvent(it))
                 }
                 missingPuzzles.clear()
                 missingPuzzles.addAll(localMissingPuzzles)
