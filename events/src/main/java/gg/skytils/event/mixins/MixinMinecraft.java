@@ -27,6 +27,7 @@ import gg.skytils.event.impl.screen.ScreenOpenEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -36,6 +37,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(Minecraft.class)
 public class MixinMinecraft {
     @Shadow public WorldClient theWorld;
+
+    @Shadow public GuiScreen currentScreen;
 
     @Inject(
             method = "runTick",
@@ -49,13 +52,14 @@ public class MixinMinecraft {
         EventsKt.postSync(new TickEvent());
     }
 
-    @Inject(method = "displayGuiScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;currentScreen:Lnet/minecraft/client/gui/GuiScreen;", opcode = 181), cancellable = true)
+    @Inject(method = "displayGuiScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;currentScreen:Lnet/minecraft/client/gui/GuiScreen;", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER), cancellable = true)
     private void openScreen(CallbackInfo ci, @Local(argsOnly = true) LocalRef<GuiScreen> screen) {
         ScreenOpenEvent event = new ScreenOpenEvent(screen.get());
         if (EventsKt.postCancellableSync(event)) {
             ci.cancel();
         }
         screen.set(event.getScreen());
+        this.currentScreen = event.getScreen();
     }
 
     @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At("HEAD"))
