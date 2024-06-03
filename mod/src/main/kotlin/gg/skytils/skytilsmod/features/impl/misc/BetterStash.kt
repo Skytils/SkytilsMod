@@ -23,14 +23,15 @@ import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.utils.MCHoverEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.setHoverText
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object BetterStash {
+object BetterStash : EventSubscriber {
     private var shouldDelete = false
 
     private val stashRegex = Regex("§eYou have §a\\d+ §eitems? stashed away!!!\\n.*")
@@ -38,16 +39,19 @@ object BetterStash {
     private val stashContentRegex2 = Regex("Item Stash Contents:\n([\\s\\S]*)")
     private val stashedItemRegex = Regex("^§a\\d+(,\\d+)*x\\x20.*\$")
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (Skytils.config.betterStash && Utils.inSkyblock && event.type != 2.toByte()) {
+    override fun setup() {
+        register(::onChat, EventPriority.Lowest)
+    }
+
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (Skytils.config.betterStash && Utils.inSkyblock) {
             if (stashRegex.matches(event.message.unformattedText)) {
-                event.isCanceled = true
+                event.cancelled = true
                 Skytils.sendMessageQueue.add("/viewstash")
                 shouldDelete = true
             } else if (shouldDelete && stashContentRegex.matches(event.message.unformattedText)) {
                 shouldDelete = false
-                event.isCanceled = true
+                event.cancelled = true
                 val items = stashContentRegex2.find(event.message.unformattedText)!!.groupValues[1].split("\n")
                     .filter {
                         stashedItemRegex.matches(it)

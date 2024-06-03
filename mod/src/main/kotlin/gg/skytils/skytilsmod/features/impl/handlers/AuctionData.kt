@@ -18,6 +18,7 @@
 package gg.skytils.skytilsmod.features.impl.handlers
 
 import gg.essential.universal.UChat
+import gg.skytils.event.EventSubscriber
 import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.client
@@ -35,11 +36,13 @@ import net.minecraft.item.ItemStack
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.jvm.javaField
 
-object AuctionData {
+object AuctionData : EventSubscriber {
 
     private val dataURL
         get() = "https://${Skytils.domain}/api/auctions/lowestbins"
     val lowestBINs = HashMap<String, Double>()
+
+    override fun setup() {}
 
     fun getIdentifier(item: ItemStack?): String? {
         val extraAttr = ItemUtil.getExtraAttributes(item) ?: return null

@@ -44,9 +44,7 @@ object LocalAPI : EventSubscriber {
     const val version = 1
     private var server: ApplicationEngine? = null
 
-    override fun setup() {
-
-    }
+    override fun setup() {}
 
     fun startServer() {
         if (server != null) error("Server is already running!")
