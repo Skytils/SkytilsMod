@@ -129,6 +129,7 @@ import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 //#endif
 //#endif
 //#if FABRIC
+//$$ import net.fabricmc.api.ClientModInitializer
 //$$ import net.fabricmc.loader.api.FabricLoader
 //#endif
 
@@ -146,7 +147,12 @@ import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 //$$ @Mod(Skytils.MOD_ID)
 //#endif
 //#endif
+//#if FORGE
+// TODO: fix fabric.mod.json
 object Skytils : CoroutineScope, EventSubscriber {
+//#else
+//$$ object Skytils : ClientModInitializer, CoroutineScope, EventSubscriber {
+//#endif
     const val MOD_ID = Reference.MOD_ID
     const val MOD_NAME = Reference.MOD_NAME
     @JvmField
@@ -272,8 +278,6 @@ object Skytils : CoroutineScope, EventSubscriber {
         }
     }
 
-    val areaRegex = Regex("§r§b§l(?<area>[\\w]+): §r§7(?<loc>[\\w ]+)§r")
-
     var domain = "api.skytils.gg"
 
     val prefix = "§9§lSkytils §8»"
@@ -282,9 +286,12 @@ object Skytils : CoroutineScope, EventSubscriber {
 
     var trustClientTime = false
 
-    //FIXME
+    //#if FORGE
     @Mod.EventHandler
     fun init(event: FMLInitializationEvent) {
+    //#else
+    //$$ override fun onInitializeClient() {
+    //#endif
         DataFetcher.preload()
         guiManager = GuiManager
         //#if FORGE
