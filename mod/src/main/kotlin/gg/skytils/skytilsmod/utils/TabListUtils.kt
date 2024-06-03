@@ -17,21 +17,38 @@
  */
 package gg.skytils.skytilsmod.utils
 
+//#if MC<11400
 import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
+//#endif
 import gg.skytils.skytilsmod.Skytils.mc
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.scoreboard.ScorePlayerTeam
+//#if MC<11400
 import net.minecraft.world.WorldSettings
+//#else
+//$$ import net.minecraft.text.Text
+//$$ import net.minecraft.util.Formatting
+//$$ import net.minecraft.world.GameMode
+//#endif
 
 val NetworkPlayerInfo.text: String
+    //#if MC<11400
     get() = displayName?.formattedText ?: ScorePlayerTeam.formatPlayerName(
         playerTeam,
         gameProfile.name
     )
-
+    //#else
+    //$$ get() {
+    //$$    return if (gameMode != GameMode.SPECTATOR)
+    //$$    displayName?.string ?: Team.decorateName(scoreboardTeam, Text.literal(profile.name)).string
+    //$$    else displayName?.copy()?.formatted(Formatting.ITALIC)?.string ?: Team.decorateName(scoreboardTeam, Text.literal(profile.name)).formatted(Formatting.ITALIC).string
+    //$$ }
+    //#endif
 
 object TabListUtils {
+
+    //#if MC<11400
     private val playerInfoOrdering = object : Ordering<NetworkPlayerInfo>() {
         override fun compare(p1: NetworkPlayerInfo?, p2: NetworkPlayerInfo?): Int {
             return when {
@@ -50,10 +67,23 @@ object TabListUtils {
             }
         }
     }
+    //#else
+    //$$ private val comparator: Comparator<PlayerListEntry> = Comparator.comparingInt<PlayerListEntry> {
+    //$$    if (it.gameMode == GameMode.SPECTATOR) 1 else 0
+    //$$ }.thenComparing { o ->
+    //$$    o.scoreboardTeam?.name ?: ""
+    //$$ }.thenComparing { o ->
+    //$$    o.profile.name.lowercase()
+    //$$ }
+    //#endif
     var tabEntries: List<Pair<NetworkPlayerInfo, String>> = emptyList()
     fun fetchTabEntries(): List<NetworkPlayerInfo> = mc.thePlayer?.let {
+        //#if MC < 11400
         playerInfoOrdering.immutableSortedCopy(
-            mc.thePlayer.sendQueue.playerInfoMap
+            it.sendQueue.playerInfoMap
         )
+        //#else
+        //$$ it.networkHandler.listedPlayerListEntries.sortedWith(comparator).take(80)
+        //#endif
     } ?: emptyList()
 }

@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.localapi
 
+import gg.skytils.event.EventSubscriber
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.localapi.routes.registerMiscRoutes
 import gg.skytils.skytilsmod.localapi.routes.registerSkytilsDataRoutes
@@ -38,10 +39,14 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
 
-object LocalAPI {
+object LocalAPI : EventSubscriber {
     const val port = 56969
     const val version = 1
     private var server: ApplicationEngine? = null
+
+    override fun setup() {
+
+    }
 
     fun startServer() {
         if (server != null) error("Server is already running!")

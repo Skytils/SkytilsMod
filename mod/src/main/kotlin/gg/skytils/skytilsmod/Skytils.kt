@@ -300,7 +300,6 @@ object Skytils : CoroutineScope, EventSubscriber {
 
         arrayOf(
             this,
-            LocalAPI,
 
             ArmorColor,
             AuctionData,
@@ -393,6 +392,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             DungeonListener,
             MayorInfo,
             guiManager,
+            LocalAPI,
             SBInfo,
             SoundQueue,
             UpdateChecker,
