@@ -1,3 +1,10 @@
 net.minecraft.entity.data.DataTracker$SerializedEntry net.minecraft.entity.data.DataTracker$Entry
 net.minecraft.entity.data.DataTracker$SerializedEntry id() net.minecraft.entity.data.DataTracker$Entry method_12797()
 net.minecraft.entity.data.DataTracker$SerializedEntry value() net.minecraft.entity.data.DataTracker$Entry get()
+net.minecraft.world.World getBlockState() net.minecraft.world.World method_0_484()
+net.minecraft.block.AbstractBlock.AbstractBlockState getBlock() net.minecraft.class_0_378 method_0_1225()
+
+# the left side is actually a method, but it will replace correctly for kotlin
+net.minecraft.world.World entities net.minecraft.world.World field_0_260
+
+net.minecraft.util.math.BlockPos down() net.minecraft.class_0_378 method_10074()

@@ -19,7 +19,11 @@
 package gg.skytils.skytilsmod.mixins
 
 import com.llamalad7.mixinextras.MixinExtrasBootstrap
+//#if MC<=11202
 import net.minecraft.launchwrapper.Launch
+//#else
+//$$ import net.fabricmc.loader.api.FabricLoader
+//#endif
 import org.objectweb.asm.tree.ClassNode
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo
@@ -30,7 +34,11 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
     var deobfEnvironment = false
 
     override fun onLoad(mixinPackage: String) {
+        //#if MC<=11202
         deobfEnvironment = Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", false) as Boolean
+        //#else
+        //$$ deobfEnvironment = FabricLoader.getInstance().isDevelopmentEnvironment
+        //#endif
         if (deobfEnvironment) {
             println("We are in a deobfuscated environment, loading compatibility mixins.")
         }
