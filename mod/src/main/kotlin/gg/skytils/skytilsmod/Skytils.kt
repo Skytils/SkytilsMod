@@ -304,7 +304,6 @@ object Skytils : CoroutineScope, EventSubscriber {
 
             ArmorColor,
             AuctionData,
-            AuctionPriceOverlay,
             BetterStash,
             BlazeSolver,
             BloodHelper,
@@ -401,6 +400,7 @@ object Skytils : CoroutineScope, EventSubscriber {
 
             AlignmentTaskSolver,
             AntiFool,
+            AuctionPriceOverlay,
             BrewingFeatures,
             ChangeAllToSameColorSolver,
             ClickInOrderSolver,

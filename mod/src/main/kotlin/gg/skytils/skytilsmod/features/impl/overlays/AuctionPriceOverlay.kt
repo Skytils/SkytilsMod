@@ -19,8 +19,12 @@ package gg.skytils.skytilsmod.features.impl.overlays
 
 import gg.essential.universal.UKeyboard
 import gg.essential.universal.UResolution
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.impl.screen.KeyInputEvent
+import gg.skytils.event.impl.screen.ScreenOpenEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.features.impl.misc.ContainerSellValue
 import gg.skytils.skytilsmod.gui.elements.CleanButton
@@ -44,71 +48,66 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C12PacketUpdateSign
 import net.minecraft.tileentity.TileEntitySign
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.Display
 import java.awt.Color
 
-object AuctionPriceOverlay {
+// TODO: Migrate to elementa
+object AuctionPriceOverlay : EventSubscriber {
     private var lastAuctionedStack: ItemStack? = null
     private var lastEnteredInput = ""
     private var undercut = false
     private val tooltipLocationButton = GuiButton(999, 2, 2, 20, 20, "bruh")
 
-    @SubscribeEvent
-    fun onGuiOpen(event: GuiOpenEvent) {
+    fun onGuiOpen(event: ScreenOpenEvent) {
         if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
-        if (event.gui is GuiEditSign && Utils.equalsOneOf(
+        if (event.screen is GuiEditSign && Utils.equalsOneOf(
                 SBInfo.lastOpenContainerName,
                 "Create Auction",
                 "Create BIN Auction"
             )
         ) {
             val sign =
-                (event.gui as AccessorGuiEditSign).tileSign
+                (event.screen as AccessorGuiEditSign).tileSign
             if (sign != null && sign.pos.y == 0 && sign.signText[1].unformattedText == "^^^^^^^^^^^^^^^" && sign.signText[2].unformattedText == "Your auction" && sign.signText[3].unformattedText == "starting bid") {
-                event.gui = AuctionPriceScreen(event.gui as GuiEditSign)
+                event.screen = AuctionPriceScreen(event.screen as GuiEditSign)
             }
         }
     }
 
-    @SubscribeEvent
-    fun onGuiKey(event: GuiScreenEvent.KeyboardInputEvent) {
+    fun onGuiKey(event: KeyInputEvent) {
         if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
-        if (event.gui is GuiChest && Keyboard.getEventKeyState() && Keyboard.getEventKey() == UKeyboard.KEY_ENTER) {
+        if (event.screen is GuiChest && Keyboard.getEventKeyState() && Keyboard.getEventKey() == UKeyboard.KEY_ENTER) {
             if (Utils.equalsOneOf(
                     SBInfo.lastOpenContainerName,
                     "Create Auction",
                     "Create BIN Auction"
                 )
             ) {
-                (event.gui as AccessorGuiContainer).invokeHandleMouseClick(
-                    (event.gui as GuiChest).inventorySlots.getSlot(
+                (event.screen as AccessorGuiContainer).invokeHandleMouseClick(
+                    (event.screen as GuiChest).inventorySlots.getSlot(
                         29
                     ), 29, 2, 3
                 )
-                event.isCanceled = true
+                event.cancelled = true
             } else if (Utils.equalsOneOf(
                     SBInfo.lastOpenContainerName,
                     "Confirm Auction",
                     "Confirm BIN Auction"
                 )
             ) {
-                (event.gui as AccessorGuiContainer).invokeHandleMouseClick(
-                    (event.gui as GuiChest).inventorySlots.getSlot(
+                (event.screen as AccessorGuiContainer).invokeHandleMouseClick(
+                    (event.screen as GuiChest).inventorySlots.getSlot(
                         11
                     ), 11, 2, 3
                 )
-                event.isCanceled = true
+                event.cancelled = true
             }
         }
     }
 
-    @SubscribeEvent
-    fun onSlotClick(event: SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
         if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
         if (event.gui is GuiChest) {
             if (Utils.equalsOneOf(
@@ -136,11 +135,18 @@ object AuctionPriceOverlay {
     }
 
     open class AuctionPriceScreen(oldScreen: GuiEditSign) : GuiScreen() {
-        private lateinit var undercutButton: CleanButton
-        private lateinit var priceField: GuiTextField
+        var fr: SmartFontRenderer = ScreenRenderer.fontRenderer
+        private val undercutButton = CleanButton(
+            0,
+            0,
+            0,
+            200,
+            20,
+            if (!isUndercut()) "Mode: Normal" else "Mode: Undercut"
+        )
+        private val priceField = GuiTextField(0, fr, 0, 0, 270, 20)
         private var sign: TileEntitySign =
             (oldScreen as AccessorGuiEditSign).tileSign
-        var fr: SmartFontRenderer = ScreenRenderer.fontRenderer
         private var dragging = false
         private var xOffset = 0f
         private var yOffset = 0f
@@ -148,7 +154,8 @@ object AuctionPriceOverlay {
             buttonList.clear()
             Keyboard.enableRepeatEvents(true)
             sign.setEditable(false)
-            priceField = GuiTextField(0, fr, width / 2 - 135, height / 2, 270, 20)
+            priceField.xPosition = width / 2 - 135
+            priceField.yPosition = height / 2
             priceField.maxStringLength = 15
             priceField.setValidator { text: String? ->
                 text!!.lowercase().replace("[^0-9.kmb]".toRegex(), "").length == text.length
@@ -157,15 +164,9 @@ object AuctionPriceOverlay {
             priceField.text = lastEnteredInput
             priceField.setCursorPositionEnd()
             priceField.setSelectionPos(0)
-            buttonList.add(
-                CleanButton(
-                    0,
-                    width / 2 - 100,
-                    height / 2 + 25,
-                    200,
-                    20,
-                    if (!isUndercut()) "Mode: Normal" else "Mode: Undercut"
-                ).also { undercutButton = it })
+            undercutButton.xPosition = width / 2 - 100
+            undercutButton.yPosition = height / 2 + 25
+            buttonList.add(undercutButton)
             buttonList.add(tooltipLocationButton)
             sign.signText[0] = ChatComponentText(input)
         }
@@ -397,5 +398,11 @@ object AuctionPriceOverlay {
     private fun isProperCompactNumber(value: String): Boolean {
         val count = value.replace("\\s+".toRegex(), "").replace("[.0-9]+".toRegex(), "")
         return count.length < 2
+    }
+
+    override fun setup() {
+        register(::onGuiOpen)
+        register(::onGuiKey)
+        register(::onSlotClick)
     }
 }
