@@ -28,6 +28,8 @@ import net.minecraftforge.fml.common.Loader
 
 //#if FABRIC
 //$$ import net.fabricmc.loader.api.FabricLoader
+//$$ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
+//$$ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 //#endif
 
 val isDeobfuscatedEnvironment by lazy {
@@ -53,9 +55,9 @@ fun isModLoaded(id: String) =
     //$$ FabricLoader.getInstance().isModLoaded(id)
     //#endif
 
-fun runCommand(command: String) =
+fun runClientCommand(command: String) =
     //#if MC<11400
     ClientCommandHandler.instance.executeCommand(UPlayer.getPlayer(), command)
     //#else
-    //$$ true //TODO: implement using fabric api
+    //$$ ClientCommandManager.getActiveDispatcher()?.execute(command.removePrefix("/"), UPlayer.getPlayer()?.networkHandler?.commandSource as? FabricClientCommandSource ?: error("No command source"))
     //#endif

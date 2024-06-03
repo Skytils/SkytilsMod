@@ -21,6 +21,7 @@ import gg.essential.universal.UKeyboard
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.runClientCommand
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -54,8 +55,7 @@ object KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) 
         for (s in shortcuts) {
             if (s.keyCode == 0) continue
             if (s.keyCode == key && s.modifiers == modifiers) {
-                if (s.message.startsWith("/") && ClientCommandHandler.instance.executeCommand(
-                        mc.thePlayer,
+                if (s.message.startsWith("/") && runClientCommand(
                         s.message
                     ) != 0
                 ) continue

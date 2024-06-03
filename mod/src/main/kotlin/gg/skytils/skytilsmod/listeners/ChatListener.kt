@@ -31,7 +31,7 @@ import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.AdManager
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.runCommand
+import gg.skytils.skytilsmod.utils.runClientCommand
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -195,7 +195,7 @@ object ChatListener : EventSubscriber {
         if (unformatted == "Welcome to Hypixel SkyBlock!") {
             if (Skytils.config.firstLaunch) {
                 UChat.chat("$prefix §bThank you for downloading Skytils!")
-                runCommand("/skytils help")
+                runClientCommand("/skytils help")
                 Skytils.config.firstLaunch = false
                 Skytils.config.markDirty()
                 Skytils.config.writeData()

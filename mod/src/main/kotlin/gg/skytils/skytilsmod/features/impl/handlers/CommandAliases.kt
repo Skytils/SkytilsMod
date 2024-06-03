@@ -22,6 +22,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
+import gg.skytils.skytilsmod.utils.runClientCommand
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraftforge.client.ClientCommandHandler
@@ -51,7 +52,7 @@ object CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json
                 if (event.addToChat) {
                     mc.ingameGUI.chatGUI.addToSentMessages(msg)
                 }
-                if (ClientCommandHandler.instance.executeCommand(mc.thePlayer, msg) != 0) return
+                if (runClientCommand(msg) != 0) return
                 Skytils.sendMessageQueue.add(msg)
             } catch (ignored: IllegalFormatException) {
                 if (event.addToChat) mc.ingameGUI.chatGUI.addToSentMessages(event.message)
