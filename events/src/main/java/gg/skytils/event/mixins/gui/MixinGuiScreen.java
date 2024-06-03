@@ -20,7 +20,9 @@ package gg.skytils.event.mixins.gui;
 
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.play.ChatMessageSentEvent;
+import gg.skytils.event.impl.screen.KeyInputEvent;
 import net.minecraft.client.gui.GuiScreen;
+import org.lwjgl.input.Keyboard;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,6 +33,13 @@ public class MixinGuiScreen {
     @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
     public void onSendChatMessage(String msg, boolean addToChat, CallbackInfo ci) {
         if (EventsKt.postCancellableSync(new ChatMessageSentEvent(msg))) {
+            ci.cancel();
+        }
+    }
+
+    @Inject(method = "handleInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiScreen;handleKeyboardInput()V"), cancellable = true)
+    public void handleKeyboardInput(CallbackInfo ci) {
+        if (EventsKt.postCancellableSync(new KeyInputEvent((GuiScreen) (Object) this, Keyboard.getEventKey()))) {
             ci.cancel();
         }
     }

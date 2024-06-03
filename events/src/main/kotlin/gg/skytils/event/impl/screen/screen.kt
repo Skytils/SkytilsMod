@@ -25,3 +25,5 @@ import net.minecraft.client.gui.GuiScreen
  * [gg.skytils.event.mixins.MixinMinecraft.openScreen]
  */
 class ScreenOpenEvent(var screen: GuiScreen?) : CancellableEvent()
+
+class KeyInputEvent(val screen: GuiScreen, val keyCode: Int) : CancellableEvent()
