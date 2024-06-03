@@ -101,6 +101,9 @@ import net.minecraft.network.play.server.S01PacketJoinGame
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.network.play.server.S3DPacketDisplayScoreboard
 import net.minecraft.network.play.server.S3FPacketCustomPayload
+//#if MC>11400
+//$$ import net.minecraft.network.packet.BrandCustomPayload
+//$$ import net.minecraft.scoreboard.ScoreboardDisplaySlot
 import sun.misc.Unsafe
 import java.io.File
 import java.net.DatagramPacket
@@ -123,13 +126,10 @@ import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
-//#else
-//$$ import net.minecraft.util.text.StringTextComponent
 //#endif
 //#endif
 //#if FABRIC
 //$$ import net.fabricmc.loader.api.FabricLoader
-//$$ import net.minecraft.network.packet.BrandCustomPayload
 //#endif
 
 //#if FORGE
@@ -506,8 +506,8 @@ object Skytils : CoroutineScope, EventSubscriber {
         ScreenRenderer.refresh()
         EntityManager.tickEntities()
 
-        ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { ScoreboardUtil.cleanSB(it) } //FIXME
-        TabListUtils.tabEntries = TabListUtils.fetchTabEntries().map { it to it.text } //FIXME
+        ScoreboardUtil.sidebarLines = ScoreboardUtil.fetchScoreboardLines().map { l -> ScoreboardUtil.cleanSB(l) }
+        TabListUtils.tabEntries = TabListUtils.fetchTabEntries().map { e -> e to e.text }
         if (displayScreen != null) {
             if (mc.thePlayer?.openContainer is ContainerPlayer) {
                 mc.displayGuiScreen(displayScreen)
@@ -582,7 +582,11 @@ object Skytils : CoroutineScope, EventSubscriber {
                 TrophyFish.loadFromApi()
             }
         }
+        //#if MC<11400
         if (!Utils.inSkyblock && Utils.isOnHypixel && event.packet is S3DPacketDisplayScoreboard && event.packet.func_149371_c() == 1) {
+        //#else
+        //$$ if (!Utils.inSkyblock && Utils.isOnHypixel && event.packet is ScoreboardDisplayS2CPacket && event.packet.slot == ScoreboardDisplaySlot.SIDEBAR) {
+        //#endif
             Utils.skyblock = event.packet.func_149370_d() == "SBScoreboard"
             printDevMessage("score ${event.packet.func_149370_d()}", "utils")
             printDevMessage("sb ${Utils.inSkyblock}", "utils")
