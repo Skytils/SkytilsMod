@@ -16,11 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.event.impl.render
+package gg.skytils.event.mixins.entity;
 
-import gg.skytils.event.Event
+import gg.skytils.event.EventsKt;
+import gg.skytils.event.impl.entity.LivingEntityDeathEvent;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.DamageSource;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/**
- * [gg.skytils.event.mixins.render.MixinGameRenderer.renderWorld]
- */
-class RenderWorldPostEvent(val partialTicks: Float) : Event()
+@Mixin(EntityLivingBase.class)
+public class MixinEntityLivingBase {
+    @Inject(method = "onDeath", at = @At("HEAD"))
+    public void onDeath(DamageSource source, CallbackInfo ci) {
+        EventsKt.postSync(new LivingEntityDeathEvent((EntityLivingBase) (Object) this));
+    }
+}

@@ -16,11 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.event.impl.render
+package gg.skytils.event.impl.entity
 
 import gg.skytils.event.Event
+import net.minecraft.entity.EntityLivingBase
 
 /**
- * [gg.skytils.event.mixins.render.MixinGameRenderer.renderWorld]
+ * [gg.skytils.event.mixins.entity.MixinEntityLivingBase.onDeath]
  */
-class RenderWorldPostEvent(val partialTicks: Float) : Event()
+class LivingEntityDeathEvent(val entity: EntityLivingBase) : Event()

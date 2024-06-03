@@ -11,5 +11,8 @@
     "network.MixinNetworkManager",
     "render.MixinGameRenderer"
   ],
-  "verbose": true
+  "verbose": true,
+  "mixins": [
+    "entity.MixinEntityLivingBase"
+  ]
 }
