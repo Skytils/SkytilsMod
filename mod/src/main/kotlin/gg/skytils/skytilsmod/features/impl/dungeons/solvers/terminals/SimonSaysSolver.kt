@@ -18,10 +18,15 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.RenderWorldPostEvent
+import gg.skytils.event.impl.world.BlockStateUpdateEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -37,35 +42,24 @@ import net.minecraft.network.play.server.S0BPacketAnimation
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-object SimonSaysSolver {
+object SimonSaysSolver : EventSubscriber {
     val startBtn = BlockPos(110, 121, 91)
     private val clickInOrder = ArrayList<BlockPos>()
     private var clickNeeded = 0
 
-    @SubscribeEvent
-    fun onPacket(event: PacketEvent) {
+    override fun setup() {
+        register(::onReceivePacket)
+        register(::onSendPacket)
+        register(::onBlockChange)
+        register(::onRenderWorld)
+        register(::onWorldChange)
+    }
+
+    fun onReceivePacket(event: PacketReceiveEvent<*>) {
         if (Skytils.config.simonSaysSolver && Utils.inDungeons && clickInOrder.isNotEmpty() && clickNeeded < clickInOrder.size) {
-            if (event.packet is C08PacketPlayerBlockPlacement || event.packet is C07PacketPlayerDigging) {
-                val pos = when (event.packet) {
-                    is C07PacketPlayerDigging -> event.packet.position
-                    is C08PacketPlayerBlockPlacement -> event.packet.position
-                    else -> error("can't reach")
-                }.east()
-                if (pos.x == 111 && pos.y in 120..123 && pos.z in 92..95) {
-                    if (SuperSecretSettings.azooPuzzoo && clickInOrder.size == 3 && clickNeeded == 0 && pos == clickInOrder[1]) {
-                        clickNeeded += 2
-                    } else if (clickInOrder[clickNeeded] != pos) {
-                        if (Skytils.config.blockIncorrectTerminalClicks) event.isCanceled = true
-                    } else {
-                        clickNeeded++
-                    }
-                }
-            } else if (Skytils.config.predictSimonClicks && event.packet is S0BPacketAnimation && event.packet.animationType == 0) {
+            if (Skytils.config.predictSimonClicks && event.packet is S0BPacketAnimation && event.packet.animationType == 0) {
                 val entity = mc.theWorld.getEntityByID(event.packet.entityID) as? EntityOtherPlayerMP ?: return
                 if (entity.posX in 105.0..115.0 && entity.posY in 115.0..128.0 && entity.posZ in 87.0..100.0) {
                     val rayCast = entity.rayTrace(5.0, RenderUtil.getPartialTicks())
@@ -81,8 +75,28 @@ object SimonSaysSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onBlockChange(event: BlockChangeEvent) {
+    fun onSendPacket(event: PacketSendEvent<*>) {
+        if (Skytils.config.simonSaysSolver && Utils.inDungeons && clickInOrder.isNotEmpty() && clickNeeded < clickInOrder.size) {
+            if (event.packet is C08PacketPlayerBlockPlacement || event.packet is C07PacketPlayerDigging) {
+                val pos = when (event.packet) {
+                    is C07PacketPlayerDigging -> event.packet.position
+                    is C08PacketPlayerBlockPlacement -> event.packet.position
+                    else -> error("can't reach")
+                }.east()
+                if (pos.x == 111 && pos.y in 120..123 && pos.z in 92..95) {
+                    if (SuperSecretSettings.azooPuzzoo && clickInOrder.size == 3 && clickNeeded == 0 && pos == clickInOrder[1]) {
+                        clickNeeded += 2
+                    } else if (clickInOrder[clickNeeded] != pos) {
+                        if (Skytils.config.blockIncorrectTerminalClicks) event.cancelled = true
+                    } else {
+                        clickNeeded++
+                    }
+                }
+            }
+        }
+    }
+
+    fun onBlockChange(event: BlockStateUpdateEvent) {
         val pos = event.pos
         val old = event.old
         val state = event.update
@@ -117,8 +131,7 @@ object SimonSaysSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: RenderWorldPostEvent) {
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
 
         if (Skytils.config.simonSaysSolver && clickNeeded < clickInOrder.size) {
@@ -153,8 +166,7 @@ object SimonSaysSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         clickInOrder.clear()
         clickNeeded = 0
     }

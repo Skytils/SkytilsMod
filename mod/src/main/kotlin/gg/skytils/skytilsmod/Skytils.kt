@@ -367,7 +367,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             ScoreCalculation,
             SelectAllColorSolver,
             ShootTheTargetSolver,
-            SimonSaysSolver,
             SlayerFeatures,
             SpidersDenFeatures,
             SpamHider,
@@ -417,6 +416,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             KuudraChestProfit,
             PotionEffectTimers,
             SelectAllColorSolver,
+            SimonSaysSolver,
             SpiritLeap,
             StartsWithSequenceSolver,
             VisitorHelper
