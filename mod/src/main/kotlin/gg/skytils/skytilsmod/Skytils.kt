@@ -104,6 +104,7 @@ import net.minecraft.network.play.server.S3FPacketCustomPayload
 //#if MC>11400
 //$$ import net.minecraft.network.packet.BrandCustomPayload
 //$$ import net.minecraft.scoreboard.ScoreboardDisplaySlot
+//#endif
 import sun.misc.Unsafe
 import java.io.File
 import java.net.DatagramPacket
