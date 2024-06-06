@@ -13,6 +13,7 @@
   ],
   "verbose": true,
   "mixins": [
-    "entity.MixinEntityLivingBase"
+    "entity.MixinEntityLivingBase",
+    "world.MixinChunk"
   ]
 }
