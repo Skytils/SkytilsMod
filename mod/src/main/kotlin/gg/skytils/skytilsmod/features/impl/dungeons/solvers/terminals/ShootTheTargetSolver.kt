@@ -19,8 +19,12 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.RenderWorldPostEvent
+import gg.skytils.event.impl.world.BlockStateUpdateEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -30,12 +34,9 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-object ShootTheTargetSolver {
+object ShootTheTargetSolver : EventSubscriber {
     private val positions = listOf(
         BlockPos(68, 130, 50), BlockPos(66, 130, 50), BlockPos(64, 130, 50),
         BlockPos(68, 128, 50), BlockPos(66, 128, 50), BlockPos(64, 128, 50),
@@ -45,8 +46,13 @@ object ShootTheTargetSolver {
 
     private val shot = arrayListOf<BlockPos>()
 
-    @SubscribeEvent
-    fun onBlockChange(event: BlockChangeEvent) {
+    override fun setup() {
+        register(::onBlockChange)
+        register(::onRenderWorld)
+        register(::onLoad)
+    }
+
+    fun onBlockChange(event: BlockStateUpdateEvent) {
         if (!Utils.inDungeons || DungeonTimer.phase2ClearTime == -1L || !Skytils.config.shootTheTargetSolver) return
         val pos = event.pos
         val old = event.old
@@ -65,8 +71,7 @@ object ShootTheTargetSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: RenderWorldPostEvent) {
         if (!Skytils.config.shootTheTargetSolver || shot.isEmpty()) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()
@@ -86,8 +91,7 @@ object ShootTheTargetSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onLoad(event: WorldEvent.Unload) {
+    fun onLoad(event: WorldUnloadEvent) {
         shot.clear()
     }
 }
