@@ -308,7 +308,6 @@ object Skytils : CoroutineScope, EventSubscriber {
 
         arrayOf(
             this,
-            BossHPDisplays,
             BoulderSolver,
             ChatTabs,
             ChangeAllToSameColorSolver,
@@ -405,6 +404,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             BetterStash,
             BlazeSolver,
             BloodHelper,
+            BossHPDisplays,
             BrewingFeatures,
             ChangeAllToSameColorSolver,
             ClickInOrderSolver,

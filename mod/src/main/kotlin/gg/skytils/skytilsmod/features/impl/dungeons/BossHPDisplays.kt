@@ -18,6 +18,12 @@
 package gg.skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
@@ -31,16 +37,9 @@ import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 
-object BossHPDisplays {
+object BossHPDisplays : EventSubscriber {
     private var canGiantsSpawn = false
     private var giantNames = emptyList<Pair<String, Vec3>>()
     private var guardianRespawnTimers = emptyList<String>()
@@ -52,9 +51,8 @@ object BossHPDisplays {
         GuardianRespawnTimer()
     }
 
-    @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inDungeons || event.type == 2.toByte()) return
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (!Utils.inDungeons) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (unformatted.startsWith("[BOSS] Sadan")) {
             if (unformatted.contains("My giants! Unleashed!")) {
@@ -72,16 +70,14 @@ object BossHPDisplays {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         canGiantsSpawn = false
         giantNames = emptyList()
         guardianRespawnTimers = emptyList()
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (!Utils.inDungeons || event.phase != TickEvent.Phase.START) return
+    fun onTick(event: gg.skytils.event.impl.TickEvent) {
+        if (!Utils.inDungeons) return
         if (canGiantsSpawn && mc.theWorld != null && (Skytils.config.showGiantHPAtFeet || Skytils.config.showGiantHP)) {
             val hasSadanPlayer = mc.theWorld.getPlayerEntityByName("Sadan ") != null
             giantNames = mc.theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().filter {
@@ -119,8 +115,7 @@ object BossHPDisplays {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: WorldDrawEvent) {
         if (!Utils.inDungeons || !Skytils.config.showGiantHPAtFeet) return
         val matrixStack = UMatrixStack()
         GlStateManager.disableCull()
@@ -210,5 +205,12 @@ object BossHPDisplays {
         init {
             Skytils.guiManager.registerElement(this)
         }
+    }
+
+    override fun setup() {
+        register(::onChat, EventPriority.Highest)
+        register(::onWorldChange)
+        register(::onTick)
+        register(::onRenderWorld)
     }
 }
