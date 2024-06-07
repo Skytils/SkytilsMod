@@ -21,4 +21,9 @@ package gg.skytils.event.impl.entity
 import gg.skytils.event.CancellableEvent
 import net.minecraft.entity.Entity
 
+/**
+ * [gg.skytils.event.mixins.world.MixinWorld.spawnEntityInWorld]
+ * [gg.skytils.event.mixins.world.MixinWorld.loadEntities]
+ * [gg.skytils.event.mixins.world.MixinWorld.joinEntityInSurroundings]
+ */
 class EntityJoinWorldEvent(val entity: Entity) : CancellableEvent()
