@@ -20,9 +20,14 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UMinecraft
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.entity.EntityJoinWorldEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.RenderWorldPostEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
@@ -33,14 +38,8 @@ import net.minecraft.init.Items
 import net.minecraft.network.play.server.S14PacketEntity
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
-object BloodHelper {
+object BloodHelper : EventSubscriber {
     val watcherSkins = setOf(
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNGNlYzQwMDA4ZTFjMzFjMTk4NGY0ZDY1MGFiYjM0MTBmMjAzNzExOWZkNjI0YWZjOTUzNTYzYjczNTE1YTA3NyJ9fX0K",
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTVjMWRjNDdhMDRjZTU3MDAxYThiNzI2ZjAxOGNkZWY0MGI3ZWE5ZDdiZDZkODM1Y2E0OTVhMGVmMTY5Zjg5MyJ9fX0K",
@@ -53,9 +52,7 @@ object BloodHelper {
     private var neededRender = listOf<Triple<String, AxisAlignedBB, Vec3>>()
 
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: gg.skytils.event.impl.TickEvent) {
         if (!Utils.inDungeons || DungeonTimer.bloodOpenTime == -1L || DungeonTimer.bloodClearTime != -1L || !Skytils.config.bloodHelper) {
             neededRender = emptyList()
             return
@@ -87,8 +84,7 @@ object BloodHelper {
         }
     }
 
-    @SubscribeEvent
-    fun render(event: RenderWorldLastEvent) {
+    fun render(event: RenderWorldPostEvent) {
         if (!Utils.inDungeons || DungeonTimer.bloodOpenTime == -1L || DungeonTimer.bloodClearTime != -1L || !Skytils.config.bloodHelper) return
         val matrixStack = UMatrixStack()
         neededRender.forEach { (num, box, pos) ->
@@ -109,7 +105,6 @@ object BloodHelper {
         }
     }
 
-    @SubscribeEvent
     fun onJoin(event: EntityJoinWorldEvent) {
         if (event.entity !is EntityZombie) return
         (event.entity as EntityZombie).apply {
@@ -124,15 +119,13 @@ object BloodHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         watchers.clear()
         mobs.clear()
         neededRender = emptyList()
     }
 
-    @SubscribeEvent
-    fun onPacket(event: MainReceivePacketEvent<*, *>) {
+    fun onPacket(event: MainThreadPacketReceiveEvent<*>) {
         if (DungeonTimer.bloodOpenTime == -1L || DungeonTimer.bloodClearTime != -1L || watchers.isEmpty()) return
         if (event.packet !is S14PacketEntity.S17PacketEntityLookMove) return
         val entity = event.packet.getEntity(UMinecraft.getWorld()) ?: return
@@ -180,5 +173,12 @@ object BloodHelper {
                 zCoord * scale
             )
         }
+    }
+
+    override fun setup() {
+        register(::onTick)
+        register(::render)
+        register(::onJoin)
+        register(::onWorldChange)
     }
 }
