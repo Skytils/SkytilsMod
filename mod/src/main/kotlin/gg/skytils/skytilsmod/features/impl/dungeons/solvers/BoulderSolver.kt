@@ -19,10 +19,15 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.Skytils.successPrefix
+import gg.skytils.skytilsmod._event.DungeonPuzzleDiscoveredEvent
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
@@ -45,7 +50,7 @@ import java.awt.Color
 import kotlin.math.floor
 import kotlin.random.Random
 
-object BoulderSolver {
+object BoulderSolver : EventSubscriber {
     var boulderChest: BlockPos? = null
     var boulderFacing: EnumFacing? = null
     var grid = Array(7) { arrayOfNulls<BoulderState>(6) }
@@ -58,15 +63,13 @@ object BoulderSolver {
         tickTimer(20, repeats = true, task = ::update)
     }
 
-    @SubscribeEvent
-    fun onPuzzleDiscovered(event: DungeonEvent.PuzzleEvent.Discovered) {
+    fun onPuzzleDiscovered(event: DungeonPuzzleDiscoveredEvent) {
         if (event.puzzle == "Boulder") {
             update()
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: WorldDrawEvent) {
         if (!Skytils.config.boulderSolver || !DungeonListener.missingPuzzles.contains("Boulder")) return
         if (boulderChest == null) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
@@ -103,8 +106,7 @@ object BoulderSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         reset()
     }
 
@@ -378,5 +380,11 @@ object BoulderSolver {
             )
         )
         variantSteps.add(arrayListOf(BoulderPush(0, 1, Direction.FORWARD)))
+    }
+
+    override fun setup() {
+        register(::onPuzzleDiscovered)
+        register(::onRenderWorld)
+        register(::onWorldChange)
     }
 }
