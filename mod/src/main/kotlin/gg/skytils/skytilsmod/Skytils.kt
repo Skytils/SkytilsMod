@@ -308,7 +308,6 @@ object Skytils : CoroutineScope, EventSubscriber {
 
         arrayOf(
             this,
-            BrewingFeatures,
             BossHPDisplays,
             BoulderSolver,
             ChatTabs,

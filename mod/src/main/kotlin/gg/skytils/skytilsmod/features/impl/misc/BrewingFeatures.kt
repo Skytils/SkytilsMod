@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UMatrixStack
 import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.render.RenderWorldPostEvent
 import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
@@ -31,8 +32,6 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.tileentity.TileEntityBrewingStand
 import net.minecraft.util.BlockPos
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 object BrewingFeatures : EventSubscriber {
@@ -54,6 +53,7 @@ object BrewingFeatures : EventSubscriber {
     override fun setup() {
         register(::onPacketSend)
         register(::onContainerUpdate)
+        register(::onWorldDraw)
     }
 
     fun onPacketSend(event: PacketSendEvent<*>) {
@@ -71,8 +71,7 @@ object BrewingFeatures : EventSubscriber {
         brewingStandToTimeMap[lastBrewingStand!!.pos] = System.currentTimeMillis() + (time * 1000L).toLong()
     }
 
-    @SubscribeEvent
-    fun onWorldDraw(event: RenderWorldLastEvent) {
+    fun onWorldDraw(event: RenderWorldPostEvent) {
         if (!Skytils.config.colorBrewingStands || !Utils.inSkyblock || SBInfo.mode != SkyblockIsland.PrivateIsland.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()
