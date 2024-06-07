@@ -21,7 +21,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 import gg.essential.universal.UMatrixStack
 import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.play.WorldUnloadEvent
-import gg.skytils.event.impl.render.RenderWorldPostEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
 import gg.skytils.event.impl.world.BlockStateUpdateEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
@@ -71,7 +71,7 @@ object ShootTheTargetSolver : EventSubscriber {
         }
     }
 
-    fun onRenderWorld(event: RenderWorldPostEvent) {
+    fun onRenderWorld(event: WorldDrawEvent) {
         if (!Skytils.config.shootTheTargetSolver || shot.isEmpty()) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()

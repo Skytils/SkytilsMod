@@ -23,4 +23,4 @@ import gg.skytils.event.Event
 /**
  * [gg.skytils.event.mixins.render.MixinGameRenderer.renderWorld]
  */
-class RenderWorldPostEvent(val partialTicks: Float) : Event()
+class WorldDrawEvent(val partialTicks: Float) : Event()

@@ -25,7 +25,7 @@ import gg.essential.universal.UMatrixStack
 import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.entity.LivingEntityDeathEvent
 import gg.skytils.event.impl.play.WorldUnloadEvent
-import gg.skytils.event.impl.render.RenderWorldPostEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
@@ -219,7 +219,7 @@ object BlazeSolver : EventSubscriber {
         }
     }
 
-    fun onWorldRender(event: RenderWorldPostEvent) {
+    fun onWorldRender(event: WorldDrawEvent) {
         if (Skytils.config.blazeSolver && Utils.inDungeons && orderedBlazes.size > 0) {
             val matrixStack = UMatrixStack()
             if (blazeMode < 0) {

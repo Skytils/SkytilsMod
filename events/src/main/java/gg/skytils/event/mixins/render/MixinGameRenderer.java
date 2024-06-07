@@ -19,7 +19,7 @@
 package gg.skytils.event.mixins.render;
 
 import gg.skytils.event.EventsKt;
-import gg.skytils.event.impl.render.RenderWorldPostEvent;
+import gg.skytils.event.impl.render.WorldDrawEvent;
 import net.minecraft.client.renderer.EntityRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -30,6 +30,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGameRenderer {
     @Inject(method = "renderWorldPass", at = @At(value = "CONSTANT", args = "stringValue=hand"))
     public void renderWorld(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci) {
-        EventsKt.postSync(new RenderWorldPostEvent(partialTicks));
+        EventsKt.postSync(new WorldDrawEvent(partialTicks));
     }
 }

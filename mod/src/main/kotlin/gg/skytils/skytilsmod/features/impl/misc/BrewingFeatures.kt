@@ -20,7 +20,7 @@ package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UMatrixStack
 import gg.skytils.event.EventSubscriber
-import gg.skytils.event.impl.render.RenderWorldPostEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
 import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
@@ -71,7 +71,7 @@ object BrewingFeatures : EventSubscriber {
         brewingStandToTimeMap[lastBrewingStand!!.pos] = System.currentTimeMillis() + (time * 1000L).toLong()
     }
 
-    fun onWorldDraw(event: RenderWorldPostEvent) {
+    fun onWorldDraw(event: WorldDrawEvent) {
         if (!Skytils.config.colorBrewingStands || !Utils.inSkyblock || SBInfo.mode != SkyblockIsland.PrivateIsland.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()

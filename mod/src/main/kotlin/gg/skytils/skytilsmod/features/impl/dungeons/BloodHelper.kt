@@ -23,7 +23,7 @@ import gg.essential.universal.UMinecraft
 import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.entity.EntityJoinWorldEvent
 import gg.skytils.event.impl.play.WorldUnloadEvent
-import gg.skytils.event.impl.render.RenderWorldPostEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
@@ -84,7 +84,7 @@ object BloodHelper : EventSubscriber {
         }
     }
 
-    fun render(event: RenderWorldPostEvent) {
+    fun render(event: WorldDrawEvent) {
         if (!Utils.inDungeons || DungeonTimer.bloodOpenTime == -1L || DungeonTimer.bloodClearTime != -1L || !Skytils.config.bloodHelper) return
         val matrixStack = UMatrixStack()
         neededRender.forEach { (num, box, pos) ->
