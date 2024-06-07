@@ -9,7 +9,8 @@
     "gui.MixinGuiScreen",
     "network.MixinNetHandlerPlayClient",
     "network.MixinNetworkManager",
-    "render.MixinGameRenderer"
+    "render.MixinGameRenderer",
+    "world.MixinWorld"
   ],
   "verbose": true,
   "mixins": [
