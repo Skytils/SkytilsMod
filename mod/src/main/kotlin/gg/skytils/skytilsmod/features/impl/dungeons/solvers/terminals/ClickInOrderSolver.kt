@@ -19,6 +19,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
 import gg.skytils.event.EventPriority
 import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.item.ItemTooltipEvent
 import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
 import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
 import gg.skytils.event.impl.screen.ScreenOpenEvent
@@ -33,8 +34,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.Item
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
 object ClickInOrderSolver : EventSubscriber {
@@ -47,6 +46,7 @@ object ClickInOrderSolver : EventSubscriber {
         register(::onGuiOpen)
         register(::onBackgroundDrawn)
         register(::onDrawSlotLow, EventPriority.Low)
+        register(::onTooltip, EventPriority.Lowest)
     }
 
     fun onGuiOpen(event: ScreenOpenEvent) {
@@ -117,15 +117,12 @@ object ClickInOrderSolver : EventSubscriber {
         }
     }
 
-    @SubscribeEvent(priority = net.minecraftforge.fml.common.eventhandler.EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (event.toolTip == null || !Utils.inDungeons || !Skytils.config.clickInOrderTerminalSolver) return
-        val chest = mc.thePlayer.openContainer
-        if (chest is ContainerChest) {
-            val chestName = chest.lowerChestInventory.displayName.unformattedText
-            if (chestName == "Click in order!") {
-                event.toolTip.clear()
-            }
+        if (!Utils.inDungeons || !Skytils.config.clickInOrderTerminalSolver) return
+        val chest = mc.thePlayer?.openContainer as? ContainerChest ?: return
+        val chestName = chest.lowerChestInventory.displayName.unformattedText
+        if (chestName == "Click in order!") {
+            event.tooltip.clear()
         }
     }
 }

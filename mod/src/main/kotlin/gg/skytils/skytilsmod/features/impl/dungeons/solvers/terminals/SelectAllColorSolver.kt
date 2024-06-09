@@ -19,6 +19,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
 import gg.skytils.event.EventPriority
 import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.item.ItemTooltipEvent
 import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
 import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
 import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
@@ -29,8 +30,6 @@ import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
 object SelectAllColorSolver : EventSubscriber {
@@ -46,7 +45,7 @@ object SelectAllColorSolver : EventSubscriber {
         register(::onBackgroundDrawn)
         register(::onDrawSlot)
         register(::onSlotClick, EventPriority.High)
-        register(::onTooltip)
+        register(::onTooltip, EventPriority.Lowest)
     }
 
     fun onBackgroundDrawn(event: GuiContainerBackgroundDrawnEvent) {
@@ -105,15 +104,12 @@ object SelectAllColorSolver : EventSubscriber {
         }
     }
 
-    @SubscribeEvent(priority = net.minecraftforge.fml.common.eventhandler.EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (event.toolTip == null || !Utils.inDungeons || !Skytils.config.selectAllColorTerminalSolver) return
-        val chest = mc.thePlayer.openContainer
-        if (chest is ContainerChest) {
-            val chestName = chest.lowerChestInventory.displayName.unformattedText
-            if (chestName.startsWith("Select all the")) {
-                event.toolTip.clear()
-            }
+        if (!Utils.inDungeons || !Skytils.config.selectAllColorTerminalSolver) return
+        val chest = mc.thePlayer?.openContainer as? ContainerChest ?: return
+        val chestName = chest.lowerChestInventory.displayName.unformattedText
+        if (chestName.startsWith("Select all the")) {
+            event.tooltip.clear()
         }
     }
 }

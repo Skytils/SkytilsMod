@@ -17,9 +17,12 @@
  */
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -27,28 +30,29 @@ import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.startsWithAny
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object TerminalFeatures {
+object TerminalFeatures : EventSubscriber {
 
     fun isInPhase3(): Boolean {
         return (SuperSecretSettings.azooPuzzoo || DungeonTimer.phase2ClearTime != -1L) && DungeonTimer.terminalClearTime == -1L && dungeonFloorNumber == 7
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onSlotClickHigh(event: SlotClickEvent) {
+    override fun setup() {
+        register(::onSlotClickHigh, EventPriority.High)
+        register(::onSlotClick)
+        register(::onTooltip, EventPriority.Lowest)
+    }
+
+    fun onSlotClickHigh(event: GuiContainerSlotClickEvent) {
         if (!Utils.inDungeons || !Skytils.config.blockIncorrectTerminalClicks || event.container !is ContainerChest) return
         if (event.chestName == "Correct all the panes!") {
             if (event.slot?.stack?.displayName?.stripControlCodes()?.startsWith("On") == true) {
-                event.isCanceled = true
+                event.cancelled = true
             }
         }
     }
 
-    @SubscribeEvent
-    fun onSlotClick(event: SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
         if (!Utils.inDungeons) return
         if (!Skytils.config.middleClickTerminals) return
         if (event.container is ContainerChest) {
@@ -69,23 +73,20 @@ object TerminalFeatures {
                     6
                 ))
             ) {
-                event.isCanceled = true
+                event.cancelled = true
                 mc.playerController.windowClick(event.container.windowId, event.slotId, 0, 4, mc.thePlayer)
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTooltip(event: ItemTooltipEvent) {
+    fun onTooltip(event: gg.skytils.event.impl.item.ItemTooltipEvent) {
         if (!Utils.inDungeons) return
-        if (event.toolTip == null) return
-        val chest = mc.thePlayer.openContainer
-        if (chest is ContainerChest) {
-            val inv = chest.lowerChestInventory
-            val chestName = inv.displayName.unformattedText
-            if (chestName == "Click the button on time!" || chestName == "Correct all the panes!") {
-                event.toolTip.clear()
-            }
+        val chest = mc.thePlayer?.openContainer as? ContainerChest ?: return
+
+        val inv = chest.lowerChestInventory
+        val chestName = inv.displayName.unformattedText
+        if (chestName == "Click the button on time!" || chestName == "Correct all the panes!") {
+            event.tooltip.clear()
         }
     }
 }

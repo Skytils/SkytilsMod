@@ -19,6 +19,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
 import gg.skytils.event.EventPriority
 import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.item.ItemTooltipEvent
 import gg.skytils.event.impl.screen.GuiContainerForegroundDrawnEvent
 import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
 import gg.skytils.event.register
@@ -32,8 +33,6 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.EnumDyeColor
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
 object ChangeAllToSameColorSolver : EventSubscriber {
@@ -52,6 +51,7 @@ object ChangeAllToSameColorSolver : EventSubscriber {
     override fun setup() {
         register(::onForegroundEvent)
         register(::onSlotClick, EventPriority.High)
+        register(::onTooltip, EventPriority.Lowest)
     }
 
     fun onForegroundEvent(event: GuiContainerForegroundDrawnEvent) {
@@ -116,18 +116,12 @@ object ChangeAllToSameColorSolver : EventSubscriber {
         }
     }
 
-    @SubscribeEvent(priority = net.minecraftforge.fml.common.eventhandler.EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (!Utils.inDungeons) return
-        if (!Skytils.config.changeAllSameColorTerminalSolver) return
-        if (event.toolTip == null) return
-        if (mc.thePlayer.openContainer is ContainerChest) {
-            val chest = mc.thePlayer.openContainer as ContainerChest
-            val inv = chest.lowerChestInventory
-            val chestName = inv.displayName.unformattedText
-            if (chestName == "Change all to same color!") {
-                event.toolTip.clear()
-            }
+        if (!Utils.inDungeons || !Skytils.config.changeAllSameColorTerminalSolver) return
+        val chest = mc.thePlayer?.openContainer as? ContainerChest ?: return
+        val chestName = chest.lowerChestInventory.displayName.unformattedText
+        if (chestName == "Change all to same color!") {
+            event.tooltip.clear()
         }
     }
 }

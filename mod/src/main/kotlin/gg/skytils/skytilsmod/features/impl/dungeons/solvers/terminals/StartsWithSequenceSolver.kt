@@ -19,6 +19,7 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals
 
 import gg.skytils.event.EventPriority
 import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.item.ItemTooltipEvent
 import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
 import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
 import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
@@ -29,8 +30,6 @@ import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
 object StartsWithSequenceSolver : EventSubscriber {
@@ -44,6 +43,7 @@ object StartsWithSequenceSolver : EventSubscriber {
         register(::onBackgroundDrawn)
         register(::onDrawSlot)
         register(::onSlotClick, EventPriority.High)
+        register(::onTooltip, EventPriority.Lowest)
     }
 
     fun onBackgroundDrawn(event: GuiContainerBackgroundDrawnEvent) {
@@ -96,15 +96,12 @@ object StartsWithSequenceSolver : EventSubscriber {
         }
     }
 
-    @SubscribeEvent(priority = net.minecraftforge.fml.common.eventhandler.EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (event.toolTip == null || !Utils.inDungeons || !Skytils.config.startsWithSequenceTerminalSolver) return
-        val container = mc.thePlayer?.openContainer
-        if (container is ContainerChest) {
-            val chestName = container.lowerChestInventory.displayName.unformattedText
-            if (chestName.startsWith("What starts with:")) {
-                event.toolTip.clear()
-            }
+        if (!Utils.inDungeons || !Skytils.config.startsWithSequenceTerminalSolver) return
+        val container = mc.thePlayer?.openContainer as? ContainerChest ?: return
+        val chestName = container.lowerChestInventory.displayName.unformattedText
+        if (chestName.startsWith("What starts with:")) {
+            event.tooltip.clear()
         }
     }
 }
