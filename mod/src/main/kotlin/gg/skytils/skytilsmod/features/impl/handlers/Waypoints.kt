@@ -22,11 +22,16 @@ import com.aayushatharva.brotli4j.encoder.Encoder
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod._event.LocrawReceivedEvent
 import gg.skytils.skytilsmod.commands.impl.OrderedWaypointCommand
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
 import gg.skytils.skytilsmod.tweaker.DependencyLoader
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.serialization.EncodeDefault
@@ -35,11 +40,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import net.minecraft.util.BlockPos
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.apache.commons.codec.binary.Base64
 import org.apache.commons.codec.binary.Base64InputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
@@ -56,12 +56,19 @@ import java.util.zip.Deflater
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
 
-object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
+object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")), EventSubscriber {
     val categories = HashSet<WaypointCategory>()
 
     private val sbeWaypointFormat =
         Regex("(?:\\.?\\/?crystalwaypoint parse )?(?<name>[a-zA-Z\\d]+)@-(?<x>[-\\d]+),(?<y>[-\\d]+),(?<z>[-\\d]+)\\\\?n?")
     private var visibleWaypoints = emptyList<Waypoint>()
+
+    override fun setup() {
+        register(::onWorldChange)
+        register(::onPlayerMove)
+        register(::onLocraw)
+        register(::onWorldRender)
+    }
 
     @OptIn(ExperimentalSerializationApi::class)
     fun getWaypointsFromString(str: String): Set<WaypointCategory> {
@@ -230,19 +237,16 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         visibleWaypoints = emptyList()
     }
 
-    @SubscribeEvent
     fun onLocraw(event: LocrawReceivedEvent) {
         tickTimer(20, task = ::computeVisibleWaypoints)
     }
 
-    @SubscribeEvent
-    fun onPlayerMove(event: ClientTickEvent) {
-        if (event.phase == TickEvent.Phase.END || mc.thePlayer?.hasMoved != true) return
+    fun onPlayerMove(event: TickEvent) {
+        if (mc.thePlayer?.hasMoved != true) return
         if (SBInfo.mode != null && OrderedWaypointCommand.trackedIsland?.mode == SBInfo.mode) {
             val tracked = OrderedWaypointCommand.trackedSet?.firstOrNull()
             if (tracked == null) {
@@ -253,8 +257,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: WorldDrawEvent) {
         val matrixStack = UMatrixStack()
         if (OrderedWaypointCommand.trackedIsland?.mode == SBInfo.mode) {
             OrderedWaypointCommand.trackedSet?.firstOrNull()?.draw(event.partialTicks, matrixStack)

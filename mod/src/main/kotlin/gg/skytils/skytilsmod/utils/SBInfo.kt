@@ -21,13 +21,14 @@ import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.play.ChatMessageSentEvent
 import gg.skytils.event.impl.play.WorldUnloadEvent
 import gg.skytils.event.impl.screen.ScreenOpenEvent
+import gg.skytils.event.postSync
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.json
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.LocrawReceivedEvent
 import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod._event.PacketSendEvent
-import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -102,7 +103,7 @@ object SBInfo : EventSubscriber {
                     }
                     locraw = obj
                     mode = obj.mode
-                    LocrawReceivedEvent(obj).postAndCatch()
+                    postSync(LocrawReceivedEvent(obj))
                 } catch (e: SerializationException) {
                     e.printStackTrace()
                 }
