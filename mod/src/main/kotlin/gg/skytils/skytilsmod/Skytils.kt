@@ -120,40 +120,14 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.math.abs
 
 //#if FORGE
-import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.common.MinecraftForge
 //#if MC<11400
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.Loader
-import net.minecraftforge.fml.common.event.FMLInitializationEvent
-import net.minecraftforge.fml.common.event.FMLLoadCompleteEvent
 //#endif
-//#endif
-//#if FABRIC
-//$$ import net.fabricmc.api.ClientModInitializer
-//$$ import net.fabricmc.loader.api.FabricLoader
 //#endif
 
-//#if FORGE
-//#if MC<11400
-@Mod(
-    modid = Skytils.MOD_ID,
-    name = Skytils.MOD_NAME,
-    acceptedMinecraftVersions = "[1.8.9]",
-    clientSideOnly = true,
-    guiFactory = "gg.skytils.skytilsmod.core.ForgeGuiFactory",
-    modLanguageAdapter = "gg.essential.api.utils.KotlinAdapter"
-)
-//#else
-//$$ @Mod(Skytils.MOD_ID)
-//#endif
-//#endif
-//#if FORGE
-// TODO: fix fabric.mod.json
 object Skytils : CoroutineScope, EventSubscriber {
-//#else
-//$$ object Skytils : ClientModInitializer, CoroutineScope, EventSubscriber {
-//#endif
     const val MOD_ID = Reference.MOD_ID
     const val MOD_NAME = Reference.MOD_NAME
     @JvmField
@@ -287,12 +261,7 @@ object Skytils : CoroutineScope, EventSubscriber {
 
     var trustClientTime = false
 
-    //#if FORGE
-    @Mod.EventHandler
-    fun init(event: FMLInitializationEvent) {
-    //#else
-    //$$ override fun onInitializeClient() {
-    //#endif
+    fun init() {
         DataFetcher.preload()
         guiManager = GuiManager
         //#if FORGE
@@ -423,8 +392,7 @@ object Skytils : CoroutineScope, EventSubscriber {
     }
 
     //FIXME
-    @Mod.EventHandler
-    fun loadComplete(event: FMLLoadCompleteEvent) {
+    fun loadComplete() {
         usingLabymod = isModLoaded("labymod")
         usingNEU = isModLoaded("notenoughupdates")
         usingSBA = isModLoaded("skyblockaddons")

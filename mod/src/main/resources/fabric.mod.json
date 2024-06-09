@@ -17,7 +17,7 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "gg.skytils.skytilsmod.Skytils"
+      "gg.skytils.skytilsmod.SkytilsMod"
     ]
   },
   "mixins": [
