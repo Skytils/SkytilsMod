@@ -345,7 +345,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             TicTacToeSolver,
             TreasureHunter,
             TriviaSolver,
-            TrophyFish,
             VisitorHelper,
             EntityPlayerSPHook,
             MouseHelperHook
@@ -385,6 +384,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             SimonSaysSolver,
             SpiritLeap,
             StartsWithSequenceSolver,
+            TrophyFish,
             VisitorHelper,
             WaterBoardSolver,
             Waypoints

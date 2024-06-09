@@ -21,6 +21,10 @@ package gg.skytils.skytilsmod.features.impl.crimson
 import gg.essential.universal.ChatColor
 import gg.essential.universal.UGraphics
 import gg.essential.universal.wrappers.UPlayer
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.core.Config
@@ -28,17 +32,19 @@ import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.UUID
+import java.util.*
 
-object TrophyFish {
+object TrophyFish : EventSubscriber {
     private val trophyFish = mutableMapOf<String, Fish>()
     private val trophyFishRegex = Regex("TROPHY FISH! You caught an? ([\\w ]+) (BRONZE|SILVER|GOLD|DIAMOND)\\.")
 
 
     init {
         Skytils.guiManager.registerElement(TrophyFishDisplay())
+    }
+
+    override fun setup() {
+        register(::onChat, EventPriority.Highest)
     }
 
     suspend fun loadFromApi() {
@@ -53,8 +59,7 @@ object TrophyFish {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: ClientChatReceivedEvent) {
+    fun onChat(event: ChatMessageReceivedEvent) {
         if (!Utils.inSkyblock || SBInfo.mode != SkyblockIsland.CrimsonIsle.mode || !Config.trophyFishTracker) return
         printDevMessage(event.message.formattedText, "trophyspam")
         trophyFishRegex.matchEntire(event.message.formattedText.stripControlCodes())?.destructured?.let { (type, tier) ->
