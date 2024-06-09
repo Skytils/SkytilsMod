@@ -52,7 +52,7 @@ import gg.skytils.skytilsmod.features.impl.farming.VisitorHelper
 import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.features.impl.handlers.*
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
-import gg.skytils.skytilsmod.features.impl.mining.StupidTreasureChestOpeningThing
+import gg.skytils.skytilsmod.features.impl.mining.CHTreasureChestHelper
 import gg.skytils.skytilsmod.features.impl.misc.*
 import gg.skytils.skytilsmod.features.impl.overlays.AuctionPriceOverlay
 import gg.skytils.skytilsmod.features.impl.protectitems.ProtectItems
@@ -332,7 +332,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             SpidersDenFeatures,
             SpamHider,
             SpiritLeap,
-            StupidTreasureChestOpeningThing,
+            CHTreasureChestHelper,
             TankDisplayStuff,
             TechnoMayor,
             TeleportMazeSolver,

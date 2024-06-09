@@ -41,16 +41,16 @@ import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
 
-object StupidTreasureChestOpeningThing {
+object CHTreasureChestHelper {
 
     var lastFoundChest = -1L
     var found = 0
 
-    var iLovePain: BlockPos? = null
+    var lastOpenedChest: BlockPos? = null
 
-    val sendHelpPlease = ConcurrentHashMap<BlockPos, StupidChest>()
+    val chests = ConcurrentHashMap<BlockPos, CHTreasureChest>()
 
-    data class StupidChest(
+    data class CHTreasureChest(
         val pos: BlockPos,
         var progress: Int = 0,
         val time: Long = System.currentTimeMillis(),
@@ -73,23 +73,23 @@ object StupidTreasureChestOpeningThing {
                 val diff = System.currentTimeMillis() - lastFoundChest
                 if (diff < 1000 && found > 0) {
                     found--
-                    sendHelpPlease[event.pos] = StupidChest(event.pos)
+                    chests[event.pos] = CHTreasureChest(event.pos)
                     printDevMessage("chest found at $diff", "chtreasure")
                 } else found = 0
             }
         } else if (event.old.block == Blocks.chest && event.update.block == Blocks.air) {
-            sendHelpPlease.remove(event.pos)
+            chests.remove(event.pos)
         }
     }
 
     @SubscribeEvent
     fun onSendPacket(event: PacketEvent.SendEvent) {
-        if (sendHelpPlease.isEmpty() || !Skytils.config.chTreasureHelper || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
+        if (chests.isEmpty() || !Skytils.config.chTreasureHelper || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
 
         when (val packet = event.packet) {
             is C08PacketPlayerBlockPlacement -> {
-                if (sendHelpPlease.containsKey(packet.position)) {
-                    iLovePain = packet.position
+                if (chests.containsKey(packet.position)) {
+                    lastOpenedChest = packet.position
                 }
             }
         }
@@ -106,21 +106,21 @@ object StupidTreasureChestOpeningThing {
                     if (formatted == "§r§aYou uncovered a treasure chest!§r") {
                         lastFoundChest = System.currentTimeMillis()
                         found++
-                    } else if (iLovePain != null && Utils.equalsOneOf(
+                    } else if (lastOpenedChest != null && Utils.equalsOneOf(
                             formatted,
                             "§r§6You have successfully picked the lock on this chest!",
                             "§r§aThe remaining contents of this treasure chest were placed in your inventory"
                         )
                     ) {
-                        sendHelpPlease.remove(iLovePain)
-                        iLovePain = null
+                        chests.remove(lastOpenedChest)
+                        lastOpenedChest = null
                     }
                 }
             }
             is S2APacketParticles -> {
                 packet.apply {
                     if (type == EnumParticleTypes.CRIT && isLongDistance && count == 1 && speed == 0f && xOffset == 0f && yOffset == 0f && zOffset == 0f) {
-                        val probable = sendHelpPlease.values.minByOrNull {
+                        val probable = chests.values.minByOrNull {
                             it.pos.distanceSq(x, y, z)
                         } ?: return
 
@@ -153,9 +153,9 @@ object StupidTreasureChestOpeningThing {
                         sound,
                         "random.orb",
                         "mob.villager.no"
-                    ) && sendHelpPlease.isNotEmpty()
+                    ) && chests.isNotEmpty()
                 ) {
-                    val probable = sendHelpPlease.values.minByOrNull {
+                    val probable = chests.values.minByOrNull {
                         val rot = mc.thePlayer.getRotationFor(it.pos)
                         abs(rot.first - mc.thePlayer.rotationYaw) + abs(rot.second - mc.thePlayer.rotationPitch)
                     } ?: return
@@ -169,11 +169,11 @@ object StupidTreasureChestOpeningThing {
 
     @SubscribeEvent
     fun onRender(event: RenderWorldLastEvent) {
-        if (!Skytils.config.chTreasureHelper || sendHelpPlease.isEmpty() || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
+        if (!Skytils.config.chTreasureHelper || chests.isEmpty() || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()
         val time = System.currentTimeMillis()
-        sendHelpPlease.entries.removeAll { (pos, chest) ->
+        chests.entries.removeAll { (pos, chest) ->
             GlStateManager.disableCull()
             RenderUtil.drawFilledBoundingBox(
                 matrixStack,
@@ -203,7 +203,7 @@ object StupidTreasureChestOpeningThing {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Unload) {
-        sendHelpPlease.clear()
+        chests.clear()
         lastFoundChest = -1L
     }
 
