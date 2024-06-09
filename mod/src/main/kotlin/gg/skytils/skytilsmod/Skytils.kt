@@ -347,7 +347,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             TriviaSolver,
             TrophyFish,
             VisitorHelper,
-            WaterBoardSolver,
             EntityPlayerSPHook,
             MouseHelperHook
         ).forEach(MinecraftForge.EVENT_BUS::register)
@@ -387,6 +386,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             SpiritLeap,
             StartsWithSequenceSolver,
             VisitorHelper,
+            WaterBoardSolver,
             Waypoints
         ).forEach(EventSubscriber::setup)
     }

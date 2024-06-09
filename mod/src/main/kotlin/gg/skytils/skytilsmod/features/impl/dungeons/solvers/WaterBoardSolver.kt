@@ -18,6 +18,10 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.tickTimer
@@ -35,9 +39,6 @@ import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.util.*
 import kotlin.random.Random
@@ -48,7 +49,7 @@ import kotlin.random.Random
  * @author bowser0000
  * @link https://github.com/bowser0000/SkyblockMod/blob/master/LICENSE
  */
-object WaterBoardSolver {
+object WaterBoardSolver : EventSubscriber {
     private val solutions = hashMapOf<WoolColor, Set<LeverBlock>>()
     private var chestPos: BlockPos? = null
     private var roomFacing: EnumFacing? = null
@@ -56,6 +57,11 @@ object WaterBoardSolver {
     private var inWaterRoom = false
     private var variant = -1
     private var job: Job? = null
+
+    override fun setup() {
+        register(::onWorldChange)
+        register(::onRenderWorld)
+    }
 
     init {
         tickTimer(20, repeats = true) {
@@ -228,8 +234,7 @@ object WaterBoardSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: WorldDrawEvent) {
         if (!Skytils.config.waterBoardSolver || !DungeonListener.missingPuzzles.contains("Water Board")) return
         if (chestPos == null || roomFacing == null || variant == -1) return
         val leverStates = LeverBlock.entries.associateWithTo(EnumMap(LeverBlock::class.java)) {
@@ -274,8 +279,7 @@ object WaterBoardSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         variant = -1
         solutions.clear()
         chestPos = null
