@@ -48,8 +48,8 @@ suspend inline fun <reified T : Event> await(priority: EventPriority = EventPrio
     suspendCancellableCoroutine { coroutine ->
         var deregister = { true }
         deregister = priority.subscribe<T> { event ->
-            deregister()
             coroutine.resume(event)
+            deregister()
         }
     }
 
