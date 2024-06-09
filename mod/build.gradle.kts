@@ -250,6 +250,11 @@ tasks {
             "META-INF/versions/**",
             "META-INF/com.android.tools/**"
         )
+        if (platform.isFabric) {
+            exclude("**/mcmod.info")
+        } else {
+            exclude("**/fabric.mod.json")
+        }
         mergeServiceFiles()
     }
     withType<AbstractArchiveTask> {
