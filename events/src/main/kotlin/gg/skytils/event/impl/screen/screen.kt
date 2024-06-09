@@ -28,4 +28,6 @@ class ScreenOpenEvent(var screen: GuiScreen?) : CancellableEvent()
 
 class KeyInputEvent(val screen: GuiScreen, val keyCode: Int) : CancellableEvent()
 
+class MouseInputEvent(val Screen: GuiScreen, val mouseX: Int, val mouseY: Int, val button: Int) : CancellableEvent()
+
 class ScreenDrawEvent(val screen: GuiScreen, val mouseX: Int, val mouseY: Int) : CancellableEvent()
