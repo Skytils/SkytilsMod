@@ -19,10 +19,15 @@
 package gg.skytils.skytilsmod.features.impl.mining
 
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -34,14 +39,11 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.abs
 
-object CHTreasureChestHelper {
+object CHTreasureChestHelper :EventSubscriber {
 
     var lastFoundChest = -1L
     var found = 0
@@ -64,7 +66,10 @@ object CHTreasureChestHelper {
         var particleBox: AxisAlignedBB? = null
     }
 
-    @SubscribeEvent
+    override fun setup() {
+        register(::onBlockChange)
+    }
+
     fun onBlockChange(event: BlockChangeEvent) {
         if (!Skytils.config.chTreasureHelper || mc.thePlayer == null || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
         if (((event.old.block == Blocks.air || event.old.block == Blocks.stone) && event.update.block == Blocks.chest)) {
@@ -82,8 +87,7 @@ object CHTreasureChestHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
+    fun onSendPacket(event: PacketSendEvent<*>) {
         if (chests.isEmpty() || !Skytils.config.chTreasureHelper || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
 
         when (val packet = event.packet) {
@@ -95,8 +99,7 @@ object CHTreasureChestHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
+    fun onReceivePacket(event: PacketReceiveEvent<*>) {
         if (!Skytils.config.chTreasureHelper || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
 
         when (val packet = event.packet) {
@@ -167,8 +170,7 @@ object CHTreasureChestHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onRender(event: RenderWorldLastEvent) {
+    fun onRender(event: WorldDrawEvent) {
         if (!Skytils.config.chTreasureHelper || chests.isEmpty() || SBInfo.mode != SkyblockIsland.CrystalHollows.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()
@@ -201,8 +203,7 @@ object CHTreasureChestHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         chests.clear()
         lastFoundChest = -1L
     }
