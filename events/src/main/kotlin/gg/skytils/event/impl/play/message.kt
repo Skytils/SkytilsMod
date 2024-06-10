@@ -24,7 +24,7 @@ import net.minecraft.util.IChatComponent
 /**
  * [gg.skytils.event.mixins.network.MixinNetHandlerPlayClient.onChat]
  */
-class ChatMessageReceivedEvent(val message: IChatComponent) : CancellableEvent()
+class ChatMessageReceivedEvent(var message: IChatComponent) : CancellableEvent()
 
 /**
  * [gg.skytils.event.mixins.gui.MixinGuiScreen.onSendChatMessage]
