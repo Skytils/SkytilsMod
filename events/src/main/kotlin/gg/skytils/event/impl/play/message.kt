@@ -29,7 +29,7 @@ class ChatMessageReceivedEvent(val message: IChatComponent) : CancellableEvent()
 /**
  * [gg.skytils.event.mixins.gui.MixinGuiScreen.onSendChatMessage]
  */
-class ChatMessageSentEvent(val message: String) : CancellableEvent()
+class ChatMessageSentEvent(val message: String, val addToHistory: Boolean) : CancellableEvent()
 
 /**
  * [gg.skytils.event.mixins.network.MixinNetHandlerPlayClient.onActionbar]

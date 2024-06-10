@@ -35,7 +35,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGuiScreen {
     @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
     public void onSendChatMessage(String msg, boolean addToChat, CallbackInfo ci) {
-        if (EventsKt.postCancellableSync(new ChatMessageSentEvent(msg))) {
+        if (EventsKt.postCancellableSync(new ChatMessageSentEvent(msg, addToChat))) {
             ci.cancel();
         }
     }
