@@ -292,7 +292,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             GriffinBurrows,
             IceFillSolver,
             IcePathSolver,
-            ItemCycle,
             ItemFeatures,
             KeyShortcuts,
             KuudraChestProfit,

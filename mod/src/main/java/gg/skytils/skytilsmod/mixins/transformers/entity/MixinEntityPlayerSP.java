@@ -45,11 +45,6 @@ public abstract class MixinEntityPlayerSP extends AbstractClientPlayer {
         super(worldIn, playerProfile);
     }
 
-    @Inject(method = "addChatMessage", at = @At("HEAD"), cancellable = true)
-    private void onAddChatMessage(IChatComponent message, CallbackInfo ci) {
-        EntityPlayerSPHookKt.onAddChatMessage(message, ci);
-    }
-
     @Inject(method = "dropOneItem", at = @At("HEAD"), cancellable = true)
     private void onDropItem(boolean dropAll, CallbackInfoReturnable<EntityItem> cir) {
         EntityPlayerSPHookKt.onDropItem(dropAll, cir);
