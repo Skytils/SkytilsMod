@@ -19,10 +19,17 @@ package gg.skytils.skytilsmod.features.impl.events
 
 import com.google.common.collect.EvictingQueue
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
@@ -34,16 +41,9 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.util.Vec3i
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 
-object GriffinBurrows {
+object GriffinBurrows : EventSubscriber {
     val particleBurrows = hashMapOf<BlockPos, ParticleBurrow>()
     var lastDugParticleBurrow: BlockPos? = null
     val recentlyDugParticleBurrows: EvictingQueue<BlockPos> = EvictingQueue.create(5)
@@ -51,17 +51,22 @@ object GriffinBurrows {
     var hasSpadeInHotbar = false
 
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    override fun setup() {
+        register(::onTick)
+        register(::onSendPacket)
+        register(::onReceivePacket)
+        register(::onWorldChange)
+        register(::onWorldRender)
+        register(::onChat, EventPriority.Highest)
+    }
+
+    fun onTick(event: TickEvent) {
         hasSpadeInHotbar = mc.thePlayer != null && Utils.inSkyblock && (0..7).any {
             mc.thePlayer.inventory.getStackInSlot(it).isSpade
         }
     }
 
-    @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (event.type == 2.toByte()) return
+    fun onChat(event: ChatMessageReceivedEvent) {
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.showGriffinBurrows &&
             (unformatted.startsWith("You died") || unformatted.startsWith("☠ You were killed") ||
@@ -79,8 +84,7 @@ object GriffinBurrows {
         }
     }
 
-    @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
+    fun onSendPacket(event: PacketSendEvent<*>) {
         if (!Utils.inSkyblock || !Skytils.config.showGriffinBurrows || mc.theWorld == null || mc.thePlayer == null) return
         val pos =
             when {
@@ -97,8 +101,7 @@ object GriffinBurrows {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: WorldDrawEvent) {
         if (Skytils.config.showGriffinBurrows) {
             val matrixStack = UMatrixStack()
             for (pb in particleBurrows.values) {
@@ -109,14 +112,12 @@ object GriffinBurrows {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         particleBurrows.clear()
         recentlyDugParticleBurrows.clear()
     }
 
-    @SubscribeEvent
-    fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
+    fun onReceivePacket(event: MainThreadPacketReceiveEvent<*>) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.showGriffinBurrows && hasSpadeInHotbar && event.packet is S2APacketParticles) {
             if (SBInfo.mode != SkyblockIsland.Hub.mode) return
