@@ -18,10 +18,15 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.DungeonPuzzleDiscoveredEvent
+import gg.skytils.skytilsmod._event.DungeonPuzzleResetEvent
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
@@ -35,12 +40,9 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.world.storage.MapData
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.experimental.and
 
-object TicTacToeSolver {
+object TicTacToeSolver : EventSubscriber {
 
     private const val MAP_COLOR_INDEX = 8256
     private const val COLOR_INT_X = 114
@@ -62,8 +64,14 @@ object TicTacToeSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onPuzzleDiscovered(event: DungeonEvent.PuzzleEvent.Discovered) {
+    override fun setup() {
+        register(::onPuzzleDiscovered)
+        register(::onWorldLoad)
+        register(::onPuzzleReset)
+        register(::onRenderWorld)
+    }
+
+    fun onPuzzleDiscovered(event: DungeonPuzzleDiscoveredEvent) {
         if (event.puzzle == "Tic Tac Toe") {
             updatePuzzleState()
         }
@@ -101,8 +109,7 @@ object TicTacToeSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Unload) {
+    fun onWorldLoad(event: WorldUnloadEvent) {
         topLeft = null
         roomFacing = null
         board = null
@@ -110,8 +117,7 @@ object TicTacToeSolver {
         mappedPositions.clear()
     }
 
-    @SubscribeEvent
-    fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
+    fun onPuzzleReset(event: DungeonPuzzleResetEvent) {
         if (event.puzzle == "Tic Tac Toe") {
             board = null
             bestMove = null
@@ -119,8 +125,7 @@ object TicTacToeSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: WorldDrawEvent) {
         if (!Utils.inDungeons || !Skytils.config.ticTacToeSolver) return
         if (bestMove != null) {
             RenderUtil.drawOutlinedBoundingBox(
