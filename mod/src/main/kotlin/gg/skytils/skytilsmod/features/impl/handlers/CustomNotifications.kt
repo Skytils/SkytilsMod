@@ -17,7 +17,11 @@
  */
 package gg.skytils.skytilsmod.features.impl.handlers
 
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.utils.RegexAsString
@@ -25,24 +29,20 @@ import gg.skytils.skytilsmod.utils.Utils
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.network.play.server.S02PacketChat
 import java.io.File
 import java.io.Reader
 import java.io.Writer
 
-object CustomNotifications : PersistentSave(File(Skytils.modDir, "customnotifications.json")) {
+object CustomNotifications : PersistentSave(File(Skytils.modDir, "customnotifications.json")), EventSubscriber {
     val notifications = hashSetOf<Notification>()
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onMessage(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type != 0.toByte() || notifications.isEmpty()) return
+    fun onMessage(event: PacketReceiveEvent<*>) {
+        if (!Utils.inSkyblock || event.packet !is S02PacketChat || event.packet.type != 0.toByte() || notifications.isEmpty()) return
         Skytils.launch {
-            val formatted = event.message.formattedText
+            val formatted = event.packet.chatComponent.formattedText
             for ((regex, text, displayTicks) in notifications) {
                 val match = regex.find(formatted) ?: continue
                 var title = text
@@ -81,4 +81,8 @@ object CustomNotifications : PersistentSave(File(Skytils.modDir, "customnotifica
         val text: String,
         @SerialName("ticks") val displayTicks: Int
     )
+
+    override fun setup() {
+        register(::onMessage, EventPriority.Highest)
+    }
 }
