@@ -18,10 +18,14 @@
 
 package gg.skytils.skytilsmod.features.impl.handlers
 
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ActionBarReceivedEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.structure.GuiElement
-import gg.skytils.skytilsmod.events.impl.SetActionBarEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.DungeonClass
 import gg.skytils.skytilsmod.utils.Utils
@@ -29,15 +33,12 @@ import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import kotlinx.serialization.encodeToString
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
 import kotlin.math.floor
 
-object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.json")) {
+object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.json")), EventSubscriber {
 
     var cooldownReduction = 0.0
     val itemCooldowns = hashMapOf<String, Double>()
@@ -51,18 +52,18 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
         println("Mage ${self.classLevel}, they are ${if (soloMage) "a" else "not a"} solo mage with cooldown reduction ${cooldownReduction}.")
     }
 
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Unload) {
+    fun onWorldLoad(event: WorldUnloadEvent) {
         cooldownReduction = 0.0
         cooldowns.clear()
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onActionBar(event: SetActionBarEvent) {
+//    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onActionBar(event: ActionBarReceivedEvent) {
         if (!Utils.inSkyblock || !Skytils.config.itemCooldownDisplay) return
         event.apply {
-            if (message.contains("§b-") && message.contains(" Mana (§6")) {
-                val itemId = message.substringAfter(" Mana (§6").substringBefore("§b)")
+            val unformatted = message.unformattedText
+            if (unformatted.contains("§b-") && unformatted.contains(" Mana (§6")) {
+                val itemId = unformatted.substringAfter(" Mana (§6").substringBefore("§b)")
                 val itemCooldown = itemCooldowns[itemId] ?: return
                 cooldowns.computeIfAbsent(itemId) {
                     System.currentTimeMillis() + ((100 - cooldownReduction) / 100 * (itemCooldown) * 1000).toLong()
@@ -134,4 +135,9 @@ object CooldownTracker : PersistentSave(File(Skytils.modDir, "cooldowntracker.js
     }
 
     data class CooldownThing(var name: String, var seconds: Double, var mageBypass: Boolean)
+
+    override fun setup() {
+        register(::onWorldLoad)
+        register(::onActionBar, EventPriority.Highest)
+    }
 }
