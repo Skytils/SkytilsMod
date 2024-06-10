@@ -60,7 +60,6 @@ import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures
 import gg.skytils.skytilsmod.features.impl.spidersden.RainTimer
 import gg.skytils.skytilsmod.features.impl.spidersden.RelicWaypoints
 import gg.skytils.skytilsmod.features.impl.spidersden.SpidersDenFeatures
-import gg.skytils.skytilsmod.features.impl.trackers.impl.DupeTracker
 import gg.skytils.skytilsmod.features.impl.trackers.impl.MayorJerryTracker
 import gg.skytils.skytilsmod.features.impl.trackers.impl.MythologicalTracker
 import gg.skytils.skytilsmod.gui.OptionsGui
@@ -284,7 +283,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             DungeonFeatures,
             Catlas,
             DungeonTimer,
-            DupeTracker,
             EnchantNames,
             FarmingFeatures,
             FavoritePets,
@@ -370,7 +368,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             CreeperSolver,
             CustomNotifications,
             DungeonChestProfit,
-            DupeTracker,
             ItemCycle,
             KuudraChestProfit,
             PotionEffectTimers,
