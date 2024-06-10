@@ -18,30 +18,28 @@
 package gg.skytils.skytilsmod.features.impl.handlers
 
 import gg.essential.universal.UChat
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageSentEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import gg.skytils.skytilsmod.utils.runClientCommand
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import net.minecraftforge.client.ClientCommandHandler
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
 import java.util.*
 
-object CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json")) {
+object CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json")), EventSubscriber {
     val aliases = hashMapOf<String, String>()
 
-    @SubscribeEvent
-    fun onSendChatMessage(event: SendChatMessageEvent) {
+    fun onSendChatMessage(event: ChatMessageSentEvent) {
         if (event.message.startsWith("/")) {
             val args = event.message.substring(1).trim().split(" ").toMutableList()
             val command = args.removeAt(0)
             val replacement = aliases[command] ?: return
-            event.isCanceled = true
+            event.cancelled = true
             try {
                 val msg =
                     if (Skytils.config.commandAliasMode == 0) "/" + replacement + " " + args.joinToString(" ") else "/${
@@ -49,13 +47,13 @@ object CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json
                             *args.toTypedArray()
                         )
                     }"
-                if (event.addToChat) {
+                if (event.addToHistory) {
                     mc.ingameGUI.chatGUI.addToSentMessages(msg)
                 }
                 if (runClientCommand(msg) != 0) return
                 Skytils.sendMessageQueue.add(msg)
             } catch (ignored: IllegalFormatException) {
-                if (event.addToChat) mc.ingameGUI.chatGUI.addToSentMessages(event.message)
+                if (event.addToHistory) mc.ingameGUI.chatGUI.addToSentMessages(event.message)
                 UChat.chat("$failPrefix §cYou did not specify the correct amount of arguments for this alias!")
             }
         }
@@ -72,5 +70,9 @@ object CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json
 
     override fun setDefault(writer: Writer) {
         writer.write("{}")
+    }
+
+    override fun setup() {
+        register(::onSendChatMessage)
     }
 }
