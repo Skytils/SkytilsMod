@@ -18,43 +18,42 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UChat
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.LivingEntityPreRenderEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
-import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.DungeonPuzzleResetEvent
 import gg.skytils.skytilsmod.core.DataFetcher
-import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.startsWithAny
 import gg.skytils.skytilsmod.utils.stripControlCodes
-import net.minecraft.block.BlockButtonStone
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.init.Blocks
-import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
-import net.minecraft.util.EnumFacing
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.event.entity.player.PlayerInteractEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 
-object TriviaSolver {
+object TriviaSolver : EventSubscriber {
     val triviaSolutions = hashMapOf<String, List<String>>()
     var triviaAnswers: List<String>? = null
     var triviaAnswer: String? = null
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (event.type == 2.toByte()) return
-        val unformatted = event.message.unformattedText.stripControlCodes()
-        val formatted = event.message.formattedText
+    override fun setup() {
+        register(::onChat, EventPriority.Highest)
+        register(::onRenderArmorStandPre)
+        register(::onWorldChange)
+        register(::onPuzzleReset)
+    }
+
+    fun onChat(event: ChatMessageReceivedEvent) {
         if (Skytils.config.triviaSolver && Utils.inDungeons) {
+            val unformatted = event.message.unformattedText.stripControlCodes()
+            val formatted = event.message.formattedText
             if (unformatted.startsWith("[STATUE] Oruo the Omniscient: ") && unformatted.contains("answered Question #") && unformatted.endsWith(
                     "correctly!"
                 )
@@ -91,7 +90,7 @@ object TriviaSolver {
         }
     }
 
-    //@SubscribeEvent
+/*
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (!Utils.inDungeons || !Skytils.config.triviaSolver || event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && event.action != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) return
         val block = event.world.getBlockState(event.pos)
@@ -133,28 +132,26 @@ object TriviaSolver {
             }
         }
     }
+*/
 
-    @SubscribeEvent
-    fun onRenderArmorStandPre(event: RenderLivingEvent.Pre<EntityArmorStand?>) {
+    fun onRenderArmorStandPre(event: LivingEntityPreRenderEvent<*>) {
         if (Skytils.config.triviaSolver && triviaAnswer != null) {
             if (event.entity is EntityArmorStand) {
                 val name = event.entity.customNameTag
-                if (name.isNotEmpty() && name.contains("ⓐ") || name.contains("ⓑ") || name.contains("ⓒ")) {
+                if (name.contains("ⓐ") || name.contains("ⓑ") || name.contains("ⓒ")) {
                     if (!name.contains(triviaAnswer!!)) {
-                        event.isCanceled = true
+                        event.cancelled = true
                     }
                 }
             }
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         triviaAnswer = null
     }
 
-    @SubscribeEvent
-    fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
+    fun onPuzzleReset(event: DungeonPuzzleResetEvent) {
         if (event.puzzle == "Quiz") {
             triviaAnswer = null
         }
