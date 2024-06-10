@@ -10,6 +10,7 @@
     "network.MixinNetHandlerPlayClient",
     "network.MixinNetworkManager",
     "render.MixinGameRenderer",
+    "render.MixinRendererLivingEntity",
     "world.MixinWorld"
   ],
   "verbose": true,
