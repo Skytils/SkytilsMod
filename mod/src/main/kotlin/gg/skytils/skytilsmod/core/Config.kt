@@ -2656,16 +2656,6 @@ object Config : Vigilant(
     var betterAuctionPriceInput = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Better Stash",
-        description = "Shows an improved view of your stash.\n&cWARNING: This feature runs /viewstash upon receiving a stash message.",
-        category = "Miscellaneous", subcategory = "Quality of Life",
-        i18nName = "skytils.config.miscellaneous.quality_of_life.better_stash",
-        i18nCategory = "skytils.config.miscellaneous",
-        i18nSubcategory = "skytils.config.miscellaneous.quality_of_life"
-    )
-    var betterStash = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Container Sell Value",
         description = "Display the lowest BIN prices for the most valuable items in backpacks, ender chest pages, minions, and island chests.",
         category = "Miscellaneous", subcategory = "Quality of Life",

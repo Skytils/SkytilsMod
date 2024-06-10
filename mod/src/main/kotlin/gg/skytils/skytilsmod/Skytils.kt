@@ -349,7 +349,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             ArmorColor,
             AuctionData,
             AuctionPriceOverlay,
-            BetterStash,
             BlazeSolver,
             BloodHelper,
             BossHPDisplays,
