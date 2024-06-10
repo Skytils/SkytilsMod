@@ -21,11 +21,15 @@ package gg.skytils.skytilsmod.features.impl.misc
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerCloseWindowEvent
+import gg.skytils.event.impl.screen.ScreenDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.mixins.hooks.item.masterStarPattern
 import gg.skytils.skytilsmod.mixins.hooks.item.masterStars
@@ -37,9 +41,6 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.roundToLong
 
@@ -48,7 +49,7 @@ import kotlin.math.roundToLong
  * and backpacks that shows the top items in the container by value and the container's total value.
  * @author FluxCapacitor2
  */
-object ContainerSellValue {
+object ContainerSellValue : EventSubscriber {
 
     private val element = SellValueDisplay()
 
@@ -204,9 +205,8 @@ object ContainerSellValue {
     /**
      * Compatibility with NEU's storage overlay
      */
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-    fun onGuiScreenDrawPre(event: GuiScreenEvent.DrawScreenEvent.Pre) {
-        if (event.isCanceled && NEUCompatibility.isStorageMenuActive && shouldRenderGuiComponent()) {
+    fun onGuiScreenDrawPre(event: ScreenDrawEvent) {
+        if (event.cancelled && NEUCompatibility.isStorageMenuActive && shouldRenderGuiComponent()) {
             // NEU cancels this event when it renders the storage overlay,
             // which means that the BackgroundDrawnEvent isn't called.
             renderGuiComponent()
@@ -220,8 +220,7 @@ object ContainerSellValue {
      * GuiContainerEvent.BackgroundDrawnEvent because Skytils's event is called before the overlay rectangle is drawn,
      * causing the text to be dimmed.
      */
-    @SubscribeEvent
-    fun onPostBackgroundDrawn(event: GuiScreenEvent.BackgroundDrawnEvent) {
+    fun onPostBackgroundDrawn(event: ScreenDrawEvent) {
         if (!NEUCompatibility.isStorageMenuActive && shouldRenderGuiComponent()) renderGuiComponent()
     }
 
@@ -251,8 +250,7 @@ object ContainerSellValue {
     /**
      * Clear the cached display items so that they don't briefly appear when opening another GUI before being updated.
      */
-    @SubscribeEvent
-    fun onGuiClose(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onGuiClose(event: GuiContainerCloseWindowEvent) {
         totalContainerValue = 0.0
         textLines.clear()
     }
@@ -316,5 +314,11 @@ object ContainerSellValue {
             (index * ScreenRenderer.fontRenderer.FONT_HEIGHT).toFloat(),
             Color.WHITE.rgb, true
         )
+    }
+
+    override fun setup() {
+        register(::onGuiScreenDrawPre, EventPriority.Lowest)
+        register(::onPostBackgroundDrawn)
+        register(::onGuiClose)
     }
 }
