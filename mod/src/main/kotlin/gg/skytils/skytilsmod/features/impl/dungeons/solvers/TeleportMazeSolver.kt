@@ -20,10 +20,14 @@ package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageSentEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
-import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.DevTools
@@ -36,30 +40,32 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MathHelper
 import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.abs
 
-object TeleportMazeSolver {
+object TeleportMazeSolver : EventSubscriber {
 
     private val steppedPads = HashSet<BlockPos>()
     val poss = HashSet<BlockPos>()
     val valid = HashSet<BlockPos>()
 
-    @SubscribeEvent
-    fun onSendMsg(event: SendChatMessageEvent) {
+    override fun setup() {
+        register(::onSendMsg)
+        register(::onPacket)
+        register(::onWorldRender)
+        register(::onWorldChange)
+    }
+
+    fun onSendMsg(event: ChatMessageSentEvent) {
         if (DevTools.getToggle("tpmaze") && event.message == "/resettp") {
             steppedPads.clear()
             poss.clear()
-            event.isCanceled = true
+            event.cancelled = true
         }
     }
 
-    @SubscribeEvent
-    fun onPacket(event: MainReceivePacketEvent<*, *>) {
+    fun onPacket(event: MainThreadPacketReceiveEvent<*>) {
         if (!Skytils.config.teleportMazeSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Teleport Maze")) return
         if (mc.thePlayer == null || mc.theWorld == null) return
         event.packet.apply {
@@ -122,8 +128,7 @@ object TeleportMazeSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: WorldDrawEvent) {
         if (!Skytils.config.teleportMazeSolver || steppedPads.isEmpty() || !DungeonListener.missingPuzzles.contains("Teleport Maze")) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()
@@ -157,8 +162,7 @@ object TeleportMazeSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         steppedPads.clear()
         poss.clear()
     }
