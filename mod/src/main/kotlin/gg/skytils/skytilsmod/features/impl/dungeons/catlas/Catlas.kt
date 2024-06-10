@@ -21,9 +21,14 @@ package gg.skytils.skytilsmod.features.impl.dungeons.catlas
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.PacketEvent
-import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
+import gg.skytils.skytilsmod._event.DungeonPuzzleResetEvent
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
@@ -39,13 +44,8 @@ import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.network.play.server.S34PacketMaps
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.world.storage.MapData
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
-object Catlas {
+object Catlas : EventSubscriber {
 
     fun reset() {
         DungeonInfo.reset()
@@ -55,9 +55,16 @@ object Catlas {
         MimicDetector.mimicPos = null
     }
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || !Utils.inDungeons || mc.thePlayer == null) return
+    override fun setup() {
+        register(::onTick)
+        register(::onWorldLoad)
+        register(::onWorldRender)
+        register(::onPuzzleReset)
+        register(::onPacket)
+    }
+
+    fun onTick(event: TickEvent) {
+        if (!Utils.inDungeons || mc.thePlayer == null) return
 
         if (!MapUtils.calibrated) {
             if (DungeonInfo.dungeonMap == null) {
@@ -81,13 +88,11 @@ object Catlas {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Unload) {
+    fun onWorldLoad(event: WorldUnloadEvent) {
         reset()
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: WorldDrawEvent) {
         if (!Utils.inDungeons || DungeonTimer.bossEntryTime != -1L || !CatlasConfig.boxWitherDoors) return
 
         DungeonInfo.dungeonList.filterIsInstance<Door>().filter {
@@ -117,8 +122,7 @@ object Catlas {
         }
     }
 
-    @SubscribeEvent
-    fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
+    fun onPuzzleReset(event: DungeonPuzzleResetEvent) {
         val mapRoom = DungeonInfo.uniqueRooms.find { room ->
             room.mainRoom.data.type == RoomType.PUZZLE && Puzzle.fromName(room.name)?.tabName == event.puzzle
         }
@@ -126,8 +130,7 @@ object Catlas {
         mapRoom?.mainRoom?.state = RoomState.DISCOVERED
     }
 
-    @SubscribeEvent
-    fun onPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacket(event: PacketReceiveEvent<*>) {
         if (event.packet is S34PacketMaps && Utils.inDungeons && DungeonInfo.dungeonMap == null && mc.theWorld != null) {
             val id = event.packet.mapId
             if (id and 1000 == 0) {
@@ -144,6 +147,6 @@ object Catlas {
 
         arrayOf(
             MimicDetector,
-        ).forEach(MinecraftForge.EVENT_BUS::register)
+        ).forEach(EventSubscriber::setup)
     }
 }

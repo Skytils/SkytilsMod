@@ -18,31 +18,35 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers
 
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.entity.LivingEntityDeathEvent
+import gg.skytils.event.impl.world.BlockStateUpdateEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
-import net.minecraftforge.event.entity.living.LivingDeathEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object MimicDetector {
+object MimicDetector : EventSubscriber {
     var mimicOpenTime = 0L
     var mimicPos: BlockPos? = null
 
-    @SubscribeEvent
-    fun onBlockChange(event: BlockChangeEvent) {
+    override fun setup() {
+        register(::onBlockChange)
+        register(::onEntityDeath)
+    }
+
+    fun onBlockChange(event: BlockStateUpdateEvent) {
         if (Utils.inDungeons && event.old.block == Blocks.trapped_chest && event.update.block == Blocks.air) {
             mimicOpenTime = System.currentTimeMillis()
             mimicPos = event.pos
         }
     }
 
-    @SubscribeEvent
-    fun onEntityDeath(event: LivingDeathEvent) {
+    fun onEntityDeath(event: LivingEntityDeathEvent) {
         if (!Utils.inDungeons) return
         val entity = event.entity as? EntityZombie ?: return
         if (entity.isChild && (0..3).all { entity.getCurrentArmor(it) == null }) {
