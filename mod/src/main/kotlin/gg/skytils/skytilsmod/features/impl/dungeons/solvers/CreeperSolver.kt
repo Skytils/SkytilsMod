@@ -18,10 +18,14 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.DungeonPuzzleDiscoveredEvent
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -31,21 +35,17 @@ import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 
 
-object CreeperSolver {
+object CreeperSolver : EventSubscriber {
     private val colors = CommonColors.set.copySet()
     private val solutionPairs = arrayListOf<Pair<BlockPos, BlockPos>>()
     private var creeper: EntityCreeper? = null
     private val candidateBlocks = setOf(Blocks.prismarine, Blocks.sea_lantern)
 
-    @SubscribeEvent
-    fun onPuzzleDiscovered(event: DungeonEvent.PuzzleEvent.Discovered) {
+    fun onPuzzleDiscovered(event: DungeonPuzzleDiscoveredEvent) {
         if (event.puzzle == "Creeper Beams") {
             updatePuzzleState()
         }
@@ -99,8 +99,7 @@ object CreeperSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: WorldDrawEvent) {
         if (Skytils.config.creeperBeamsSolver && solutionPairs.isNotEmpty() && !creeper!!.isDead && DungeonListener.missingPuzzles.contains(
                 "Creeper Beams"
             )
@@ -147,8 +146,7 @@ object CreeperSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         creeper = null
         solutionPairs.clear()
     }
@@ -261,4 +259,10 @@ object CreeperSolver {
     }
 
     private class Holder<T>(var value: T)
+
+    override fun setup() {
+        register(::onPuzzleDiscovered)
+        register(::onWorldRender)
+        register(::onWorldChange)
+    }
 }
