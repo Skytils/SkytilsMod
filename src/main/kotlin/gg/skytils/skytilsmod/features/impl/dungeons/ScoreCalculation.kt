@@ -18,7 +18,6 @@
 package gg.skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.elementa.state.BasicState
-import gg.essential.elementa.state.State
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.GuiManager
@@ -80,11 +79,48 @@ object ScoreCalculation {
         "default" to FloorRequirement()
     )
 
+    // Raw vars parsed from the dungeon
     // clear stuff
-    var completedRooms = BasicState(0)
-    var clearedPercentage = BasicState(0)
-    val totalRoomMap = mutableMapOf<Int, Int>()
-    val totalRooms = (clearedPercentage.zip(completedRooms)).map { (clear, complete) ->
+    private var completedRooms = BasicState(0)
+    private var clearedPercentage = BasicState(0)
+
+    // death stuff
+    private var deaths = BasicState(0)
+    var firstDeathHadSpirit = BasicState(false)
+
+    // puzzle stuff
+    private var missingPuzzles = BasicState(0).also {
+        it.onSetValue {
+            printDevMessage("missing puzzles $it", "scorecalcpuzzle")
+        }
+    }
+    private var failedPuzzles = BasicState(0)
+
+    // secrets stuff
+    var floorReq = BasicState(floorRequirements["default"]!!)
+    private var foundSecrets: BasicState<Int> = BasicState(0)
+    private var totalSecrets = BasicState(0)
+
+    // speed stuff
+    private var secondsElapsed = BasicState(0.0)
+
+    // bonus stuff
+    private var crypts = BasicState(0)
+    var mimicKilled = BasicState(false)
+    private var isPaul = BasicState(false)
+
+    init {
+        tickTimer(5, repeats = true) {
+            isPaul.set(
+                (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
+            )
+        }
+    }
+
+    // Calcs
+    //  Room clear %, used in Skill and Exploration scores
+    private val totalRoomMap = mutableMapOf<Int, Int>()
+    private val totalRooms = clearedPercentage.zip(completedRooms).map { (clear, complete) ->
         printDevMessage("total clear $clear complete $complete", "scorecalcroom")
         val a = if (clear > 0 && complete > 0) {
             (100 * (complete / clear.toDouble())).roundToInt()
@@ -94,85 +130,66 @@ object ScoreCalculation {
         totalRoomMap[a] = (totalRoomMap[a] ?: 0) + 1
         totalRoomMap.toList().maxByOrNull { it.second }!!.first
     }
-    val calcingCompletedRooms = completedRooms.map {
+    private val effectiveCompletedRooms = completedRooms.map {
         it + (!DungeonFeatures.hasBossSpawned).ifTrue(1) + (DungeonTimer.bloodClearTime == -1L).ifTrue(1)
     }
-    val calcingClearPercentage = calcingCompletedRooms.map { complete ->
+    private val effectiveClearPercentage = effectiveCompletedRooms.map { complete ->
         val total = totalRooms.get()
         printDevMessage("total $total complete $complete", "scorecalcroom")
         val a = if (total > 0) (complete / total.toDouble()).coerceAtMost(1.0) else 0.0
         printDevMessage("calced room clear $a", "scorecalcroom")
         a
     }
-    val roomClearScore = calcingClearPercentage.map {
-        (60 * it).coerceIn(0.0, 60.0)
+
+    //  death and puzzle penalty, used in Skill score
+    private val deathPenalty = deaths.zip(firstDeathHadSpirit).map { (deathCount, spirit) ->
+        (2 * deathCount) - spirit.ifTrue(1)
+    }
+    private val puzzlePenalty = missingPuzzles.zip(failedPuzzles).map { (missing, failed) ->
+        printDevMessage("puzzle penalty changed", "scorecalcpuzzle")
+        10 * (missing + failed)
     }
 
-    // secrets stuff
-    var floorReq = BasicState(floorRequirements["default"]!!)
-    var foundSecrets: State<Int> = BasicState(0).also { state ->
-        state.onSetValue {
-            updateText(totalScore.get())
-        }
-    }
-    var totalSecrets = BasicState(0)
-    var totalSecretsNeeded = (floorReq.zip(totalSecrets)).map { (req, total) ->
+    //  % of (max for score) secrets found, used in Explore score
+    private val maxScoreSecrets = floorReq.zip(totalSecrets).map { (req, total) ->
         if (total == 0) return@map 1
         ceil(total * req.secretPercentage).toInt()
     }
-    val percentageOfNeededSecretsFound = (foundSecrets.zip(totalSecretsNeeded)).map { (found, totalNeeded) ->
+    private val percentageOfMaxSecretsFound = foundSecrets.zip(maxScoreSecrets).map { (found, totalNeeded) ->
         found / totalNeeded.toDouble()
     }
-    val secretScore = (totalSecrets.zip(percentageOfNeededSecretsFound)).map { (total, percent) ->
+
+    //  seconds past the floor speed requirement
+    private val totalElapsed = secondsElapsed.zip(floorReq).map { (seconds, req) ->
+        seconds + 480 - req.speed
+    }
+
+    //  secret and clear score, both used in Explore score
+    private val secretScore = totalSecrets.zip(percentageOfMaxSecretsFound).map { (total, percent) ->
         if (total <= 0)
             0.0
         else
             (40f * percent).coerceIn(0.0, 40.0)
     }
-
-
-    val discoveryScore = (roomClearScore.zip(secretScore)).map { (clear, secret) ->
-        printDevMessage("clear $clear secret $secret", "scorecalcexplore")
-        if (DungeonFeatures.dungeonFloor == "E") (clear * 0.7).toInt() + (secret * 0.7).toInt()
-        else clear.toInt() + secret.toInt()
+    private val roomClearScore = effectiveClearPercentage.map {
+        (60 * it).coerceIn(0.0, 60.0)
     }
 
-
-    // death stuff
-    var deaths = BasicState(0)
-    var firstDeathHadSpirit = BasicState(false)
-    val deathPenalty = (deaths.zip(firstDeathHadSpirit)).map { (deathCount, spirit) ->
-        (2 * deathCount) - spirit.ifTrue(1)
-    }
-
-    // puzzle stuff
-    var missingPuzzles = BasicState(0).also {
-        it.onSetValue {
-            printDevMessage("missing puzzles $it", "scorecalcpuzzle")
-        }
-    }
-    var failedPuzzles = BasicState(0)
-    val puzzlePenalty = (missingPuzzles.zip(failedPuzzles)).map { (missing, failed) ->
-        printDevMessage("puzzle penalty changed", "scorecalcpuzzle")
-        10 * (missing + failed)
-    }
-
-    val skillScore = (calcingClearPercentage.zip(deathPenalty.zip(puzzlePenalty))).map { (clear, penalties) ->
+    // final scores
+    private val skillScore = effectiveClearPercentage.zip(deathPenalty.zip(puzzlePenalty)).map { (clear, penalties) ->
         printDevMessage("puzzle penalty ${penalties.second}", "scorecalcpuzzle")
         if (DungeonFeatures.dungeonFloor == "E")
             ((20.0 + clear * 80.0 - penalties.first - penalties.second) * 0.7).toInt()
         else (20.0 + clear * 80.0 - penalties.first - penalties.second).toInt()
     }
 
-    // speed stuff
-    var secondsElapsed = BasicState(0.0)
-    val overtime = (secondsElapsed.zip(floorReq)).map { (seconds, req) ->
-        seconds - req.speed
+    private val exploreScore = roomClearScore.zip(secretScore).map { (clear, secret) ->
+        printDevMessage("clear $clear secret $secret", "scorecalcexplore")
+        if (DungeonFeatures.dungeonFloor == "E") (clear * 0.7).toInt() + (secret * 0.7).toInt()
+        else clear.toInt() + secret.toInt()
     }
-    val totalElapsed = (secondsElapsed.zip(floorReq)).map { (seconds, req) ->
-        seconds + 480 - req.speed
-    }
-    val speedScore = totalElapsed.map { time ->
+
+    private val speedScore = totalElapsed.map { time ->
         if (DungeonFeatures.dungeonFloor == "E") {
             when {
                 time < 492.0 -> 70.0
@@ -194,19 +211,15 @@ object ScoreCalculation {
         }
     }
 
-    // bonus stuff
-    var crypts = BasicState(0)
-    var mimicKilled = BasicState(false)
-    var isPaul = BasicState(false)
-    val bonusScore = (crypts.zip(mimicKilled.zip(isPaul))).map { (crypts, bools) ->
+    private val bonusScore = crypts.zip(mimicKilled.zip(isPaul)).map { (crypts, bools) ->
         ((if (bools.first) 2 else 0) + crypts.coerceAtMost(5) + if (bools.second) 10 else 0)
     }
 
-    var hasSaid270 = false
-    var hasSaid300 = false
+    private var hasSaid270 = false
+    private var hasSaid300 = false
 
     val totalScore =
-        ((skillScore.zip(discoveryScore)).zip(speedScore.zip(bonusScore))).map { (first, second) ->
+        ((skillScore.zip(exploreScore)).zip(speedScore.zip(bonusScore))).map { (first, second) ->
             printDevMessage("skill score ${first.first}", "scorecalcpuzzle")
             printDevMessage(
                 "skill ${first.first} disc ${first.second} speed ${second.first} bonus ${second.second}",
@@ -243,7 +256,7 @@ object ScoreCalculation {
             }
         }
 
-    val rank: String
+    private val rank: String
         get() {
             val score = totalScore.get()
             return when {
@@ -273,7 +286,7 @@ object ScoreCalculation {
                 ScoreCalculationElement.text.add("§f• §eMissing Puzzles:§c ${missingPuzzles.get()}")
                 ScoreCalculationElement.text.add("§f• §eFailed Puzzles:§c ${failedPuzzles.get()}")
                 if (foundSecrets.get() > 0) ScoreCalculationElement.text.add(
-                    "§f• §eSecrets: ${if (foundSecrets.get() >= totalSecretsNeeded.get()) "§a" else "§c"}${foundSecrets.get()}§7/§a${totalSecretsNeeded.get()} " +
+                    "§f• §eSecrets: ${if (foundSecrets.get() >= maxScoreSecrets.get()) "§a" else "§c"}${foundSecrets.get()}§7/§a${maxScoreSecrets.get()} " +
                             if (floorReq.get().secretPercentage != 1.0) "§7(§6Total: ${totalSecrets.get()}§7)" else ""
                 )
                 ScoreCalculationElement.text.add("§f• §eCrypts:§a ${crypts.get()}")
@@ -287,7 +300,7 @@ object ScoreCalculation {
                 else
                     ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
                 ScoreCalculationElement.text.add(
-                    "§f• §eExplore Score:§a ${discoveryScore.get()} §7(§e${
+                    "§f• §eExplore Score:§a ${exploreScore.get()} §7(§e${
                         roomClearScore.get().toInt()
                     } §7+ §6${secretScore.get().toInt()}§7)"
                 )
@@ -421,14 +434,6 @@ object ScoreCalculation {
                 true
             )
             printDevMessage("you died. spirit: ${firstDeathHadSpirit.get()}", "scorecalcdeath")
-        }
-    }
-
-    init {
-        tickTimer(5, repeats = true) {
-            isPaul.set(
-                (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
-            )
         }
     }
 
