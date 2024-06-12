@@ -323,7 +323,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             SpiritLeap,
             TankDisplayStuff,
             TechnoMayor,
-            ThreeWeirdosSolver,
             VisitorHelper,
             EntityPlayerSPHook,
             MouseHelperHook
@@ -372,6 +371,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             StartsWithSequenceSolver,
             TeleportMazeSolver,
             TerminalFeatures,
+            ThreeWeirdosSolver,
             TicTacToeSolver,
             TreasureHunterSolver,
             TriviaSolver,

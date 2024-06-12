@@ -18,6 +18,11 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UChat
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.Skytils.mc
@@ -31,12 +36,8 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object ThreeWeirdosSolver {
+object ThreeWeirdosSolver : EventSubscriber {
     val solutions = hashSetOf<String>()
 
     var riddleNPC: String? = null
@@ -44,9 +45,12 @@ object ThreeWeirdosSolver {
     @JvmField
     var riddleChest: BlockPos? = null
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (event.type == 2.toByte()) return
+    override fun setup() {
+        register(::onChat, EventPriority.Highest)
+        register(::onWorldChange)
+    }
+
+    fun onChat(event: ChatMessageReceivedEvent) {
         if (!Skytils.config.threeWeirdosSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Three Weirdos")) return
         val formatted = event.message.formattedText
         if (formatted.startsWith("§a§lPUZZLE SOLVED!") && "wasn't fooled by " in formatted) {
@@ -78,8 +82,7 @@ object ThreeWeirdosSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         riddleNPC = null
         riddleChest = null
     }
