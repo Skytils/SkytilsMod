@@ -45,7 +45,8 @@ public class MixinMinecraft {
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/profiler/Profiler;endSection()V",
-                    shift = At.Shift.BEFORE
+                    shift = At.Shift.BEFORE,
+                    ordinal = 0
             )
     )
     private void tick(CallbackInfo ci) {
