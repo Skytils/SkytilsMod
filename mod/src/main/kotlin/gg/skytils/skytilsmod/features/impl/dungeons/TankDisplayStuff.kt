@@ -18,6 +18,9 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons
 
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.listeners.DungeonListener
@@ -26,14 +29,15 @@ import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.bindColor
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
-object TankDisplayStuff {
+object TankDisplayStuff : EventSubscriber {
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    override fun setup() {
+        register(::onRenderWorld)
+    }
+
+    fun onRenderWorld(event: WorldDrawEvent) {
         if (!Utils.inDungeons) return
         for (teammate in DungeonListener.team.values) {
             val player = teammate.player ?: continue
