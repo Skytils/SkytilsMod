@@ -27,7 +27,7 @@ import gg.skytils.skytilsmod.Skytils.json
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.TriviaSolver
 import gg.skytils.skytilsmod.features.impl.farming.FarmingFeatures
-import gg.skytils.skytilsmod.features.impl.farming.TreasureHunter
+import gg.skytils.skytilsmod.features.impl.farming.TreasureHunterSolver
 import gg.skytils.skytilsmod.features.impl.funny.skytilsplus.SheepifyRebellion
 import gg.skytils.skytilsmod.features.impl.handlers.Mayor
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
@@ -115,8 +115,8 @@ object DataFetcher {
                 }
                 get<Map<String, String>>("${dataUrl}solvers/treasurehunter.json") {
                     Utils.checkThreadAndQueue {
-                        TreasureHunter.treasureHunterLocations.clear()
-                        entries.associateTo(TreasureHunter.treasureHunterLocations) { (key, value) ->
+                        TreasureHunterSolver.treasureHunterLocations.clear()
+                        entries.associateTo(TreasureHunterSolver.treasureHunterLocations) { (key, value) ->
                             key to value.split(",").map { it.toDouble() }
                                 .run { BlockPos(this[0], this[1], this[2]) }
                         }

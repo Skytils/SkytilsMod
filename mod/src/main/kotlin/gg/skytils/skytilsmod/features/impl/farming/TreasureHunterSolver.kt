@@ -19,6 +19,11 @@ package gg.skytils.skytilsmod.features.impl.farming
 
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.Skytils.successPrefix
@@ -27,23 +32,23 @@ import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 
-object TreasureHunter {
+object TreasureHunterSolver : EventSubscriber {
 
     val treasureHunterLocations = LinkedHashMap<String, BlockPos>()
     private var treasureLocation: BlockPos? = null
 
-    @SubscribeEvent
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type == 2.toByte()) return
+    override fun setup() {
+        register(::onChat, EventPriority.Highest)
+        register(::onRenderWorld)
+    }
+
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (!Utils.inSkyblock) return
 
         val formatted = event.message.formattedText
-        val unformatted = event.message.unformattedText.stripControlCodes()
 
         if (formatted == "§r§aYou found a treasure chest!§r") {
             treasureLocation = null
@@ -54,6 +59,7 @@ object TreasureHunter {
                 DataFetcher.reloadData()
                 return
             }
+            val unformatted = event.message.unformattedText.stripControlCodes()
             val solution =
                 treasureHunterLocations.getOrDefault(treasureHunterLocations.keys.find { s: String ->
                     unformatted.contains(s)
@@ -65,8 +71,7 @@ object TreasureHunter {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: WorldDrawEvent) {
         if (!Utils.inSkyblock || treasureLocation == null || SBInfo.mode != SkyblockIsland.FarmingIsland.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()

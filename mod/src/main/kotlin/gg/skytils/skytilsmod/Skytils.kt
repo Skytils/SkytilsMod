@@ -47,7 +47,7 @@ import gg.skytils.skytilsmod.features.impl.events.MayorJerry
 import gg.skytils.skytilsmod.features.impl.events.TechnoMayor
 import gg.skytils.skytilsmod.features.impl.farming.FarmingFeatures
 import gg.skytils.skytilsmod.features.impl.farming.GardenFeatures
-import gg.skytils.skytilsmod.features.impl.farming.TreasureHunter
+import gg.skytils.skytilsmod.features.impl.farming.TreasureHunterSolver
 import gg.skytils.skytilsmod.features.impl.farming.VisitorHelper
 import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.features.impl.handlers.*
@@ -324,7 +324,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             TankDisplayStuff,
             TechnoMayor,
             ThreeWeirdosSolver,
-            TreasureHunter,
             VisitorHelper,
             EntityPlayerSPHook,
             MouseHelperHook
@@ -374,6 +373,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             TeleportMazeSolver,
             TerminalFeatures,
             TicTacToeSolver,
+            TreasureHunterSolver,
             TriviaSolver,
             TrophyFish,
             VisitorHelper,
