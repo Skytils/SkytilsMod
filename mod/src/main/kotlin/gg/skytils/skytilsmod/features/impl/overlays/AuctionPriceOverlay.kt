@@ -21,7 +21,7 @@ import gg.essential.universal.UKeyboard
 import gg.essential.universal.UResolution
 import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
-import gg.skytils.event.impl.screen.KeyInputEvent
+import gg.skytils.event.impl.screen.ScreenKeyInputEvent
 import gg.skytils.event.impl.screen.ScreenOpenEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
@@ -76,7 +76,7 @@ object AuctionPriceOverlay : EventSubscriber {
         }
     }
 
-    fun onGuiKey(event: KeyInputEvent) {
+    fun onGuiKey(event: ScreenKeyInputEvent) {
         if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
         if (event.screen is GuiChest && Keyboard.getEventKeyState() && Keyboard.getEventKey() == UKeyboard.KEY_ENTER) {
             if (Utils.equalsOneOf(
