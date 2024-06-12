@@ -20,6 +20,7 @@ package gg.skytils.event.impl.entity
 
 import gg.skytils.event.CancellableEvent
 import net.minecraft.entity.Entity
+import net.minecraft.entity.boss.IBossDisplayData
 
 /**
  * [gg.skytils.event.mixins.world.MixinWorld.spawnEntityInWorld]
@@ -27,3 +28,11 @@ import net.minecraft.entity.Entity
  * [gg.skytils.event.mixins.world.MixinWorld.joinEntityInSurroundings]
  */
 class EntityJoinWorldEvent(val entity: Entity) : CancellableEvent()
+
+
+/**
+ * [gg.skytils.event.mixins.entity.MixinBossStatus.onSetBossStatus]
+ *
+ * TODO: find better mixin
+ */
+class BossBarSetEvent(val data: IBossDisplayData, val hasColorModifier: Boolean) : CancellableEvent()
