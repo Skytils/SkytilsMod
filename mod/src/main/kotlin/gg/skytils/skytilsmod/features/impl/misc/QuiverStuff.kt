@@ -19,10 +19,12 @@
 package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UResolution
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
@@ -32,9 +34,8 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object QuiverStuff {
+object QuiverStuff : EventSubscriber {
     private val activeArrowRegex = Regex("§7Active Arrow: (?<type>§.[\\w -]+) §7\\(§e(?<amount>\\d+)§7\\)")
 
     private var selectedType: String = ""
@@ -46,8 +47,11 @@ object QuiverStuff {
         SelectedArrowDisplay
     }
 
-    @SubscribeEvent
-    fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
+    override fun setup() {
+        register(::onReceivePacket)
+    }
+
+    fun onReceivePacket(event: MainThreadPacketReceiveEvent<*>) {
         if (!Utils.inSkyblock || event.packet !is S2FPacketSetSlot || event.packet.func_149173_d() != 44) return
         val stack = event.packet.func_149174_e() ?: return
         if (!Utils.equalsOneOf(stack.item, Items.arrow, Items.feather)) return
