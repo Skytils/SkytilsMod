@@ -18,13 +18,14 @@
 
 package gg.skytils.skytilsmod.features.impl.misc
 
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageSentEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import gg.skytils.skytilsmod.utils.Utils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object PartyFeatures {
+object PartyFeatures : EventSubscriber {
     private val subCommands =
         setOf(
             "help",
@@ -45,9 +46,12 @@ object PartyFeatures {
             "join"
         )
 
-    @SubscribeEvent
-    fun onChatSend(event: SendChatMessageEvent) {
-        if (!Skytils.config.multiplePartyInviteFix || !Utils.isOnHypixel || !event.addToChat) return
+    override fun setup() {
+        register(::onChatSend)
+    }
+
+    fun onChatSend(event: ChatMessageSentEvent) {
+        if (!Skytils.config.multiplePartyInviteFix || !Utils.isOnHypixel || !event.addToHistory) return
 
         val m = event.message
         if (!m.startsWith("/p ") && !m.startsWith("/party ")) return
@@ -64,7 +68,7 @@ object PartyFeatures {
             Skytils.sendMessageQueue.add("/p invite $it")
         }
 
-        event.isCanceled = true
+        event.cancelled = true
         mc.ingameGUI.chatGUI.addToSentMessages(m)
 
     }
