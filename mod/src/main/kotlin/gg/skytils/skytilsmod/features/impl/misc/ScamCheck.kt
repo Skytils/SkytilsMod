@@ -20,11 +20,13 @@ package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.client
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.MojangUtil
 import gg.skytils.skytilsmod.utils.Utils
@@ -37,18 +39,20 @@ import net.minecraft.item.ItemStack
 import net.minecraft.network.play.server.S2DPacketOpenWindow
 import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.network.play.server.S30PacketWindowItems
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 
-object ScamCheck {
+object ScamCheck : EventSubscriber {
     // it caps out at 10 characters for otherParty
     private val tradingRegex = Regex("You {18}(?<otherParty>\\w{1,16})")
     private val tradingWithRegex = Regex("§7Trading with.*? (?<otherParty>\\w{1,16})§f§7\\.")
     private var tradingWindowId = -1
     private var scamChecked = false
 
-    @SubscribeEvent
-    fun onPacket(event: MainReceivePacketEvent<*, *>) {
+    override fun setup() {
+        register(::onPacket)
+    }
+
+    fun onPacket(event: MainThreadPacketReceiveEvent<*>) {
         if (!Utils.inSkyblock || !Skytils.config.scamCheck) return
         when (val packet = event.packet) {
             is S2DPacketOpenWindow -> {
