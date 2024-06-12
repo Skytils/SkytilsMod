@@ -19,24 +19,24 @@ package gg.skytils.skytilsmod.features.impl.spidersden
 
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.BlockPos
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 
-object SpidersDenFeatures {
+object SpidersDenFeatures : EventSubscriber {
     private var shouldShowArachneSpawn = false
     private var arachneName: String? = null
 
@@ -44,18 +44,22 @@ object SpidersDenFeatures {
         ArachneHPElement()
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    override fun setup() {
+        register(::onTick)
+        register(::onChat)
+        register(::onWorldRender)
+        register(::onWorldChange)
+    }
+
+    fun onTick(event: TickEvent) {
         arachneName =
             if (!Utils.inSkyblock || SBInfo.mode != SkyblockIsland.SpiderDen.mode || !Skytils.config.showArachneHP) null else mc.theWorld?.loadedEntityList?.find {
                 val name = it.displayName.formattedText
-                name.endsWith("§c❤") && (name.contains("§cArachne §") || name.contains("§5Runic Arachne §"))
+                it is EntityArmorStand && name.endsWith("§c❤") && (name.contains("§cArachne §") || name.contains("§5Runic Arachne §"))
             }?.displayName?.formattedText
     }
 
-    @SubscribeEvent
-    fun onChat(event: ClientChatReceivedEvent) {
+    fun onChat(event: ChatMessageReceivedEvent) {
         if (!Utils.inSkyblock) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (unformatted.startsWith("☄") && (unformatted.contains("placed an Arachne Fragment! (") || unformatted.contains(
@@ -69,8 +73,7 @@ object SpidersDenFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: WorldDrawEvent) {
         if (shouldShowArachneSpawn && Skytils.config.showArachneSpawn) {
             val spawnPos = BlockPos(-282, 49, -178)
             val matrixStack = UMatrixStack()
@@ -83,8 +86,7 @@ object SpidersDenFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         shouldShowArachneSpawn = false
         arachneName = null
     }
