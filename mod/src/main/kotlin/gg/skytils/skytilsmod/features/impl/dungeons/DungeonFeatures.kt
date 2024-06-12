@@ -20,33 +20,43 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.entity.BossBarSetEvent
+import gg.skytils.event.impl.entity.LivingEntityDeathEvent
+import gg.skytils.event.impl.item.ItemTooltipEvent
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.ChatMessageSentEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.CheckRenderEntityEvent
+import gg.skytils.event.impl.render.LivingEntityPreRenderEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.impl.screen.ScreenOpenEvent
+import gg.skytils.event.impl.world.BlockStateUpdateEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.Skytils.prefix
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
-import gg.skytils.skytilsmod.events.impl.*
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorC0EPacketClickWindow
-import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.ItemUtil.setLore
 import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
@@ -58,31 +68,16 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemSkull
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.*
-import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
-import net.minecraft.util.EnumChatFormatting
-import net.minecraft.world.World
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.entity.living.LivingDeathEvent
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 
-object DungeonFeatures {
+object DungeonFeatures : EventSubscriber {
     private val deathOrPuzzleFail =
         Regex("^ ☠ .+ and became a ghost\\.$|^PUZZLE FAIL! .+$|^\\[STATUE] Oruo the Omniscient: .+ chose the wrong answer!")
     private val thornMissMessages = arrayOf(
@@ -130,8 +125,27 @@ object DungeonFeatures {
         SpiritBearSpawnTimer()
     }
 
-    @SubscribeEvent
-    fun onBlockChange(event: BlockChangeEvent) {
+    override fun setup() {
+        register(::onBlockChange)
+        register(::onReceivePacketHighest, EventPriority.Highest)
+        register(::onTick)
+        register(::onTickLowest, EventPriority.Lowest)
+        register(::onPacketSend, EventPriority.Highest)
+        register(::onDeath, EventPriority.Highest)
+        register(::onChat, EventPriority.Highest)
+        register(::onSendChatMessage)
+        register(::onRenderLivingPre)
+        register(::onRenderWorld)
+        register(::onReceivePacket, EventPriority.Lowest)
+        register(::onGuiOpen)
+        register(::onSlotClick, EventPriority.High)
+        register(::onTooltip, EventPriority.Lowest)
+        register(::onWorldChange)
+        register(::onBossBarSet)
+        register(::onCheckRender)
+    }
+
+    fun onBlockChange(event: BlockStateUpdateEvent) {
         if (hasBossSpawned && Skytils.config.spiritBearTimer && dungeonFloor?.endsWith('4') == true) {
             if (event.pos == lastBlockPos) {
                 lastLitUpTime =
@@ -146,8 +160,7 @@ object DungeonFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onReceivePacketHighest(event: ReceiveEvent) {
+    fun onReceivePacketHighest(event: PacketReceiveEvent<*>) {
         event.apply {
             if (hasBossSpawned && Skytils.config.spiritBearTimer && dungeonFloor?.endsWith('4') == true) {
                 when (packet) {
@@ -177,9 +190,8 @@ object DungeonFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
+    fun onTick(event: TickEvent) {
+        if (mc.thePlayer == null || mc.theWorld == null) return
         if (Utils.inDungeons) {
             if (dungeonFloor == null) {
                 ScoreboardUtil.sidebarLines.find {
@@ -225,9 +237,9 @@ object DungeonFeatures {
 
     var fakeDungeonMap: ItemStack? = null
     var intendedItemStack: ItemStack? = null
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTickLowest(event: ClientTickEvent) {
-        if (!Utils.inDungeons && event.phase != TickEvent.Phase.START) return
+
+    fun onTickLowest(event: TickEvent) {
+        if (!Utils.inDungeons) return
         if (Skytils.config.injectFakeDungeonMap && DungeonTimer.bossEntryTime == -1L) {
             (DungeonInfo.dungeonMap ?: DungeonInfo.guessMapData)?.let {
                 val slot = mc.thePlayer?.inventory?.getStackInSlot(8)
@@ -255,19 +267,17 @@ object DungeonFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onPacketSend(event: PacketEvent.SendEvent) {
+    fun onPacketSend(event: PacketSendEvent<*>) {
         if (fakeDungeonMap != null && event.packet is C0EPacketClickWindow && event.packet.clickedItem == fakeDungeonMap) {
             (event.packet as AccessorC0EPacketClickWindow).setClickedItem(intendedItemStack)
         }
     }
 
-    @SubscribeEvent
-    fun onBossBarSet(event: BossBarEvent.Set) {
+    fun onBossBarSet(event: BossBarSetEvent) {
         if (!Utils.inDungeons) return
-        val displayData = event.displayData
-        val unformatted = event.displayData.displayName.unformattedText.stripControlCodes()
-        if (equalsOneOf(dungeonFloor, "F7", "M7")) {
+        val displayData = event.data
+        val unformatted = displayData.displayName.unformattedText.stripControlCodes()
+        if (dungeonFloorNumber == 7) {
             if (equalsOneOf(unformatted, "Maxor", "Storm", "Goldor", "Necron")) {
                 when (Skytils.config.necronHealth) {
                     2 -> {
@@ -278,7 +288,7 @@ object DungeonFeatures {
                             BossStatus.healthScale * 100
                         ) + "%"
                         BossStatus.hasColorModifier = event.hasColorModifier
-                        event.isCanceled = true
+                        event.cancelled = true
                     }
 
                     1 -> {
@@ -296,7 +306,7 @@ object DungeonFeatures {
                             (BossStatus.healthScale * health).toLong()
                         ) + "§r§8/§r§a${NumberUtil.format(health)}§r§c❤"
                         BossStatus.hasColorModifier = event.hasColorModifier
-                        event.isCanceled = true
+                        event.cancelled = true
                     }
 
                     0 -> {
@@ -305,23 +315,22 @@ object DungeonFeatures {
             }
             return
         }
-        if (equalsOneOf(dungeonFloor, "F6", "M6")) {
+        if (dungeonFloorNumber == 6) {
             if (terracottaEndTime == -1.0) {
                 if (unformatted.contains("Sadan's Interest Level")) {
                     val length = if (dungeonFloor == "F6") 105 else 115
                     terracottaEndTime = System.currentTimeMillis().toDouble() / 1000f + length
                 }
             } else if (terracottaEndTime > 0 && Skytils.config.showSadanInterest) {
-                event.isCanceled = true
+                event.cancelled = true
             }
             return
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onDeath(event: LivingDeathEvent) {
+    fun onDeath(event: LivingEntityDeathEvent) {
         if (!Utils.inDungeons) return
-        if (event.entityLiving is EntityOtherPlayerMP && terracottaEndTime > 0 && event.entityLiving.name == "Terracotta ") {
+        if (event.entity is EntityOtherPlayerMP && terracottaEndTime > 0 && event.entity.name == "Terracotta ") {
             //for some reason this event fires twice for players
             printDevMessage("terracotta died", "terracotta")
             terracottaEndTime -= 1
@@ -331,9 +340,8 @@ object DungeonFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type == 2.toByte()) return
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (!Utils.inSkyblock) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Utils.inDungeons) {
             if (Skytils.config.autoCopyFailToClipboard) {
@@ -364,7 +372,7 @@ object DungeonFeatures {
                     )
                 }
             ) {
-                event.isCanceled = true
+                event.cancelled = true
             }
             if (unformatted.startsWith("[BOSS]") && unformatted.contains(":")) {
                 val bossName = unformatted.substringAfter("[BOSS] ").substringBefore(":").trim()
@@ -387,24 +395,22 @@ object DungeonFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onSendChatMessage(event: SendChatMessageEvent) {
-        if (event.message.startsWith("/skytilscopy") && !event.addToChat) {
+    fun onSendChatMessage(event: ChatMessageSentEvent) {
+        if (event.message.startsWith("/skytilscopy") && !event.addToHistory) {
             UChat.chat("$prefix §aCopied to clipboard.")
             GuiScreen.setClipboardString(event.message.substring("/skytilscopy ".length))
-            event.isCanceled = true
+            event.cancelled = true
         }
     }
 
-    @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!Utils.inDungeons) return
-        if (Skytils.config.hideArcherBonePassive && event.entity is EntityItem && event.entity.entityItem.itemDamage == 15 && event.entity.entityItem.item === Items.dye)
-            event.isCanceled = true
+        val entity = event.entity
+        if (Skytils.config.hideArcherBonePassive && (entity as? EntityItem)?.entityItem?.itemDamage == 15 && entity.entityItem.item === Items.dye)
+            event.cancelled = true
     }
 
-    @SubscribeEvent
-    fun onRenderLivingPre(event: RenderLivingEvent.Pre<*>) {
+    fun onRenderLivingPre(event: LivingEntityPreRenderEvent<*>) {
         if (Utils.inDungeons) {
             val matrixStack = UMatrixStack()
             if (Skytils.config.boxSpiritBow && hasBossSpawned && event.entity.isInvisible && equalsOneOf(
@@ -450,7 +456,7 @@ object DungeonFeatures {
                     }
                 }
                 if (Skytils.config.hideFairies && event.entity.heldItem != null && ItemUtil.getSkullTexture(event.entity.heldItem) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTZjM2UzMWNmYzY2NzMzMjc1YzQyZmNmYjVkOWE0NDM0MmQ2NDNiNTVjZDE0YzljNzdkMjczYTIzNTIifX19") {
-                    event.isCanceled = true
+                    event.cancelled = true
                 }
             }
             if (!mc.renderManager.isDebugBoundingBox) {
@@ -541,8 +547,7 @@ object DungeonFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: WorldDrawEvent) {
         val stack = UMatrixStack()
         GlStateManager.disableCull()
         GlStateManager.disableDepth()
@@ -561,8 +566,7 @@ object DungeonFeatures {
         GlStateManager.enableDepth()
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
+    fun onReceivePacket(event: MainThreadPacketReceiveEvent<*>) {
         if (!Utils.inSkyblock) return
         if (event.packet is S45PacketTitle) {
             val packet = event.packet
@@ -572,13 +576,13 @@ object DungeonFeatures {
                         "activated a terminal!"
                     ) || unformatted.contains("completed a device!") || unformatted.contains("activated a lever!"))
                 ) {
-                    event.isCanceled = true
+                    event.cancelled = true
                     runCatching {
                         val slash = unformatted.indexOf("/")
                         val numBeforeSlash = unformatted[slash - 1].digitToInt()
                         val numAfterSlash = unformatted[slash + 1].digitToInt()
                         if (numBeforeSlash == 0 || numBeforeSlash == numAfterSlash) {
-                            event.isCanceled = false
+                            event.cancelled = false
                         }
                     }
                 }
@@ -590,19 +594,17 @@ object DungeonFeatures {
                 val sound = packet.soundName
                 val pitch = packet.pitch
                 val volume = packet.volume
-                if (sound == "game.player.hurt" && pitch == 0f && volume == 0f) event.isCanceled = true
-                if (sound == "random.eat" && pitch == 0.6984127f && volume == 1f) event.isCanceled = true
+                if (sound == "game.player.hurt" && pitch == 0f && volume == 0f) event.cancelled = true
+                if (sound == "random.eat" && pitch == 0.6984127f && volume == 1f) event.cancelled = true
             }
         }
     }
 
-    @SubscribeEvent
-    fun onGuiOpen(event: GuiOpenEvent) {
+    fun onGuiOpen(event: ScreenOpenEvent) {
         rerollClicks = 0
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onSlotClick(event: SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
         if (!Utils.inDungeons) return
         if (event.container is ContainerChest) {
             val chestName = event.chestName
@@ -612,7 +614,7 @@ object DungeonFeatures {
                         rerollClicks++
                         val neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks
                         if (neededClicks > 0) {
-                            event.isCanceled = true
+                            event.cancelled = true
                         }
                     }
                 }
@@ -624,7 +626,7 @@ object DungeonFeatures {
                                 1
                             )?.toIntOrNull() ?: 0)
                         if (teamCount < 5) {
-                            event.isCanceled = true
+                            event.cancelled = true
                             EssentialAPI.getNotifications()
                                 .push(
                                     "Party only has $teamCount members!",
@@ -641,25 +643,21 @@ object DungeonFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
-        if (event.itemStack != null) {
-            if (Utils.inDungeons && Skytils.config.kismetRerollConfirm > 0 && ItemUtil.getDisplayName(event.itemStack)
-                    .contains("Reroll") && SBInfo.lastOpenContainerName?.endsWith(" Chest") == true
-            ) {
-                for (i in event.toolTip.indices) {
-                    if (event.toolTip[i].contains("Click to reroll")) {
-                        val neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks
-                        event.toolTip[i] = "§eClick §a$neededClicks§e times to reroll this chest!"
-                        break
-                    }
+        if (Utils.inDungeons && Skytils.config.kismetRerollConfirm > 0 && ItemUtil.getDisplayName(event.stack)
+                .contains("Reroll") && SBInfo.lastOpenContainerName?.endsWith(" Chest") == true
+        ) {
+            for (i in event.tooltip.indices) {
+                if (event.tooltip[i].contains("Click to reroll")) {
+                    val neededClicks = Skytils.config.kismetRerollConfirm - rerollClicks
+                    event.tooltip[i] = "§eClick §a$neededClicks§e times to reroll this chest!"
+                    break
                 }
             }
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         dungeonFloor = null
         hasBossSpawned = false
         isInTerracottaPhase = false
