@@ -19,11 +19,13 @@
 package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UChat
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.Skytils.prefix
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.core.structure.GuiElement
-import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorServerListEntryNormal
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
@@ -36,11 +38,10 @@ import net.minecraft.client.network.OldServerPinger
 import net.minecraft.network.play.client.C16PacketClientStatus
 import net.minecraft.network.play.server.S01PacketJoinGame
 import net.minecraft.network.play.server.S37PacketStatistics
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
-object Ping {
+object Ping : EventSubscriber {
 
     var lastPingAt = -1L
 
@@ -50,6 +51,10 @@ object Ping {
 
     val oldServerPinger = OldServerPinger()
     var lastOldServerPing = 0L
+
+    override fun setup() {
+        register(::onPacket)
+    }
 
     fun sendPing() {
         if (lastPingAt > 0) {
@@ -64,8 +69,7 @@ object Ping {
         )
     }
 
-    @SubscribeEvent
-    fun onPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacket(event: PacketReceiveEvent<*>) {
         if (lastPingAt > 0) {
             when (event.packet) {
                 is S01PacketJoinGame -> {
