@@ -18,9 +18,12 @@
 package gg.skytils.skytilsmod.features.impl.spidersden
 
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent.SendEvent
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.serialization.builtins.ListSerializer
@@ -31,19 +34,22 @@ import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.Reader
 import java.io.Writer
 
-object RelicWaypoints : Tracker("found_spiders_den_relics") {
+object RelicWaypoints : Tracker("found_spiders_den_relics"), EventSubscriber {
     val relicLocations = hashSetOf<BlockPos>()
     val foundRelics = hashSetOf<BlockPos>()
     private val rareRelicLocations = hashSetOf<BlockPos>()
 
-    @SubscribeEvent
-    fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
+    override fun setup() {
+        register(::onReceivePacket)
+        register(::onSendPacket)
+        register(::onWorldRender)
+    }
+
+    fun onReceivePacket(event: MainThreadPacketReceiveEvent<*>) {
         if (!Utils.inSkyblock) return
         if (event.packet is S2APacketParticles) {
             if (Skytils.config.rareRelicFinder) {
@@ -56,8 +62,7 @@ object RelicWaypoints : Tracker("found_spiders_den_relics") {
         }
     }
 
-    @SubscribeEvent
-    fun onSendPacket(event: SendEvent) {
+    fun onSendPacket(event: PacketSendEvent<*>) {
         if (!Utils.inSkyblock) return
         if (SBInfo.mode != SkyblockIsland.SpiderDen.mode) return
         if (event.packet is C08PacketPlayerBlockPlacement) {
@@ -70,8 +75,7 @@ object RelicWaypoints : Tracker("found_spiders_den_relics") {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: WorldDrawEvent) {
         if (!Utils.inSkyblock) return
         if (SBInfo.mode != SkyblockIsland.SpiderDen.mode) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
