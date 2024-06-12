@@ -12,6 +12,7 @@
     "network.MixinNetworkManager",
     "render.MixinGameRenderer",
     "render.MixinRendererLivingEntity",
+    "render.MixinRenderManager",
     "world.MixinWorld"
   ],
   "verbose": true,
