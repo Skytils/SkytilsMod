@@ -161,20 +161,19 @@ object MiningFeatures {
     @SubscribeEvent
     fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
-        if (event.slot.hasStack) {
-            val item = event.slot.stack
-            if (Skytils.config.highlightDisabledHOTMPerks && SBInfo.lastOpenContainerName == "Heart of the Mountain") {
-                if (ItemUtil.getItemLore(item).any { it == "§c§lDISABLED" }) {
-                    event.slot highlight Color(255, 0, 0)
-                }
+        if (!event.slot.hasStack) return
+        if (Skytils.config.highlightDisabledHOTMPerks && SBInfo.lastOpenContainerName == "Heart of the Mountain") {
+            if (ItemUtil.getItemLore(event.slot.stack).any { it == "§c§lDISABLED" }) {
+                event.slot highlight Color(255, 0, 0)
             }
-            if (Skytils.config.highlightCompletedCommissions && SBInfo.lastOpenContainerName.equals("Commissions")) {
-                if (item.displayName.startsWith("§6Commission #") && item.item == Items.writable_book) {
-                    if (ItemUtil.getItemLore(item).any {
-                            it == "§eClick to claim rewards!"
-                        }) {
-                        event.slot highlight Color(255, 0, 0)
-                    }
+        }
+        if (Skytils.config.highlightCompletedCommissions && SBInfo.lastOpenContainerName.equals("Commissions")) {
+            val item = event.slot.stack
+            if (item.displayName.startsWith("§6Commission #") && item.item == Items.writable_book) {
+                if (ItemUtil.getItemLore(item).any {
+                        it == "§eClick to claim rewards!"
+                    }) {
+                    event.slot highlight Color(255, 0, 0)
                 }
             }
         }
