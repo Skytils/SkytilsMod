@@ -449,14 +449,25 @@ object Config : Vigilant(
     var showScoreCalculation = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Minimized Dungeon Score Estimate",
-        description = "Only shows the dungeon score.",
+        type = PropertyType.SELECTOR, name = "Dungeon Score Estimate Style",
+        description = "Change the style of the Score Estimate",
         category = "Dungeons", subcategory = "Score Calculation",
-        i18nName = "skytils.config.dungeons.score_calculation.minimized_dungeon_score_estimate",
+        options = ["Standard", "Minimized", "Bettermap"],
+        i18nName = "skytils.config.dungeons.score_calculation.dungeon_score_estimate_style",
         i18nCategory = "skytils.config.dungeons",
         i18nSubcategory = "skytils.config.dungeons.score_calculation"
     )
-    var minimizedScoreCalculation = false
+    var scoreCalculationStyle = 0
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Score Estimate In Boss",
+        description = "Hides the score estimate when in a dungeon boss room",
+        category = "Dungeons", subcategory = "Score Calculation",
+        i18nName = "skytils.config.dungeons.score_calculation.hide_score_estimate_in_boss",
+        i18nCategory = "skytils.config.dungeons",
+        i18nSubcategory = "skytils.config.dungeons.score_calculation"
+    )
+    var hideScoreEstimateBoss = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Score Calculation Party Assist",
