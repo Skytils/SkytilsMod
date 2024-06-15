@@ -51,6 +51,8 @@ import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.jvm.jvmName
 
 object DataFetcher {
+    var job: Job? = null
+
     private fun loadData(): Job {
         return Skytils.IO.launch {
             try {
@@ -213,8 +215,13 @@ object DataFetcher {
         }
 
     @JvmStatic
-    fun reloadData() =
-        loadData()
+    fun reloadData() {
+        if (job?.isActive != true) {
+            job = loadData()
+        } else {
+            UChat.chat("$failPrefix §cData fetch requested while already fetching!")
+        }
+    }
 
     internal fun preload() {}
 

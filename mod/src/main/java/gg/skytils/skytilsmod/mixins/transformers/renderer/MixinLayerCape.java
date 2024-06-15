@@ -38,7 +38,7 @@ public abstract class MixinLayerCape implements LayerRenderer<AbstractClientPlay
 
     @Inject(method = "doRenderLayer(Lnet/minecraft/client/entity/AbstractClientPlayer;FFFFFFF)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;pushMatrix()V", shift = At.Shift.AFTER))
     private void scaleChild(AbstractClientPlayer entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, CallbackInfo ci) {
-        if (this.playerRenderer.getMainModel().isChild) {
+        if (this.playerRenderer.getMainModel().isChild || entity.isChild()) {
             GlStateManager.scale(0.5, 0.5, 0.5);
             GlStateManager.translate(0.0F, 24.0F * scale, 0.0F);
         }

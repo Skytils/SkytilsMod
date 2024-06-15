@@ -1,0 +1,11 @@
+{
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8",
+  "plugin": "gg.skytils.skytilsmod.mixins.SkytilsMixinInitPlugin",
+  "package": "gg.skytils.skytilsmod.mixins.transformers.init",
+  "refmap": "mixins.skytils-init.refmap.json",
+  "target": "@env(PREINIT)",
+  "priority": 999,
+  "mixins": [],
+  "verbose": true
+}

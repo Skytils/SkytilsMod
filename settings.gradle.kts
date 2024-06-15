@@ -64,3 +64,4 @@ listOf(
 }
 includeBuild("events")
 includeBuild("hypixel-api/types")
+includeBuild("ws-shared")

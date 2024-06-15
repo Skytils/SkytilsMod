@@ -27,6 +27,7 @@ import gg.skytils.event.impl.TickEvent
 import gg.skytils.event.impl.network.ClientDisconnectEvent
 import gg.skytils.event.impl.screen.ScreenOpenEvent
 import gg.skytils.event.register
+import gg.skytils.skytilsmod._event.HypixelPacketFailedEvent
 import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.commands.impl.*
@@ -51,6 +52,7 @@ import gg.skytils.skytilsmod.features.impl.farming.TreasureHunterSolver
 import gg.skytils.skytilsmod.features.impl.farming.VisitorHelper
 import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.features.impl.handlers.*
+import gg.skytils.skytilsmod.features.impl.mining.CHWaypoints
 import gg.skytils.skytilsmod.features.impl.mining.MiningFeatures
 import gg.skytils.skytilsmod.features.impl.mining.CHTreasureChestHelper
 import gg.skytils.skytilsmod.features.impl.misc.*
@@ -66,6 +68,7 @@ import gg.skytils.skytilsmod.gui.OptionsGui
 import gg.skytils.skytilsmod.gui.ReopenableGUI
 import gg.skytils.skytilsmod.listeners.ChatListener
 import gg.skytils.skytilsmod.listeners.DungeonListener
+import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor
 import gg.skytils.skytilsmod.localapi.LocalAPI
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import gg.skytils.skytilsmod.mixins.hooks.entity.EntityPlayerSPHook
@@ -77,6 +80,7 @@ import gg.skytils.skytilsmod.tweaker.DependencyLoader
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
+import gg.skytils.skytilsws.client.WSClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
@@ -205,6 +209,23 @@ object Skytils : CoroutineScope, EventSubscriber {
         }
     }
 
+    val trustManager by lazy {
+        val backingManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
+            init(null as KeyStore?)
+        }.trustManagers.first { it is X509TrustManager } as X509TrustManager
+
+        val ourManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
+            Skytils::class.java.getResourceAsStream("/skytilscacerts.jks").use {
+                val ourKs = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
+                    load(it, "skytilsontop".toCharArray())
+                }
+                init(ourKs)
+            }
+        }.trustManagers.first { it is X509TrustManager } as X509TrustManager
+
+        UnionX509TrustManager(backingManager, ourManager)
+    }
+
     val client = HttpClient(CIO) {
         install(ContentEncoding) {
             customEncoder(BrotliEncoder, 1.0F)
@@ -234,20 +255,7 @@ object Skytils : CoroutineScope, EventSubscriber {
                 socketTimeout = 10000
             }
             https {
-                val backingManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
-                    init(null as KeyStore?)
-                }.trustManagers.first { it is X509TrustManager } as X509TrustManager
-
-                val ourManager = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm()).apply {
-                    Skytils::class.java.getResourceAsStream("/skytilscacerts.jks").use {
-                        val ourKs = KeyStore.getInstance(KeyStore.getDefaultType()).apply {
-                            load(it, "skytilsontop".toCharArray())
-                        }
-                        init(ourKs)
-                    }
-                }.trustManagers.first { it is X509TrustManager } as X509TrustManager
-
-                trustManager = UnionX509TrustManager(backingManager, ourManager)
+                trustManager = Skytils.trustManager
             }
         }
     }
@@ -344,6 +352,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             Catlas,
             ChangeAllToSameColorSolver,
             CHTreasureChestHelper,
+            CHWaypoints,
             ClickInOrderSolver,
             CommandAliases,
             ContainerSellValue,
@@ -362,6 +371,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             RelicWaypoints,
             ScamCheck,
             SelectAllColorSolver,
+            ServerPayloadInterceptor,
             ShootTheTargetSolver,
             SimonSaysSolver,
             SpidersDenFeatures,
@@ -538,12 +548,19 @@ object Skytils : CoroutineScope, EventSubscriber {
         }
     }
 
+    fun onHypixelPacketFail(event: HypixelPacketFailedEvent) {
+        UChat.chat("$failPrefix Mod API request failed: ${event.reason}")
+    }
+
     fun onPacket(event: MainThreadPacketReceiveEvent<*>) {
         if (event.packet is S01PacketJoinGame) {
             Utils.skyblock = false
             Utils.dungeons = false
             IO.launch {
                 TrophyFish.loadFromApi()
+            }
+            IO.launch {
+                WSClient.openConnection()
             }
         }
         //#if MC<11400
@@ -575,9 +592,14 @@ object Skytils : CoroutineScope, EventSubscriber {
     }
 
     fun onDisconnect(event: ClientDisconnectEvent) {
+        Utils.lastNHPC = null
         Utils.isOnHypixel = false
         Utils.skyblock = false
         Utils.dungeons = false
+
+        IO.launch {
+            WSClient.closeConnection()
+        }
     }
 
     fun onSendPacket(event: PacketSendEvent<*>) {
@@ -641,5 +663,6 @@ object Skytils : CoroutineScope, EventSubscriber {
         register(::onPacket)
         register(::onSendPacket)
         register(::onGuiChange)
+        register(::onHypixelPacketFail)
     }
 }

@@ -28,7 +28,7 @@ import gg.skytils.event.impl.play.WorldUnloadEvent
 import gg.skytils.event.impl.render.WorldDrawEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod._event.LocrawReceivedEvent
+import gg.skytils.skytilsmod._event.LocationChangeEvent
 import gg.skytils.skytilsmod.commands.impl.OrderedWaypointCommand
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.tickTimer
@@ -66,7 +66,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")), Event
     override fun setup() {
         register(::onWorldChange)
         register(::onPlayerMove)
-        register(::onLocraw)
+        register(::onLocationChange)
         register(::onWorldRender)
     }
 
@@ -241,13 +241,12 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")), Event
         visibleWaypoints = emptyList()
     }
 
-    fun onLocraw(event: LocrawReceivedEvent) {
+    fun onLocationChange(event: LocationChangeEvent) {
         tickTimer(20, task = ::computeVisibleWaypoints)
     }
 
     fun onPlayerMove(event: TickEvent) {
-        if (mc.thePlayer?.hasMoved != true) return
-        if (SBInfo.mode != null && OrderedWaypointCommand.trackedIsland?.mode == SBInfo.mode) {
+        if (mc.thePlayer?.hasMoved == true && SBInfo.mode != null && OrderedWaypointCommand.trackedIsland?.mode == SBInfo.mode) {
             val tracked = OrderedWaypointCommand.trackedSet?.firstOrNull()
             if (tracked == null) {
                 OrderedWaypointCommand.doneTracking()

@@ -20,6 +20,8 @@
     "accessors.AccessorGuiMainMenu",
     "accessors.AccessorGuiNewChat",
     "accessors.AccessorGuiStreamUnavailable",
+    "accessors.AccessorHypixelModAPI",
+    "accessors.AccessorHypixelPacketRegistry",
     "accessors.AccessorMinecraft",
     "accessors.AccessorModelDragon",
     "accessors.AccessorRenderItem",
@@ -103,6 +105,7 @@
     "events.MixinPacketThreadUtil",
     "gui.MixinGuiEditSign",
     "gui.MixinGuiIngameMenu",
+    "renderer.MixinModelBiped",
     "util.MixinMouseHelper"
   ]
 }

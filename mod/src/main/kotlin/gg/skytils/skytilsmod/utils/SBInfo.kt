@@ -17,27 +17,23 @@
  */
 package gg.skytils.skytilsmod.utils
 
+import gg.skytils.event.EventPriority
 import gg.skytils.event.EventSubscriber
-import gg.skytils.event.impl.play.ChatMessageSentEvent
+import gg.skytils.event.impl.network.ClientDisconnectEvent
 import gg.skytils.event.impl.play.WorldUnloadEvent
 import gg.skytils.event.impl.screen.ScreenOpenEvent
 import gg.skytils.event.postSync
 import gg.skytils.event.register
-import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.Skytils.json
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod._event.LocrawReceivedEvent
-import gg.skytils.skytilsmod._event.PacketReceiveEvent
-import gg.skytils.skytilsmod._event.PacketSendEvent
+import gg.skytils.skytilsmod._event.HypixelPacketReceiveEvent
+import gg.skytils.skytilsmod._event.LocationChangeEvent
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraft.network.play.client.C01PacketChatMessage
-import net.minecraft.network.play.server.S02PacketChat
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -55,16 +51,14 @@ object SBInfo : EventSubscriber {
     var location = ""
     var date = ""
     var time = ""
-    var objective: String? = ""
-    var mode: String? = ""
+    var objective: String? = null
+    var mode: String? = null
+    var server: String? = null
     var currentTimeDate: Date? = null
+    var lastLocationPacket: ClientboundLocationPacket? = null
 
     @JvmField
     var lastOpenContainerName: String? = null
-    private var lastManualLocRaw: Long = -1
-    private var lastLocRaw: Long = -1
-    private var joinedWorld: Long = -1
-    private var locraw: LocrawObject? = null
     private val junkRegex = Regex("[^\u0020-\u0127û]")
 
     fun onGuiOpen(event: ScreenOpenEvent) {
@@ -78,54 +72,31 @@ object SBInfo : EventSubscriber {
     }
 
     fun onWorldChange(event: WorldUnloadEvent) {
-        lastLocRaw = -1
-        locraw = null
-        mode = null
-        joinedWorld = System.currentTimeMillis()
         lastOpenContainerName = null
     }
 
-    fun onSendChatMessage(event: ChatMessageSentEvent) {
-        val msg = event.message
-        if (msg.trim().startsWith("/locraw")) {
-            lastManualLocRaw = System.currentTimeMillis()
-        }
+
+    fun onDisconnect(event: ClientDisconnectEvent)  {
+        mode = null
+        server = null
+        lastLocationPacket = null
     }
 
-    fun onChatMessage(event: PacketReceiveEvent<*>) {
-        if (event.packet is S02PacketChat) {
-            val unformatted = event.packet.chatComponent.unformattedText
-            if (unformatted.startsWith("{") && unformatted.endsWith("}")) {
-                try {
-                    val obj = json.decodeFromString<LocrawObject>(unformatted)
-                    if (System.currentTimeMillis() - lastManualLocRaw > 5000) {
-                        Utils.cancelChatPacket(event)
-                    }
-                    locraw = obj
-                    mode = obj.mode
-                    postSync(LocrawReceivedEvent(obj))
-                } catch (e: SerializationException) {
-                    e.printStackTrace()
-                }
+    fun onHypixelPacket(event: HypixelPacketReceiveEvent) {
+        if (event.packet is ClientboundLocationPacket) {
+            Utils.checkThreadAndQueue {
+                mode = event.packet.mode.orElse(null)
+                server = event.packet.serverName
+                lastLocationPacket = event.packet
+                println(event.packet)
+                postSync(LocationChangeEvent(event.packet))
             }
         }
     }
 
-    fun onPacket(event: PacketSendEvent<*>) {
-        if (Utils.isOnHypixel && event.packet is C01PacketChatMessage) {
-            if (event.packet.message.startsWith("/locraw")) {
-                lastLocRaw = System.currentTimeMillis()
-            }
-        }
-    }
 
     fun onTick(event: gg.skytils.event.impl.TickEvent) {
         if (mc.thePlayer == null || mc.theWorld == null || !Utils.inSkyblock) return
-        val currentTime = System.currentTimeMillis()
-        if (locraw == null && currentTime - joinedWorld > 1300 && currentTime - lastLocRaw > 15000) {
-            lastLocRaw = System.currentTimeMillis()
-            Skytils.sendMessageQueue.add("/locraw")
-        }
         try {
             val lines = ScoreboardUtil.fetchScoreboardLines().map { it.stripControlCodes() }
             if (lines.size >= 5) {
@@ -161,10 +132,9 @@ object SBInfo : EventSubscriber {
     override fun setup() {
         register(::onGuiOpen)
         register(::onWorldChange)
-        register(::onSendChatMessage)
-        register(::onChatMessage, gg.skytils.event.EventPriority.Highest)
-        register(::onPacket)
+        register(::onDisconnect)
         register(::onTick)
+        register(::onHypixelPacket, EventPriority.High)
     }
 }
 
@@ -226,12 +196,3 @@ enum class SkyblockIsland(val displayName: String, val mode: String) {
         }
     }
 }
-
-
-@Serializable
-data class LocrawObject(
-    val server: String,
-    val gametype: String = "unknown",
-    val mode: String = "unknown",
-    val map: String = "unknown"
-)

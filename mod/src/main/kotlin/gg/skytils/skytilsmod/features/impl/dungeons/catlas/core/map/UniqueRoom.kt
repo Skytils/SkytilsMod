@@ -10,7 +10,8 @@ class UniqueRoom(arrX: Int, arrY: Int, room: Room) {
     private var topLeft = Pair(arrX, arrY)
     private var center = Pair(arrX, arrY)
     var mainRoom = room
-    private val tiles = mutableListOf(room)
+    val tiles = mutableListOf(room)
+    var foundSecrets: Int? = null
 
     init {
         DungeonInfo.cryptCount += room.data.crypts

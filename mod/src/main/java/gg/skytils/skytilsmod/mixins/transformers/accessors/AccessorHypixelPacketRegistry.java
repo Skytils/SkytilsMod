@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -18,29 +18,15 @@
 
 package gg.skytils.skytilsmod.mixins.transformers.accessors;
 
-import net.minecraft.command.CommandHandler;
-import net.minecraft.command.ICommand;
+import net.hypixel.modapi.packet.HypixelPacket;
+import net.hypixel.modapi.packet.PacketRegistry;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.Map;
-import java.util.Set;
 
-@Mixin(CommandHandler.class)
-public interface AccessorCommandHandler {
+@Mixin(PacketRegistry.class)
+public interface AccessorHypixelPacketRegistry {
     @Accessor
-    Set<ICommand> getCommandSet();
-
-    @Mutable
-    @Accessor
-    void setCommandSet(Set<ICommand> set);
-
-    @Accessor
-    Map<String, ICommand> getCommandMap();
-
-    @Mutable
-    @Accessor
-    void setCommandMap(Map<String, ICommand> map);
-
+    Map<Class<? extends HypixelPacket>, String> getClassToIdentifier();
 }

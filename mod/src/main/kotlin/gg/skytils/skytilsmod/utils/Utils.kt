@@ -45,6 +45,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
+import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.client.settings.GameSettings
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -91,6 +92,8 @@ object Utils {
 
     @JvmField
     var lastRenderedSkullEntity: EntityLivingBase? = null
+
+    var lastNHPC: NetHandlerPlayClient? = null
 
     @JvmStatic
     var random = Random()
@@ -427,6 +430,9 @@ operator fun Vec3.plus(other: Vec3): Vec3 = add(other)
 operator fun Vec3.minus(other: Vec3): Vec3 = subtract(other)
 
 operator fun Vec3.times(scaleValue: Double): Vec3 = Vec3(xCoord * scaleValue, yCoord * scaleValue, zCoord * scaleValue)
+
+fun Vec3.squareDistanceTo(x: Double, y: Double, z: Double)=
+     (x - xCoord) * (x - xCoord) + (y - yCoord) * (y - yCoord) + (z - zCoord) * (z - zCoord)
 
 /**
  * @author Ilya

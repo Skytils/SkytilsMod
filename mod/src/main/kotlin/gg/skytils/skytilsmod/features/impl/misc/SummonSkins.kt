@@ -26,11 +26,12 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.utils.io.jvm.javaio.*
 import kotlinx.coroutines.launch
+import java.util.concurrent.ConcurrentHashMap
 import javax.imageio.ImageIO
 
 object SummonSkins {
     // maps name to url
-    val skinMap = HashMap<String, String>()
+    val skinMap = ConcurrentHashMap<String, String>()
 
     // maps name to dynamic resource
     val skintextureMap = HashMap<String, DynamicResource>()

@@ -41,6 +41,7 @@ repositories {
     mavenCentral()
     maven("https://repo.sk1er.club/repository/maven-public/")
     maven("https://repo.sk1er.club/repository/maven-releases/")
+    maven("https://repo.hypixel.net/repository/Hypixel/")
     maven("https://jitpack.io") {
         mavenContent {
             includeGroupAndSubgroups("com.github")
@@ -77,13 +78,14 @@ loom {
 
                 programArgs("--mixin", "mixins.skytils.json")
                 programArgs("--mixin", "mixins.skytils-events.json")
+                programArgs("--mixin", "mixins.skytils-init.json")
             }
         }
         remove(getByName("server"))
     }
     if (project.platform.isForge) {
         forge {
-            mixinConfig("mixins.skytils.json", "mixins.skytils-events.json")
+            mixinConfig("mixins.skytils.json", "mixins.skytils-events.json", "mixins.skytils-init.json")
         }
     }
     mixin {
@@ -127,7 +129,7 @@ dependencies {
     }
 
     shadowMe(platform(kotlin("bom")))
-    shadowMe(platform(ktor("bom", "2.3.9", addSuffix = false)))
+    shadowMe(platform(ktor("bom", "2.3.11", addSuffix = false)))
 
     shadowMe(ktor("serialization-kotlinx-json"))
 
@@ -159,6 +161,14 @@ dependencies {
 
     shadowMe("gg.skytils:events")
     shadowMe("gg.skytils.hypixel.types:types")
+    shadowMe("gg.skytils.skytilsws.shared:ws-shared")
+
+    shadowMe("org.bouncycastle:bcpg-jdk18on:1.78.1") {
+        exclude(module = "bcprov-jdk18on")
+    }
+    compileOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
+    shadowMe("net.hypixel:mod-api:0.4.0")
+
 
     shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")!!)
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
@@ -201,7 +211,7 @@ tasks {
                     "FMLCorePlugin" to "gg.skytils.skytilsmod.tweaker.SkytilsLoadingPlugin",
                     "FMLCorePluginContainsFMLMod" to true,
                     "ForceLoadAsMod" to true,
-                    "MixinConfigs" to "mixins.skytils.json,mixins.skytils-events.json",
+                    "MixinConfigs" to "mixins.skytils.json,mixins.skytils-events.json,mixins.skytils-init.json",
                     "ModSide" to "CLIENT",
                     "ModType" to "FML",
                     "TweakClass" to "gg.skytils.skytilsmod.tweaker.SkytilsTweaker",
@@ -234,6 +244,7 @@ tasks {
         relocate("kotlinx.serialization", "gg.skytils.ktx-serialization")
         relocate("kotlinx.coroutines", "gg.skytils.ktx-coroutines")
         relocate("gg.essential.vigilance", "gg.skytils.vigilance")
+        relocate("net.hypixel", "gg.skytils.hypixel-net")
 
         exclude(
             "**/LICENSE_MixinExtras",

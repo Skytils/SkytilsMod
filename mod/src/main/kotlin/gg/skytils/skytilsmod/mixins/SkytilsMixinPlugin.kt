@@ -18,7 +18,6 @@
 
 package gg.skytils.skytilsmod.mixins
 
-import com.llamalad7.mixinextras.MixinExtrasBootstrap
 //#if MC<=11202
 import net.minecraft.launchwrapper.Launch
 //#else
@@ -28,8 +27,8 @@ import org.objectweb.asm.tree.ClassNode
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo
 
-class SkytilsMixinPlugin : IMixinConfigPlugin {
-    val mixinPackage = "gg.skytils.skytilsmod.mixins.transformers"
+open class SkytilsMixinPlugin : IMixinConfigPlugin {
+    open val mixinPackage = "gg.skytils.skytilsmod.mixins.transformers"
     val eventsPackage = "gg.skytils.events.mixins"
     var deobfEnvironment = false
 
@@ -42,7 +41,6 @@ class SkytilsMixinPlugin : IMixinConfigPlugin {
         if (deobfEnvironment) {
             println("We are in a deobfuscated environment, loading compatibility mixins.")
         }
-        MixinExtrasBootstrap.init()
     }
 
     override fun getRefMapperConfig(): String? = null

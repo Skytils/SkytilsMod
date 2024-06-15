@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,31 +16,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.mixins.transformers.accessors;
+package gg.skytils.skytilsmod._event
 
-import net.minecraft.command.CommandHandler;
-import net.minecraft.command.ICommand;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Mutable;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import gg.skytils.event.Event
+import net.hypixel.modapi.error.ErrorReason
+import net.hypixel.modapi.packet.ClientboundHypixelPacket
 
-import java.util.Map;
-import java.util.Set;
-
-@Mixin(CommandHandler.class)
-public interface AccessorCommandHandler {
-    @Accessor
-    Set<ICommand> getCommandSet();
-
-    @Mutable
-    @Accessor
-    void setCommandSet(Set<ICommand> set);
-
-    @Accessor
-    Map<String, ICommand> getCommandMap();
-
-    @Mutable
-    @Accessor
-    void setCommandMap(Map<String, ICommand> map);
-
-}
+class HypixelPacketReceiveEvent(val packet: ClientboundHypixelPacket) : Event()
+class HypixelPacketSendEvent(val type: String) : Event()
+class HypixelPacketFailedEvent(val type: String, val reason: ErrorReason) : Event()

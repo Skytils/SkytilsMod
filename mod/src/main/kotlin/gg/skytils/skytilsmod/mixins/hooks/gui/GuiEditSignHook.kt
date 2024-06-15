@@ -28,6 +28,7 @@ val prompts = listOf(
     "Your auction",
     "Enter the amount",
     "Auction", // Auction time
+    "Please enter", // Fann level selection
 )
 
 fun isConfirmableSign(gui: AccessorGuiEditSign): Boolean =

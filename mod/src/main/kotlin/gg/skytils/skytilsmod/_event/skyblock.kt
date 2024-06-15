@@ -19,11 +19,11 @@
 package gg.skytils.skytilsmod._event
 
 import gg.skytils.event.Event
-import gg.skytils.skytilsmod.utils.LocrawObject
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 
 
 class DungeonPuzzleDiscoveredEvent(val puzzle: String) : Event()
 class DungeonPuzzleCompletedEvent(val puzzle: String) : Event()
 class DungeonPuzzleResetEvent(val puzzle: String) : Event()
 
-class LocrawReceivedEvent(val loc: LocrawObject) : Event()
+class LocationChangeEvent(val packet: ClientboundLocationPacket) : Event()

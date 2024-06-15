@@ -26,6 +26,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.security.Security;
 
 import static gg.skytils.skytilsmod.tweaker.TweakerUtil.addToClasspath;
 
@@ -36,6 +37,7 @@ public class DependencyLoader {
 
     public static void loadDependencies() {
         loadBrotli();
+        if (Security.getProvider("BC") == null) loadBCProv();
     }
 
     public static File loadDependency(String path) throws Throwable {
@@ -49,11 +51,21 @@ public class DependencyLoader {
             }
         }
 
-        System.out.println("Brotli size: " + Files.size(downloadPath));
+        System.out.printf("Dependency size for %s: %s%n", path.substring(path.lastIndexOf('/') + 1), Files.size(downloadPath));
 
         addToClasspath(downloadLocation.toURI().toURL());
 
         return downloadLocation;
+    }
+
+    public static void loadBCProv() {
+        try {
+            loadDependency("org/bouncycastle/bcprov-jdk18on/1.78.1/bcprov-jdk18on-1.78.1.jar");
+            System.out.println("Bouncy Castle provider loaded");
+        } catch (Throwable t) {
+            System.out.println("Failed to load Bouncy Castle providers");
+            t.printStackTrace();
+        }
     }
 
     public static void loadBrotli() {

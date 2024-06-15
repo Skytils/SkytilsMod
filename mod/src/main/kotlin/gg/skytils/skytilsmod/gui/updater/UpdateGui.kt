@@ -32,8 +32,15 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.launch
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.util.EnumChatFormatting
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.bouncycastle.openpgp.PGPPublicKeyRingCollection
+import org.bouncycastle.openpgp.PGPSignatureList
+import org.bouncycastle.openpgp.PGPUtil
+import org.bouncycastle.openpgp.jcajce.JcaPGPObjectFactory
+import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator
+import org.bouncycastle.openpgp.operator.jcajce.JcaPGPContentVerifierBuilderProvider
 import java.io.File
+import java.security.Security
 import kotlin.math.floor
 
 /**
@@ -46,12 +53,14 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
     companion object {
         private val DOTS = arrayOf(".", "..", "...", "...", "...")
         private const val DOT_TIME = 200 // ms between "." -> ".." -> "..."
-        var failed = false
         var complete = false
     }
 
     private var backButton: GuiButton? = null
     private var progress = 0.0
+    private var stage = "Downloading"
+    var failed = false
+
     override fun initGui() {
         buttonList.add(GuiButton(0, width / 2 - 100, height / 3 * 2, 200, 20, "").also { backButton = it })
         updateText()
@@ -63,14 +72,48 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
             val url = UpdateChecker.updateDownloadURL
             val jarName = UpdateChecker.getJarNameFromUrl(url)
             IO.launch(CoroutineName("Skytils-update-downloader-thread")) {
-                downloadUpdate(url, directory)
+                val updateFile = downloadUpdate(url, directory)
+                val signFile = downloadUpdate("$url.asc", directory)
                 if (!failed) {
-                    UpdateChecker.scheduleCopyUpdateAtShutdown(jarName)
-                    if (restartNow) {
-                        mc.shutdown()
+                    if (updateFile != null && signFile != null) {
+                        stage = "Verifying signature"
+                        val finger = JcaKeyFingerprintCalculator()
+
+                        fun getKeyRingCollection(fileName: String): PGPPublicKeyRingCollection =
+                            this::class.java.classLoader.getResourceAsStream("assets/skytils/$fileName.gpg")!!.use {
+                                PGPPublicKeyRingCollection(PGPUtil.getDecoderStream(it), finger)
+                            }
+
+                        val keys = listOf(
+                            getKeyRingCollection("my-name-is-jeff"),
+                            getKeyRingCollection("sychic")
+                        )
+
+                        val sig = (JcaPGPObjectFactory(PGPUtil.getDecoderStream(signFile.inputStream())).nextObject() as PGPSignatureList).first()
+                        val key = keys.firstNotNullOfOrNull { it.getPublicKey(sig.keyID) }
+                        if (key != null) {
+                            sig.init(JcaPGPContentVerifierBuilderProvider().setProvider(Security.getProvider("BC") ?: BouncyCastleProvider().also(Security::addProvider)), key)
+                            sig.update(updateFile.readBytes())
+                            if (sig.verify()) {
+                                signFile.deleteOnExit()
+                                UpdateChecker.scheduleCopyUpdateAtShutdown(jarName)
+                                if (restartNow) {
+                                    mc.shutdown()
+                                }
+                                complete = true
+                                updateText()
+                            } else {
+                                failed = true
+                                println("Signature verification failed")
+                            }
+                        } else {
+                            println("Key not found")
+                            failed = true
+                        }
+                    } else {
+                        println("Files are missing")
+                        failed = true
                     }
-                    complete = true
-                    updateText()
                 }
             }
         } catch (ex: Exception) {
@@ -82,7 +125,7 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
         backButton!!.displayString = if (failed || complete) "Back" else "Cancel"
     }
 
-    private suspend fun downloadUpdate(urlString: String, directory: File) {
+    private suspend fun downloadUpdate(urlString: String, directory: File): File? {
         try {
             val url = Url(urlString)
 
@@ -102,25 +145,27 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
                 failed = true
                 updateText()
                 println("$url returned status code ${st.status}")
-                return
+                return null
             }
             if (!directory.exists() && !directory.mkdirs()) {
                 failed = true
                 updateText()
                 println("Couldn't create update file directory")
-                return
+                return null
             }
             val fileSaved = File(directory, url.pathSegments.last().decodeURLPart())
             if (mc.currentScreen !== this@UpdateGui || st.bodyAsChannel().copyTo(fileSaved.writeChannel()) == 0L) {
                 failed = true
-                return
+                return null
             }
             println("Downloaded update to $fileSaved")
+            return fileSaved
         } catch (ex: Exception) {
             ex.printStackTrace()
             failed = true
             updateText()
         }
+        return null
     }
 
     public override fun actionPerformed(button: GuiButton) {
@@ -134,14 +179,14 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
         when {
             failed -> drawCenteredString(
                 mc.fontRendererObj,
-                EnumChatFormatting.RED.toString() + "Update download failed",
+                "§cUpdate download failed",
                 width / 2,
                 height / 2,
                 -0x1
             )
             complete -> drawCenteredString(
                 mc.fontRendererObj,
-                EnumChatFormatting.GREEN.toString() + "Update download complete",
+                "§aUpdate download complete",
                 width / 2,
                 height / 2,
                 0xFFFFFF
@@ -162,16 +207,8 @@ class UpdateGui(restartNow: Boolean) : GuiScreen() {
                     top + 3,
                     -0x1000000
                 )
-                val x = (width - mc.fontRendererObj.getStringWidth(
-                    String.format(
-                        "Downloading %s",
-                        DOTS[DOTS.size - 1]
-                    )
-                )) / 2
-                val title = String.format(
-                    "Downloading %s",
-                    DOTS[(System.currentTimeMillis() % (DOT_TIME * DOTS.size)).toInt() / DOT_TIME]
-                )
+                val x = (width - mc.fontRendererObj.getStringWidth("$stage ${DOTS[DOTS.size - 1]}")) / 2
+                val title = "$stage ${DOTS[(System.currentTimeMillis() % (DOT_TIME * DOTS.size)).toInt() / DOT_TIME]}"
                 drawString(mc.fontRendererObj, title, x, top - mc.fontRendererObj.FONT_HEIGHT - 2, -0x1)
             }
         }
