@@ -17,6 +17,7 @@
  */
 package gg.skytils.skytilsmod.mixins.hooks.renderer
 
+import gg.skytils.skytilsmod.Skytils.config.threeWeirdosSolverColor
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
 import gg.skytils.skytilsmod.utils.bindColor
 import net.minecraft.client.renderer.GlStateManager
@@ -34,7 +35,7 @@ fun setChestColor(
     ci: CallbackInfo
 ) {
     if (te.pos == ThreeWeirdosSolver.riddleChest) {
-        Color.RED.bindColor()
+        ticTacToeSolverColor.bindColor()
         GlStateManager.disableTexture2D()
     }
 }
