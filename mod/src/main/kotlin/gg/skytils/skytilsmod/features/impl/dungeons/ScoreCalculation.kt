@@ -89,16 +89,25 @@ object ScoreCalculation {
     var firstDeathHadSpirit = BasicState(false)
 
     // puzzle stuff
+    private var puzzleCount = 0
     private var missingPuzzles = BasicState(0).also {
         it.onSetValue {
             printDevMessage("missing puzzles $it", "scorecalcpuzzle")
         }
     }
-    private var failedPuzzles = BasicState(0)
+    private var failedPuzzles: BasicState<Int> = BasicState(0).also {
+        it.onSetValue {
+            updateText(totalScore.get())
+        }
+    }
 
     // secrets stuff
     var floorReq = BasicState(floorRequirements["default"]!!)
-    private var foundSecrets: BasicState<Int> = BasicState(0)
+    private var foundSecrets: BasicState<Int> = BasicState(0).also {
+        it.onSetValue {
+            updateText(totalScore.get())
+        }
+    }
     private var totalSecrets = BasicState(0)
 
     // speed stuff
@@ -141,13 +150,9 @@ object ScoreCalculation {
         a
     }
 
-    //  death and puzzle penalty, used in Skill score
+    //  death penalty, used in Skill score
     private val deathPenalty = deaths.zip(firstDeathHadSpirit).map { (deathCount, spirit) ->
         (2 * deathCount) - spirit.ifTrue(1)
-    }
-    private val puzzlePenalty = missingPuzzles.zip(failedPuzzles).map { (missing, failed) ->
-        printDevMessage("puzzle penalty changed", "scorecalcpuzzle")
-        10 * (missing + failed)
     }
 
     //  % of (max for score) secrets found, used in Explore score
@@ -155,40 +160,13 @@ object ScoreCalculation {
         if (total == 0) return@map 1
         ceil(total * req.secretPercentage).toInt()
     }
-    private val percentageOfMaxSecretsFound = foundSecrets.zip(maxScoreSecrets).map { (found, totalNeeded) ->
-        found / totalNeeded.toDouble()
-    }
 
     //  seconds past the floor speed requirement
     private val totalElapsed = secondsElapsed.zip(floorReq).map { (seconds, req) ->
         seconds + 480 - req.speed
     }
 
-    //  secret and clear score, both used in Explore score
-    private val secretScore = totalSecrets.zip(percentageOfMaxSecretsFound).map { (total, percent) ->
-        if (total <= 0)
-            0.0
-        else
-            (40f * percent).coerceIn(0.0, 40.0)
-    }
-    private val roomClearScore = effectiveClearPercentage.map {
-        (60 * it).coerceIn(0.0, 60.0)
-    }
-
-    // final scores
-    private val skillScore = effectiveClearPercentage.zip(deathPenalty.zip(puzzlePenalty)).map { (clear, penalties) ->
-        printDevMessage("puzzle penalty ${penalties.second}", "scorecalcpuzzle")
-        if (DungeonFeatures.dungeonFloor == "E")
-            ((20.0 + clear * 80.0 - penalties.first - penalties.second) * 0.7).toInt()
-        else (20.0 + clear * 80.0 - penalties.first - penalties.second).toInt()
-    }
-
-    private val exploreScore = roomClearScore.zip(secretScore).map { (clear, secret) ->
-        printDevMessage("clear $clear secret $secret", "scorecalcexplore")
-        if (DungeonFeatures.dungeonFloor == "E") (clear * 0.7).toInt() + (secret * 0.7).toInt()
-        else clear.toInt() + secret.toInt()
-    }
-
+    //  final speed score
     private val speedScore = totalElapsed.map { time ->
         if (DungeonFeatures.dungeonFloor == "E") {
             when {
@@ -211,8 +189,98 @@ object ScoreCalculation {
         }
     }
 
+    // Min secret stuff
+    // The max number of secrets that can be skipped for 300 assuming 5 crypts, mimic and 100 speed score
+    private val skippableSecrets = maxScoreSecrets.zip(failedPuzzles.zip(deathPenalty.zip(isPaul))).map {
+        val totalSecrets = it.first
+        val failedRooms = it.second.first
+        val deathPenalty = it.second.second.first
+        val paul = it.second.second.second.ifTrue(10)
+        val mimic = ((dungeonFloorNumber ?: 0) >= 6).ifTrue(2)
+
+        val neededScore = 40 - paul - 5 - mimic + deathPenalty + if (failedRooms > 0) {
+            val total = totalRooms.get().toDouble()
+            if (total == 0.0) return@map -1
+
+            ceil(80 * failedRooms / total).toInt() + ceil(60 * failedRooms / total).toInt() + 10 * failedRooms
+        } else {
+            0
+        }
+        // Clear too bad to skip secrets
+        if (neededScore > 40) return@map -2
+        // Clear too good to have skipped secrets
+        if (neededScore <= (foundSecrets.get() / totalSecrets.toDouble() * 40f).coerceIn(0.0, 40.0)) return@map -3
+
+        return@map ceil(neededScore / 40.0 * totalSecrets).toInt()
+    }
+
+    // final bonus score
     private val bonusScore = crypts.zip(mimicKilled.zip(isPaul)).map { (crypts, bools) ->
         ((if (bools.first) 2 else 0) + crypts.coerceAtMost(5) + if (bools.second) 10 else 0)
+    }
+
+    // The min number of secrets for 300 score with current failed puzzles, deaths, bonus & speed score
+    private val minSecrets = maxScoreSecrets.zip(failedPuzzles.zip(deathPenalty.zip(bonusScore.zip(speedScore)))).map {
+        val totalSecrets = it.first
+        val failedRooms = it.second.first
+        val deathPenalty = it.second.second.first
+        val (bonus, speed) = it.second.second.second
+
+        val neededScore = 40 - bonus + deathPenalty + (100 - speed) + if (failedRooms > 0) {
+            val total = totalRooms.get().toDouble()
+            if (total == 0.0) return@map -1
+
+            ceil(80 * failedRooms / total).toInt() + ceil(60 * failedRooms / total).toInt() + 10 * failedRooms
+        } else {
+            0
+        }
+
+        // Clear too bad for secrets to compensate
+        if (neededScore > 40) return@map -2
+        // Clear too good to need secrets to compensate
+        if (neededScore <= (foundSecrets.get() / totalSecrets.toDouble() * 40f).coerceIn(0.0, 40.0)) return@map -3
+
+        return@map ceil(neededScore / 40.0 * totalSecrets).toInt()
+    }.also {
+        it.onSetValue {
+            updateText(totalScore.get())
+        }
+    }
+
+    // puzzle penalty, used in Skill score
+    private val puzzlePenalty = missingPuzzles.zip(failedPuzzles).map { (missing, failed) ->
+        printDevMessage("puzzle penalty changed", "scorecalcpuzzle")
+        10 * (missing + failed)
+    }
+
+    // final skill score
+    private val skillScore = effectiveClearPercentage.zip(deathPenalty.zip(puzzlePenalty)).map { (clear, penalties) ->
+        printDevMessage("puzzle penalty ${penalties.second}", "scorecalcpuzzle")
+        if (DungeonFeatures.dungeonFloor == "E")
+            ((20.0 + clear * 80.0 - penalties.first - penalties.second) * 0.7).toInt()
+        else (20.0 + clear * 80.0 - penalties.first - penalties.second).toInt()
+    }
+
+    // secret and clear score, both used in Explore score
+    private val percentageOfMaxSecretsFound = foundSecrets.zip(maxScoreSecrets).map { (found, totalNeeded) ->
+        found / totalNeeded.toDouble()
+    }
+
+    private val secretScore = totalSecrets.zip(percentageOfMaxSecretsFound).map { (total, percent) ->
+        if (total <= 0)
+            0.0
+        else
+            (40f * percent).coerceIn(0.0, 40.0)
+    }
+    private val roomClearScore = effectiveClearPercentage.map {
+        (60 * it).coerceIn(0.0, 60.0)
+    }
+
+    // final explore score
+    private val exploreScore = roomClearScore.zip(secretScore).map { (clear, secret) ->
+        printDevMessage("clear $clear secret $secret", "scorecalcexplore")
+        if (DungeonFeatures.dungeonFloor == "E") (clear * 0.7).toInt() + (secret * 0.7).toInt()
+        else clear.toInt() + secret.toInt()
     }
 
     private var hasSaid270 = false
@@ -273,48 +341,66 @@ object ScoreCalculation {
         Utils.checkThreadAndQueue {
             ScoreCalculationElement.text.clear()
             if (!Utils.inDungeons) return@checkThreadAndQueue
-            if (Skytils.config.minimizedScoreCalculation) {
+            if (Skytils.config.showDungeonStatus) {
+                ScoreCalculationElement.text.add("§9Dungeon Status")
+                ScoreCalculationElement.text.add("• §eDeaths: §${if (deaths.get() == 0) "a" else "c"}${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
+                // TODO puzzles
+                ScoreCalculationElement.text.add("• §eSecrets: " + if (totalSecrets.get() == 0) {
+                    "§7?"
+                } else {
+                    val found = foundSecrets.get()
+                    if (found == totalSecrets.get()) {
+                        "§a"
+                    } else if (found >= minSecrets.get()) {
+                        "§e"
+                    } else {
+                        "§c"
+                    } + found + "§7/§a" + totalSecrets.get() + " §e(min: " + when (val sec = minSecrets.get()) {
+                        -1 -> "§7?"
+                        -2 -> "§c✘"
+                        -3 -> "§a✔"
+                        else -> "§a${(sec - found).takeUnless { it <= 0 } ?: "✔"}"
+                    } + "§e, could skip: " + when (val skip = skippableSecrets.get()) {
+                        -1 -> "§7?"
+                        -2 -> "§c✘"
+                        -3 -> "§a✔"
+                        else -> "§a${totalSecrets.get()  - skip}"
+                    } + "§e)"
+                })
+                ScoreCalculationElement.text.add("• §eCrypts: §${if (crypts.get() >= 5) "a" else "c"}${crypts.get().coerceAtMost(5)}")
+                ScoreCalculationElement.text.add("• §eMimic:§l${if ((dungeonFloorNumber ?: 0) >= 6) if (mimicKilled.get()) "§a ✔" else "§c ✘" else "§7 -"}")
+                // TODO trap
+                // TODO rooms
+                ScoreCalculationElement.text.add("")
+            }
+            if (Skytils.config.showScoreBreakdown) {
+                ScoreCalculationElement.text.add("§6Dungeon Score")
+                if (DungeonFeatures.dungeonFloor == "E")
+                    ScoreCalculationElement.text.add("• §eSkill Score:§a ${skillScore.get().coerceIn(14, 70)}")
+                else
+                    ScoreCalculationElement.text.add("• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
+                ScoreCalculationElement.text.add(
+                    "• §eExplore Score:§a ${exploreScore.get()} §7(§e${
+                        roomClearScore.get().toInt()
+                    } §7+ §6${secretScore.get().toInt()}§7)"
+                )
+                ScoreCalculationElement.text.add("• §eSpeed Score:§a ${speedScore.get()}")
+
+                if (DungeonFeatures.dungeonFloor == "E") {
+                    ScoreCalculationElement.text.add("• §eBonus Score:§a ${(bonusScore.get() * 0.7).toInt()}")
+                    ScoreCalculationElement.text.add("• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+7§7)" else "")
+                } else {
+                    ScoreCalculationElement.text.add("• §eBonus Score:§a ${bonusScore.get()}")
+                    ScoreCalculationElement.text.add("• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
+                }
+                ScoreCalculationElement.text.add("• §eRank: $rank")
+            } else {
                 val color = when {
                     score < 270 -> 'c'
                     score < 300 -> 'e'
                     else -> 'a'
                 }
-                ScoreCalculationElement.text.add("§eScore: §$color$score §7($rank§7)")
-            } else {
-                ScoreCalculationElement.text.add("§9Dungeon Status")
-                ScoreCalculationElement.text.add("§f• §eDeaths:§c ${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
-                ScoreCalculationElement.text.add("§f• §eMissing Puzzles:§c ${missingPuzzles.get()}")
-                ScoreCalculationElement.text.add("§f• §eFailed Puzzles:§c ${failedPuzzles.get()}")
-                if (foundSecrets.get() > 0) ScoreCalculationElement.text.add(
-                    "§f• §eSecrets: ${if (foundSecrets.get() >= maxScoreSecrets.get()) "§a" else "§c"}${foundSecrets.get()}§7/§a${maxScoreSecrets.get()} " +
-                            if (floorReq.get().secretPercentage != 1.0) "§7(§6Total: ${totalSecrets.get()}§7)" else ""
-                )
-                ScoreCalculationElement.text.add("§f• §eCrypts:§a ${crypts.get()}")
-                if (dungeonFloorNumber?.let { it >= 6 } == true) {
-                    ScoreCalculationElement.text.add("§f• §eMimic:§l${if (mimicKilled.get()) "§a ✔" else "§c ✘"}")
-                }
-                ScoreCalculationElement.text.add("")
-                ScoreCalculationElement.text.add("§6Score")
-                if (DungeonFeatures.dungeonFloor == "E")
-                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(14, 70)}")
-                else
-                    ScoreCalculationElement.text.add("§f• §eSkill Score:§a ${skillScore.get().coerceIn(20, 100)}")
-                ScoreCalculationElement.text.add(
-                    "§f• §eExplore Score:§a ${exploreScore.get()} §7(§e${
-                        roomClearScore.get().toInt()
-                    } §7+ §6${secretScore.get().toInt()}§7)"
-                )
-                ScoreCalculationElement.text.add("§f• §eSpeed Score:§a ${speedScore.get()}")
-
-                if (DungeonFeatures.dungeonFloor == "E") {
-                    ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${(bonusScore.get() * 0.7).toInt()}")
-                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+7§7)" else "")
-                } else {
-                    ScoreCalculationElement.text.add("§f• §eBonus Score:§a ${bonusScore.get()}")
-                    ScoreCalculationElement.text.add("§f• §eTotal Score:§a $score" + if (isPaul.get()) " §7(§6+10§7)" else "")
-                }
-                ScoreCalculationElement.text.add("§f• §eRank: $rank")
-
+                ScoreCalculationElement.text.add("• §6Dungeon Score: §$color$score §7($rank§7)")
             }
         }
     }
@@ -376,6 +462,7 @@ object ScoreCalculation {
                 name.contains("Puzzles:") -> {
                     val matcher = missingPuzzlePattern.find(name) ?: return@forEach
                     missingPuzzles.set(matcher.groups["count"]?.value?.toIntOrNull() ?: 0)
+                    puzzleCount = missingPuzzles.get()
                     printDevMessage("puzzles ${missingPuzzles.get()}", "scorecalcpuzzle")
                     updateText(totalScore.get())
                 }
@@ -479,6 +566,7 @@ object ScoreCalculation {
         mimicKilled.set(false)
         firstDeathHadSpirit.set(false)
         floorReq.set(floorRequirements["default"]!!)
+        puzzleCount = 0
         missingPuzzles.set(0)
         failedPuzzles.set(0)
         secondsElapsed.set(0.0)
@@ -543,39 +631,58 @@ object ScoreCalculation {
         }
 
         override fun demoRender() {
-            if (Skytils.config.minimizedScoreCalculation) {
-                RenderUtil.drawAllInList(this, demoMin)
+            if (Skytils.config.showDungeonStatus) {
+                RenderUtil.drawAllInList(this, demoStatus + if (Skytils.config.showScoreBreakdown) demoScore else demoMin)
             } else {
-                RenderUtil.drawAllInList(this, demoText)
+                RenderUtil.drawAllInList(this, if (Skytils.config.showScoreBreakdown) demoScore else demoMin)
             }
         }
 
         companion object {
-            private val demoText = listOf(
+            private val demoStatus = listOf(
                 "§9Dungeon Status",
-                "§f• §eDeaths:§c 0",
-                "§f• §eMissing Puzzles:§c 0",
-                "§f• §eFailed Puzzles:§c 0",
-                "§f• §eSecrets: §a50§7/§a50 §7(§6Total: 50§7)",
-                "§f• §eCrypts:§a 5",
-                "§f• §eMimic:§a ✔",
-                "",
-                "§6Score",
-                "§f• §eSkill Score:§a 100",
-                "§f• §eExplore Score:§a 100 §7(§e60 §7+ §640§7)",
-                "§f• §eSpeed Score:§a 100",
-                "§f• §eBonus Score:§a 17",
-                "§f• §eTotal Score:§a 317 §7(§6+10§7)",
-                "§f• §eRank: §6§lS+"
+                "• §eDeaths: §c1 §7(§6Spirit§7)",
+                // TODO puzzles
+                "• §eSecrets: §e30§7/§a40 §e(min: §a✔, could skip: §a20§e)",
+                "• §eCrypts: §c4",
+                "• §eMimic:§l§a ✔",
+                // TODO trap
+                // TODO rooms
+                ""
             )
-            private val demoMin = listOf("§eScore: §e300 §7(§6§lS+§7)")
+            private val demoScore = listOf(
+                "§6Dungeon Score",
+                "• §eSkill Score:§a 100",
+                "• §eExplore Score:§a 100 §7(§e60 §7+ §640§7)",
+                "• §eSpeed Score:§a 100",
+                "• §eBonus Score:§a 17",
+                "• §eTotal Score:§a 317 §7(§6+10§7)",
+                "• §eRank: §6§lS+",
+            )
+            private val demoMin = listOf("• §6Dungeon Score: §a 300 §7(§6§lS+§7)")
             val text = ArrayList<String>()
         }
 
         override val height: Int
-            get() = if (Skytils.config.minimizedScoreCalculation) ScreenRenderer.fontRenderer.FONT_HEIGHT else ScreenRenderer.fontRenderer.FONT_HEIGHT * demoText.size
+            get() = (if (Skytils.config.showDungeonStatus) {
+                6
+            } else {
+                0
+            } + if (Skytils.config.showScoreBreakdown) {
+                7
+            } else {
+                1
+            }) * ScreenRenderer.fontRenderer.FONT_HEIGHT
         override val width: Int
-            get() = demoText.maxOf { ScreenRenderer.fontRenderer.getStringWidth(it) }
+            get() = (if (Skytils.config.showDungeonStatus) {
+                demoStatus
+            } else {
+                emptyList()
+            } + if (Skytils.config.showScoreBreakdown) {
+                demoScore
+            } else {
+                demoMin
+            }).maxOf { ScreenRenderer.fontRenderer.getStringWidth(it) }
 
         override val toggled: Boolean
             get() = Skytils.config.showScoreCalculation
