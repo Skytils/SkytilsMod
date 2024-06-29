@@ -52,6 +52,8 @@ object ScoreCalculation {
         Regex("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7] §.+")
     private val solvedPuzzlePattern =
         Regex("§r (?<puzzle>.+): §r§7\\[§r§a§l✔§r§7] §.+")
+    private val discoveredPuzzlePattern =
+        Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] §.+")
     private val secretsFoundPattern = Regex("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
     private val secretsFoundPercentagePattern = Regex("§r Secrets Found: §r§[ae](?<percentage>[\\d.]+)%§r")
     private val cryptsPattern = Regex("§r Crypts: §r§6(?<crypts>\\d+)§r")
@@ -95,6 +97,7 @@ object ScoreCalculation {
             printDevMessage("missing puzzles $it", "scorecalcpuzzle")
         }
     }
+    private val failedPuzzlesNames = hashSetOf<String>()
     private var failedPuzzles: BasicState<Int> = BasicState(0).also {
         it.onSetValue {
             updateText(totalScore.get())
@@ -349,13 +352,13 @@ object ScoreCalculation {
                     "§7?"
                 } else {
                     val found = foundSecrets.get()
-                    if (found == totalSecrets.get()) {
+                    (if (found == totalSecrets.get()) {
                         "§a"
                     } else if (found >= minSecrets.get()) {
                         "§e"
                     } else {
                         "§c"
-                    } + found + "§7/§a" + totalSecrets.get() + " §e(min: " + when (val sec = minSecrets.get()) {
+                    }) + found + "§7/§a" + totalSecrets.get() + " §e(min: " + when (val sec = minSecrets.get()) {
                         -1 -> "§7?"
                         -2 -> "§c✘"
                         -3 -> "§a✔"
@@ -474,9 +477,23 @@ object ScoreCalculation {
                 }
 
                 name.contains("✖") -> {
-                    if (failedPuzzlePattern.containsMatchIn(name)) {
+                    failedPuzzlePattern.find(name)?.let {
+                        val (puzzleName) = it.destructured
                         missingPuzzles.set((missingPuzzles.get() - 1).coerceAtLeast(0))
                         failedPuzzles.set(failedPuzzles.get() + 1)
+                        failedPuzzlesNames.add(puzzleName)
+                    }
+                }
+
+                name.contains("✦") -> {
+                    if (failedPuzzlesNames.isNotEmpty()) {
+                        discoveredPuzzlePattern.find(name)?.let {
+                            val (puzzleName) = it.destructured
+                            if (failedPuzzlesNames.remove(puzzleName)) {
+                                missingPuzzles.set(missingPuzzles.get() + 1)
+                                failedPuzzles.set((failedPuzzles.get() - 1).coerceAtLeast(0))
+                            }
+                        }
                     }
                 }
 
@@ -643,7 +660,7 @@ object ScoreCalculation {
                 "§9Dungeon Status",
                 "• §eDeaths: §c1 §7(§6Spirit§7)",
                 // TODO puzzles
-                "• §eSecrets: §e30§7/§a40 §e(min: §a✔, could skip: §a20§e)",
+                "• §eSecrets: §e30§7/§a40 §e(min: §a✔§e, could skip: §a20§e)",
                 "• §eCrypts: §c4",
                 "• §eMimic:§l§a ✔",
                 // TODO trap
