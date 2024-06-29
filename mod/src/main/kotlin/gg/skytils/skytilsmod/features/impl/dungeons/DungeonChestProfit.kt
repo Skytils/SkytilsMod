@@ -98,7 +98,7 @@ object DungeonChestProfit : EventSubscriber {
             GlStateManager.pushMatrix()
             GlStateManager.translate(
                 (-(event.gui as AccessorGuiContainer).guiLeft).toDouble(),
-                -(event.gui as AccessorGuiContainer).guiTop.toDouble(),
+                -(event.gui as AccessorGuiContainer).guiTop.toDouble() + DungeonChest.entries.count { it.items.isNotEmpty() } * ScreenRenderer.fontRenderer.FONT_HEIGHT,
                 299.0
             )
             drawChestProfit(chestType)
