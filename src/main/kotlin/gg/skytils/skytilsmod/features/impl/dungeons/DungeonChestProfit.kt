@@ -88,7 +88,10 @@ object DungeonChestProfit {
                 }
             }
             GlStateManager.pushMatrix()
-            GlStateManager.translate((-(event.gui as AccessorGuiContainer).guiLeft).toDouble(), -event.gui.guiTop.toDouble(), 299.0)
+            GlStateManager.translate(
+                (-(event.gui as AccessorGuiContainer).guiLeft).toDouble(),
+                -event.gui.guiTop.toDouble() + DungeonChest.entries.count { it.items.isNotEmpty() } * ScreenRenderer.fontRenderer.FONT_HEIGHT,
+                299.0)
             drawChestProfit(chestType)
             GlStateManager.popMatrix()
         } else if (croesusChestRegex.matches(event.chestName)) {
