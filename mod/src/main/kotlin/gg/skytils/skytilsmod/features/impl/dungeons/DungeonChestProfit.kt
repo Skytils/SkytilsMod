@@ -181,7 +181,7 @@ object DungeonChestProfit : EventSubscriber {
         } else {
             val unformatted = name.stripControlCodes().replace("Shiny ", "")
             ItemFeatures.itemIdToNameLookup.entries.find {
-                it.value == unformatted && !it.value.contains("STARRED")
+                it.value == unformatted && !it.key.contains("STARRED")
             }?.key
         }
     }
