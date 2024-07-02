@@ -285,7 +285,6 @@ object Skytils : CoroutineScope, EventSubscriber {
         arrayOf(
             this,
             ChatTabs,
-            DungeonChestProfit,
             NamespacedCommands,
             DamageSplash,
             DungeonTimer,
