@@ -18,26 +18,29 @@
 
 package gg.skytils.skytilsmod.features.impl.handlers
 
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.item.ItemTooltipEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.utils.DevTools
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
 
-object EnchantNames : PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
+object EnchantNames : EventSubscriber, PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
     private val enchantRegex =
         Regex("(?<color>(?:§[0-9a-fzl]){1,2})(?<enchant> ?[\\w ]+[\\w \\-]*?)(?<level> [IVXLCDM0-9]{1,3})(?<suffix>§[9d], )?")
     val replacements = hashMapOf<String, String>()
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    override fun setup() {
+        register(::onTooltip, EventPriority.Lowest)
+    }
+
     fun onTooltip(event: ItemTooltipEvent) {
-        event.toolTip.replaceAll {
+        event.tooltip.replaceAll {
             var newline = it
             enchantRegex.findAll(
                 it
