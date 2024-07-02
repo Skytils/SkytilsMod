@@ -18,6 +18,11 @@
 package gg.skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.universal.UChat
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
@@ -29,14 +34,10 @@ import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.stripControlCodes
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
-object DungeonTimer {
+object DungeonTimer : EventSubscriber {
     var dungeonStartTime = -1L
     var bloodOpenTime = -1L
     var bloodClearTime = -1L
@@ -58,9 +59,13 @@ object DungeonTimer {
         SadanPhaseTimerElement()
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inDungeons || event.type == 2.toByte()) return
+    override fun setup() {
+        register(::onChat, EventPriority.Highest)
+        register(::onWorldChange)
+    }
+
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (!Utils.inDungeons) return
         val message = event.message.formattedText
         val unformatted = event.message.unformattedText.stripControlCodes()
         when {
@@ -206,8 +211,7 @@ object DungeonTimer {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         dungeonStartTime = -1
         bloodOpenTime = -1
         bloodClearTime = -1
