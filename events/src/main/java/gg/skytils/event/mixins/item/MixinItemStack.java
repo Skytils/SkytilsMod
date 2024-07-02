@@ -31,8 +31,10 @@ import java.util.List;
 
 @Mixin(ItemStack.class)
 public class MixinItemStack {
-    @Inject(method = "getTooltip", at = @At("RETURN"))
+    @Inject(method = "getTooltip", at = @At("RETURN"), cancellable = true)
     private void getTooltip(EntityPlayer playerIn, boolean advanced, CallbackInfoReturnable<List<String>> cir) {
-        EventsKt.postSync(new ItemTooltipEvent((ItemStack) (Object) this, cir.getReturnValue(), advanced));
+        ItemTooltipEvent event = new ItemTooltipEvent((ItemStack) (Object) this, cir.getReturnValue(), advanced);
+        EventsKt.postSync(event);
+        cir.setReturnValue(event.getTooltip());
     }
 }
