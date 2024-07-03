@@ -18,10 +18,14 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.DungeonPuzzleResetEvent
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.funny.Funny
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.RenderUtil
@@ -34,14 +38,11 @@ import net.minecraft.tileentity.TileEntityChest
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.awt.Point
 import kotlin.math.abs
 
-object IcePathSolver {
+object IcePathSolver : EventSubscriber {
     private val steps: MutableList<Point?> = ArrayList()
     private var silverfishChestPos: BlockPos? = null
     private var roomFacing: EnumFacing? = null
@@ -109,8 +110,13 @@ object IcePathSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
+    override fun setup() {
+        register(::onPuzzleReset)
+        register(::onWorldRender)
+        register(::onWorldChange)
+    }
+
+    fun onPuzzleReset(event: DungeonPuzzleResetEvent) {
         if (event.puzzle == "Ice Path") {
             steps.clear()
             silverfish = null
@@ -118,8 +124,7 @@ object IcePathSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: WorldDrawEvent) {
         if (!Skytils.config.icePathSolver) return
         if (silverfishChestPos != null && roomFacing != null && grid != null && silverfish?.isEntityAlive == true) {
             GlStateManager.disableCull()
@@ -139,8 +144,7 @@ object IcePathSolver {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         silverfishChestPos = null
         roomFacing = null
         grid = null
