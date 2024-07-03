@@ -18,15 +18,21 @@
 package gg.skytils.skytilsmod.features.impl.farming
 
 import gg.essential.universal.UChat
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.screen.ScreenMouseInputEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.Skytils.prefix
 import gg.skytils.skytilsmod.Skytils.successPrefix
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.Utils
@@ -34,14 +40,8 @@ import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.gui.GuiChat
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import org.lwjgl.input.Mouse
 
-object FarmingFeatures {
+object FarmingFeatures : EventSubscriber {
     val hungerHikerItems = LinkedHashMap<String, String>()
     var trapperCooldownExpire = -1L
     var animalFound = false
@@ -52,9 +52,16 @@ object FarmingFeatures {
     var targetMinY = 0
     var targetMaxY = 0
 
-    @SubscribeEvent
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (SBInfo.mode != "farming_1" || event.type == 2.toByte()) return
+    override fun setup() {
+        register(::onChat)
+        register(::onReceivePacket)
+        register(::onTick)
+        register(::onWorldChange)
+        register(::onMouseInputPost)
+    }
+
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (SBInfo.mode != "farming_1") return
 
         val formatted = event.message.formattedText
         val unformatted = event.message.unformattedText.stripControlCodes()
@@ -108,7 +115,7 @@ object FarmingFeatures {
 
                     UChat.chat("§r§aThe target is at §6Y §r§e$targetMinY${if (targetMinY != targetMaxY) "-$targetMaxY" else ""} §7($blocks blocks ${match.groups["type"]!!.value}, ${match.groups["angle"]!!.value} angle)")
 
-                    event.isCanceled = true
+                    event.cancelled = true
                 }
             }
         }
@@ -142,23 +149,21 @@ object FarmingFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onReceivePacket(event: ReceiveEvent) {
+    fun onReceivePacket(event: PacketReceiveEvent<*>) {
         if (!Utils.inSkyblock) return
         if (event.packet is S45PacketTitle) {
             val packet = event.packet
             if (packet.message != null) {
                 val unformatted = packet.message.unformattedText.stripControlCodes()
                 if (Skytils.config.hideFarmingRNGTitles && unformatted.contains("DROP!")) {
-                    event.isCanceled = true
+                    event.cancelled = true
                 }
             }
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!Utils.inSkyblock || !Skytils.config.trapperPing || event.phase != TickEvent.Phase.START) return
+    fun onTick(event: TickEvent) {
+        if (!Utils.inSkyblock || !Skytils.config.trapperPing) return
         if (trapperCooldownExpire > 0 && mc.thePlayer != null) {
             if (System.currentTimeMillis() > trapperCooldownExpire && animalFound) {
                 trapperCooldownExpire = -1
@@ -170,15 +175,13 @@ object FarmingFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         trapperCooldownExpire = -1
     }
 
-    @SubscribeEvent
-    fun onMouseInputPost(event: GuiScreenEvent.MouseInputEvent.Post) {
+    fun onMouseInputPost(event: ScreenMouseInputEvent) {
         if (!Utils.inSkyblock) return
-        if (Mouse.getEventButton() == 0 && event.gui is GuiChat) {
+        if (event.button == 0 && event.screen is GuiChat) {
             if (Skytils.config.acceptTrapperTask && acceptTrapperCommand.isNotBlank()) {
                 Skytils.sendMessageQueue.add(acceptTrapperCommand)
                 acceptTrapperCommand = ""
