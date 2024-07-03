@@ -18,6 +18,10 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.tickTimer
@@ -34,12 +38,9 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.Vec3
 import net.minecraft.world.World
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-object IceFillSolver {
+object IceFillSolver : EventSubscriber {
     private var puzzles: Triple<IceFillPuzzle, IceFillPuzzle, IceFillPuzzle>? = null
     private var job: Job? = null
 
@@ -108,8 +109,12 @@ object IceFillSolver {
             (down == Blocks.ice || down == Blocks.packed_ice) && world.getBlockState(spot).block != Blocks.stone
         }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    override fun setup() {
+        register(::onWorldRender)
+        register(::onWorldChange)
+    }
+
+    fun onWorldRender(event: WorldDrawEvent) {
         if (!Skytils.config.iceFillSolver || "Ice Fill" !in DungeonListener.missingPuzzles) return
         val (three, five, seven) = puzzles ?: return
         val matrixStack = UMatrixStack.Compat.get()
@@ -118,8 +123,7 @@ object IceFillSolver {
         seven.draw(matrixStack, event.partialTicks)
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         puzzles = null
         job = null
     }
