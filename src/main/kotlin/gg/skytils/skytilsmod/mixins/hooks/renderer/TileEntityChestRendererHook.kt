@@ -1,3 +1,5 @@
+package gg.skytils.skytilsmod.mixins.hooks.renderer
+
 import gg.skytils.skytilsmod.core.Config.threeWeirdosSolverColor
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.ThreeWeirdosSolver
 import gg.skytils.skytilsmod.utils.bindColor
