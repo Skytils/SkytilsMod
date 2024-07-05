@@ -28,6 +28,7 @@ import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.events.impl.*
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
+import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.listeners.DungeonListener
@@ -328,6 +329,14 @@ object DungeonFeatures {
         }
         if (event.entity is EntityBlaze && ++blazes == 10 && Skytils.config.sayBlazeDone) {
             Skytils.sendMessageQueue.add("/pc Blaze Done")
+        }
+    }
+
+    @SubscribeEvent
+    fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
+        if (!Utils.inDungeons) return
+        if (event.puzzle == "Higher Or Lower") {
+            blazes = 0
         }
     }
 
