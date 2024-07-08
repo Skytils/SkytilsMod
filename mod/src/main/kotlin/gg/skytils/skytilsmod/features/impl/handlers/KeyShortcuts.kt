@@ -18,43 +18,47 @@
 package gg.skytils.skytilsmod.features.impl.handlers
 
 import gg.essential.universal.UKeyboard
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.KeyboardInputEvent
+import gg.skytils.event.impl.play.MouseInputEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.runClientCommand
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
-import net.minecraftforge.client.ClientCommandHandler
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent.KeyInputEvent
-import org.lwjgl.input.Keyboard
-import org.lwjgl.input.Mouse
 import java.io.File
 import java.io.Reader
 import java.io.Writer
 
-object KeyShortcuts : PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
+object KeyShortcuts : EventSubscriber, PersistentSave(File(Skytils.modDir, "keyshortcuts.json")) {
     val shortcuts = HashSet<KeybindShortcut>()
 
-    @SubscribeEvent
-    fun onInput(event: InputEvent) {
+    override fun setup() {
+        register(::onMouseInput)
+        register(::onKeyInput)
+    }
+
+    fun onMouseInput(event: MouseInputEvent) {
         if (!Utils.inSkyblock || shortcuts.isEmpty()) return
-        val key =
-            when {
-                event is KeyInputEvent && Keyboard.getEventKeyState() -> Keyboard.getEventKey()
-                event is InputEvent.MouseInputEvent && Mouse.getEventButtonState() -> Mouse.getEventButton() - 100
-                else -> return
-            }
+        handleInput(event.button - 100)
+    }
+
+    fun onKeyInput(event: KeyboardInputEvent) {
+        if (!Utils.inSkyblock || shortcuts.isEmpty()) return
+        handleInput(event.keyCode)
+    }
+
+    private fun handleInput(keyCode: Int) {
         val modifiers = Modifiers.getBitfield(Modifiers.getPressed())
         for (s in shortcuts) {
             if (s.keyCode == 0) continue
-            if (s.keyCode == key && s.modifiers == modifiers) {
+            if (s.keyCode == keyCode && s.modifiers == modifiers) {
                 if (s.message.startsWith("/") && runClientCommand(
                         s.message
                     ) != 0
