@@ -19,19 +19,20 @@
 package gg.skytils.skytilsmod.features.impl.crimson
 
 import gg.essential.universal.ChatColor
+import gg.essential.universal.UKeyboard
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 
-object KuudraFeatures {
+object KuudraFeatures : EventSubscriber {
     var kuudraOver = false
     var myFaction: CrimsonFaction? = null
     private val factionRegex = Regex("§r§.§l(?<faction>\\w+) Reputation:§r")
@@ -47,23 +48,26 @@ object KuudraFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Unload) {
+    override fun setup() {
+        register(::onWorldLoad)
+        register(::onCheckRender)
+        register(::onPacket, EventPriority.Highest)
+    }
+
+    fun onWorldLoad(event: WorldUnloadEvent) {
         kuudraOver = false
     }
 
-    @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (event.entity !is EntityArmorStand || SBInfo.mode != SkyblockIsland.KuudraHollow.mode) return
-        if (Skytils.config.kuudraHideNonNametags && !kuudraOver && !Keyboard.isKeyDown(Keyboard.KEY_LMENU)) {
+        if (Skytils.config.kuudraHideNonNametags && !kuudraOver && !UKeyboard.isKeyDown(UKeyboard.KEY_LMENU)) {
             if (event.entity.isInvisible && !event.entity.alwaysRenderNameTag) {
                 event.isCanceled = true
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onPacket(event: PacketEvent.ReceiveEvent) {
+    fun onPacket(event: PacketReceiveEvent<*>) {
         if (SBInfo.mode != SkyblockIsland.KuudraHollow.mode) return
         if (event.packet is S02PacketChat) {
             if (event.packet.chatComponent.unformattedText.stripControlCodes().trim() == "KUUDRA DOWN!") {
