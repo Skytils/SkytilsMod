@@ -18,15 +18,21 @@
 
 package gg.skytils.event.mixins;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.TickEvent;
+import gg.skytils.event.impl.play.KeyboardInputEvent;
+import gg.skytils.event.impl.play.MouseInputEvent;
 import gg.skytils.event.impl.play.WorldUnloadEvent;
 import gg.skytils.event.impl.screen.ScreenOpenEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.WorldClient;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -51,6 +57,28 @@ public class MixinMinecraft {
     )
     private void tick(CallbackInfo ci) {
         EventsKt.postSync(new TickEvent());
+    }
+
+    @WrapOperation(method = "runTick", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;next()Z"))
+    private boolean mouseInput(Operation<Boolean> original) {
+        while(original.call()) {
+            if (EventsKt.postCancellableSync(new MouseInputEvent(Mouse.getEventX(), Mouse.getEventY(), Mouse.getEventButton()))) {
+                continue;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @WrapOperation(method = "runTick", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;next()Z"))
+    private boolean keyboardInput(Operation<Boolean> original) {
+        while(original.call()) {
+            if (EventsKt.postCancellableSync(new KeyboardInputEvent(Keyboard.getEventKey()))) {
+                continue;
+            }
+            return true;
+        }
+        return false;
     }
 
     @Inject(method = "displayGuiScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;currentScreen:Lnet/minecraft/client/gui/GuiScreen;", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER), cancellable = true)
