@@ -292,7 +292,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             GardenFeatures,
             GlintCustomizer,
             ItemFeatures,
-            KuudraChestProfit,
             KuudraFeatures,
             LividFinder,
             LockOrb,
