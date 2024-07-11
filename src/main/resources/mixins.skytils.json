@@ -97,7 +97,6 @@
   ],
   "verbose": true,
   "client": [
-    "accessors.AccessorPlayerControllerMP",
     "gui.MixinGuiEditSign",
     "renderer.MixinModelBiped",
     "util.MixinMouseHelper"
