@@ -492,6 +492,9 @@ object ScoreCalculation {
                             if (failedPuzzlesNames.remove(puzzleName)) {
                                 missingPuzzles.set(missingPuzzles.get() + 1)
                                 failedPuzzles.set((failedPuzzles.get() - 1).coerceAtLeast(0))
+                                if (puzzleName == "Higher Or Lower") {
+                                    DungeonFeatures.blazes = 0
+                                }
                             }
                         }
                     }

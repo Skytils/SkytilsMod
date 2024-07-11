@@ -108,7 +108,7 @@ object DungeonFeatures {
     private var lastLitUpTime = -1L
     private val lastBlockPos = BlockPos(7, 77, 34)
     private var startWithoutFullParty = false
-    private var blazes = 0
+    var blazes = 0
     var hasClearedText = false
     private var terracottaSpawns = hashMapOf<BlockPos, Long>()
     private val dungeonMobSpawns = setOf(
