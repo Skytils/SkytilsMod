@@ -92,6 +92,7 @@ object ScoreCalculation {
 
     // puzzle stuff
     private var puzzleCount = 0
+    private var completedPuzzleCount = 0
     private var missingPuzzles = BasicState(0).also {
         it.onSetValue {
             printDevMessage("missing puzzles $it", "scorecalcpuzzle")
@@ -347,7 +348,7 @@ object ScoreCalculation {
             if (Skytils.config.showDungeonStatus) {
                 ScoreCalculationElement.text.add("§9Dungeon Status")
                 ScoreCalculationElement.text.add("• §eDeaths: §${if (deaths.get() == 0) "a" else "c"}${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
-                // TODO puzzles
+                ScoreCalculationElement.text.add("• §ePuzzles: §${if (completedPuzzleCount == puzzleCount) "a" else if (failedPuzzles.get() > 0) "c" else "e"}$completedPuzzleCount§7/§a$puzzleCount")
                 ScoreCalculationElement.text.add("• §eSecrets: " + if (totalSecrets.get() == 0) {
                     "§7?"
                 } else {
@@ -372,8 +373,6 @@ object ScoreCalculation {
                 })
                 ScoreCalculationElement.text.add("• §eCrypts: §${if (crypts.get() >= 5) "a" else "c"}${crypts.get().coerceAtMost(5)}")
                 ScoreCalculationElement.text.add("• §eMimic:§l${if ((dungeonFloorNumber ?: 0) >= 6) if (mimicKilled.get()) "§a ✔" else "§c ✘" else "§7 -"}")
-                // TODO trap
-                // TODO rooms
                 ScoreCalculationElement.text.add("")
             }
             if (Skytils.config.showScoreBreakdown) {
@@ -472,6 +471,7 @@ object ScoreCalculation {
 
                 name.contains("✔") -> {
                     if (solvedPuzzlePattern.containsMatchIn(name)) {
+                        completedPuzzleCount++
                         missingPuzzles.set((missingPuzzles.get() - 1).coerceAtLeast(0))
                     }
                 }
@@ -584,6 +584,7 @@ object ScoreCalculation {
         firstDeathHadSpirit.set(false)
         floorReq.set(floorRequirements["default"]!!)
         puzzleCount = 0
+        completedPuzzleCount = 0
         missingPuzzles.set(0)
         failedPuzzles.set(0)
         secondsElapsed.set(0.0)
@@ -659,12 +660,10 @@ object ScoreCalculation {
             private val demoStatus = listOf(
                 "§9Dungeon Status",
                 "• §eDeaths: §c1 §7(§6Spirit§7)",
-                // TODO puzzles
+                "• §ePuzzles: §a5§7/§a5",
                 "• §eSecrets: §e30§7/§a40 §e(min: §a✔§e, could skip: §a20§e)",
                 "• §eCrypts: §c4",
                 "• §eMimic:§l§a ✔",
-                // TODO trap
-                // TODO rooms
                 ""
             )
             private val demoScore = listOf(
@@ -682,7 +681,7 @@ object ScoreCalculation {
 
         override val height: Int
             get() = (if (Skytils.config.showDungeonStatus) {
-                6
+                7
             } else {
                 0
             } + if (Skytils.config.showScoreBreakdown) {
