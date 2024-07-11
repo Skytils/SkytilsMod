@@ -463,16 +463,6 @@ object Config : Vigilant(
     var showScoreBreakdown = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Minimized Dungeon Score Estimate",
-        description = "Only shows the dungeon score.",
-        category = "Dungeons", subcategory = "Score Calculation",
-        i18nName = "skytils.config.dungeons.score_calculation.minimized_dungeon_score_estimate",
-        i18nCategory = "skytils.config.dungeons",
-        i18nSubcategory = "skytils.config.dungeons.score_calculation"
-    )
-    var minimizedScoreCalculation = false
-
-    @Property(
         type = PropertyType.SWITCH, name = "Score Calculation Party Assist",
         description = "Helps your party determine the state of the mimic in your dungeon by sending in party chat.\n§cThis feature is use at your own risk.",
         category = "Dungeons", subcategory = "Score Calculation",
