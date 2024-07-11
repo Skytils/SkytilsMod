@@ -347,8 +347,18 @@ object ScoreCalculation {
             if (!Utils.inDungeons) return@checkThreadAndQueue
             if (Skytils.config.showDungeonStatus) {
                 ScoreCalculationElement.text.add("§9Dungeon Status")
-                ScoreCalculationElement.text.add("• §eDeaths: §${if (deaths.get() == 0) "a" else "c"}${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
-                ScoreCalculationElement.text.add("• §ePuzzles: §${if (completedPuzzleCount == puzzleCount) "a" else if (failedPuzzles.get() > 0) "c" else "e"}$completedPuzzleCount§7/§a$puzzleCount")
+                ScoreCalculationElement.text.add("• §eDeaths: ${if (deaths.get() == 0) {
+                    "§a"
+                } else {
+                    "§c"
+                }}${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
+                ScoreCalculationElement.text.add("• §ePuzzles: ${if (completedPuzzleCount == puzzleCount) {
+                    "§a"
+                } else if (failedPuzzles.get() > 0) {
+                    "§c"
+                } else {
+                    "§e"
+                }}$completedPuzzleCount§7/§a$puzzleCount")
                 ScoreCalculationElement.text.add("• §eSecrets: " + if (totalSecrets.get() == 0) {
                     "§7?"
                 } else {
@@ -371,8 +381,20 @@ object ScoreCalculation {
                         else -> "§a${totalSecrets.get()  - skip}"
                     } + "§e)"
                 })
-                ScoreCalculationElement.text.add("• §eCrypts: §${if (crypts.get() >= 5) "a" else "c"}${crypts.get().coerceAtMost(5)}")
-                ScoreCalculationElement.text.add("• §eMimic:§l${if ((dungeonFloorNumber ?: 0) >= 6) if (mimicKilled.get()) "§a ✔" else "§c ✘" else "§7 -"}")
+                ScoreCalculationElement.text.add("• §eCrypts: ${if (crypts.get() >= 5) {
+                    "§a"
+                } else {
+                    "§c"
+                }}${crypts.get().coerceAtMost(5)}")
+                ScoreCalculationElement.text.add("• §eMimic: §l${if ((dungeonFloorNumber ?: 0) >= 6) {
+                    if (mimicKilled.get()) {
+                        "§a✔"
+                    } else {
+                        "§c✘"
+                    }
+                } else {
+                    "§7-"
+                }}")
                 ScoreCalculationElement.text.add("")
             }
             if (Skytils.config.showScoreBreakdown) {
