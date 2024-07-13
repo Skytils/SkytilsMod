@@ -96,7 +96,7 @@ object BoulderSolver : EventSubscriber {
                     RenderUtil.drawFilledBoundingBox(
                         matrixStack,
                         AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1),
-                        Color(255, 0, 0, 255),
+                        Skytils.config.boulderSolverColor,
                         0.7f
                     )
                     GlStateManager.enableCull()
