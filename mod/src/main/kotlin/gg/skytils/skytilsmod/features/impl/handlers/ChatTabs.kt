@@ -19,13 +19,28 @@
 package gg.skytils.skytilsmod.features.impl.handlers
 
 import gg.essential.api.EssentialAPI
-import gg.essential.universal.UChat
-import gg.essential.universal.UResolution
+import gg.essential.elementa.ElementaVersion
+import gg.essential.elementa.components.UIContainer
+import gg.essential.elementa.components.Window
+import gg.essential.elementa.constraints.ChildBasedMaxSizeConstraint
+import gg.essential.elementa.constraints.ChildBasedRangeConstraint
+import gg.essential.elementa.dsl.basicYConstraint
+import gg.essential.elementa.dsl.childOf
+import gg.essential.elementa.dsl.constrain
+import gg.essential.elementa.dsl.pixels
+import gg.essential.universal.*
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.network.ClientDisconnectEvent
+import gg.skytils.event.impl.screen.ScreenDrawEvent
+import gg.skytils.event.impl.screen.ScreenMouseInputEvent
+import gg.skytils.event.impl.screen.ScreenOpenEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.PacketEvent
-import gg.skytils.skytilsmod.gui.elements.CleanButton
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
+import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionChatLine
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionChatStyle
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiChat
@@ -36,20 +51,21 @@ import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
-import org.lwjgl.input.Mouse
 import java.awt.Color
 
-object ChatTabs {
+object ChatTabs : EventSubscriber {
     var selectedTab = ChatTab.ALL
     var hoveredChatLine: ChatLine? = null
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onChat(event: PacketEvent.ReceiveEvent) {
+    override fun setup() {
+        register(::onChat, EventPriority.Highest)
+        register(::onOpenGui)
+        register(::drawScreen)
+        register(::mouseInput)
+        register(::onDisconnect)
+    }
+
+    fun onChat(event: PacketReceiveEvent<*>) {
         if (!Utils.isOnHypixel || !Skytils.config.chatTabs || event.packet !is S02PacketChat || event.packet.type == 2.toByte()) return
 
         val style = event.packet.chatComponent.chatStyle
@@ -78,11 +94,10 @@ object ChatTabs {
         return style.chatTabType!!.contains(selectedTab)
     }
 
-    @SubscribeEvent
-    fun onOpenGui(event: GuiOpenEvent) {
-        if (!Skytils.config.chatTabs || !Skytils.config.preFillChatTabCommands || !Utils.isOnHypixel || event.gui !is GuiChat) return
-        if ((event.gui as AccessorGuiChat).defaultInputFieldText.isBlank()) {
-            (event.gui as AccessorGuiChat).defaultInputFieldText =
+    fun onOpenGui(event: ScreenOpenEvent) {
+        if (!Skytils.config.chatTabs || !Skytils.config.preFillChatTabCommands || !Utils.isOnHypixel || event.screen !is GuiChat) return
+        if ((event.screen as AccessorGuiChat).defaultInputFieldText.isBlank()) {
+            (event.screen as AccessorGuiChat).defaultInputFieldText =
                 when (selectedTab) {
                     ChatTab.ALL -> "/ac "
                     ChatTab.PARTY -> "/pc "
@@ -93,80 +108,24 @@ object ChatTabs {
         }
     }
 
-    @SubscribeEvent
-    fun onScreenEvent(event: GuiScreenEvent) {
-        if (!Skytils.config.chatTabs || !Utils.isOnHypixel || event.gui !is GuiChat) return
-        val chat = mc.ingameGUI.chatGUI
-        chat as AccessorGuiNewChat
-        when (event) {
-            is GuiScreenEvent.InitGuiEvent.Post -> {
-                event.buttonList.addAll(ChatTab.buttons.values)
-            }
-
-            is GuiScreenEvent.ActionPerformedEvent.Pre -> {
-                ChatTab.buttons.entries.find {
-                    it.value == event.button
-                }?.let {
-                    selectedTab = it.key
-                    runCatching {
-                        chat.refreshChat()
-                    }.onFailure { e ->
-                        e.printStackTrace()
-                        UChat.chat("$failPrefix §cSkytils ran into an error while refreshing chat tabs. Please send your logs on our Discord server at discord.gg/skytils!")
-                        chat.drawnChatLines.clear()
-                        chat.resetScroll()
-                        for (line in chat.chatLines.asReversed()) {
-                            if (line?.chatComponent == null) continue
-                            chat.invokeSetChatLine(
-                                line.chatComponent,
-                                line.chatLineID,
-                                line.updatedCounter,
-                                true
-                            )
-                        }
-                    }
-                    if (Skytils.config.autoSwitchChatChannel) {
-                        Skytils.sendMessageQueue.addFirst(
-                            when (selectedTab) {
-                                ChatTab.ALL -> "/chat a"
-                                ChatTab.PARTY -> "/chat p"
-                                ChatTab.GUILD -> "/chat g"
-                                ChatTab.COOP -> "/chat coop"
-                                else -> ""
-                            }
-                        )
-                    }
-                }
-            }
-
-            is GuiScreenEvent.DrawScreenEvent.Pre -> {
-                ChatTab.buttons.entries.forEach { (c, b) ->
-                    b.enabled = c != selectedTab
-                    b.yPosition =
-                        (UResolution.scaledHeight - (chat.drawnChatLines.size.coerceAtMost(chat.lineCount) * mc.fontRendererObj.FONT_HEIGHT) - (12 + b.height) * 2)
-                }
-            }
+    fun drawScreen(event: ScreenDrawEvent) {
+        if (!Skytils.config.chatTabs || !Utils.isOnHypixel || event.screen !is GuiChat) return
+        ChatTab.screen.draw(UMatrixStack.Compat.get())
+        UMinecraft.getChatGUI()?.let { chat ->
+            hoveredChatLine =
+                if (Skytils.config.copyChat && chat.chatOpen) chat.getChatLine(event.mouseX, event.mouseY) else null
         }
     }
 
-    @SubscribeEvent
-    fun preDrawScreen(event: GuiScreenEvent.DrawScreenEvent.Pre) {
-        val chat = mc.ingameGUI.chatGUI
-        chat as AccessorGuiNewChat
-        hoveredChatLine =
-            if (Skytils.config.copyChat && chat.chatOpen) chat.getChatLine(Mouse.getX(), Mouse.getY()) else null
-    }
-
-    @SubscribeEvent
-    fun onAttemptCopy(event: GuiScreenEvent.MouseInputEvent.Pre) {
-        if (!Utils.isOnHypixel || event.gui !is GuiChat || !Mouse.getEventButtonState()) return
+    fun mouseInput(event: ScreenMouseInputEvent) {
+        if (!Utils.isOnHypixel || event.screen !is GuiChat) return
+        event.cancelled = !ChatTab.screen.clickMouse(event.mouseX.toDouble(), event.mouseY.toDouble(), event.button)
         val chat = mc.ingameGUI.chatGUI
         chat as AccessorGuiNewChat
         if (GuiScreen.isCtrlKeyDown() && DevTools.getToggle("chat")) {
-            val button = Mouse.getEventButton()
-            if (button != 0 && button != 1) return
+            if (event.button != 0 && event.button != 1) return
             val chatLine = hoveredChatLine ?: return
-            if (button == 0) {
+            if (event.button == 0) {
                 val component = (chatLine as ExtensionChatLine).fullComponent ?: chatLine.chatComponent
                 GuiScreen.setClipboardString(component.formattedText)
                 printDevMessage("Copied formatted message to clipboard!", "chat")
@@ -187,8 +146,7 @@ object ChatTabs {
                 )
             }
         } else if (Skytils.config.copyChat) {
-            val button = Mouse.getEventButton()
-            if (button != 0) return
+            if (event.button != 0) return
             val chatLine = hoveredChatLine ?: return
             val component = if (GuiScreen.isCtrlKeyDown()) (chatLine as ExtensionChatLine).fullComponent
                 ?: chatLine.chatComponent else if (GuiScreen.isShiftKeyDown()) chatLine.chatComponent else return
@@ -198,8 +156,7 @@ object ChatTabs {
         }
     }
 
-    @SubscribeEvent
-    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+    fun onDisconnect(event: ClientDisconnectEvent) {
         runCatching {
             mc.ingameGUI.chatGUI.refreshChat()
         }.onFailure {
@@ -237,10 +194,66 @@ object ChatTabs {
             formatted.startsWith("§r§bCo-op > ")
         });
 
-        val button = CleanButton(-69420, 2 + 22 * ordinal, 0, 20, 20, text)
+        val button = SimpleButton(text).constrain {
+            x = (22 * ordinal).pixels
+            width = 20.pixels
+            height = 20.pixels
+        }.onMouseClick { event ->
+            if (selectedTab == this@ChatTab) return@onMouseClick
+            event.stopPropagation()
+            USound.playButtonPress()
+            selectedTab = this@ChatTab
+            val chat = UMinecraft.getChatGUI() ?: return@onMouseClick
+            chat as AccessorGuiNewChat
+            runCatching {
+                chat.refreshChat()
+            }.onFailure { e ->
+                e.printStackTrace()
+                UChat.chat("$failPrefix §cSkytils ran into an error while refreshing chat tabs. Please send your logs on our Discord server at discord.gg/skytils!")
+                chat.drawnChatLines.clear()
+                chat.resetScroll()
+                for (line in chat.chatLines.asReversed()) {
+                    if (line?.chatComponent == null) continue
+                    chat.invokeSetChatLine(
+                        line.chatComponent,
+                        line.chatLineID,
+                        line.updatedCounter,
+                        true
+                    )
+                }
+            }
+            if (Skytils.config.autoSwitchChatChannel) {
+                Skytils.sendMessageQueue.addFirst(
+                    when (selectedTab) {
+                        ALL -> "/chat a"
+                        PARTY -> "/chat p"
+                        GUILD -> "/chat g"
+                        COOP -> "/chat coop"
+                        else -> ""
+                    }
+                )
+            }
+        }
 
         companion object {
-            val buttons by lazy { entries.associateWith { it.button } }
+            val screen = Window(ElementaVersion.V5)
+            private val container = UIContainer().constrain {
+                x = 2.pixels
+                y = basicYConstraint { UResolution.scaledHeight - calculateChatHeight().toFloat() - 30f /* bottom bit */ - 20f /* height */ - 5f /* padding */ }
+                height = ChildBasedMaxSizeConstraint()
+                width = ChildBasedRangeConstraint()
+            } childOf screen
+
+            init {
+                entries.forEach { tab ->
+                    tab.button childOf container
+                }
+            }
+
+            private fun calculateChatHeight() =
+                UMinecraft.getChatGUI()?.let { chat ->
+                    chat.chatHeight.coerceAtMost((chat as AccessorGuiNewChat).drawnChatLines.size * UMinecraft.getFontRenderer().FONT_HEIGHT)
+                } ?: 0
         }
     }
 }

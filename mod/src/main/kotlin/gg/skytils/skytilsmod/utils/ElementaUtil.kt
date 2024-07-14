@@ -21,6 +21,8 @@ package gg.skytils.skytilsmod.utils
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.components.UIContainer
 import gg.essential.elementa.components.input.UITextInput
+import gg.essential.elementa.dsl.childOf
+import gg.essential.elementa.events.UIClickEvent
 import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.gui.settings.SettingComponent
 import java.awt.Color
@@ -58,3 +60,21 @@ fun UITextInput.colorIfNumeric(validColor: Color, invalidColor: Color) = apply {
  */
 val UIComponent.childContainers
     get() = this.childrenOfType<UIContainer>().filter { it !is SettingComponent }
+
+/**
+ * Determines whether a mouse click was consumed or not
+ */
+fun UIComponent.clickMouse(x: Double, y: Double, button: Int): Boolean {
+    var consumed = true
+    val finalListener: UIComponent.(UIClickEvent) -> Unit = { event ->
+        if (event.propagationStopped && event.target != this@clickMouse) {
+            consumed = false
+        }
+    }
+
+    mouseClickListeners.add(finalListener)
+    mouseClick(x, y, button)
+    mouseClickListeners.remove(finalListener)
+
+    return consumed
+}

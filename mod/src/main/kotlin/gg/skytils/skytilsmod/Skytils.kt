@@ -284,7 +284,6 @@ object Skytils : CoroutineScope, EventSubscriber {
 
         arrayOf(
             this,
-            ChatTabs,
             NamespacedCommands,
             DamageSplash,
             FavoritePets,
@@ -336,6 +335,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             BrewingFeatures,
             Catlas,
             ChangeAllToSameColorSolver,
+            ChatTabs,
             CHTreasureChestHelper,
             CHWaypoints,
             ClickInOrderSolver,

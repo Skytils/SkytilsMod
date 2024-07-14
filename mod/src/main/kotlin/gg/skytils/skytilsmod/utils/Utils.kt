@@ -21,6 +21,7 @@ import dev.falsehonesty.asmhelper.AsmHelper
 import dev.falsehonesty.asmhelper.dsl.instructions.Descriptor
 import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.universal.ChatColor
+import gg.essential.universal.UGraphics
 import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
@@ -266,21 +267,20 @@ val EntityLivingBase.baseMaxHealth: Double
 
 fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
     if (chatOpen && this is AccessorGuiNewChat) {
-        val scaleFactor = UResolution.scaleFactor
         val extraOffset =
-            if (ReflectionHelper.getFieldFor("club.sk1er.patcher.config.PatcherConfig", "chatPosition")
+            if (
+                ReflectionHelper
+                    .getFieldFor("club.sk1er.patcher.config.PatcherConfig", "chatPosition")
                     ?.getBoolean(null) == true
             ) 12 else 0
-        val x = MathHelper.floor_float((mouseX / scaleFactor - 3).toFloat() / chatScale)
-        val y = MathHelper.floor_float((mouseY / scaleFactor - 27 - extraOffset).toFloat() / chatScale)
+        val x = ((mouseX - 3) / chatScale).toInt()
+        val y = (((UResolution.scaledHeight - mouseY) - 30 - extraOffset) / chatScale).toInt()
 
         if (x >= 0 && y >= 0) {
-            val l = this.lineCount.coerceAtMost(this.drawnChatLines.size)
-            if (x <= MathHelper.floor_float(this.chatWidth.toFloat() / this.chatScale) && y < mc.fontRendererObj.FONT_HEIGHT * l + l) {
-                val lineNum = y / mc.fontRendererObj.FONT_HEIGHT + this.scrollPos
-                if (lineNum >= 0 && lineNum < this.drawnChatLines.size) {
-                    return drawnChatLines[lineNum]
-                }
+            val l = lineCount.coerceAtMost(drawnChatLines.size)
+            if (x <= chatWidth / chatScale && y < UGraphics.getFontHeight() * l + l) {
+                val lineNum = y / UGraphics.getFontHeight() + scrollPos
+                return drawnChatLines.getOrNull(lineNum)
             }
         }
     }
