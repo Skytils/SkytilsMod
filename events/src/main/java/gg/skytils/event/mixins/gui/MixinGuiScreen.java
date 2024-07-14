@@ -48,8 +48,8 @@ public class MixinGuiScreen {
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-    public void handleMouseInput(CallbackInfo ci) {
-        if (EventsKt.postCancellableSync(new ScreenMouseInputEvent((GuiScreen) (Object) this, Mouse.getEventX(), Mouse.getEventY(), Mouse.getEventButton()))) {
+    public void handleMouseInput(int mouseX, int mouseY, int mouseButton, CallbackInfo ci) {
+        if (EventsKt.postCancellableSync(new ScreenMouseInputEvent((GuiScreen) (Object) this, mouseX, mouseY, mouseButton))) {
             ci.cancel();
         }
     }
