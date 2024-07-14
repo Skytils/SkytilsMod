@@ -19,21 +19,26 @@ package gg.skytils.skytilsmod.features.impl.mining
 
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
+import gg.essential.universal.UMinecraft
 import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.entity.BossBarSetEvent
+import gg.skytils.event.impl.play.BlockInteractEvent
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
-import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.Skytils.prefix
 import gg.skytils.skytilsmod.Skytils.successPrefix
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.BossBarEvent
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import net.minecraft.client.renderer.GlStateManager
@@ -43,16 +48,10 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.entity.player.PlayerInteractEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.util.regex.Pattern
 
-object MiningFeatures {
+object MiningFeatures : EventSubscriber {
 
     var fetchurItems = linkedMapOf<String, String>()
 
@@ -63,10 +62,19 @@ object MiningFeatures {
     private var raffleBox: BlockPos? = null
     private var inRaffle = false
 
-    @SubscribeEvent
-    fun onBossBar(event: BossBarEvent.Set) {
+    override fun setup() {
+        register(::onBossBar)
+        register(::onChat)
+        register(::onDrawSlot)
+        register(::onPlayerInteract)
+        register(::onRenderWorld)
+        register(::onScoreboardChange)
+        register(::onWorldChange)
+    }
+
+    fun onBossBar(event: BossBarSetEvent) {
         if (!Utils.inSkyblock) return
-        val unformatted = event.displayData.displayName.unformattedText.stripControlCodes()
+        val unformatted = event.data.displayName.unformattedText.stripControlCodes()
         if (Skytils.config.raffleWarning) {
             if (unformatted.contains("EVENT")) {
                 eventPattern.find(unformatted)?.groups?.let {
@@ -85,9 +93,9 @@ object MiningFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type == 2.toByte()) return
+//    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (!Utils.inSkyblock) return
         val formatted = event.message.formattedText
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.powerGhastPing) {
@@ -159,8 +167,7 @@ object MiningFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
+    fun onDrawSlot(event: GuiContainerPreDrawSlotEvent) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
         if (!event.slot.hasStack) return
         if (Skytils.config.highlightDisabledHOTMPerks && SBInfo.lastOpenContainerName == "Heart of the Mountain") {
@@ -180,22 +187,17 @@ object MiningFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onPlayerInteract(event: PlayerInteractEvent) {
+    fun onPlayerInteract(event: BlockInteractEvent) {
         if (!Utils.inSkyblock) return
-        if (event.entity !== mc.thePlayer) return
-        if (event.action != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) {
-            if (Skytils.config.raffleWaypoint && inRaffle && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-                val block = event.world.getBlockState(event.pos)
-                if (block.block === Blocks.jukebox) {
-                    lastJukebox = event.pos
-                }
+        if (Skytils.config.raffleWaypoint && inRaffle) {
+            val block = UMinecraft.getWorld()?.getBlockState(event.pos) ?: return
+            if (block.block === Blocks.jukebox) {
+                lastJukebox = event.pos
             }
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: WorldDrawEvent) {
         if (!Utils.inSkyblock) return
         val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
         val matrixStack = UMatrixStack()
@@ -223,8 +225,7 @@ object MiningFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onScoreboardChange(event: PacketEvent.ReceiveEvent) {
+    fun onScoreboardChange(event: PacketReceiveEvent<*>) {
         if (
             !Utils.inSkyblock ||
             event.packet !is S3EPacketTeams
@@ -244,8 +245,7 @@ object MiningFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         puzzlerSolution = null
         lastJukebox = null
         raffleBox = null
