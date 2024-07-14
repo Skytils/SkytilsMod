@@ -18,10 +18,19 @@
 
 package gg.skytils.event.impl.play
 
+import gg.skytils.event.CancellableEvent
 import gg.skytils.event.Event
+import net.minecraft.item.ItemStack
+import net.minecraft.util.BlockPos
 import net.minecraft.world.World
 
 /**
  * [gg.skytils.event.mixins.MixinMinecraft.worldChange]
  */
 class WorldUnloadEvent(val world: World) : Event()
+
+/**
+ * Represents right-clicking on a block
+ * [gg.skytils.event.mixins.MixinMinecraft.onBlockInteract]
+ */
+class BlockInteractEvent(val item: ItemStack, val pos: BlockPos) : CancellableEvent()

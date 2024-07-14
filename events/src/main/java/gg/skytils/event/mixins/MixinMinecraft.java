@@ -26,11 +26,18 @@ import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.TickEvent;
 import gg.skytils.event.impl.play.KeyboardInputEvent;
 import gg.skytils.event.impl.play.MouseInputEvent;
+import gg.skytils.event.impl.play.BlockInteractEvent;
 import gg.skytils.event.impl.play.WorldUnloadEvent;
 import gg.skytils.event.impl.screen.ScreenOpenEvent;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.objectweb.asm.Opcodes;
@@ -96,5 +103,10 @@ public class MixinMinecraft {
         if (this.theWorld != null) {
             EventsKt.postSync(new WorldUnloadEvent(this.theWorld));
         }
+    }
+
+    @WrapOperation(method = "rightClickMouse", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;onPlayerRightClick(Lnet/minecraft/client/entity/EntityPlayerSP;Lnet/minecraft/client/multiplayer/WorldClient;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/BlockPos;Lnet/minecraft/util/EnumFacing;Lnet/minecraft/util/Vec3;)Z"))
+    private boolean onBlockInteract(PlayerControllerMP instance, EntityPlayerSP iblockstate, WorldClient world, ItemStack itemStack, BlockPos pos, EnumFacing enumFacing, Vec3 hitVec, Operation<Boolean> original) {
+        return !EventsKt.postCancellableSync(new BlockInteractEvent(itemStack, pos)) && original.call(instance, iblockstate, world, itemStack, pos, enumFacing, hitVec);
     }
 }
