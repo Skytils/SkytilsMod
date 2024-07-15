@@ -19,6 +19,12 @@
 package gg.skytils.skytilsmod.features.impl.farming
 
 import gg.essential.api.EssentialAPI
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.SelectionBoxDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.tickTimer
@@ -26,13 +32,8 @@ import gg.skytils.skytilsmod.utils.*
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.util.MovingObjectPosition
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.DrawBlockHighlightEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object GardenFeatures {
+object GardenFeatures : EventSubscriber {
     private val cleanupRegex = Regex("^\\s*Cleanup: [\\d.]+%$")
     var isCleaningPlot = false
         private set
@@ -53,9 +54,14 @@ object GardenFeatures {
     private var nextVisitorAt = -1L
     private var lastKnownVisitorCount = 0
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type == 2.toByte()) return
+    override fun setup() {
+        register(::onChat, EventPriority.Highest)
+        register(::onBlockSelect)
+        register(::onWorldChange)
+    }
+
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (!Utils.inSkyblock) return
         if (!Skytils.config.visitorNotifications) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (unformatted.matches(newVisitorRegex)) {
@@ -87,8 +93,7 @@ object GardenFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onBlockSelect(event: DrawBlockHighlightEvent) {
+    fun onBlockSelect(event: SelectionBoxDrawEvent) {
         if (!Utils.inSkyblock || !Skytils.config.showSamScytheBlocks) return
 
         if (event.target.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
@@ -119,8 +124,7 @@ object GardenFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         isCleaningPlot = false
     }
 }

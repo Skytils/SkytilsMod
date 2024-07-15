@@ -18,9 +18,13 @@
 
 package gg.skytils.event.impl.render
 
+import gg.skytils.event.CancellableEvent
 import gg.skytils.event.Event
+import net.minecraft.util.MovingObjectPosition
 
 /**
  * [gg.skytils.event.mixins.render.MixinGameRenderer.renderWorld]
  */
 class WorldDrawEvent(val partialTicks: Float) : Event()
+
+class SelectionBoxDrawEvent(val target: MovingObjectPosition, val partialTicks: Float) : CancellableEvent()

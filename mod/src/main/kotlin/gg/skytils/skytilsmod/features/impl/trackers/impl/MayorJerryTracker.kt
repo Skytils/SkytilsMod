@@ -18,6 +18,9 @@
 
 package gg.skytils.skytilsmod.features.impl.trackers.impl
 
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
@@ -27,15 +30,11 @@ import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.Reader
 import java.io.Writer
 
-object MayorJerryTracker : Tracker("mayorjerry") {
+object MayorJerryTracker : EventSubscriber, Tracker("mayorjerry") {
 
     @Suppress("UNUSED")
     enum class HiddenJerry(val type: String, val colorCode: String, var discoveredTimes: Long = 0L) {
@@ -81,8 +80,11 @@ object MayorJerryTracker : Tracker("mayorjerry") {
         markDirty<MayorJerryTracker>()
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
+    override fun setup() {
+        register(::onChat, gg.skytils.event.EventPriority.Highest)
+    }
+
+    fun onChat(event: ChatMessageReceivedEvent) {
         if (!Skytils.config.trackHiddenJerry) return
         val formatted = event.message.formattedText
         val unformatted = event.message.unformattedText.stripControlCodes()

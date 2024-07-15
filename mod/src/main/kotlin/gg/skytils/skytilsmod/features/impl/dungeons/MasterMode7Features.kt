@@ -21,13 +21,19 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.universal.ChatColor
 import gg.essential.universal.UChat
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.entity.LivingEntityDeathEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.CheckRenderEntityEvent
+import gg.skytils.event.impl.render.LivingEntityPreRenderEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.impl.world.BlockStateUpdateEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
-import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorModelDragon
 import gg.skytils.skytilsmod.utils.*
@@ -40,16 +46,11 @@ import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.network.play.server.S2CPacketSpawnGlobalEntity
 import net.minecraft.util.*
-import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.entity.living.LivingDeathEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
 
-object MasterMode7Features {
+object MasterMode7Features : EventSubscriber {
 
     private val spawningDragons = hashSetOf<WitherKingDragons>()
     private val killedDragons = hashSetOf<WitherKingDragons>()
@@ -57,8 +58,17 @@ object MasterMode7Features {
     private val glowstones = hashSetOf<AxisAlignedBB>()
     private val dragonSpawnTimes = hashMapOf<WitherKingDragons, Long>()
 
-    @SubscribeEvent
-    fun onBlockChange(event: BlockChangeEvent) {
+    override fun setup() {
+        register(::onBlockChange)
+        register(::onPacket)
+        register(::onDeath)
+        register(::onWorldLoad)
+        register(::onRenderLivingPost)
+        register(::onRenderWorld)
+        register(::onCheckRender)
+    }
+
+    fun onBlockChange(event: BlockStateUpdateEvent) {
         if (DungeonTimer.phase4ClearTime == -1L) return
         if (Skytils.config.witherKingDragonSlashAlert) {
             if (event.old.block === Blocks.glowstone) {
@@ -86,8 +96,7 @@ object MasterMode7Features {
         }
     }
 
-    @SubscribeEvent
-    fun onPacket(event: MainReceivePacketEvent<*, *>) {
+    fun onPacket(event: MainThreadPacketReceiveEvent<*>) {
         if (DungeonTimer.phase4ClearTime == -1L) return
         if (event.packet is S2CPacketSpawnGlobalEntity && event.packet.func_149053_g() == 1) {
             val x = event.packet.func_149051_d() / 32.0
@@ -127,8 +136,7 @@ object MasterMode7Features {
         }
     }
 
-    @SubscribeEvent
-    fun onDeath(event: LivingDeathEvent) {
+    fun onDeath(event: LivingEntityDeathEvent) {
         if (event.entity is EntityDragon) {
             val item = (event.entity as ExtensionEntityLivingBase).skytilsHook.masterDragonType ?: return
             printDevMessage("${item.name} died", "witherkingdrags")
@@ -137,8 +145,7 @@ object MasterMode7Features {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Unload) {
+    fun onWorldLoad(event: WorldUnloadEvent) {
         spawningDragons.clear()
         killedDragons.clear()
         dragonMap.clear()
@@ -146,8 +153,7 @@ object MasterMode7Features {
         WitherKingDragons.entries.forEach { it.isDestroyed = false }
     }
 
-    @SubscribeEvent
-    fun onRenderLivingPost(event: RenderLivingEvent.Post<*>) {
+    fun onRenderLivingPost(event: LivingEntityPreRenderEvent<*>) {
         val entity = event.entity
         if (DungeonTimer.phase4ClearTime != -1L && entity is EntityDragon && (Skytils.config.showWitherDragonsColorBlind || Skytils.config.showWitherKingDragonsHP || Skytils.config.showWitherKingStatueBox)) {
             val matrixStack = UMatrixStack()
@@ -191,8 +197,7 @@ object MasterMode7Features {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: WorldDrawEvent) {
         if (Skytils.config.showWitherKingStatueBox && DungeonTimer.phase4ClearTime != -1L) {
             for (drag in WitherKingDragons.entries) {
                 if (drag.isDestroyed) continue
@@ -225,10 +230,9 @@ object MasterMode7Features {
         }
     }
 
-    @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (event.entity is EntityDragon && event.entity.deathTicks > 1 && shouldHideDragonDeath()) {
-            event.isCanceled = true
+        if (event.entity is EntityDragon && (event.entity as EntityDragon).deathTicks > 1 && shouldHideDragonDeath()) {
+            event.cancelled = true
         }
     }
 

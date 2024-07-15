@@ -20,18 +20,24 @@ package gg.skytils.skytilsmod.features.impl.misc
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.BlockInteractEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.impl.screen.GuiContainerForegroundDrawnEvent
+import gg.skytils.event.impl.screen.GuiContainerPostDrawSlotEvent
+import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.register
 import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.json
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
-import gg.skytils.skytilsmod.events.impl.GuiRenderItemEvent
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
@@ -74,18 +80,11 @@ import net.minecraft.network.play.server.S2FPacketSetSlot
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.util.MovingObjectPosition
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.common.util.Constants
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.event.entity.player.PlayerInteractEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import java.awt.Color
 import kotlin.math.pow
 
-object ItemFeatures {
+object ItemFeatures : EventSubscriber {
 
     private val headPattern =
         Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
@@ -184,8 +183,20 @@ object ItemFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
+    override fun setup() {
+        register(::onDrawSlot)
+        register(::onSlotClick)
+        register(::ontooltip, EventPriority.Highest)
+        register(::onReceivePacket)
+        register(::onSendPacket)
+        register(::onEntitySpawn)
+        register(::onInteract)
+        register(::onRenderItemOverlayPost)
+        register(::onDrawContainerForeground)
+        register(::onRenderWorld)
+    }
+
+    fun onDrawSlot(event: GuiContainerPreDrawSlotEvent) {
         if (Utils.inSkyblock && Skytils.config.showItemRarity && event.slot.hasStack) {
             renderRarity(event.slot.stack, event.slot.xDisplayPosition, event.slot.yDisplayPosition)
         }
@@ -261,12 +272,11 @@ object ItemFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onSlotClick(event: SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
         if (!Utils.inSkyblock) return
         if (event.container is ContainerChest) {
-            if (event.slot != null && event.slot.hasStack) {
-                val item = event.slot.stack ?: return
+            if (event.slot != null && event.slot!!.hasStack) {
+                val item = event.slot!!.stack ?: return
                 val extraAttr = getExtraAttributes(item)
                 if (Skytils.config.stopClickingNonSalvageable) {
                     if (event.chestName.startsWith("Salvage") && extraAttr != null) {
@@ -274,7 +284,7 @@ object ItemFeatures {
                                 "Essence"
                             )
                         ) {
-                            event.isCanceled = true
+                            event.cancelled = true
                         }
                     }
                 }
@@ -282,10 +292,9 @@ object ItemFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onTooltip(event: ItemTooltipEvent) {
+    fun ontooltip(event: gg.skytils.event.impl.item.ItemTooltipEvent) {
         if (!Utils.inSkyblock) return
-        val item = event.itemStack
+        val item = event.stack
         val extraAttr = getExtraAttributes(item)
         var itemId = getSkyBlockItemID(extraAttr)
         var isSuperpairsReward = false
@@ -318,7 +327,7 @@ object ItemFeatures {
                                 if (isSuperpairsReward) NumberUtil.nf.format(valuePer) else NumberUtil.nf.format(
                                     valuePer * item!!.stackSize
                                 )
-                            event.toolTip.add(
+                            event.tooltip.add(
                                 "§6Lowest BIN Price: §b$total" + if (item!!.stackSize > 1 && !isSuperpairsReward) " §7(" + NumberUtil.nf.format(
                                     valuePer
                                 ) + " each§7)" else ""
@@ -329,14 +338,14 @@ object ItemFeatures {
                                 val kuudraPrice = KuudraPriceData.getOrRequestAttributePricedItem(attrId)
                                 if (kuudraPrice != null) {
                                     if (kuudraPrice == KuudraPriceData.AttributePricedItem.EMPTY) {
-                                        event.toolTip.add("§6Kuudra BIN Price: §cNot Found")
+                                        event.tooltip.add("§6Kuudra BIN Price: §cNot Found")
                                     } else {
-                                        event.toolTip.add(
+                                        event.tooltip.add(
                                             "§6Kuudra BIN Price: §b${NumberUtil.nf.format(kuudraPrice.price)}"
                                         )
                                     }
                                 } else {
-                                    event.toolTip.add("§6Kuudra BIN Price: §cLoading...")
+                                    event.tooltip.add("§6Kuudra BIN Price: §cLoading...")
                                 }
                             }
                         }
@@ -359,7 +368,7 @@ object ItemFeatures {
                                     }
                                 }
                             }
-                            if (bitValue != -1) event.toolTip.add("§6Coin/Bit: §b" + NumberUtil.nf.format(valuePer / bitValue))
+                            if (bitValue != -1) event.tooltip.add("§6Coin/Bit: §b" + NumberUtil.nf.format(valuePer / bitValue))
                         }
                         if (Skytils.config.showCoinsPerCopper) {
                             var copperValue = copperCosts.getOrDefault(auctionIdentifier, -1)
@@ -382,7 +391,7 @@ object ItemFeatures {
                                     }
                                 }
                             }
-                            if (copperValue != -1) event.toolTip.add(
+                            if (copperValue != -1) event.tooltip.add(
                                 "§6Coin/Copper: §c" + NumberUtil.nf.format(valuePer / copperValue)
                             )
                         }
@@ -391,7 +400,7 @@ object ItemFeatures {
             }
             if (Skytils.config.showNPCSellPrice) {
                 val valuePer = sellPrices[itemId]
-                if (valuePer != null) event.toolTip.add(
+                if (valuePer != null) event.tooltip.add(
                     "§6NPC Value: §b" + NumberUtil.nf.format(valuePer * item!!.stackSize) + if (item.stackSize > 1) " §7(" + NumberUtil.nf.format(
                         valuePer
                     ) + " each§7)" else ""
@@ -405,22 +414,22 @@ object ItemFeatures {
             } catch (e: Exception) {
                 "Error"
             }
-            for (i in event.toolTip.indices) {
-                val line = event.toolTip[i]
+            for (i in event.tooltip.indices) {
+                val line = event.tooltip[i]
                 if (line.contains("§7Crit Damage:")) {
-                    event.toolTip.add(i + 1, "§8Radioactive Bonus: §c+${bonus}%")
+                    event.tooltip.add(i + 1, "§8Radioactive Bonus: §c+${bonus}%")
                     break
                 }
             }
         }
         if (itemId == "PREHISTORIC_EGG" && extraAttr != null) {
-            event.toolTip.add((event.toolTip.indexOfFirst { it.contains("Legendary Armadillo") } + 1),
+            event.tooltip.add((event.tooltip.indexOfFirst { it.contains("Legendary Armadillo") } + 1),
                 "§7Blocks Walked: §c${extraAttr.getInteger("blocks_walked")}")
         }
         if (Skytils.config.showGemstones && extraAttr?.hasKey("gems") == true) {
             val gems = extraAttr.getCompoundTag("gems")
-            event.toolTip.add("§bGemstones: ")
-            event.toolTip.addAll(gems.keySet.filterNot { it.endsWith("_gem") || it == "unlocked_slots" }.map {
+            event.tooltip.add("§bGemstones: ")
+            event.tooltip.addAll(gems.keySet.filterNot { it.endsWith("_gem") || it == "unlocked_slots" }.map {
                 val quality = when (val tag: NBTBase? = gems.getTag(it)) {
                     is NBTTagCompound -> tag.getString("quality").toTitleCase().ifEmpty { "Report Unknown" }
                     is NBTTagString -> tag.string.toTitleCase()
@@ -457,17 +466,16 @@ object ItemFeatures {
                     else -> "§b"
                 }
 
-                event.toolTip.add("§6Quality: $color$boost% §7($floor§7)")
+                event.tooltip.add("§6Quality: $color$boost% §7($floor§7)")
             }
         }
 
         if (DevTools.getToggle("nbt") && Keyboard.isKeyDown(46) && GuiScreen.isCtrlKeyDown() && !GuiScreen.isShiftKeyDown() && !GuiScreen.isAltKeyDown()) {
-            GuiScreen.setClipboardString(event.itemStack?.tagCompound?.toString())
+            GuiScreen.setClipboardString(event.stack.tagCompound?.toString())
         }
     }
 
-    @SubscribeEvent
-    fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
+    fun onReceivePacket(event: MainThreadPacketReceiveEvent<*>) {
         if (!Utils.inSkyblock || mc.theWorld == null) return
         event.packet.apply {
             if (this is S2APacketParticles) {
@@ -484,7 +492,7 @@ object ItemFeatures {
                                     "Necron's Blade", "Scylla", "Astraea", "Hyperion", "Valkyrie"
                                 )
                             }) {
-                            event.isCanceled = true
+                            event.cancelled = true
                         }
                     }
                 }
@@ -522,35 +530,33 @@ object ItemFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
+    fun onSendPacket(event: PacketSendEvent<*>) {
         if (!Utils.inSkyblock || lastShieldUse != -1L || mc.thePlayer?.heldItem == null) return
-        if (event.packet is C08PacketPlayerBlockPlacement && mc.thePlayer.heldItem.item == Items.iron_sword && getExtraAttributes(
-                mc.thePlayer.heldItem
-            )?.getTagList("ability_scroll", Constants.NBT.TAG_STRING)?.asStringSet()
+        if (event.packet is C08PacketPlayerBlockPlacement &&
+            mc.thePlayer.heldItem.item == Items.iron_sword &&
+            getExtraAttributes(mc.thePlayer.heldItem)
+                ?.getTagList("ability_scroll", 8) // String
+                ?.asStringSet()
                 ?.contains("WITHER_SHIELD_SCROLL") == true
         ) {
             lastShieldClick = System.currentTimeMillis()
         }
     }
 
-    @SubscribeEvent
-    fun onEntitySpawn(event: EntityJoinWorldEvent) {
+    fun onEntitySpawn(event: gg.skytils.event.impl.entity.EntityJoinWorldEvent) {
         if (!Utils.inSkyblock) return
         if (event.entity !is EntityFishHook || !Skytils.config.hideFishingHooks) return
         if ((event.entity as EntityFishHook).angler is EntityOtherPlayerMP) {
             event.entity.setDead()
-            event.isCanceled = true
+            event.cancelled = true
         }
     }
 
-    @SubscribeEvent
-    fun onInteract(event: PlayerInteractEvent) {
+    fun onInteract(event: BlockInteractEvent) {
         if (!Utils.inSkyblock) return
-        if (event.entity !== mc.thePlayer) return
-        val item = event.entityPlayer.heldItem
+        val item = event.item
         val itemId = getSkyBlockItemID(item) ?: return
-        if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (equalsOneOf(
+        if (Skytils.config.preventPlacingWeapons && (equalsOneOf(
                 itemId,
                 "FLOWER_OF_TRUTH",
                 "BOUQUET_OF_LIES",
@@ -565,14 +571,13 @@ object ItemFeatures {
         ) {
             val block = mc.theWorld.getBlockState(event.pos)
             if (!interactables.contains(block.block) || Utils.inDungeons && (block.block === Blocks.coal_block || block.block === Blocks.stained_hardened_clay)) {
-                event.isCanceled = true
+                event.cancelled = true
             }
         }
     }
 
-    @SubscribeEvent
-    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
-        val item = event.stack ?: return
+    fun onRenderItemOverlayPost(event: GuiContainerPostDrawSlotEvent) {
+        val item = event.slot.stack ?: return
         if (!Utils.inSkyblock || item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
         val matrixStack = UMatrixStack()
         var stackTip = ""
@@ -623,7 +628,7 @@ object ItemFeatures {
                         GlStateManager.disableDepth()
                         GlStateManager.disableBlend()
                         GlStateManager.pushMatrix()
-                        GlStateManager.translate(event.x.toFloat(), event.y.toFloat(), 1f)
+                        GlStateManager.translate(event.slot.xDisplayPosition.toFloat(), event.slot.yDisplayPosition.toFloat(), 1f)
                         GlStateManager.scale(0.8, 0.8, 1.0)
                         ScreenRenderer.fontRenderer.drawString(
                             prefix,
@@ -650,8 +655,8 @@ object ItemFeatures {
             }
             if (extraAttributes.hasKey("pickonimbus_durability")) {
                 RenderUtil.drawDurabilityBar(
-                    event.x,
-                    event.y,
+                    event.slot.xDisplayPosition,
+                    event.slot.yDisplayPosition,
                     1 - extraAttributes.getInteger("pickonimbus_durability") / 5000.0
                 )
             }
@@ -670,7 +675,7 @@ object ItemFeatures {
                         UGraphics.disableDepth()
                         UGraphics.disableBlend()
                         matrixStack.push()
-                        matrixStack.translate(event.x.toFloat(), event.y.toFloat(), 1f)
+                        matrixStack.translate(event.slot.xDisplayPosition.toFloat(), event.slot.yDisplayPosition.toFloat(), 1f)
                         matrixStack.scale(0.8, 0.8, 1.0)
                         matrixStack.runWithGlobalState {
                             ScreenRenderer.fontRenderer.drawString(
@@ -707,19 +712,20 @@ object ItemFeatures {
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()
             GlStateManager.disableBlend()
-            event.fr.drawStringWithShadow(
+            UGraphics.drawString(
+                matrixStack,
                 stackTip,
-                (event.x + 17 - event.fr.getStringWidth(stackTip)).toFloat(),
-                (event.y + 9).toFloat(),
-                16777215
+                (event.slot.xDisplayPosition + 17 - UGraphics.getStringWidth(stackTip)).toFloat(),
+                (event.slot.yDisplayPosition + 9).toFloat(),
+                16777215,
+                true
             )
             GlStateManager.enableLighting()
             GlStateManager.enableDepth()
         }
     }
 
-    @SubscribeEvent
-    fun onDrawContainerForeground(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    fun onDrawContainerForeground(event: GuiContainerForegroundDrawnEvent) {
         if (!Skytils.config.combineHelper || !Utils.inSkyblock) return
         if (event.container !is ContainerChest || !equalsOneOf(
                 event.chestName,
@@ -765,8 +771,7 @@ object ItemFeatures {
         UGraphics.enableLighting()
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: RenderWorldLastEvent) {
+    fun onRenderWorld(event: WorldDrawEvent) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.showEtherwarpTeleportPos && mc.thePlayer?.isSneaking == true) {
             val extraAttr = getExtraAttributes(mc.thePlayer.heldItem) ?: return

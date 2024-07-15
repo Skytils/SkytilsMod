@@ -19,6 +19,12 @@
 package gg.skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.universal.UChat
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.LivingEntityPreRenderEvent
+import gg.skytils.event.impl.world.BlockStateUpdateEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
@@ -41,23 +47,24 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.world.World
-import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import java.awt.Color
 
-object LividFinder {
+object LividFinder : EventSubscriber {
     private var foundLivid = false
     var livid: Entity? = null
     private var lividTag: Entity? = null
     private var lividJob: Job? = null
     private val lividBlock = BlockPos(13, 107, 25)
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START || mc.thePlayer == null || !Utils.inDungeons || DungeonFeatures.dungeonFloorNumber != 5 || !DungeonFeatures.hasBossSpawned || !Skytils.config.findCorrectLivid) return
+    override fun setup() {
+        register(::onTick)
+        register(::onBlockChange)
+        register(::onRenderLivingPre)
+        register(::onWorldChange)
+    }
+
+    fun onTick(event: TickEvent) {
+        if (mc.thePlayer == null || !Utils.inDungeons || DungeonFeatures.dungeonFloorNumber != 5 || !DungeonFeatures.hasBossSpawned || !Skytils.config.findCorrectLivid) return
 
         if (Skytils.config.lividFinderType == 1 && !foundLivid && mc.thePlayer.isPotionActive(Potion.blindness)) {
             if (lividJob == null || lividJob?.isCancelled == true || lividJob?.isCompleted == true) {
@@ -79,8 +86,7 @@ object LividFinder {
         }
     }
 
-    @SubscribeEvent
-    fun onBlockChange(event: BlockChangeEvent) {
+    fun onBlockChange(event: BlockStateUpdateEvent) {
         if (mc.thePlayer == null || !Utils.inDungeons || DungeonFeatures.dungeonFloorNumber != 5 || !DungeonFeatures.hasBossSpawned || !Skytils.config.findCorrectLivid) return
         if (event.pos == lividBlock) {
             printDevMessage("Livid block changed", "livid")
@@ -99,8 +105,7 @@ object LividFinder {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderLivingPre(event: RenderLivingEvent.Pre<*>) {
+    fun onRenderLivingPre(event: LivingEntityPreRenderEvent<*>) {
         if (!Utils.inDungeons) return
         if (event.entity == lividTag) {
             val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
@@ -120,9 +125,7 @@ object LividFinder {
             )
         }
     }
-
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         lividTag = null
         livid = null
         foundLivid = false

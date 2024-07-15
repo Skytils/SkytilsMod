@@ -19,6 +19,7 @@
 package gg.skytils.event.mixins.render;
 
 import gg.skytils.event.EventsKt;
+import gg.skytils.event.impl.render.LivingEntityPostRenderEvent;
 import gg.skytils.event.impl.render.LivingEntityPreRenderEvent;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
@@ -35,5 +36,10 @@ public class MixinRendererLivingEntity<T extends EntityLivingBase> {
         if (EventsKt.postCancellableSync(event)) {
             ci.cancel();
         }
+    }
+
+    @Inject(method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", at = @At("TAIL"))
+    private void onRenderPost(T entity, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
+        EventsKt.postSync(new LivingEntityPostRenderEvent(entity));
     }
 }

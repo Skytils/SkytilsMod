@@ -17,20 +17,24 @@
  */
 package gg.skytils.skytilsmod.features.impl.misc
 
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.PacketEvent
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object LockOrb {
+object LockOrb : EventSubscriber {
     private val orbTimeRegex = Regex("§e(?<seconds>\\d+)s§r")
 
-    @SubscribeEvent
-    fun onPacket(event: PacketEvent.SendEvent) {
+    override fun setup() {
+        register(::onPacket)
+    }
+
+    fun onPacket(event: PacketSendEvent<*>) {
         if (!Utils.inSkyblock || !Skytils.config.powerOrbLock) return
         if (event.packet !is C08PacketPlayerBlockPlacement) return
         val itemId = getSkyBlockItemID(mc.thePlayer.heldItem) ?: return
@@ -47,7 +51,7 @@ object LockOrb {
                 if (remainingTime >= Skytils.config.powerOrbDuration) {
                     if (orbEntity.getDistanceSqToEntity(mc.thePlayer) <= (orb.radius * orb.radius)) {
                         mc.thePlayer.playSound("random.orb", 0.8f, 1f)
-                        event.isCanceled = true
+                        event.cancelled = true
                     }
                 }
             }

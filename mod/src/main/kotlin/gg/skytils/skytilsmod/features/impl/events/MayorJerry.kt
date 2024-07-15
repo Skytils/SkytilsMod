@@ -18,6 +18,10 @@
 package gg.skytils.skytilsmod.features.impl.events
 
 import gg.essential.universal.UChat
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.structure.GuiElement
@@ -32,12 +36,9 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
-object MayorJerry {
+object MayorJerry : EventSubscriber {
 
     private val jerryType = Regex("(\\w+)(?=\\s+Jerry)")
     var lastJerry = -1L
@@ -47,10 +48,13 @@ object MayorJerry {
         JerryTimerGuiElement()
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
+    override fun setup() {
+        register(::onChat, EventPriority.Highest)
+    }
+
+    fun onChat(event: ChatMessageReceivedEvent) {
         if (!Utils.inSkyblock) return
-        if (!Skytils.config.hiddenJerryTimer && !Skytils.config.hiddenJerryAlert && !Skytils.config.trackHiddenJerry || event.type == 2.toByte()) return
+        if (!Skytils.config.hiddenJerryTimer && !Skytils.config.hiddenJerryAlert && !Skytils.config.trackHiddenJerry) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         val formatted = event.message.formattedText
         if (formatted.startsWith("§b ☺ §e") && unformatted.contains("Jerry") && !unformatted.contains(

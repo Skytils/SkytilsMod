@@ -20,31 +20,36 @@ package gg.skytils.skytilsmod.features.impl.events
 
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.LivingEntityPostRenderEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.baseMaxHealth
-import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityIronGolem
 import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
 
-object MayorDiana {
+object MayorDiana : EventSubscriber {
 
     private val gaiaConstructHits = HashMap<EntityIronGolem, Int>()
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onPacket(event: MainReceivePacketEvent<*, *>) {
+    override fun setup() {
+        register(::onPacket, EventPriority.Highest)
+        register(::onPostRenderEntity)
+        register(::onTick)
+        register(::onWorldChange)
+    }
+
+    fun onPacket(event: MainThreadPacketReceiveEvent<*>) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.trackGaiaHits && event.packet is S29PacketSoundEffect) {
             if (event.packet.volume == 0.8f && event.packet.soundName == "random.anvil_land") {
@@ -57,11 +62,10 @@ object MayorDiana {
         }
     }
 
-    @SubscribeEvent
-    fun onPostRenderEntity(event: RenderLivingEvent.Post<*>) {
+    fun onPostRenderEntity(event: LivingEntityPostRenderEvent) {
         if (!Utils.inSkyblock) return
         if (event.entity is EntityIronGolem) {
-            with(event.entity) {
+            with(event.entity as EntityIronGolem) {
                 if (gaiaConstructHits.containsKey(this)) {
                     val percentageHp = health / baseMaxHealth
                     val neededHits = when {
@@ -85,18 +89,16 @@ object MayorDiana {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: TickEvent) {
         if (!Utils.inSkyblock) return
-        if (event.phase == TickEvent.Phase.START && Skytils.config.trackGaiaHits) for (golem in gaiaConstructHits.keys) {
+        if (Skytils.config.trackGaiaHits) for (golem in gaiaConstructHits.keys) {
             if (golem.hurtTime == 10) {
                 gaiaConstructHits[golem] = 0
             }
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         gaiaConstructHits.clear()
     }
 }
