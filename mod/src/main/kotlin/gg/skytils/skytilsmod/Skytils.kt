@@ -367,6 +367,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             RandomStuff,
             RelicWaypoints,
             ScamCheck,
+            ScoreCalculation,
             SelectAllColorSolver,
             ServerPayloadInterceptor,
             ShootTheTargetSolver,

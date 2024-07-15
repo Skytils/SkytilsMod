@@ -4374,6 +4374,9 @@ object Config : Vigilant(
         addDependency("kuudraChestProfitIncludesEssence", "kuudraChestProfit")
         addDependency("kuudraChestProfitCountsKey", "kuudraChestProfit")
 
+        addDependency("showDungeonStatus", "showScoreCalculation")
+        addDependency("showScoreBreakdown", "showScoreCalculation")
+
         addDependency("message270Score", "sendMessageOn270Score")
         addDependency("messageTitle270Score", "createTitleOn270Score")
 

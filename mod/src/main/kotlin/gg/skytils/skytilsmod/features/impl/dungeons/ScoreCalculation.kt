@@ -18,12 +18,17 @@
 package gg.skytils.skytilsmod.features.impl.dungeons
 
 import gg.essential.elementa.state.BasicState
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.listeners.DungeonListener
@@ -36,15 +41,11 @@ import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.network.play.server.S45PacketTitle
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
 
-object ScoreCalculation {
+object ScoreCalculation: EventSubscriber {
 
     private val deathsTabPattern = Regex("§r§a§lTeam Deaths: §r§f(?<deaths>\\d+)§r")
     private val missingPuzzlePattern = Regex("§r§b§lPuzzles: §r§f\\((?<count>\\d)\\)§r")
@@ -429,9 +430,16 @@ object ScoreCalculation {
         }
     }
 
+    override fun setup() {
+        register(::onScoreboardChange)
+        register(::onTabChange)
+        register(::onTitle)
+        register(::onChatReceived, EventPriority.Highest)
+        register(::canYouPleaseStopCryingThanks, EventPriority.Lowest)
+        register(::clearScore)
+    }
 
-    @SubscribeEvent
-    fun onScoreboardChange(event: MainReceivePacketEvent<*, *>) {
+    fun onScoreboardChange(event: MainThreadPacketReceiveEvent<*>) {
         if (
             !Utils.inSkyblock ||
             event.packet !is S3EPacketTeams
@@ -466,8 +474,7 @@ object ScoreCalculation {
         }
     }
 
-    @SubscribeEvent
-    fun onTabChange(event: MainReceivePacketEvent<*, *>) {
+    fun onTabChange(event: MainThreadPacketReceiveEvent<*>) {
         if (
             !Utils.inDungeons ||
             event.packet !is S38PacketPlayerListItem ||
@@ -553,8 +560,7 @@ object ScoreCalculation {
         }
     }
 
-    @SubscribeEvent
-    fun onTitle(event: MainReceivePacketEvent<*, *>) {
+    fun onTitle(event: MainThreadPacketReceiveEvent<*>) {
         if (!Utils.inDungeons || event.packet !is S45PacketTitle || event.packet.type != S45PacketTitle.Type.TITLE) return
         if (event.packet.message.formattedText == "§eYou became a ghost!§r") {
             if (DungeonListener.hutaoFans.getIfPresent(mc.thePlayer.name) == true
@@ -566,9 +572,8 @@ object ScoreCalculation {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChatReceived(event: ClientChatReceivedEvent) {
-        if (!Utils.inDungeons || mc.thePlayer == null || event.type == 2.toByte()) return
+    fun onChatReceived(event: ChatMessageReceivedEvent) {
+        if (!Utils.inDungeons || mc.thePlayer == null) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if (Skytils.config.scoreCalculationReceiveAssist) {
             if (unformatted.startsWith("Party > ") || (unformatted.contains(":") && !unformatted.contains(">"))) {
@@ -580,16 +585,15 @@ object ScoreCalculation {
                     return
                 }
                 if (unformatted.contains("\$SKYTILS-DUNGEON-SCORE-ROOM$")) {
-                    event.isCanceled = true
+                    event.cancelled = true
                     return
                 }
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun canYouPleaseStopCryingThanks(event: ClientChatReceivedEvent) {
-        if (!Utils.inDungeons || event.type != 0.toByte()) return
+    fun canYouPleaseStopCryingThanks(event: ChatMessageReceivedEvent) {
+        if (!Utils.inDungeons) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if ((unformatted.startsWith("Party > ") || unformatted.startsWith("P > ")) && unformatted.contains(": Skytils-SC > ")) {
             event.message.siblings.filterIsInstance<ChatComponentText>().forEach {
@@ -603,8 +607,7 @@ object ScoreCalculation {
         }
     }
 
-    @SubscribeEvent
-    fun clearScore(event: WorldEvent.Unload) {
+    fun clearScore(event: WorldUnloadEvent) {
         mimicKilled.set(false)
         firstDeathHadSpirit.set(false)
         floorReq.set(floorRequirements["default"]!!)
