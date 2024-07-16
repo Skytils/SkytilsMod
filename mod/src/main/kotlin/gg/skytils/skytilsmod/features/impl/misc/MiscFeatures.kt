@@ -282,22 +282,6 @@ object MiscFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderOverlayPre(event: RenderGameOverlayEvent.Pre) {
-        if (!Utils.inSkyblock) return
-        if (event.type == RenderGameOverlayEvent.ElementType.AIR && Skytils.config.hideAirDisplay && !Utils.inDungeons) {
-            event.isCanceled = true
-        } else if (event.type == RenderGameOverlayEvent.ElementType.ARMOR && Skytils.config.hideArmorDisplay) {
-            event.isCanceled = true
-        } else if (event.type == RenderGameOverlayEvent.ElementType.FOOD && Skytils.config.hideHungerDisplay) {
-            event.isCanceled = true
-        } else if (event.type == RenderGameOverlayEvent.ElementType.HEALTH && Skytils.config.hideHealthDisplay) {
-            event.isCanceled = true
-        } else if (event.type == RenderGameOverlayEvent.ElementType.HEALTHMOUNT && Skytils.config.hidePetHealth) {
-            event.isCanceled = true
-        }
-    }
-
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderHud(event: RenderHUDEvent) {
         if (!Utils.inSkyblock || mc.thePlayer == null || Skytils.config.lowHealthVignetteThreshold == 0.0f) return
