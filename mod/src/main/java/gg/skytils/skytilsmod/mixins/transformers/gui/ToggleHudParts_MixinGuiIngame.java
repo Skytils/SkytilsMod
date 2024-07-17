@@ -21,33 +21,38 @@ package gg.skytils.skytilsmod.mixins.transformers.gui;
 import gg.skytils.skytilsmod.Skytils;
 import net.minecraftforge.client.GuiIngameForge;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiIngameForge.class)
 public class ToggleHudParts_MixinGuiIngame {
-    @Inject(method = "renderAir", at = @At("HEAD"), cancellable = true)
+    //TODO update when remapping between versions
+    @Unique
+    private static final boolean skytils$remap = false;
+
+    @Inject(method = "renderAir", at = @At("HEAD"), cancellable = true, remap = skytils$remap)
     private void renderAir(CallbackInfo ci) {
         if (Skytils.getConfig().getHideAirDisplay()) ci.cancel();
     }
 
-    @Inject(method = "renderArmor", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderArmor", at = @At("HEAD"), cancellable = true, remap = skytils$remap)
     private void renderArmor(CallbackInfo ci) {
         if (Skytils.getConfig().getHideArmorDisplay()) ci.cancel();
     }
 
-    @Inject(method = "renderFood", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderFood", at = @At("HEAD"), cancellable = true, remap = skytils$remap)
     private void renderHunger(CallbackInfo ci) {
         if (Skytils.getConfig().getHideHungerDisplay()) ci.cancel();
     }
 
-    @Inject(method = "renderHealth", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderHealth", at = @At("HEAD"), cancellable = true, remap = skytils$remap)
     private void renderHealth(CallbackInfo ci) {
         if (Skytils.getConfig().getHideHealthDisplay()) ci.cancel();
     }
 
-    @Inject(method = "renderHealthMount", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderHealthMount", at = @At("HEAD"), cancellable = true, remap = skytils$remap)
     private void renderHealthMount(CallbackInfo ci) {
         if (Skytils.getConfig().getHidePetHealth()) ci.cancel();
     }
