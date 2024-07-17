@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,11 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.events.impl
+package gg.skytils.skytilsmod._event
 
-import gg.skytils.skytilsmod.events.SkytilsEvent
+import gg.skytils.event.CancellableEvent
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.Cancelable
 
-@Cancelable
-data class ItemTossEvent(val item: ItemStack, val dropStack: Boolean) : SkytilsEvent()
+class ItemTossEvent(val stack: ItemStack) : CancellableEvent()

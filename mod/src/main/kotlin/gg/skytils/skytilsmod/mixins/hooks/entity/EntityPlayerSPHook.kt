@@ -17,9 +17,10 @@
  */
 package gg.skytils.skytilsmod.mixins.hooks.entity
 
+import gg.skytils.event.postCancellableSync
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.ItemTossEvent
+import gg.skytils.skytilsmod._event.ItemTossEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.client.settings.KeyBinding
@@ -47,7 +48,7 @@ object EntityPlayerSPHook {
 
 fun onDropItem(dropAll: Boolean, cir: CallbackInfoReturnable<EntityItem?>) {
     val stack = mc.thePlayer.inventory.mainInventory[currentItem ?: mc.thePlayer.inventory.currentItem]
-    if (stack != null && ItemTossEvent(stack, dropAll).postAndCatch()) cir.returnValue = null
+    if (stack != null && postCancellableSync(ItemTossEvent(stack))) cir.returnValue = null
 }
 
 fun onKeybindCheck(keyBinding: KeyBinding): Boolean {
