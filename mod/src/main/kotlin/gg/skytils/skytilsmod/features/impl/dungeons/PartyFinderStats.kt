@@ -21,6 +21,10 @@ package gg.skytils.skytilsmod.features.impl.dungeons
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.register
 import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.hypixel.types.skyblock.Pet
 import gg.skytils.skytilsmod.Skytils
@@ -33,26 +37,25 @@ import gg.skytils.skytilsmod.utils.SkillUtils.level
 import kotlinx.coroutines.launch
 import net.minecraft.event.ClickEvent
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.common.util.Constants
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.*
 import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
-object PartyFinderStats {
+object PartyFinderStats : EventSubscriber {
 
     private val partyFinderRegex = Regex(
         "^Party Finder > (?<name>\\w+) joined the dungeon group! \\((?<class>Archer|Berserk|Mage|Healer|Tank) Level (?<classLevel>\\d+)\\)$"
     )
     private val requiredRegex = Regex("§7§4☠ §cRequires §5.+§c.")
 
-    @SubscribeEvent(receiveCanceled = true, priority = EventPriority.HIGHEST)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.isOnHypixel || event.type == 2.toByte()) return
+    override fun setup() {
+        register(::onChat, EventPriority.Highest)
+    }
+
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (!Utils.isOnHypixel) return
         if (Skytils.config.partyFinderStats) {
             val match = partyFinderRegex.find(event.message.formattedText.stripControlCodes()) ?: return
             val username = match.groups["name"]?.value ?: return
@@ -149,7 +152,7 @@ object PartyFinderStats {
                                 //Mage
                                 when {
                                     extraAttribs.any {
-                                        it.getTagList("ability_scroll", Constants.NBT.TAG_STRING).tagCount() == 3
+                                        it.getTagList("ability_scroll", 8 /* TAG_STRING*/ ).tagCount() == 3
                                     } -> add("§dWither Impact")
 
                                     itemIds.contains("MIDAS_STAFF") -> add("§6Midas Staff")
