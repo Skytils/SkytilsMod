@@ -18,11 +18,15 @@
 package gg.skytils.skytilsmod.features.impl.protectitems
 
 import gg.essential.universal.UChat
+import gg.skytils.event.CancellableEvent
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerCloseWindowEvent
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.ItemTossEvent
 import gg.skytils.skytilsmod.core.SoundQueue
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.events.impl.ItemTossEvent
 import gg.skytils.skytilsmod.features.impl.protectitems.strategy.ItemProtectStrategy
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.Utils
@@ -31,17 +35,20 @@ import net.minecraft.init.Blocks
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.Event
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object ProtectItems {
+object ProtectItems : EventSubscriber {
 
     init {
         ItemProtectStrategy.isAnyToggled()
     }
 
-    @SubscribeEvent
-    fun onCloseWindow(event: GuiContainerEvent.CloseWindowEvent) {
+    override fun setup() {
+        register(::onCloseWindow)
+        register(::onDropItem)
+        register(::onSlotClick)
+    }
+
+    fun onCloseWindow(event: GuiContainerCloseWindowEvent) {
         if (!Utils.inSkyblock) return
         if (mc.thePlayer.inventory.itemStack != null) {
             val item = mc.thePlayer.inventory.itemStack
@@ -54,25 +61,23 @@ object ProtectItems {
                 return
             }
             notifyStopped(null, "closing the window on", strategy)
-            event.isCanceled = true
+            event.cancelled = true
         }
     }
 
-    @SubscribeEvent
     fun onDropItem(event: ItemTossEvent) {
         if (!Utils.inSkyblock) return
-        val strategy = ItemProtectStrategy.findValidStrategy(event.item, ItemUtil.getExtraAttributes(event.item), ItemProtectStrategy.ProtectType.HOTBARDROPKEY) ?: return
+        val strategy = ItemProtectStrategy.findValidStrategy(event.stack, ItemUtil.getExtraAttributes(event.stack), ItemProtectStrategy.ProtectType.HOTBARDROPKEY) ?: return
         notifyStopped(event, "dropping", strategy)
     }
 
-    @SubscribeEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
         if (!Utils.inSkyblock) return
         if (event.container is ContainerChest && ItemProtectStrategy.isAnyToggled()) {
-            val inv = event.container.lowerChestInventory
+            val inv = (event.container as ContainerChest).lowerChestInventory
             val chestName = event.chestName
-            if (event.slot != null && event.slot.hasStack) {
-                var item: ItemStack = event.slot.stack ?: return
+            if (event.slot != null && event.slot!!.hasStack) {
+                var item: ItemStack = event.slot!!.stack ?: return
                 var extraAttr = ItemUtil.getExtraAttributes(item)
                 if (chestName.startsWith("Salvage")) {
                     var inSalvageGui = false
@@ -82,7 +87,7 @@ object ProtectItems {
                         extraAttr = ItemUtil.getExtraAttributes(item) ?: return
                         inSalvageGui = true
                     }
-                    if (inSalvageGui || event.slot.inventory === mc.thePlayer.inventory) {
+                    if (inSalvageGui || event.slot!!.inventory === mc.thePlayer.inventory) {
                         val strategy = ItemProtectStrategy.findValidStrategy(
                             item,
                             extraAttr,
@@ -102,7 +107,7 @@ object ProtectItems {
                                     "Sell Item"
                                 ) || ItemUtil.getItemLore(sellItem).any { s: String -> s.contains("buyback") }
                             ) {
-                                if (event.slotId != 49 && event.slot.inventory === mc.thePlayer.inventory) {
+                                if (event.slotId != 49 && event.slot!!.inventory === mc.thePlayer.inventory) {
                                     val strategy = ItemProtectStrategy.findValidStrategy(
                                         item,
                                         extraAttr,
@@ -141,8 +146,8 @@ object ProtectItems {
                 return
             }
         }
-        if (event.clickType == 4 && event.slotId != -999 && event.slot != null && event.slot.hasStack) {
-            val item = event.slot.stack
+        if (event.clickType == 4 && event.slotId != -999 && event.slot != null && event.slot!!.hasStack) {
+            val item = event.slot!!.stack
             val extraAttr = ItemUtil.getExtraAttributes(item)
             val strategy = ItemProtectStrategy.findValidStrategy(item, extraAttr, ItemProtectStrategy.ProtectType.DROPKEYININVENTORY)
             if (strategy != null) {
@@ -152,10 +157,10 @@ object ProtectItems {
         }
     }
 
-    private fun notifyStopped(event: Event?, action: String, strategy: ItemProtectStrategy? = null) {
+    private fun notifyStopped(event: CancellableEvent?, action: String, strategy: ItemProtectStrategy? = null) {
         SoundQueue.addToQueue("note.bass", 0.5f, 1f)
         UChat.chat("$failPrefix §cStopped you from $action that item!${"§7 (§e${strategy?.name}§7)".toStringIfTrue(strategy != null)}")
-        event?.isCanceled = true
+        event?.cancelled = true
     }
 
 }
