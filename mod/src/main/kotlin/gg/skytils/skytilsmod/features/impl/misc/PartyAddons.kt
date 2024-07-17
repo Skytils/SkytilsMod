@@ -21,20 +21,21 @@ package gg.skytils.skytilsmod.features.impl.misc
 import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.ChatMessageSentEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.append
 import gg.skytils.skytilsmod.utils.printDevMessage
 import gg.skytils.skytilsmod.utils.setHoverText
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * Inspired by https://www.chattriggers.com/modules/v/HypixelUtilities
  */
-object PartyAddons {
+object PartyAddons : EventSubscriber {
     private val partyStartPattern = Regex("^§6Party Members \\((\\d+)\\)§r$")
     private val playerPattern = Regex("(?<rank>§r§.(?:\\[.+?] )?)(?<name>\\w+) ?§r(?<status>§a|§c) ?● ?")
     private val party = mutableListOf<PartyMember>()
@@ -43,24 +44,27 @@ object PartyAddons {
     //0 = not awaiting, 1 = awaiting 2nd delimiter, 2 = awaiting 1st delimiter
     private var awaitingDelimiter = 0
 
-    @SubscribeEvent
-    fun onCommandRun(event: SendChatMessageEvent) {
+    override fun setup() {
+        register(::onCommandRun)
+        register(::onChat)
+    }
+
+    fun onCommandRun(event: ChatMessageSentEvent) {
         if (!Utils.isOnHypixel || !Skytils.config.partyAddons) return
         if (event.message in partyCommands) {
             awaitingDelimiter = 2
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.isOnHypixel || event.type == 2.toByte() || !Skytils.config.partyAddons) return
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (!Utils.isOnHypixel || !Skytils.config.partyAddons) return
         val message = event.message.formattedText
 
         if (message == "§f§r" && awaitingDelimiter != 0) {
-            event.isCanceled = true
+            event.cancelled = true
         } else if (partyStartPattern.matches(message)) {
             party.clear()
-            event.isCanceled = true
+            event.cancelled = true
         } else if (message.startsWith("§eParty ")) {
             val playerType = when {
                 message.startsWith("§eParty Leader: ") -> PartyMemberType.LEADER
@@ -81,7 +85,7 @@ object PartyAddons {
                     )
                 }
             }
-            event.isCanceled = true
+            event.cancelled = true
         } else if (message.startsWith("§cYou are not currently in a party.") && awaitingDelimiter != 0) {
             party.clear()
         } else if (event.message.unformattedText.startsWith("-----") && awaitingDelimiter != 0) {
