@@ -61,3 +61,10 @@ fun runClientCommand(command: String) =
     //#else
     //$$ ClientCommandManager.getActiveDispatcher()?.execute(command.removePrefix("/"), UPlayer.getPlayer()?.networkHandler?.commandSource as? FabricClientCommandSource ?: error("No command source"))
     //#endif
+
+fun isTimechangerLoaded() =
+    //#if FORGE
+    Loader.instance().activeModList.any { it.modId == "timechanger" && it.version == "1.0" }
+    //#else
+    //$$ false
+    //#endif

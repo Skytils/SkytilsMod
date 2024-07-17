@@ -19,18 +19,32 @@ package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
+import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.entity.BossBarSetEvent
+import gg.skytils.event.impl.entity.EntityJoinWorldEvent
+import gg.skytils.event.impl.item.ItemTooltipEvent
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.ChatMessageSentEvent
+import gg.skytils.event.impl.render.CheckRenderEntityEvent
+import gg.skytils.event.impl.render.ItemOverlayPostRenderEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.Skytils.prefix
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
+import gg.skytils.skytilsmod._event.RenderHUDEvent
 import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.*
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntityArmorstand
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
 import gg.skytils.skytilsmod.utils.*
@@ -71,23 +85,9 @@ import net.minecraft.network.play.server.S29PacketSoundEffect
 import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.client.event.RenderBlockOverlayEvent
-import net.minecraftforge.client.event.RenderGameOverlayEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
-import net.minecraftforge.event.entity.living.EnderTeleportEvent
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.Loader
-import net.minecraftforge.fml.common.eventhandler.Event
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
-import kotlin.time.Duration.Companion.milliseconds
 
-object MiscFeatures {
+object MiscFeatures : EventSubscriber {
     private var golemSpawnTime: Long = 0
     var inRangePlayerCount = 0
     var placedEyes = 0
@@ -110,24 +110,38 @@ object MiscFeatures {
         WorldAgeDisplay()
     }
 
-    @SubscribeEvent
-    fun onSendChatMessage(event: SendChatMessageEvent) {
+    override fun setup() {
+        register(::onSendChatMessage)
+        register(::onBossBarSet)
+        register(::onChat, EventPriority.Highest)
+        register(::onCheckRender)
+        register(::onDrawSlot)
+        register(::onJoin)
+        register(::onRenderHud, EventPriority.Highest)
+        register(::onReceivePacket)
+        register(::onSlotClick, EventPriority.Highest)
+        register(::onTooltip)
+        register(::onSlotClickLow, EventPriority.Lowest)
+        register(::onTick)
+        register(::onRenderItemOverlayPost)
+    }
+
+    fun onSendChatMessage(event: ChatMessageSentEvent) {
         if (!Utils.isOnHypixel) return
         if (Skytils.config.guildLeaveConfirmation && event.message.startsWith("/g leave") && System.currentTimeMillis() - lastGLeaveCommand >= 10_000) {
-            event.isCanceled = true
+            event.cancelled = true
             lastGLeaveCommand = System.currentTimeMillis()
             UChat.chat("$failPrefix §cSkytils stopped you from using leaving your guild! §6Run the command again if you wish to leave!")
         }
         if (Skytils.config.coopAddConfirmation && event.message.startsWith("/coopadd ") && System.currentTimeMillis() - lastCoopAddCommand >= 10_000) {
-            event.isCanceled = true
+            event.cancelled = true
             lastCoopAddCommand = System.currentTimeMillis()
             UChat.chat("$failPrefix §c§lBe careful! Skytils stopped you from giving a player full control of your island! §6Run the command again if you are sure!")
         }
     }
 
-    @SubscribeEvent
-    fun onBossBarSet(event: BossBarEvent.Set) {
-        val displayData = event.displayData
+    fun onBossBarSet(event: BossBarSetEvent) {
+        val displayData = event.data
         if (Utils.inSkyblock) {
             if (Skytils.config.bossBarFix && equalsOneOf(
                     displayData.displayName.unformattedText.stripControlCodes(),
@@ -137,15 +151,14 @@ object MiscFeatures {
                     "Ender Dragon"
                 )
             ) {
-                event.isCanceled = true
+                event.cancelled = true
                 return
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type == 2.toByte()) return
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (!Utils.inSkyblock) return
         val unformatted = event.message.unformattedText.stripControlCodes().trim()
         val formatted = event.message.formattedText
         if (formatted.startsWith("§r§cYou died") && Skytils.config.preventMovingOnDeath) {
@@ -203,36 +216,35 @@ object MiscFeatures {
         }
     }
 
-    @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.bossBarFix && event.entity is IBossDisplayData && event.entity.isInvisible && event.entity.hasCustomName()) {
-            event.result = Event.Result.ALLOW
-        } else if (Skytils.config.hideDyingMobs && event.entity is EntityLivingBase && (event.entity.health <= 0 || event.entity.isDead)) {
-            event.isCanceled = true
+            return
+        } else if (Skytils.config.hideDyingMobs && event.entity is EntityLivingBase && ((event.entity as EntityLivingBase).health <= 0 || event.entity.isDead)) {
+            event.cancelled = true
         } else if (event.entity is EntityFallingBlock) {
-            val entity = event.entity
+            val entity = event.entity as EntityFallingBlock
             if (Skytils.config.hideMidasStaffGoldBlocks && entity.block.block === Blocks.gold_block) {
-                event.isCanceled = true
+                event.cancelled = true
             }
         } else if (event.entity is EntityItem) {
-            val entity = event.entity
+            val entity = event.entity as EntityItem
             val item = entity.entityItem
             if (Skytils.config.hideJerryRune) {
                 if (item.item === Items.spawn_egg && ItemMonsterPlacer.getEntityName(item) == "Villager" && item.displayName == "Spawn Villager" && entity.lifespan == 6000) {
-                    event.isCanceled = true
+                    event.cancelled = true
                 }
             }
             if (Skytils.config.hideCheapCoins && cheapCoins.contains(ItemUtil.getSkullTexture(item))) {
-                event.isCanceled = true
+                event.cancelled = true
             }
         } else if (event.entity is EntityLightningBolt) {
             if (Skytils.config.hideLightning) {
-                event.isCanceled = true
+                event.cancelled = true
             }
         } else if (event.entity is EntityOtherPlayerMP) {
             if (Skytils.config.hidePlayersInSpawn && event.entity.position == hubSpawnPoint && SBInfo.mode == SkyblockIsland.Hub.mode) {
-                event.isCanceled = true
+                event.cancelled = true
             }
         } else if (Skytils.deobfEnvironment && DevTools.getToggle("invis")) {
             event.entity.isInvisible = false
@@ -240,8 +252,7 @@ object MiscFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onDrawSlot(event: GuiContainerEvent.DrawSlotEvent.Pre) {
+    fun onDrawSlot(event: GuiContainerPreDrawSlotEvent) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
         val item = event.slot.stack ?: return
         if (Skytils.config.highlightDisabledPotionEffects && event.chestName.startsWith("Toggle Potion Effects")) {
@@ -261,7 +272,6 @@ object MiscFeatures {
         }
     }
 
-    @SubscribeEvent
     fun onJoin(event: EntityJoinWorldEvent) {
         if (!Utils.inSkyblock || mc.thePlayer == null || mc.theWorld == null) return
         if (event.entity is EntityArmorStand) {
@@ -282,7 +292,6 @@ object MiscFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRenderHud(event: RenderHUDEvent) {
         if (!Utils.inSkyblock || mc.thePlayer == null || Skytils.config.lowHealthVignetteThreshold == 0.0f) return
         val healthPercentage = (mc.thePlayer.health + mc.thePlayer.absorptionAmount) / mc.thePlayer.baseMaxHealth
@@ -295,50 +304,41 @@ object MiscFeatures {
         } else PatcherCompatability.disableHUDCaching = false
     }
 
-    @SubscribeEvent
-    fun onRenderBlockOverlay(event: RenderBlockOverlayEvent) {
-        if (Utils.inSkyblock && Skytils.config.noFire && event.overlayType == RenderBlockOverlayEvent.OverlayType.FIRE) {
-            event.isCanceled = true
-        }
-    }
-
-    @SubscribeEvent
-    fun onReceivePacket(event: ReceiveEvent) {
+    fun onReceivePacket(event: PacketReceiveEvent<*>) {
         if (!Utils.inSkyblock) return
         if (event.packet is S29PacketSoundEffect) {
             val packet = event.packet
             if (Skytils.config.disableCooldownSounds && packet.soundName == "mob.endermen.portal" && packet.pitch == 0f && packet.volume == 8f) {
-                event.isCanceled = true
+                event.cancelled = true
                 return
             }
             if (Skytils.config.disableJerrygunSounds) {
                 when (packet.soundName) {
                     "mob.villager.yes" -> if (packet.volume == 0.35f) {
-                        event.isCanceled = true
+                        event.cancelled = true
                         return
                     }
 
                     "mob.villager.haggle" -> if (packet.volume == 0.5f) {
-                        event.isCanceled = true
+                        event.cancelled = true
                         return
                     }
                 }
             }
             if (Skytils.config.disableTruthFlowerSounds && packet.soundName == "random.eat" && packet.pitch == 0.6984127f && packet.volume == 1.0f) {
-                event.isCanceled = true
+                event.cancelled = true
                 return
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onSlotClick(event: SlotClickEvent) {
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
         if (!Utils.inSkyblock) return
         if (event.container is ContainerChest) {
             val slot = event.slot ?: return
             val item = slot.stack ?: return
             if (Skytils.config.coopAddConfirmation && item.item == Items.diamond && item.displayName == "§aCo-op Request") {
-                event.isCanceled = true
+                event.cancelled = true
                 UChat.chat("$failPrefix §c§lBe careful! Skytils stopped you from giving a player full control of your island!")
             }
             val extraAttributes = getExtraAttributes(item)
@@ -346,11 +346,11 @@ object MiscFeatures {
                 if (Skytils.config.dungeonPotLock > 0) {
                     if (slot.inventory === mc.thePlayer.inventory || equalsOneOf(slot.slotNumber, 49, 53)) return
                     if (item.item !== Items.potionitem || extraAttributes == null || !extraAttributes.hasKey("potion_level")) {
-                        event.isCanceled = true
+                        event.cancelled = true
                         return
                     }
                     if (extraAttributes.getInteger("potion_level") != Skytils.config.dungeonPotLock) {
-                        event.isCanceled = true
+                        event.cancelled = true
                         return
                     }
                 }
@@ -358,37 +358,32 @@ object MiscFeatures {
         }
     }
 
-    @SubscribeEvent
     fun onTooltip(event: ItemTooltipEvent) {
         if (!Utils.inSkyblock) return
         if (!Skytils.config.hideTooltipsOnStorage) return
-        if (event.toolTip == null) return
         if (mc.currentScreen is GuiChest) {
             val player = Minecraft.getMinecraft().thePlayer
             val chest = player.openContainer as ContainerChest
             val inventory = chest.lowerChestInventory
             val chestName = inventory.displayName.unformattedText
-            if (chestName.equals("Storage")) {
-                if (ItemUtil.getDisplayName(event.itemStack).containsAny(
-                        "Backpack",
-                        "Ender Chest",
-                        "Locked Page"
-                    )
-                )
-                    event.toolTip.clear()
+            if (chestName.equals("Storage") && ItemUtil.getDisplayName(event.stack).containsAny(
+                    "Backpack",
+                    "Ender Chest",
+                    "Locked Page"
+                )) {
+                event.tooltip.clear()
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onSlotClickLow(event: SlotClickEvent) {
+    fun onSlotClickLow(event: GuiContainerSlotClickEvent) {
         if (!Utils.inSkyblock || !Skytils.config.middleClickGUIItems) return
-        if (event.clickedButton != 0 || event.clickType != 0 || event.container !is ContainerChest || event.slot == null || !event.slot.hasStack) return
-        val chest = event.container
+        if (event.clickedButton != 0 || event.clickType != 0 || event.container !is ContainerChest || event.slot == null || !event.slot!!.hasStack) return
+        val chest = event.container as ContainerChest
         if (equalsOneOf(chest.lowerChestInventory.name, "Chest", "Large Chest")) return
         if (SBInfo.lastOpenContainerName.startsWithAny("Wardrobe", "Drill Anvil", "Anvil", "Storage")) return
-        if (event.slot.inventory === mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return
-        val item = event.slot.stack
+        if (event.slot!!.inventory === mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return
+        val item = event.slot!!.stack
         if (getSkyBlockItemID(item) == null) {
             if (SBInfo.lastOpenContainerName.startsWithAny(
                     "Reforge Item"
@@ -401,14 +396,13 @@ object MiscFeatures {
             if (ItemUtil.getItemLore(item).asReversed().any {
                     it.contains("-click", true)
                 }) return
-            event.isCanceled = true
+            event.cancelled = true
             mc.playerController.windowClick(chest.windowId, event.slotId, 2, 3, mc.thePlayer)
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (!Utils.inSkyblock || event.phase != TickEvent.Phase.START || mc.thePlayer == null || mc.theWorld == null) return
+    fun onTick(event: TickEvent) {
+        if (!Utils.inSkyblock || mc.thePlayer == null || mc.theWorld == null) return
 
         if (Skytils.config.playersInRangeDisplay) {
             inRangePlayerCount = (mc.theWorld.playerEntities.filterIsInstance<EntityOtherPlayerMP>().count {
@@ -424,8 +418,7 @@ object MiscFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.Post) {
+    fun onRenderItemOverlayPost(event: ItemOverlayPostRenderEvent) {
         val item = event.stack ?: return
         if (!Utils.inSkyblock || mc.thePlayer == null || item.stackSize != 1 || item.tagCompound?.hasKey("SkytilsNoItemOverlay") == true) return
         var stackTip = ""
@@ -454,26 +447,20 @@ object MiscFeatures {
             GlStateManager.disableLighting()
             GlStateManager.disableDepth()
             GlStateManager.disableBlend()
-            event.fr.drawStringWithShadow(
+            UGraphics.drawString(
+                UMatrixStack.Compat.get(),
                 stackTip,
-                (event.x + 17 - event.fr.getStringWidth(stackTip)).toFloat(),
+                (event.x + 17 - UGraphics.getStringWidth(stackTip)).toFloat(),
                 (event.y + 9).toFloat(),
-                16777215
+                16777215,
+                true
             )
             GlStateManager.enableLighting()
             GlStateManager.enableDepth()
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onEnderTeleport(event: EnderTeleportEvent) {
-        if (Utils.inSkyblock && Skytils.config.disableEndermanTeleport) {
-            event.isCanceled = true
-        }
-    }
-
-    @SubscribeEvent
-    fun renderFishingHookAge(event: RenderWorldLastEvent) {
+    fun renderFishingHookAge(event: WorldDrawEvent) {
         if (Utils.inSkyblock && Config.fishingHookAge) {
             mc.theWorld?.getEntities(EntityFishHook::class.java) { entity ->
                 mc.thePlayer == entity?.angler
@@ -654,8 +641,7 @@ object MiscFeatures {
         }
 
         override fun demoRender() {
-            usesBaldTimeChanger =
-                Loader.instance().activeModList.any { it.modId == "timechanger" && it.version == "1.0" }
+            usesBaldTimeChanger = isTimechangerLoaded()
             if (usesBaldTimeChanger) {
                 ScreenRenderer.fontRenderer.drawString(
                     "Incompatible Time Changer detected.",
