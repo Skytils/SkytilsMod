@@ -289,7 +289,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             FavoritePets,
             Funny,
             GlintCustomizer,
-            PotionEffectTimers,
             PricePaid,
             ProtectItems,
             RainTimer,
