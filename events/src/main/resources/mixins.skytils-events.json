@@ -11,6 +11,7 @@
     "network.MixinNetHandlerPlayClient",
     "network.MixinNetworkManager",
     "render.MixinGameRenderer",
+    "render.MixinItemRenderer",
     "render.MixinRendererLivingEntity",
     "render.MixinRenderManager",
     "world.MixinWorld"
