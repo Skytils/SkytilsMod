@@ -291,7 +291,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             GlintCustomizer,
             RainTimer,
             ScoreCalculation,
-            TechnoMayor,
             VisitorHelper,
             EntityPlayerSPHook,
             MouseHelperHook
@@ -375,6 +374,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             SpiritLeap,
             StartsWithSequenceSolver,
             TankDisplayStuff,
+            TechnoMayor,
             TeleportMazeSolver,
             TerminalFeatures,
             ThreeWeirdosSolver,
