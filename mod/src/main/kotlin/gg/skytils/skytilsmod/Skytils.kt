@@ -291,7 +291,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             GlintCustomizer,
             RainTimer,
             ScoreCalculation,
-            EntityPlayerSPHook,
             MouseHelperHook
         ).forEach(MinecraftForge.EVENT_BUS::register)
 
@@ -383,7 +382,8 @@ object Skytils : CoroutineScope, EventSubscriber {
             TrophyFish,
             VisitorHelper,
             WaterBoardSolver,
-            Waypoints
+            Waypoints,
+            EntityPlayerSPHook,
         ).forEach(EventSubscriber::setup)
     }
 

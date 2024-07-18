@@ -17,31 +17,39 @@
  */
 package gg.skytils.skytilsmod.mixins.hooks.entity
 
+import gg.skytils.event.EventSubscriber
 import gg.skytils.event.postCancellableSync
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod._event.ItemTossEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.network.play.server.S09PacketHeldItemChange
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 var currentItem: Int? = null
 
 
-object EntityPlayerSPHook {
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onItemChange(event: PacketEvent) {
-        if (event.packet is S09PacketHeldItemChange) {
-            currentItem = event.packet.heldItemHotbarIndex
-        } else if (event.packet is C09PacketHeldItemChange) {
-            currentItem = event.packet.slotId
-        }
+object EntityPlayerSPHook : EventSubscriber {
+
+    override fun setup() {
+        register(::serverItemChange)
+        register(::clientItemChange)
+    }
+
+    fun serverItemChange(event: PacketReceiveEvent<*>) {
+        val packet = event.packet as? S09PacketHeldItemChange ?: return
+        currentItem = packet.heldItemHotbarIndex
+    }
+
+    fun clientItemChange(event: PacketSendEvent<*>) {
+        val packet = event.packet as? C09PacketHeldItemChange ?: return
+        currentItem = packet.slotId
     }
 
 }
