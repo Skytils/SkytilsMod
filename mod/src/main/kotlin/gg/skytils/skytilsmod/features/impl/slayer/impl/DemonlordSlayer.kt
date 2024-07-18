@@ -18,12 +18,14 @@
 
 package gg.skytils.skytilsmod.features.impl.slayer.impl
 
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.entity.EntityJoinWorldEvent
+import gg.skytils.event.impl.world.BlockStateUpdateEvent
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures
 import gg.skytils.skytilsmod.features.impl.slayer.base.ThrowingSlayer
 import gg.skytils.skytilsmod.utils.ItemUtil
@@ -41,8 +43,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemSkull
 import net.minecraft.util.BlockPos
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
 
 class DemonlordSlayer(entity: EntityBlaze) :
@@ -142,7 +142,7 @@ class DemonlordSlayer(entity: EntityBlaze) :
         blazeFirePingTask = createBlazeFirePingTask()
     }
 
-    override fun tick(event: TickEvent.ClientTickEvent) {
+    override fun tick(event: TickEvent) {
         if (entity.isInvisible && !lastTickInvis) {
             lastTickInvis = true
             val prevBB = entity.entityBoundingBox.expand(3.0, 1.5, 3.0)
@@ -200,7 +200,7 @@ class DemonlordSlayer(entity: EntityBlaze) :
         }
     }
 
-    override fun blockChange(event: BlockChangeEvent) {
+    override fun blockChange(event: BlockStateUpdateEvent) {
         if (totemEntity != null && event.old.block == Blocks.stained_hardened_clay && event.update.block is BlockAir) {
             totemEntity = null
             printDevMessage("removed totem entity", "totem")

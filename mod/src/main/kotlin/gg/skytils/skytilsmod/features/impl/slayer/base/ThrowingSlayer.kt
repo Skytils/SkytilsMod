@@ -18,11 +18,11 @@
 
 package gg.skytils.skytilsmod.features.impl.slayer.base
 
-import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
+import gg.skytils.event.impl.entity.EntityJoinWorldEvent
+import gg.skytils.event.impl.world.BlockStateUpdateEvent
 import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.BlockPos
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
 
 /**
  * Represents a slayer which can throw a thing
@@ -37,5 +37,5 @@ abstract class ThrowingSlayer<T : EntityLiving>(entity: T, name: String, nameSta
 
     open fun entityJoinWorld(event: EntityJoinWorldEvent) {}
 
-    abstract fun blockChange(event: BlockChangeEvent)
+    abstract fun blockChange(event: BlockStateUpdateEvent)
 }
