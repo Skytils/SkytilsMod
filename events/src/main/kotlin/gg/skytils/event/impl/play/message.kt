@@ -34,4 +34,4 @@ class ChatMessageSentEvent(val message: String, val addToHistory: Boolean) : Can
 /**
  * [gg.skytils.event.mixins.network.MixinNetHandlerPlayClient.onActionbar]
  */
-class ActionBarReceivedEvent(val message: IChatComponent) : CancellableEvent()
+class ActionBarReceivedEvent(var message: IChatComponent) : CancellableEvent()
