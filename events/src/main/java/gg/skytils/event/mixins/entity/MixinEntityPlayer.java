@@ -20,12 +20,14 @@ package gg.skytils.event.mixins.entity;
 
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.entity.EntityAttackEvent;
+import gg.skytils.event.impl.play.EntityInteractEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityPlayer.class)
 public class MixinEntityPlayer {
@@ -33,6 +35,13 @@ public class MixinEntityPlayer {
     private void onAttack(Entity targetEntity, CallbackInfo ci) {
         if (EventsKt.postCancellableSync(new EntityAttackEvent((Entity) (Object) this, targetEntity))) {
             ci.cancel();
+        }
+    }
+
+    @Inject(method = "interactWith", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;getCurrentEquippedItem()Lnet/minecraft/item/ItemStack;"), cancellable = true)
+    private void onEntityInteract(Entity targetEntity, CallbackInfoReturnable<Boolean> cir) {
+        if (EventsKt.postCancellableSync(new EntityInteractEvent(targetEntity))) {
+            cir.setReturnValue(false);
         }
     }
 }

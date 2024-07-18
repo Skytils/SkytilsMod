@@ -20,6 +20,7 @@ package gg.skytils.event.impl.play
 
 import gg.skytils.event.CancellableEvent
 import gg.skytils.event.Event
+import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
 import net.minecraft.util.BlockPos
 import net.minecraft.world.World
@@ -34,3 +35,5 @@ class WorldUnloadEvent(val world: World) : Event()
  * [gg.skytils.event.mixins.MixinMinecraft.onBlockInteract]
  */
 class BlockInteractEvent(val item: ItemStack, val pos: BlockPos) : CancellableEvent()
+
+class EntityInteractEvent(val entity: Entity) : CancellableEvent()
