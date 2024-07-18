@@ -18,15 +18,20 @@
 package gg.skytils.skytilsmod.features.impl.handlers
 
 import gg.essential.universal.UChat
+import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.data.PropertyItem
 import gg.essential.vigilance.data.PropertyType
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.play.ActionBarReceivedEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.structure.GuiElement
-import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
-import gg.skytils.skytilsmod.events.impl.SetActionBarEvent
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.RegexAsString
 import gg.skytils.skytilsmod.utils.Utils
@@ -44,16 +49,13 @@ import net.minecraft.init.Blocks
 import net.minecraft.item.Item
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S0BPacketAnimation
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
 import java.util.*
 import kotlin.math.sin
 
-object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
+object SpamHider : EventSubscriber, PersistentSave(File(Skytils.modDir, "spamhider.json")) {
 
     val spamMessages = ArrayList<SpamMessage>()
 
@@ -161,15 +163,21 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
     private val powderQueue = hashMapOf<String, Int>()
     private var powderQueueTicks = -1
 
-    @SubscribeEvent
-    fun onActionBarDisplay(event: SetActionBarEvent) {
+    override fun setup() {
+        register(::onActionBarDisplay)
+        register(::onChatPacket, EventPriority.Lowest)
+        register(::onTick)
+    }
+
+    fun onActionBarDisplay(event: ActionBarReceivedEvent) {
         if (!Utils.inSkyblock) return
-        val manaUsageMatcher = Regexs.MANAUSED.pattern.find(event.message)
+        val message = event.message.unformattedText.stripControlCodes()
+        val manaUsageMatcher = Regexs.MANAUSED.pattern.find(message)
         if (Skytils.config.manaUseHider != 0 && manaUsageMatcher != null) {
             val manaUsage = manaUsageMatcher.groups[1]?.value ?: return
             val spaced = " ".repeat(manaUsage.length)
 
-            event.message = event.message.replace(manaUsage, spaced)
+            event.message = UTextComponent(message.replace(manaUsage, spaced)).component
             if (Skytils.config.manaUseHider == 2) {
                 if (lastAbilityUsed != manaUsage || abilityUses % 3 == 0) {
                     lastAbilityUsed = manaUsage
@@ -195,8 +203,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         ;
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-    fun onChatPacket(event: ReceiveEvent) {
+    fun onChatPacket(event: PacketReceiveEvent<*>) {
         val packet = event.packet
         if (Utils.inSkyblock && packet is S0BPacketAnimation && packet.animationType == 0) {
             val entity = mc.theWorld?.getEntityByID(packet.entityID) ?: return
@@ -248,7 +255,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                     }
                 }
             }
-            if (unformatted.contains(":") || event.isCanceled) return
+            if (unformatted.contains(":") || event.cancelled) return
             when {
                 //Autopet hider
                 unformatted.startsWith("Autopet equipped your") -> {
@@ -693,9 +700,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
-        if (event.phase != TickEvent.Phase.START) return
+    fun onTick(event: TickEvent) {
         if (powderQueueTicks != -1) {
             if (--powderQueueTicks <= 0) {
                 powderQueueTicks = -1
@@ -705,7 +710,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         }
     }
 
-    private fun checkFilter(filter: Filter, formatted: String, unformatted: String, event: ReceiveEvent): Boolean {
+    private fun checkFilter(filter: Filter, formatted: String, unformatted: String, event: PacketReceiveEvent<*>): Boolean {
         @Suppress("SENSELESS_COMPARISON")
         if (filter == null) return false
         runCatching {
@@ -819,7 +824,7 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
         }
     }
 
-    private fun cancelChatPacket(event: ReceiveEvent, addToSpam: Boolean) {
+    private fun cancelChatPacket(event: PacketReceiveEvent<*>, addToSpam: Boolean) {
         if (event.packet !is S02PacketChat) return
         Utils.cancelChatPacket(event)
         if (addToSpam) newMessage(event.packet.chatComponent.formattedText)
