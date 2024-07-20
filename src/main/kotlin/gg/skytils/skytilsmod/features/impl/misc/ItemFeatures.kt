@@ -602,11 +602,11 @@ object ItemFeatures {
                         val prefix: String = if (enchant != null) {
                             val parts = enchant.loreName.split(" ")
                             val joined = if (parts.size > 1) parts.joinToString("") { it[0].uppercase() }
-                                else if (parts[0].startsWith("Turbo-")) "${
-                                    parts[0].split("-").first().take(3).toTitleCase()
+                                else if (parts.first().startsWith("Turbo-")) "${
+                                    parts.first().split("-")[1].take(3).toTitleCase()
                                 }."
                                 else "${
-                                    parts[0].take(3).toTitleCase()
+                                    parts.first().take(3).toTitleCase()
                                 }."
                             if (enchant.nbtName.startsWith("ultimate")) {
                                 "§d§l${joined}"
