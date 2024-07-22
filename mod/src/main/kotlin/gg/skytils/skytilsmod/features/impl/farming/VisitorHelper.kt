@@ -21,6 +21,7 @@ package gg.skytils.skytilsmod.features.impl.farming
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
 import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
 import gg.skytils.event.impl.screen.GuiContainerCloseWindowEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
@@ -37,8 +38,6 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.client.event.GuiScreenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object VisitorHelper : EventSubscriber {
     private val inGarden
@@ -52,6 +51,7 @@ object VisitorHelper : EventSubscriber {
 
     override fun setup() {
         register(::onGuiClose)
+        register(::onBackgroundDrawn)
     }
 
     fun onGuiClose(event: GuiContainerCloseWindowEvent) {
@@ -117,9 +117,7 @@ object VisitorHelper : EventSubscriber {
         }
     }
 
-
-    @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiScreenEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerBackgroundDrawnEvent) {
         if (textLines.isEmpty() || event.gui !is GuiChest) return
         val stack = UMatrixStack()
         stack.push()

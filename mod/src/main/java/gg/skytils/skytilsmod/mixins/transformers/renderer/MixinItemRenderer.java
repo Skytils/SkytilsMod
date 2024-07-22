@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.mixins.transformers.renderer;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import gg.skytils.skytilsmod.Skytils;
 import gg.skytils.skytilsmod.mixins.hooks.renderer.ItemRendererHookKt;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -43,5 +44,12 @@ public abstract class MixinItemRenderer {
     @Inject(method = "transformFirstPersonItem", at = @At(value = "TAIL"))
     private void modifySize(float equipProgress, float swingProgress, CallbackInfo ci) {
         ItemRendererHookKt.modifySize();
+    }
+
+    @WrapOperation(method = "renderOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ItemRenderer;renderFireInFirstPerson(F)V"))
+    private void cancelFirstPersonFire(ItemRenderer instance, float f1, Operation<Void> original) {
+        if (!Skytils.getConfig().getNoFire()) {
+            original.call(instance, f1);
+        }
     }
 }

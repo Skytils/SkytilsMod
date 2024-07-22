@@ -29,9 +29,6 @@
     "accessors.AccessorS3BPacketScoreboardObjective",
     "accessors.AccessorServerListEntryNormal",
     "accessors.AccessorSettingsGui",
-    //#if MC >= 11404
-    //$$ "accessors.AccessorWorld",
-    //#endif
     "accessors.AccessorWorldInfo",
     "audio.MixinSoundManager",
     "block.MixinBlockSlab",
@@ -40,6 +37,7 @@
     "crash.MixinCrashReport",
     "entity.MixinAbstractClientPlayer",
     "entity.MixinBossStatus",
+    "entity.MixinEnderman",
     "entity.MixinEntityBlaze",
     "entity.MixinEntityDragon",
     "entity.MixinEntityFishHook",
@@ -105,6 +103,7 @@
     "events.MixinPacketThreadUtil",
     "gui.MixinGuiEditSign",
     "gui.MixinGuiIngameMenu",
+    "gui.ToggleHudParts_MixinGuiIngame",
     "renderer.MixinModelBiped",
     "util.MixinMouseHelper"
   ]

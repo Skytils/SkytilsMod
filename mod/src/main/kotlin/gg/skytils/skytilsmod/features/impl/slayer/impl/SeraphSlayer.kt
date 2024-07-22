@@ -18,11 +18,13 @@
 
 package gg.skytils.skytilsmod.features.impl.slayer.impl
 
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.entity.EntityJoinWorldEvent
+import gg.skytils.event.impl.world.BlockStateUpdateEvent
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
 import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures
 import gg.skytils.skytilsmod.features.impl.slayer.base.ThrowingSlayer
 import gg.skytils.skytilsmod.utils.ItemUtil
@@ -34,8 +36,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 import kotlin.math.abs
 
 class SeraphSlayer(entity: EntityEnderman) :
@@ -48,7 +48,7 @@ class SeraphSlayer(entity: EntityEnderman) :
     val hitPhase: Boolean
         get() = nameEntity?.customNameTag?.dropLastWhile { it == 's' }?.endsWith(" Hit") ?: false
 
-    override fun tick(event: TickEvent.ClientTickEvent) {
+    override fun tick(event: TickEvent) {
         if (lastYangGlyphSwitchTicks >= 0) lastYangGlyphSwitchTicks++
         if (lastYangGlyphSwitchTicks > 120) lastYangGlyphSwitchTicks = -1
         if (Config.experimentalYangGlyphDetection && lastYangGlyphSwitchTicks >= 0 && thrownEntity == null && thrownLocation == null) {
@@ -121,7 +121,7 @@ class SeraphSlayer(entity: EntityEnderman) :
         }
     }
 
-    override fun blockChange(event: BlockChangeEvent) {
+    override fun blockChange(event: BlockStateUpdateEvent) {
         if (event.pos == thrownLocation && event.old.block is BlockBeacon && event.update.block !is BlockBeacon) {
             thrownLocation = null
             thrownEntity = null

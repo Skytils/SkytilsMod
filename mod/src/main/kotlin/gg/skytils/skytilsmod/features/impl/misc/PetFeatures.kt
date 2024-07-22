@@ -19,14 +19,17 @@ package gg.skytils.skytilsmod.features.impl.misc
 
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.play.ChatMessageSentEvent
+import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.Skytils.prefix
-import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent.SendEvent
-import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
+import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.utils.ItemUtil.getItemLore
 import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
@@ -35,16 +38,12 @@ import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.setHoverText
 import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.event.ClickEvent
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-import net.minecraftforge.client.event.ClientChatReceivedEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-object PetFeatures {
+object PetFeatures : EventSubscriber {
     val petItems = HashMap<String, Boolean>()
     private val SUMMON_PATTERN = Regex("§r§aYou summoned your §r(?<pet>.+)§r§a!§r")
     private val AUTOPET_PATTERN =
@@ -53,9 +52,15 @@ object PetFeatures {
     private var lastPetLockNotif: Long = 0
     var lastPet: String? = null
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type == 2.toByte()) return
+    override fun setup() {
+        register(::onChat, EventPriority.Highest)
+        register(::onDraw, EventPriority.Low)
+        register(::onSendPacket)
+        register(::onSendChatMessage)
+    }
+
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (!Utils.inSkyblock) return
         val message = event.message.formattedText
         if (message.startsWith("§r§aYou despawned your §r§")) {
             lastPet = null
@@ -72,8 +77,7 @@ object PetFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onDraw(event: GuiContainerEvent.DrawSlotEvent.Pre) {
+    fun onDraw(event: GuiContainerPreDrawSlotEvent) {
         if (!Utils.inSkyblock || event.container !is ContainerChest) return
         if (Skytils.config.highlightActivePet && (SBInfo.lastOpenContainerName?.startsWith("Pets") == true) && event.slot.hasStack && event.slot.slotNumber in 10..43) {
             val item = event.slot.stack
@@ -88,8 +92,7 @@ object PetFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onSendPacket(event: SendEvent) {
+    fun onSendPacket(event: PacketSendEvent<*>) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.petItemConfirmation && (event.packet is C02PacketUseEntity || event.packet is C08PacketPlayerBlockPlacement)) {
             val item = mc.thePlayer.heldItem ?: return
@@ -105,7 +108,7 @@ object PetFeatures {
             }
             if (petItems[itemId] == true) {
                 if (System.currentTimeMillis() - lastPetConfirmation > 5000) {
-                    event.isCanceled = true
+                    event.cancelled = true
                     if (System.currentTimeMillis() - lastPetLockNotif > 10000) {
                         lastPetLockNotif = System.currentTimeMillis()
                         UChat.chat(
@@ -121,12 +124,11 @@ object PetFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onSendChatMessage(event: SendChatMessageEvent) {
-        if (event.message == "/disableskytilspetitemlock" && !event.addToChat) {
+    fun onSendChatMessage(event: ChatMessageSentEvent) {
+        if (event.message == "/disableskytilspetitemlock" && !event.addToHistory) {
             lastPetConfirmation = System.currentTimeMillis()
             UChat.chat("$prefix §aYou may now apply pet items for 5 seconds.")
-            event.isCanceled = true
+            event.cancelled = true
         }
     }
 }

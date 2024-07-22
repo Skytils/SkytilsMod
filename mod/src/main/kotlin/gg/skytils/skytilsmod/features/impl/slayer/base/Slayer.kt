@@ -18,6 +18,7 @@
 
 package gg.skytils.skytilsmod.features.impl.slayer.base
 
+import gg.skytils.event.impl.TickEvent
 import gg.skytils.skytilsmod.core.tickTask
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures
@@ -29,7 +30,6 @@ import kotlinx.coroutines.launch
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
 /**
  * Represents a slayer entity
@@ -114,7 +114,7 @@ open class Slayer<T : EntityLivingBase>(
                 throw Exception("Wrong entity!")
             }
         }
-    open fun tick(event: TickEvent.ClientTickEvent) {}
+    open fun tick(event: TickEvent) {}
 
     open fun set() {}
     open fun unset() {}

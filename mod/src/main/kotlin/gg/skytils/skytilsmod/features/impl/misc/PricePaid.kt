@@ -18,31 +18,36 @@
 
 package gg.skytils.skytilsmod.features.impl.misc
 
+import gg.skytils.event.EventPriority
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.item.ItemTooltipEvent
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.serialization.Contextual
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
 import java.util.*
 
-object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
+object PricePaid : EventSubscriber, PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
     val prices = mutableMapOf<@Contextual UUID, Double>()
     private val coinRegex = Regex("(?:§6)?([\\d,]+) coins", RegexOption.IGNORE_CASE)
     private var lastBought: Triple<String, UUID, Double>? = null
     private val junkRegex = Regex("[,.]")
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onPacket(event: PacketEvent.ReceiveEvent) {
+    override fun setup() {
+        register(::onPacket, EventPriority.Highest)
+        register(::toolTip)
+        register(::slotClick)
+    }
+
+    fun onPacket(event: PacketReceiveEvent<*>) {
         if (!Utils.inSkyblock || lastBought == null || event.packet !is S02PacketChat || event.packet.type == 2.toByte()) return
         val formatted = event.packet.chatComponent.formattedText
         val unformatted = event.packet.chatComponent.unformattedText.stripControlCodes()
@@ -63,20 +68,18 @@ object PricePaid : PersistentSave(File(Skytils.modDir, "pricepaid.json")) {
         }
     }
 
-    @SubscribeEvent
     fun toolTip(event: ItemTooltipEvent) {
         if (!Utils.inSkyblock || !Skytils.config.pricePaid) return
-        val extraAttr = ItemUtil.getExtraAttributes(event.itemStack) ?: return
+        val extraAttr = ItemUtil.getExtraAttributes(event.stack) ?: return
         prices[UUID.fromString(extraAttr.getString("uuid").ifEmpty { return })]?.let { price ->
-            event.toolTip.add("§r§7Price Paid: §9\$${NumberUtil.nf.format(price)}")
+            event.tooltip.add("§r§7Price Paid: §9\$${NumberUtil.nf.format(price)}")
         } ?: return
     }
 
-    @SubscribeEvent
-    fun slotClick(event: GuiContainerEvent.SlotClickEvent) {
+    fun slotClick(event: GuiContainerSlotClickEvent) {
         if (SBInfo.lastOpenContainerName?.equals("BIN Auction View") == false) return
         if (event.slotId != 31 || !event.slot!!.hasStack) return
-        ItemUtil.getItemLore(event.slot.stack).firstNotNullOfOrNull {
+        ItemUtil.getItemLore(event.slot!!.stack).firstNotNullOfOrNull {
             coinRegex.find(it)?.groupValues?.get(1)
         }?.let { price ->
             val stack = event.gui.inventorySlots.getSlot(13).stack ?: return

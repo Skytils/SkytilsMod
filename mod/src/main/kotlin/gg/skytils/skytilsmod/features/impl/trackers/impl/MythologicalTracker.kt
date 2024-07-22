@@ -18,13 +18,14 @@
 
 package gg.skytils.skytilsmod.features.impl.trackers.impl
 
-import gg.essential.universal.UChat
 import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UTextComponent
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.core.SoundQueue
 import gg.skytils.skytilsmod.core.structure.GuiElement
-import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.features.impl.events.GriffinBurrows
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
@@ -38,14 +39,13 @@ import kotlinx.serialization.encodeToString
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.Reader
 import java.io.Writer
 import java.util.*
 import kotlin.math.pow
 import kotlinx.serialization.Serializable
 
-object MythologicalTracker : Tracker("mythological") {
+object MythologicalTracker : EventSubscriber, Tracker("mythological") {
 
     private val rareDugDrop = Regex("^RARE DROP! You dug out a (.+)!$")
     private val mythCreatureDug = Regex("^(?:Oi|Uh oh|Yikes|Woah|Oh|Danger|Good Grief)! You dug out (?:a )?(.+)!$")
@@ -117,8 +117,11 @@ object MythologicalTracker : Tracker("mythological") {
         }
     }
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
+    override fun setup() {
+        register(::onReceivePacket)
+    }
+
+    fun onReceivePacket(event: PacketReceiveEvent<*>) {
         if (!Utils.inSkyblock || (!Skytils.config.trackMythEvent && !Skytils.config.broadcastMythCreatureDrop)) return
         when (event.packet) {
             is S02PacketChat -> {

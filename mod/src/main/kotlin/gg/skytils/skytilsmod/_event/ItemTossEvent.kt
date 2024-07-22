@@ -16,22 +16,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.event.impl.play
+package gg.skytils.skytilsmod._event
 
 import gg.skytils.event.CancellableEvent
-import net.minecraft.util.IChatComponent
+import net.minecraft.item.ItemStack
 
-/**
- * [gg.skytils.event.mixins.network.MixinNetHandlerPlayClient.onChat]
- */
-class ChatMessageReceivedEvent(var message: IChatComponent) : CancellableEvent()
-
-/**
- * [gg.skytils.event.mixins.gui.MixinGuiScreen.onSendChatMessage]
- */
-class ChatMessageSentEvent(val message: String, val addToHistory: Boolean) : CancellableEvent()
-
-/**
- * [gg.skytils.event.mixins.network.MixinNetHandlerPlayClient.onActionbar]
- */
-class ActionBarReceivedEvent(var message: IChatComponent) : CancellableEvent()
+class ItemTossEvent(val stack: ItemStack) : CancellableEvent()

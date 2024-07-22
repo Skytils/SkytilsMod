@@ -24,6 +24,7 @@ import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.play.ChatMessageSentEvent
 import gg.skytils.event.impl.screen.GuiContainerBackgroundDrawnEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
@@ -31,7 +32,6 @@ import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.SendChatMessageEvent
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.startsWithAny
@@ -41,7 +41,6 @@ import kotlinx.serialization.encodeToString
 import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import java.io.Reader
 import java.io.Writer
@@ -62,6 +61,7 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
     override fun setup() {
         register(::onPacket)
         register(::onTick)
+        register(::onCommandRun)
         register(::onDrawBackground)
     }
 
@@ -102,12 +102,11 @@ object PotionEffectTimers : PersistentSave(File(Skytils.modDir, "potionEffectTim
         markDirty<PotionEffectTimers>()
     }
 
-    @SubscribeEvent
-    fun onCommandRun(event: SendChatMessageEvent) {
+    fun onCommandRun(event: ChatMessageSentEvent) {
         if (event.message == "/skytilsupdatepotioneffects") {
             if (System.currentTimeMillis() > lastCommandRun + 2500) {
                 lastCommandRun = System.currentTimeMillis()
-                event.isCanceled = true
+                event.cancelled = true
                 shouldReadEffects = true
                 potionEffectTimers.clear()
                 neededPage = 1

@@ -22,17 +22,27 @@ import gg.essential.universal.UChat
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UResolution
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.entity.EntityAttackEvent
+import gg.skytils.event.impl.entity.EntityJoinWorldEvent
+import gg.skytils.event.impl.entity.LivingEntityDeathEvent
+import gg.skytils.event.impl.play.MouseInputEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.CheckRenderEntityEvent
+import gg.skytils.event.impl.render.LivingEntityPreRenderEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.impl.world.BlockStateUpdateEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.Skytils.prefix
+import gg.skytils.skytilsmod._event.PacketReceiveEvent
+import gg.skytils.skytilsmod._event.RenderHUDEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.BlockChangeEvent
-import gg.skytils.skytilsmod.events.impl.CheckRenderEntityEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
-import gg.skytils.skytilsmod.events.impl.RenderHUDEvent
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.features.impl.handlers.PotionEffectTimers
 import gg.skytils.skytilsmod.features.impl.slayer.base.Slayer
@@ -77,16 +87,6 @@ import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraft.util.MathHelper
-import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
-import net.minecraftforge.event.entity.living.LivingDeathEvent
-import net.minecraftforge.event.entity.player.AttackEntityEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.InputEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11
 import java.awt.Color
@@ -94,7 +94,7 @@ import java.util.concurrent.Executors
 import kotlin.math.floor
 
 
-object SlayerFeatures : CoroutineScope {
+object SlayerFeatures : EventSubscriber, CoroutineScope {
     override val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher() + SupervisorJob()
 
     private val ZOMBIE_MINIBOSSES = arrayOf(
@@ -234,10 +234,24 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: ClientTickEvent) {
+    override fun setup() {
+        register(::onTick)
+        register(::onRenderLivingPre)
+        register(::onReceivePacket)
+        register(::onBlockChange)
+        register(::onWorldRender)
+        register(::onEntityJoinWorld)
+        register(::onClick)
+        register(::onAttack)
+        register(::onDeath)
+        register(::onWorldLoad)
+        register(::onCheckRender)
+        register(::onRenderHud)
+    }
+
+    fun onTick(event: TickEvent) {
         if (!Utils.inSkyblock) return
-        if (event.phase != TickEvent.Phase.START || mc.theWorld == null || mc.thePlayer == null) return
+        if (mc.theWorld == null || mc.thePlayer == null) return
         lastTickHasSlayerText = hasSlayerText
         val index = sidebarLines.indexOf("Slay the boss!")
         hasSlayerText = index != -1
@@ -251,8 +265,7 @@ object SlayerFeatures : CoroutineScope {
         slayer?.tick(event)
     }
 
-    @SubscribeEvent
-    fun onRenderLivingPre(event: RenderLivingEvent.Pre<EntityLivingBase>) {
+    fun onRenderLivingPre(event: LivingEntityPreRenderEvent<*>) {
         if (!Utils.inSkyblock) return
         if (event.entity is EntityArmorStand) {
             val entity = event.entity as EntityArmorStand
@@ -300,8 +313,7 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    @SubscribeEvent
-    fun onReceivePacket(event: ReceiveEvent) {
+    fun onReceivePacket(event: PacketReceiveEvent<*>) {
         if (!Utils.inSkyblock) return
         val packet = event.packet
         if (packet is S1CPacketEntityMetadata) {
@@ -400,13 +412,11 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    @SubscribeEvent
-    fun onBlockChange(event: BlockChangeEvent) {
+    fun onBlockChange(event: BlockStateUpdateEvent) {
         (slayer as? ThrowingSlayer)?.blockChange(event)
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: WorldDrawEvent) {
         if (!Utils.inSkyblock) return
         val matrixStack = UMatrixStack()
         (slayer as? SeraphSlayer)?.run {
@@ -449,7 +459,6 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    @SubscribeEvent
     fun onEntityJoinWorld(event: EntityJoinWorldEvent) {
         if (!Utils.inSkyblock) return
         (slayer as? ThrowingSlayer)?.run { entityJoinWorld(event) }
@@ -461,14 +470,12 @@ object SlayerFeatures : CoroutineScope {
         processSlayerEntity(event.entity)
     }
 
-    @SubscribeEvent
-    fun onClick(event: InputEvent.MouseInputEvent) {
+    fun onClick(event: MouseInputEvent) {
         if (!Utils.inSkyblock || mc.pointedEntity == null || Skytils.config.slayerCarryMode == 0 || Mouse.getEventButton() != 2 || !Mouse.getEventButtonState() || mc.currentScreen != null || mc.thePlayer == null) return
         processSlayerEntity(mc.pointedEntity)
     }
 
-    @SubscribeEvent
-    fun onAttack(event: AttackEntityEvent) {
+    fun onAttack(event: EntityAttackEvent) {
         val entity = event.target as? EntityLivingBase ?: return
 
         if (!hasSlayerText || !Utils.inSkyblock || event.entity != mc.thePlayer || !Skytils.config.useSlayerHitMethod) return
@@ -486,21 +493,18 @@ object SlayerFeatures : CoroutineScope {
         }
     }
 
-    @SubscribeEvent
-    fun onDeath(event: LivingDeathEvent) {
+    fun onDeath(event: LivingEntityDeathEvent) {
         if (!Utils.inSkyblock) return
         if (event.entity is EntityEnderman) {
             hitMap.remove(event.entity)
         }
     }
 
-    @SubscribeEvent
-    fun onWorldLoad(event: WorldEvent.Unload) {
+    fun onWorldLoad(event: WorldUnloadEvent) {
         slayer = null
         hitMap.clear()
     }
 
-    @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (Skytils.config.hideOthersBrokenHeartRadiation && event.entity.isInvisible && event.entity is EntityGuardian) {
             (slayer as? SeraphSlayer)?.run {
@@ -508,11 +512,11 @@ object SlayerFeatures : CoroutineScope {
                     printDevMessage("Slayer is Riding", "slayer", "seraph", "seraphRadiation")
                     if (event.entity.getDistanceSqToEntity(entity) > 3.5 * 3.5) {
                         printDevMessage("Guardian too far", "slayer", "seraph", "seraphRadiation")
-                        event.isCanceled = true
+                        event.cancelled = true
                     }
                 } else {
                     printDevMessage("Slayer not riding, removing guardian", "slayer", "seraph", "seraphRadiation")
-                    event.isCanceled = true
+                    event.cancelled = true
                 }
             }
         }
@@ -522,13 +526,12 @@ object SlayerFeatures : CoroutineScope {
         ) {
             (slayer as? DemonlordSlayer)?.run {
                 if (event.entity.getDistanceSqToEntity(mc.renderViewEntity) > 3 * 3 && event.entity != entity) {
-                    event.isCanceled = true
+                    event.cancelled = true
                 }
             }
         }
     }
 
-    @SubscribeEvent
     fun onRenderHud(event: RenderHUDEvent) {
         if (!Utils.inSkyblock) return
         if (Skytils.config.pointYangGlyph) {
