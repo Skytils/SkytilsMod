@@ -18,30 +18,32 @@
 
 package gg.skytils.skytilsmod.mixins.hooks.util
 
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.TickEvent
+import gg.skytils.event.impl.screen.ScreenOpenEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
-import net.minecraftforge.client.event.GuiOpenEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.gameevent.TickEvent
 
-object MouseHelperHook {
+object MouseHelperHook : EventSubscriber {
     private var lastOpen = -1L
     private var hasScreen = false
 
+    override fun setup() {
+        register(::onGuiOpen)
+        register(::onTick)
+    }
 
-    @SubscribeEvent
-    fun onGuiOpen(e: GuiOpenEvent) {
+    fun onGuiOpen(e: ScreenOpenEvent) {
         val oldGui = mc.currentScreen
-        if (e.gui is GuiChest && (oldGui is GuiContainer || oldGui == null)) {
+        if (e.screen is GuiChest && (oldGui is GuiContainer || oldGui == null)) {
             lastOpen = System.currentTimeMillis()
         }
     }
 
-
-    @SubscribeEvent
-    fun onTick(event: TickEvent.ClientTickEvent) {
+    fun onTick(event: TickEvent) {
         hasScreen = mc.currentScreen != null
     }
 

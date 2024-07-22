@@ -291,12 +291,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             GlintCustomizer,
             RainTimer,
             ScoreCalculation,
-            SlayerFeatures,
-            SpamHider,
-            TechnoMayor,
-            VisitorHelper,
-            EntityPlayerSPHook,
-            MouseHelperHook
         ).forEach(MinecraftForge.EVENT_BUS::register)
 
         arrayOf(
@@ -372,10 +366,13 @@ object Skytils : CoroutineScope, EventSubscriber {
             ServerPayloadInterceptor,
             ShootTheTargetSolver,
             SimonSaysSolver,
+            SlayerFeatures,
+            SpamHider,
             SpidersDenFeatures,
             SpiritLeap,
             StartsWithSequenceSolver,
             TankDisplayStuff,
+            TechnoMayor,
             TeleportMazeSolver,
             TerminalFeatures,
             ThreeWeirdosSolver,
@@ -385,7 +382,9 @@ object Skytils : CoroutineScope, EventSubscriber {
             TrophyFish,
             VisitorHelper,
             WaterBoardSolver,
-            Waypoints
+            Waypoints,
+            EntityPlayerSPHook,
+            MouseHelperHook
         ).forEach(EventSubscriber::setup)
     }
 

@@ -36,3 +36,5 @@ class EntityJoinWorldEvent(val entity: Entity) : CancellableEvent()
  * TODO: find better mixin
  */
 class BossBarSetEvent(val data: IBossDisplayData, val hasColorModifier: Boolean) : CancellableEvent()
+
+class EntityAttackEvent(val entity: Entity, val target: Entity) : CancellableEvent()

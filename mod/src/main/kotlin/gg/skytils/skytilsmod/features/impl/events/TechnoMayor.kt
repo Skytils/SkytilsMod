@@ -18,6 +18,13 @@
 package gg.skytils.skytilsmod.features.impl.events
 
 import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.entity.EntityAttackEvent
+import gg.skytils.event.impl.play.EntityInteractEvent
+import gg.skytils.event.impl.play.WorldUnloadEvent
+import gg.skytils.event.impl.render.LivingEntityPreRenderEvent
+import gg.skytils.event.impl.render.WorldDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.utils.*
@@ -29,20 +36,21 @@ import net.minecraft.entity.passive.EntityPig
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
 import net.minecraft.util.Vec3
-import net.minecraftforge.client.event.RenderLivingEvent
-import net.minecraftforge.client.event.RenderWorldLastEvent
-import net.minecraftforge.event.entity.player.AttackEntityEvent
-import net.minecraftforge.event.entity.player.EntityInteractEvent
-import net.minecraftforge.event.world.WorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-object TechnoMayor {
+object TechnoMayor : EventSubscriber {
     private val shinyPigs = HashMap<Vec3, EntityPig?>()
     private var latestPig: EntityPig? = null
 
-    @SubscribeEvent
-    fun onRenderSpecialLivingPre(event: RenderLivingEvent.Specials.Pre<EntityLivingBase?>) {
+    override fun setup() {
+        register(::onRenderSpecialLivingPre)
+        register(::onWorldRender)
+        register(::onEntityInteract)
+        register(::onEntityAttack)
+        register(::onWorldChange)
+    }
+
+    fun onRenderSpecialLivingPre(event: LivingEntityPreRenderEvent<*>) {
         if (!Utils.inSkyblock) return
         val e = event.entity
         if (!e.isValidPigLabel()) return
@@ -60,8 +68,7 @@ object TechnoMayor {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: RenderWorldLastEvent) {
+    fun onWorldRender(event: WorldDrawEvent) {
         if (!Utils.inSkyblock) return
         if (SBInfo.mode != SkyblockIsland.Hub.mode && SBInfo.mode != SkyblockIsland.FarmingIsland.mode) return
         if (!Skytils.config.shinyOrbWaypoints) return
@@ -112,14 +119,12 @@ object TechnoMayor {
         GlState.popState()
     }
 
-    @SubscribeEvent
     fun onEntityInteract(event: EntityInteractEvent) {
         if (!Utils.inSkyblock) return
-        checkPig(event.target as? EntityPig ?: return)
+        checkPig(event.entity as? EntityPig ?: return)
     }
 
-    @SubscribeEvent
-    fun onEntityAttack(event: AttackEntityEvent) {
+    fun onEntityAttack(event: EntityAttackEvent) {
         if (!Utils.inSkyblock) return
         checkPig(event.target as? EntityPig ?: return)
     }
@@ -136,8 +141,7 @@ object TechnoMayor {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: WorldEvent.Unload) {
+    fun onWorldChange(event: WorldUnloadEvent) {
         shinyPigs.clear()
         latestPig = null
     }
