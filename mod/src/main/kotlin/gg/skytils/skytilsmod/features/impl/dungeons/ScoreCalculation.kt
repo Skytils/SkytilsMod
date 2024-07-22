@@ -124,7 +124,7 @@ object ScoreCalculation: EventSubscriber {
     private var isPaul = BasicState(false)
 
     init {
-        tickTimer(5, repeats = true) {
+        tickTimer(60 * 20, repeats = true) {
             isPaul.set(
                 (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
             )
