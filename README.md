@@ -15,7 +15,7 @@
     <img alt="discord" src="https://img.shields.io/discord/807302538558308352?color=4166f5&label=discord&style=flat-square" />
   </a>
 </p>
-A Hypixel Skyblock Utilities mod.
+A Hypixel Skyblock Utilities mod.  
 
 <p style="font-size: larger">
 09/15/2023:
