@@ -130,6 +130,10 @@ import net.minecraftforge.fml.common.Loader
 //#endif
 //#endif
 
+//#if FABRIC
+//$$ import net.fabricmc.loader.api.FabricLoader
+//#endif
+
 object Skytils : CoroutineScope, EventSubscriber {
     const val MOD_ID = Reference.MOD_ID
     const val MOD_NAME = Reference.MOD_NAME
