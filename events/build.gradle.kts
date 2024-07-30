@@ -18,9 +18,13 @@
 import org.apache.tools.ant.filters.FixCrLfFilter
 
 plugins {
-    kotlin("jvm") version "1.9.22"
-    id("gg.essential.loom") version "1.4.13"
-    id("gg.essential.defaults") version "0.4.1"
+    kotlin("jvm")
+    id("gg.essential.defaults")
+    id("gg.essential.multi-version")
+}
+
+repositories {
+    if (project.platform.isFabric && project.platform.mcVersion == 10809) maven("https://repo.legacyfabric.net/repository/legacyfabric/")
 }
 
 dependencies {
@@ -30,7 +34,7 @@ dependencies {
     compileOnly("org.spongepowered:mixin:0.8.5")
 }
 
-group = "gg.skytils"
+group = "gg.skytils.events"
 
 java.toolchain {
     languageVersion = JavaLanguageVersion.of(8)
