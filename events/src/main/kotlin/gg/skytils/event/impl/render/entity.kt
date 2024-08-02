@@ -20,7 +20,6 @@ package gg.skytils.event.impl.render
 
 import gg.skytils.event.CancellableEvent
 import gg.skytils.event.Event
-import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.client.renderer.entity.RendererLivingEntity
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -41,4 +40,4 @@ class LivingEntityPostRenderEvent(val entity: Entity) : Event()
  *
  * TODO: find better inject mixin
  */
-class CheckRenderEntityEvent<T : Entity>(val entity: T, val camera: ICamera, val camX: Double, val camY: Double, val camZ: Double) : CancellableEvent()
+class CheckRenderEntityEvent<T : Entity>(val entity: T) : CancellableEvent()
