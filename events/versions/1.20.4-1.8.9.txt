@@ -1,0 +1,1 @@
+net.minecraft.entity.boss.BossBar net.minecraft.class_0_1876
