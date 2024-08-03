@@ -29,8 +29,20 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+//#if MC>12000
+//$$ import net.minecraft.util.ActionResult;
+//$$ import net.minecraft.util.Hand;
+//#endif
+
 @Mixin(EntityPlayer.class)
 public class MixinEntityPlayer {
+    private static final String skytils$entityInteractTarget =
+            //#if MC>12000
+            //$$ "Lnet/minecraft/entity/player/PlayerEntity;getStackInHand(Lnet/minecraft/util/Hand;)Lnet/minecraft/item/ItemStack;";
+            //#else
+            "Lnet/minecraft/entity/player/EntityPlayer;getCurrentEquippedItem()Lnet/minecraft/item/ItemStack;";
+            //#endif
+
     @Inject(method = "attackTargetEntityWithCurrentItem", at = @At("HEAD"), cancellable = true)
     private void onAttack(Entity targetEntity, CallbackInfo ci) {
         if (EventsKt.postCancellableSync(new EntityAttackEvent((Entity) (Object) this, targetEntity))) {
@@ -38,10 +50,21 @@ public class MixinEntityPlayer {
         }
     }
 
-    @Inject(method = "interactWith", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;getCurrentEquippedItem()Lnet/minecraft/item/ItemStack;"), cancellable = true)
-    private void onEntityInteract(Entity targetEntity, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "interactWith", at = @At(value = "INVOKE", target = skytils$entityInteractTarget), cancellable = true)
+    private void onEntityInteract(Entity targetEntity,
+                                  //#if MC>12000
+                                  //$$ Hand hand,
+                                  //$$ CallbackInfoReturnable<ActionResult> cir
+                                  //#else
+                                  CallbackInfoReturnable<Boolean> cir
+                                  //#endif
+    ) {
         if (EventsKt.postCancellableSync(new EntityInteractEvent(targetEntity))) {
+            //#if MC>12000
+            //$$ cir.setReturnValue(ActionResult.FAIL);
+            //#else
             cir.setReturnValue(false);
+            //#endif
         }
     }
 }
