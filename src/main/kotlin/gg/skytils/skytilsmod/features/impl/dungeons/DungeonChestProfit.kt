@@ -53,7 +53,7 @@ object DungeonChestProfit {
     private val element = DungeonChestProfitElement()
     private var rerollBypass = false
     private val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")
-    private val croesusChestRegex = Regex("^(Master Mode|The)? Catacombs - Floor (IV|V?I{0,3})$")
+    private val croesusChestRegex = Regex("^(Master Mode )?The Catacombs - Flo(or (IV|V?I{0,3}))?$")
 
     @SubscribeEvent
     fun onGUIDrawnEvent(event: GuiContainerEvent.ForegroundDrawnEvent) {
@@ -126,7 +126,7 @@ object DungeonChestProfit {
         val stack = event.slot.stack ?: return
         if (stack.item == Items.skull) {
             val name = stack.displayName
-            if (!(name == "§cThe Catacombs" || name == "§cMaster Mode Catacombs")) return
+            if (!(name == "§cThe Catacombs" || name == "§cMaster Mode The Catacombs")) return
             val lore = ItemUtil.getItemLore(stack)
             event.slot highlight when {
                 lore.any { line -> line == "§aNo more Chests to open!" } -> {
