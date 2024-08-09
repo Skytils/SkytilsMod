@@ -18,11 +18,16 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers
 
+import gg.skytils.skytilsmod.Skytils.Companion.IO
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner.scan
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.ScanUtils
+import gg.skytils.skytilsmod.listeners.DungeonListener
+import gg.skytils.skytilsmod.utils.SBInfo
+import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoom
+import kotlinx.coroutines.launch
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 
@@ -73,6 +78,11 @@ object DungeonScanner {
 
                 scanRoom(xPos, zPos, z, x)?.let {
                     DungeonInfo.dungeonList[z * 11 + x] = it
+                    if (it is Room && it.data.name != "Unknown") {
+                        IO.launch {
+                            DungeonListener.outboundRoomQueue.add(C2SPacketDungeonRoom(SBInfo.server ?: return@launch, it.data.name, xPos, zPos, x, z, it.core, it.isSeparator))
+                        }
+                    }
                 }
             }
         }

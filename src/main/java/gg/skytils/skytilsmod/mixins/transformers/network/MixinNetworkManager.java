@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.mixins.transformers.network;
 
 import gg.skytils.skytilsmod.mixins.hooks.network.NetworkManagerHookKt;
+import gg.skytils.skytilsmod.utils.Utils;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import net.minecraft.network.EnumPacketDirection;

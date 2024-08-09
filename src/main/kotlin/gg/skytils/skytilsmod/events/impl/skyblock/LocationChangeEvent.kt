@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -19,6 +19,6 @@
 package gg.skytils.skytilsmod.events.impl.skyblock
 
 import gg.skytils.skytilsmod.events.SkytilsEvent
-import gg.skytils.skytilsmod.utils.LocrawObject
+import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 
-data class LocrawReceivedEvent(val loc: LocrawObject) : SkytilsEvent()
+data class LocationChangeEvent(val packet: ClientboundLocationPacket) : SkytilsEvent()

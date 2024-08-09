@@ -26,7 +26,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.commands.impl.OrderedWaypointCommand
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.skyblock.LocrawReceivedEvent
+import gg.skytils.skytilsmod.events.impl.skyblock.LocationChangeEvent
 import gg.skytils.skytilsmod.tweaker.DependencyLoader
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.serialization.EncodeDefault
@@ -236,14 +236,14 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     }
 
     @SubscribeEvent
-    fun onLocraw(event: LocrawReceivedEvent) {
+    fun onLocationChange(event: LocationChangeEvent) {
         tickTimer(20, task = ::computeVisibleWaypoints)
     }
 
     @SubscribeEvent
     fun onPlayerMove(event: ClientTickEvent) {
-        if (event.phase == TickEvent.Phase.END || mc.thePlayer?.hasMoved != true) return
-        if (SBInfo.mode != null && OrderedWaypointCommand.trackedIsland?.mode == SBInfo.mode) {
+        if (event.phase == TickEvent.Phase.END) return
+        if (mc.thePlayer?.hasMoved == true && SBInfo.mode != null && OrderedWaypointCommand.trackedIsland?.mode == SBInfo.mode) {
             val tracked = OrderedWaypointCommand.trackedSet?.firstOrNull()
             if (tracked == null) {
                 OrderedWaypointCommand.doneTracking()

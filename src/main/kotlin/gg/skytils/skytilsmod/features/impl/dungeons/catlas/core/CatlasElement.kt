@@ -142,7 +142,7 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
         DungeonInfo.uniqueRooms.forEach { unq ->
             val room = unq.mainRoom
-            if (room.state == RoomState.UNDISCOVERED) return@forEach
+            if (room.state == RoomState.UNDISCOVERED || room.state == RoomState.UNOPENED) return@forEach
             val size = MapUtils.mapRoomSize + DungeonMapColorParser.quarterRoom
             val checkPos = unq.getCheckmarkPosition()
             val namePos = unq.getNamePosition()
@@ -161,7 +161,12 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
             val roomType = room.data.type
             val hasSecrets = secretCount > 0
 
-            if (room.state == RoomState.UNOPENED) return@forEach
+            val secretText = when (CatlasConfig.foundRoomSecrets) {
+                0 -> secretCount.toString()
+                1 -> "${unq.foundSecrets ?: "?"}/${secretCount}"
+                2 -> unq.foundSecrets?.toString() ?: "?"
+                else -> error("Invalid foundRoomSecrets value")
+            }
 
             if (CatlasConfig.mapRoomSecrets == 2 && hasSecrets) {
                 GlStateManager.pushMatrix()
@@ -171,7 +176,7 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                     0f
                 )
                 GlStateManager.scale(2f, 2f, 1f)
-                RenderUtils.renderCenteredText(listOf(secretCount.toString()), 0, 0, color)
+                RenderUtils.renderCenteredText(listOf(secretText), 0, 0, color)
                 GlStateManager.popMatrix()
             } else if (CatlasConfig.mapCheckmark != 0) {
                 drawCheckmark(room, xOffsetCheck, yOffsetCheck, checkmarkSize)
@@ -191,7 +196,7 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                 name.addAll(room.data.name.split(" "))
             }
             if (room.data.type == RoomType.NORMAL && CatlasConfig.mapRoomSecrets == 1) {
-                name.add(secretCount.toString())
+                name.add(secretText)
             }
             // Offset + half of roomsize
             RenderUtils.renderCenteredText(

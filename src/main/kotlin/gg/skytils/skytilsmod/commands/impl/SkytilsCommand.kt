@@ -45,18 +45,23 @@ import gg.skytils.skytilsmod.features.impl.misc.Ping
 import gg.skytils.skytilsmod.features.impl.misc.PricePaid
 import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
-import gg.skytils.skytilsmod.gui.*
+import gg.skytils.skytilsmod.gui.OptionsGui
 import gg.skytils.skytilsmod.gui.editing.ElementaEditingGui
 import gg.skytils.skytilsmod.gui.editing.VanillaEditingGui
 import gg.skytils.skytilsmod.gui.features.*
 import gg.skytils.skytilsmod.gui.profile.ProfileGui
 import gg.skytils.skytilsmod.gui.updater.UpdateGui
 import gg.skytils.skytilsmod.gui.waypoints.WaypointsGui
+import gg.skytils.skytilsmod.listeners.ServerPayloadInterceptor.getResponse
 import gg.skytils.skytilsmod.localapi.LocalAPI
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorHypixelPacketRegistry
 import gg.skytils.skytilsmod.utils.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import net.hypixel.modapi.HypixelModAPI
+import net.hypixel.modapi.packet.ClientboundHypixelPacket
+import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.command.WrongUsageException
@@ -372,6 +377,31 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                     }
                     else -> {
                         Skytils.displayScreen = CatlasConfig.gui()
+                    }
+                }
+            }
+
+            "hypixelpacket" -> {
+                val registry = HypixelModAPI.getInstance().registry
+                val id = args.getOrNull(1) ?: return UChat.chat("$failPrefix §cInput a packet type!")
+                if (id == "list") {
+                    UChat.chat("$successPrefix §eAvailable types: ${registry.identifiers.joinToString(", ")}")
+                } else if (!registry.isRegistered(id)) {
+                    UChat.chat("$failPrefix §cPacket not found!")
+                } else {
+                    registry as AccessorHypixelPacketRegistry
+                    val packetClass = registry.classToIdentifier.entries.find { it.value == id && ServerboundVersionedPacket::class.java.isAssignableFrom(it.key) }
+                        ?: return UChat.chat("$failPrefix §cPacket not found!")
+                    val packet = packetClass.key.newInstance() as ServerboundVersionedPacket
+                    UChat.chat("$successPrefix §aPacket created: $packet")
+                    Skytils.IO.launch {
+                        runCatching {
+                            packet.getResponse<ClientboundHypixelPacket>()
+                        }.onFailure {
+                            UChat.chat("$failPrefix §cFailed to get packet response: ${it.message}")
+                        }.onSuccess { response ->
+                            UChat.chat("$successPrefix §aPacket response: $response")
+                        }
                     }
                 }
             }

@@ -1132,13 +1132,23 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Boulder Solver",
-        description = "§b[WIP] §rShow which boxes to move on the Boulder puzzle.",
+        description = "Show which boxes to move on the Boulder puzzle.",
         category = "Dungeons", subcategory = "Solvers",
         i18nName = "skytils.config.dungeons.solvers.boulder_solver",
         i18nCategory = "skytils.config.dungeons",
         i18nSubcategory = "skytils.config.dungeons.solvers"
     )
     var boulderSolver = false
+
+    @Property(
+        type = PropertyType.COLOR, name = "Boulder Solver Color",
+        description = "Color of the box that shows which button to click in the Boulder puzzle.",
+        category = "Dungeons", subcategory = "Solvers",
+        i18nName = "skytils.config.dungeons.solvers.boulder_solver_color",
+        i18nCategory = "skytils.config.dungeons",
+        i18nSubcategory = "skytils.config.dungeons.solvers"
+    )
+    var boulderSolverColor = Color(255, 0, 0, 255)
 
     @Property(
         type = PropertyType.SWITCH, name = "Creeper Beams Solver",
@@ -1182,7 +1192,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.COLOR, name = "Teleport Maze Solver Color",
-        description = "Color of the thing that shows which pads you've stepped on in the Teleport Maze puzzle.",
+        description = "Color of the box that shows which pads you've stepped on in the Teleport Maze puzzle.",
         category = "Dungeons", subcategory = "Solvers",
         i18nName = "skytils.config.dungeons.solvers.teleport_maze_solver_color",
         i18nCategory = "skytils.config.dungeons",
@@ -1201,8 +1211,18 @@ object Config : Vigilant(
     var threeWeirdosSolver = false
 
     @Property(
+        type = PropertyType.COLOR, name = "Three Weirdos Solver Color",
+        description = "Color of the chest to click on the Three Weirdos puzzle.",
+        category = "Dungeons", subcategory = "Solvers",
+        i18nName = "skytils.config.dungeons.solvers.three_weirdos_solver_color",
+        i18nCategory = "skytils.config.dungeons",
+        i18nSubcategory = "skytils.config.dungeons.solvers"
+    )
+    var threeWeirdosSolverColor = Color(255, 0, 0, 255)
+
+    @Property(
         type = PropertyType.SWITCH, name = "Tic Tac Toe Solver",
-        description = "§b[WIP] §rDisplays the best move on the Tic Tac Toe puzzle.",
+        description = "Displays the best move on the Tic Tac Toe puzzle.",
         category = "Dungeons", subcategory = "Solvers",
         i18nName = "skytils.config.dungeons.solvers.tic_tac_toe_solver",
         i18nCategory = "skytils.config.dungeons",
@@ -1212,7 +1232,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.COLOR, name = "Tic Tac Toe Solver Color",
-        description = "Color of the thing that displays the best move on the Tic Tac Toe puzzle.",
+        description = "Color of the outline that displays the best move on the Tic Tac Toe puzzle.",
         category = "Dungeons", subcategory = "Solvers",
         i18nName = "skytils.config.dungeons.solvers.tic_tac_toe_solver_color",
         i18nCategory = "skytils.config.dungeons",
@@ -3287,10 +3307,10 @@ object Config : Vigilant(
     var fishingHookAge = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Tropy Fish Tracker",
+        type = PropertyType.SWITCH, name = "Trophy Fish Tracker",
         description = "Tracks trophy fish caught.",
         category = "Miscellaneous", subcategory = "Quality of Life",
-        i18nName = "skytils.config.miscellaneous.quality_of_life.tropy_fish_tracker",
+        i18nName = "skytils.config.miscellaneous.quality_of_life.trophy_fish_tracker",
         i18nCategory = "skytils.config.miscellaneous",
         i18nSubcategory = "skytils.config.miscellaneous.quality_of_life"
     )
