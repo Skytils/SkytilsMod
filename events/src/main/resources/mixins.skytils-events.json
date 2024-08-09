@@ -5,6 +5,10 @@
   "refmap": "mixins.skytils-events.refmap.json",
   "client": [
     "MixinMinecraft",
+    //#if MC>=11300
+    //$$ "MixinKeyboard",
+    //$$ "MixinMouse",
+    //#endif
     "entity.MixinBossStatus",
     "entity.MixinEntityPlayer",
     "gui.MixinGuiContainer",
