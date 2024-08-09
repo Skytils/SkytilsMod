@@ -290,10 +290,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             this,
             NamespacedCommands,
             DamageSplash,
-            FavoritePets,
             Funny,
-            GlintCustomizer,
-            RainTimer,
             ScoreCalculation,
         ).forEach(MinecraftForge.EVENT_BUS::register)
 
@@ -334,7 +331,9 @@ object Skytils : CoroutineScope, EventSubscriber {
             DungeonTimer,
             EnchantNames,
             FarmingFeatures,
+            FavoritePets,
             GardenFeatures,
+            GlintCustomizer,
             GriffinBurrows,
             IceFillSolver,
             IcePathSolver,
@@ -362,6 +361,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             PotionEffectTimers,
             PricePaid,
             ProtectItems,
+            RainTimer,
             RandomStuff,
             RelicWaypoints,
             ScamCheck,

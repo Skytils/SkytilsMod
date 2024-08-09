@@ -17,6 +17,7 @@
  */
 package gg.skytils.skytilsmod.features.impl.handlers
 
+import gg.skytils.event.EventSubscriber
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
@@ -27,8 +28,10 @@ import java.io.File
 import java.io.Reader
 import java.io.Writer
 
-object GlintCustomizer : PersistentSave(File(Skytils.modDir, "customizedglints.json")) {
+object GlintCustomizer : PersistentSave(File(Skytils.modDir, "customizedglints.json")), EventSubscriber {
     val glintItems = HashMap<String, CustomGlint>()
+
+    override fun setup() {}
 
     fun getGlintItem(uuid: String) = glintItems.getOrPut(uuid) {
         CustomGlint(null, null)
