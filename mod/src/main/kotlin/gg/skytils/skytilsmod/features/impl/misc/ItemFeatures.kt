@@ -606,9 +606,13 @@ object ItemFeatures : EventSubscriber {
                         val enchant = EnchantUtil.enchants.find { it.nbtName == name }
                         val prefix: String = if (enchant != null) {
                             val parts = enchant.loreName.split(" ")
-                            val joined = if (parts.size > 1) parts.joinToString("") { it[0].uppercase() } else "${
-                                parts[0].take(3).toTitleCase()
-                            }."
+                            val joined = if (parts.size > 1) parts.joinToString("") { it[0].uppercase() }
+                                else if (parts.first().startsWith("Turbo-")) "${
+                                    parts.first().split("-")[1].take(3).toTitleCase()
+                                }."
+                                else "${
+                                    parts.first().take(3).toTitleCase()
+                                }."
                             if (enchant.nbtName.startsWith("ultimate")) {
                                 "§d§l${joined}"
                             } else joined
