@@ -59,31 +59,45 @@ object IceFillSolver {
                             val pos = te.pos
                             if (world.getBlockState(pos.down()).block == Blocks.stone) {
                                 for (direction in EnumFacing.HORIZONTALS) {
+                                    fun checkChestTorches(dir: EnumFacing): Boolean {
+                                        return world.getBlockState(
+                                            pos.offset(
+                                                dir,
+                                                1
+                                            )
+                                        ).block == Blocks.torch && world.getBlockState(
+                                            pos.offset(
+                                                dir.opposite,
+                                                3
+                                            )
+                                        ).block == Blocks.torch
+                                    }
+
                                     if (world.getBlockState(pos.offset(direction)).block == Blocks.cobblestone && world.getBlockState(
                                             pos.offset(direction.opposite, 2)
-                                        ).block == Blocks.iron_bars && world.getBlockState(
-                                            pos.offset(
-                                                direction.rotateY(),
-                                                2
+                                        ).block == Blocks.iron_bars) {
+
+                                        val offsetDir: EnumFacing? = if (checkChestTorches(direction.rotateY())) {
+                                            direction.rotateYCCW()
+                                        } else if (checkChestTorches(direction.rotateYCCW())) {
+                                            direction.rotateY()
+                                        } else continue
+
+                                        if (world.getBlockState(
+                                                pos.offset(direction.opposite)
+                                                    .offset(offsetDir)
+                                                    .down(2)
+                                            ).block == Blocks.stone_brick_stairs) {
+                                            puzzles = Triple(
+                                                IceFillPuzzle(world, 70, pos, direction),
+                                                IceFillPuzzle(world, 71, pos, direction),
+                                                IceFillPuzzle(world, 72, pos, direction)
                                             )
-                                        ).block == Blocks.torch && world.getBlockState(
-                                            pos.offset(
-                                                direction.rotateYCCW(),
-                                                2
+                                            println(
+                                                "An Ice Fill chest is at $pos and is facing $direction. Offset direction is $offsetDir."
                                             )
-                                        ).block == Blocks.torch && world.getBlockState(
-                                            pos.offset(direction.opposite).down(2)
-                                        ).block == Blocks.stone_brick_stairs
-                                    ) {
-                                        puzzles = Triple(
-                                            IceFillPuzzle(world, 70, pos, direction),
-                                            IceFillPuzzle(world, 71, pos, direction),
-                                            IceFillPuzzle(world, 72, pos, direction)
-                                        )
-                                        println(
-                                            "Ice fill chest is at $pos and is facing $direction"
-                                        )
-                                        break@findChest
+                                            break@findChest
+                                        }
                                     }
                                 }
                             }
