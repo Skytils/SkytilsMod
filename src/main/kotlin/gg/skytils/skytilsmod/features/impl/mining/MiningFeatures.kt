@@ -238,7 +238,7 @@ object MiningFeatures {
             Skytils.config.skymallReminder && SBInfo.mode == SkyblockIsland.DwarvenMines.mode
         ) {
             val message = UMessage("§cSkymall reset ")
-            message.append(UTextComponent("§b[HOTM])").setClick(MCClickEventAction.RUN_COMMAND, "/hotm"))
+            message.append(UTextComponent("§b[HOTM]").setClick(MCClickEventAction.RUN_COMMAND, "/hotm"))
             message.chat()
         }
     }
