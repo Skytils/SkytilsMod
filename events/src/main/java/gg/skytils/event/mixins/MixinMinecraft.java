@@ -57,7 +57,11 @@ public class MixinMinecraft {
             method = "runTick",
             at = @At(
                     value = "INVOKE",
+                    //#if MC>=12000
+                    //$$ target = "Lnet/minecraft/util/profiler/Profiler;pop()V",
+                    //#else
                     target = "Lnet/minecraft/profiler/Profiler;endSection()V",
+                    //#endif
                     shift = At.Shift.BEFORE,
                     ordinal = 0
             )
