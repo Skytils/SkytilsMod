@@ -25,12 +25,11 @@ import gg.skytils.event.impl.play.WorldUnloadEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
+import gg.skytils.skytilsmod._event.DungeonPuzzleResetEvent
 import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
-import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
-import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.listeners.DungeonListener
@@ -426,6 +425,7 @@ object ScoreCalculation: EventSubscriber {
         register(::onTabChange)
         register(::onTitle)
         register(::onChatReceived, EventPriority.Highest)
+        register(::onPuzzleReset)
         register(::canYouPleaseStopCryingThanks, EventPriority.Lowest)
         register(::clearScore)
     }
@@ -583,15 +583,13 @@ object ScoreCalculation: EventSubscriber {
         }
     }
 
-    @SubscribeEvent
-    fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
+    fun onPuzzleReset(event: DungeonPuzzleResetEvent) {
         missingPuzzles.set(missingPuzzles.get() + 1)
         failedPuzzles.set((failedPuzzles.get() - 1).coerceAtLeast(0))
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun canYouPleaseStopCryingThanks(event: ClientChatReceivedEvent) {
-        if (!Utils.inDungeons || event.type != 0.toByte()) return
+    fun canYouPleaseStopCryingThanks(event: ChatMessageReceivedEvent) {
+        if (!Utils.inDungeons) return
         val unformatted = event.message.unformattedText.stripControlCodes()
         if ((unformatted.startsWith("Party > ") || unformatted.startsWith("P > ")) && unformatted.contains(": Skytils-SC > ")) {
             event.message.siblings.filterIsInstance<ChatComponentText>().forEach {
