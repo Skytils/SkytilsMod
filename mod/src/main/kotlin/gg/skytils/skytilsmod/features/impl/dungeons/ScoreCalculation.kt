@@ -54,8 +54,6 @@ object ScoreCalculation: EventSubscriber {
         Regex("§r (?<puzzle>.+): §r§7\\[§r§c§l✖§r§7] §.+")
     private val solvedPuzzlePattern =
         Regex("§r (?<puzzle>.+): §r§7\\[§r§a§l✔§r§7] §.+")
-    private val discoveredPuzzlePattern =
-        Regex("§r (?<puzzle>.+): §r§7\\[§r§6§l✦§r§7] §.+")
     private val secretsFoundPattern = Regex("§r Secrets Found: §r§b(?<secrets>\\d+)§r")
     private val secretsFoundPercentagePattern = Regex("§r Secrets Found: §r§[ae](?<percentage>[\\d.]+)%§r")
     private val cryptsPattern = Regex("§r Crypts: §r§6(?<crypts>\\d+)§r")
@@ -100,7 +98,6 @@ object ScoreCalculation: EventSubscriber {
             printDevMessage("missing puzzles $it", "scorecalcpuzzle")
         }
     }
-    private val failedPuzzlesNames = hashSetOf<String>()
     private var failedPuzzles: BasicState<Int> = BasicState(0).also {
         it.onSetValue {
             updateText(totalScore.get())
@@ -498,25 +495,8 @@ object ScoreCalculation: EventSubscriber {
 
                 name.contains("✖") -> {
                     failedPuzzlePattern.find(name)?.let {
-                        val (puzzleName) = it.destructured
                         missingPuzzles.set((missingPuzzles.get() - 1).coerceAtLeast(0))
                         failedPuzzles.set(failedPuzzles.get() + 1)
-                        failedPuzzlesNames.add(puzzleName)
-                    }
-                }
-
-                name.contains("✦") -> {
-                    if (failedPuzzlesNames.isNotEmpty()) {
-                        discoveredPuzzlePattern.find(name)?.let {
-                            val (puzzleName) = it.destructured
-                            if (failedPuzzlesNames.remove(puzzleName)) {
-                                missingPuzzles.set(missingPuzzles.get() + 1)
-                                failedPuzzles.set((failedPuzzles.get() - 1).coerceAtLeast(0))
-                                if (puzzleName == "Higher Or Lower") {
-                                    DungeonFeatures.blazes = 0
-                                }
-                            }
-                        }
                     }
                 }
 
