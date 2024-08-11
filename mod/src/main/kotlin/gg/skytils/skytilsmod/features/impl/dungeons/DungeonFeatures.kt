@@ -39,12 +39,12 @@ import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.Skytils.prefix
+import gg.skytils.skytilsmod._event.DungeonPuzzleResetEvent
 import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
-import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.listeners.DungeonListener
@@ -342,7 +342,7 @@ object DungeonFeatures : EventSubscriber {
         }
     }
 
-    fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
+    fun onPuzzleReset(event: DungeonPuzzleResetEvent) {
         if (!Utils.inDungeons) return
         if (event.puzzle == "Higher Or Lower") {
             blazes = 0
