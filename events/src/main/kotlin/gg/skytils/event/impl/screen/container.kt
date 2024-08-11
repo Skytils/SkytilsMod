@@ -30,41 +30,41 @@ import net.minecraft.inventory.Slot
  * [gg.skytils.event.mixins.gui.MixinGuiContainer.backgroundDrawn]
  */
 class GuiContainerBackgroundDrawnEvent(
-    val gui: GuiContainer,
+    val gui: ContainerGui,
     val container: Container,
     val mouseX: Int,
     val mouseY: Int,
     val partialTicks: Float
 ) : Event() {
     val chestName by lazy {
-        getChestName(container)
+        getChestName(gui)
     }
 }
 
 /**
  * [gg.skytils.event.mixins.gui.MixinGuiContainer.closeWindowPressed]
  */
-class GuiContainerCloseWindowEvent(val gui: GuiContainer, val container: Container) : CancellableEvent() {
+class GuiContainerCloseWindowEvent(val gui: ContainerGui, val container: Container) : CancellableEvent() {
     val chestName by lazy {
-        getChestName(container)
+        getChestName(gui)
     }
 }
 
 /**
  * [gg.skytils.event.mixins.gui.MixinGuiContainer.onDrawSlot]
  */
-class GuiContainerPreDrawSlotEvent(val gui: GuiContainer, val container: Container, val slot: Slot) : CancellableEvent() {
+class GuiContainerPreDrawSlotEvent(val gui: ContainerGui, val container: Container, val slot: Slot) : CancellableEvent() {
     val chestName by lazy {
-        getChestName(container)
+        getChestName(gui)
     }
 }
 
 /**
  * [gg.skytils.event.mixins.gui.MixinGuiContainer.onDrawSlotPost]
  */
-class GuiContainerPostDrawSlotEvent(val gui: GuiContainer, val container: Container, val slot: Slot) : Event() {
+class GuiContainerPostDrawSlotEvent(val gui: ContainerGui, val container: Container, val slot: Slot) : Event() {
     val chestName by lazy {
-        getChestName(container)
+        getChestName(gui)
     }
 }
 
@@ -72,14 +72,14 @@ class GuiContainerPostDrawSlotEvent(val gui: GuiContainer, val container: Contai
  * [gg.skytils.event.mixins.gui.MixinGuiContainer.onForegroundDraw]
  */
 class GuiContainerForegroundDrawnEvent(
-    val gui: GuiContainer,
+    val gui: ContainerGui,
     val container: Container,
     val mouseX: Int,
     val mouseY: Int,
     val partialTicks: Float
 ) : Event() {
     val chestName by lazy {
-        getChestName(container)
+        getChestName(gui)
     }
 }
 
@@ -87,7 +87,7 @@ class GuiContainerForegroundDrawnEvent(
  * [gg.skytils.event.mixins.gui.MixinGuiContainer.onMouseClick]
  */
 class GuiContainerSlotClickEvent(
-    val gui: GuiContainer,
+    val gui: ContainerGui,
     val container: Container,
     val slot: Slot?,
     val slotId: Int,
@@ -95,10 +95,21 @@ class GuiContainerSlotClickEvent(
     val clickType: Int
 ) : CancellableEvent() {
     val chestName by lazy {
-        getChestName(container)
+        getChestName(gui)
     }
 }
 
-private fun getChestName(container: Container): String {
-    return (container as? ContainerChest)?.lowerChestInventory?.displayName?.unformattedText?.trim() ?: error("Container is not a chest")
+private fun getChestName(containerGui: ContainerGui): String {
+    //#if MC<12000
+    return (containerGui.inventorySlots as? ContainerChest)?.lowerChestInventory?.displayName?.unformattedText?.trim() ?: error("Container is not a chest")
+    //#else
+    //$$ return containerGui.title.string
+    //#endif
 }
+
+typealias ContainerGui =
+        //#if MC<12000
+        GuiContainer
+        //#else
+        //$$ HandledScreen<*>
+        //#endif

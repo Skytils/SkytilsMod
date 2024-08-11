@@ -17,6 +17,7 @@
  */
 package gg.skytils.skytilsmod.features.impl.spidersden
 
+import gg.skytils.event.EventSubscriber
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.utils.Utils
@@ -27,8 +28,10 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
  * Adopted from PikaFan's Rain Timer Website, licensed under GPL v3
  * @link https://github.com/PikaFan123/rain-timer
  */
-object RainTimer {
+object RainTimer : EventSubscriber{
     var nextRain = 1596552707000
+
+    override fun setup() {}
 
     init {
         RainTimerGuiElement()

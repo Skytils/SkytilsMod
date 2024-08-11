@@ -18,9 +18,23 @@
 
 package gg.skytils.skytilsmod.features.impl.misc
 
+import gg.essential.elementa.ElementaVersion
+import gg.essential.elementa.components.Window
+import gg.essential.elementa.dsl.basicYConstraint
+import gg.essential.elementa.dsl.childOf
+import gg.essential.elementa.dsl.constrain
+import gg.essential.elementa.dsl.pixels
+import gg.essential.universal.UMatrixStack
+import gg.skytils.event.EventSubscriber
+import gg.skytils.event.impl.play.ChatMessageReceivedEvent
+import gg.skytils.event.impl.screen.GuiContainerPreDrawSlotEvent
+import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
+import gg.skytils.event.impl.screen.ScreenDrawEvent
+import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
+import gg.skytils.skytilsmod.gui.components.SimpleButton
 import gg.skytils.skytilsmod.utils.ItemRarity
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
@@ -41,7 +55,7 @@ import java.io.File
 import java.io.Reader
 import java.io.Writer
 
-object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) {
+object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")), EventSubscriber {
 
     private val favorited = hashSetOf<String>()
     private var highlighting = false
@@ -50,9 +64,28 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
     private val petLevelUpRegex =
         Regex("§r§aYour §r(?<rarityColor>§[0-9a-f])(?<name>.+)\\b(?<skinned> §r§6✦)? §r§alevelled up to level §r§9(?<lvl>\\d{1,3})§r§a!§r")
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-    fun onChat(event: ClientChatReceivedEvent) {
-        if (!Utils.inSkyblock || event.type == 2.toByte()) return
+    private val window = Window(ElementaVersion.V5)
+    private val button = SimpleButton("${if (highlighting) "§6" else "§f"}Favorite").constrain {
+        x = 50.pixels
+        y = basicYConstraint {
+            (((mc.currentScreen as? GuiChest)?.height?.div(2) ?: 0) + 100f)
+        }
+        width = 100.pixels
+        height = 20.pixels
+    }.onMouseClick {
+        highlighting = !highlighting
+        (this as SimpleButton).text.setText("${if (highlighting) "§6" else "§f"}Favorite")
+    } childOf window
+
+    override fun setup() {
+        register(::onChat, priority = gg.skytils.event.EventPriority.Highest)
+        register(::onSlotClick, priority = gg.skytils.event.EventPriority.Highest)
+        register(::onScreenDraw)
+        register(::onSlotDraw)
+    }
+
+    fun onChat(event: ChatMessageReceivedEvent) {
+        if (!Utils.inSkyblock) return
 
         val formatted = event.message.formattedText
         if (formatted.contains(" §r§alevelled up to level §r§9")) {
@@ -70,56 +103,35 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
 
     }
 
-    @SubscribeEvent
-    fun onGuiScreenEvent(event: GuiScreenEvent) {
+    fun onScreenDraw(event: ScreenDrawEvent) {
         if (!Utils.inSkyblock || !Skytils.config.highlightFavoritePets) return
-        if (event.gui is GuiChest) {
-            val chest = event.gui as GuiChest
-            val container = chest.inventorySlots as ContainerChest
-            if (container.lowerChestInventory.name.startsWith("Pets")) {
-                when {
-                    event is GuiScreenEvent.InitGuiEvent -> event.buttonList.add(
-                        GuiButton(
-                            69420,
-                            50,
-                            chest.height / 2 + 100,
-                            100,
-                            20,
-                            "${if (highlighting) "§6" else "§f"}Favorite"
-                        )
-                    )
-
-                    event is GuiScreenEvent.ActionPerformedEvent.Pre && event.button.id == 69420 -> {
-                        highlighting = !highlighting
-                        event.button.displayString = "${if (highlighting) "§6" else "§f"}Favorite"
-                    }
-                }
-            }
+        val chest = event.screen as? GuiChest ?: return
+        val container = chest.inventorySlots as ContainerChest
+        if (container.lowerChestInventory.name.startsWith("Pets")) {
+            window.draw(UMatrixStack.Compat.get())
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!Utils.inSkyblock || !highlighting || event.container !is ContainerChest) return
-        val chest = event.container
+    fun onSlotClick(event: GuiContainerSlotClickEvent) {
+        if (!Utils.inSkyblock || !highlighting) return
+        val chest = event.container as? ContainerChest ?: return
         if (!chest.lowerChestInventory.name.startsWith("Pets")) return
-        if (event.slot == null || !event.slot.hasStack || event.slotId < 10 || event.slotId > 43 || Utils.equalsOneOf(
-                event.slot.slotNumber % 9,
+        if (event.slot?.hasStack != true || event.slotId < 10 || event.slotId > 43 || Utils.equalsOneOf(
+                event.slot!!.slotNumber % 9,
                 0,
                 8
             )
         ) return
-        val item = event.slot.stack!!
+        val item = event.slot!!.stack!!
         val petId = getPetIdFromItem(item) ?: return
-        event.isCanceled = true
+        event.cancelled = true
         if (favorited.contains(petId)) favorited.remove(petId) else favorited.add(petId)
         markDirty<FavoritePets>()
     }
 
-    @SubscribeEvent
-    fun onSlotDraw(event: GuiContainerEvent.DrawSlotEvent.Pre) {
-        if (!Utils.inSkyblock || !Skytils.config.highlightFavoritePets || event.container !is ContainerChest) return
-        val chest = event.container
+    fun onSlotDraw(event: GuiContainerPreDrawSlotEvent) {
+        if (!Utils.inSkyblock || !Skytils.config.highlightFavoritePets) return
+        val chest = event.container as? ContainerChest ?: return
         if (!chest.lowerChestInventory.name.startsWith("Pets")) return
         if (!event.slot.hasStack || event.slot.slotNumber < 10 || event.slot.slotNumber > 43 || Utils.equalsOneOf(
                 event.slot.slotNumber % 9,
@@ -161,5 +173,4 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
     override fun setDefault(writer: Writer) {
         writer.write("[]")
     }
-
 }

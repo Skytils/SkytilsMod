@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,20 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.commands.impl
-
-import gg.essential.universal.UChat
-import gg.skytils.skytilsmod.Skytils.failPrefix
-import gg.skytils.skytilsmod.commands.BaseCommand
-import gg.skytils.skytilsmod.utils.Utils
-import net.minecraft.client.entity.EntityPlayerSP
-
-object LimboCommand : BaseCommand("limbo", listOf("skytilslimbo")) {
-    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
-        if (!Utils.isOnHypixel) {
-            UChat.chat("$failPrefix §cYou must be on Hypixel to use this command!")
-            return
-        }
-        player.sendChatMessage("§")
-    }
+plugins {
+    kotlin("jvm") apply false
+    id("gg.essential.multi-version.root") apply false
 }

@@ -130,6 +130,10 @@ import net.minecraftforge.fml.common.Loader
 //#endif
 //#endif
 
+//#if FABRIC
+//$$ import net.fabricmc.loader.api.FabricLoader
+//#endif
+
 object Skytils : CoroutineScope, EventSubscriber {
     const val MOD_ID = Reference.MOD_ID
     const val MOD_NAME = Reference.MOD_NAME
@@ -286,10 +290,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             this,
             NamespacedCommands,
             DamageSplash,
-            FavoritePets,
             Funny,
-            GlintCustomizer,
-            RainTimer,
         ).forEach(MinecraftForge.EVENT_BUS::register)
 
         arrayOf(
@@ -329,7 +330,9 @@ object Skytils : CoroutineScope, EventSubscriber {
             DungeonTimer,
             EnchantNames,
             FarmingFeatures,
+            FavoritePets,
             GardenFeatures,
+            GlintCustomizer,
             GriffinBurrows,
             IceFillSolver,
             IcePathSolver,
@@ -357,6 +360,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             PotionEffectTimers,
             PricePaid,
             ProtectItems,
+            RainTimer,
             RandomStuff,
             RelicWaypoints,
             ScamCheck,
@@ -415,7 +419,6 @@ object Skytils : CoroutineScope, EventSubscriber {
         cch.registerCommand(FragBotCommand)
         cch.registerCommand(HollowWaypointCommand)
         cch.registerCommand(ItemCycleCommand)
-        cch.registerCommand(LimboCommand)
         cch.registerCommand(OrderedWaypointCommand)
         cch.registerCommand(ScamCheckCommand)
         cch.registerCommand(SlayerCommand)

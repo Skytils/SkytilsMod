@@ -38,14 +38,32 @@ pluginManagement {
         kotlin("jvm") version kotlinVersion apply false
         kotlin("plugin.serialization") version kotlinVersion apply false
         id("gg.essential.multi-version.root") version "0.6.0"
-        id("gg.essential.loom") apply false
-        id("gg.essential.defaults") apply false
+        id("gg.essential.loom")
+        id("gg.essential.defaults")
     }
 }
 
 rootProject.name = "SkytilsMod"
 rootProject.buildFileName = "root.gradle.kts"
 
+// events
+include(":events")
+project(":events").apply {
+    projectDir = file("events")
+    buildFileName = "root.gradle.kts"
+}
+listOf(
+    "1.8.9-forge",
+    "1.8.9-fabric",
+    "1.20.4-fabric"
+).forEach { version ->
+    include(":events:$version")
+    project(":events:$version").apply {
+        projectDir = file("events/versions/$version")
+        buildFileName = "../../build.gradle.kts"
+    }
+}
+// mod
 include(":mod")
 project(":mod").apply {
     projectDir = file("./mod")
@@ -62,6 +80,6 @@ listOf(
         buildFileName = "../../build.gradle.kts"
     }
 }
-includeBuild("events")
+// misc
 includeBuild("hypixel-api/types")
 includeBuild("ws-shared")

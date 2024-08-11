@@ -33,12 +33,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiScreen.class)
 public class MixinGuiScreen {
+
+    //#if MC<12000
     @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
     public void onSendChatMessage(String msg, boolean addToChat, CallbackInfo ci) {
         if (EventsKt.postCancellableSync(new ChatMessageSentEvent(msg, addToChat))) {
             ci.cancel();
         }
     }
+    //#endif
 
     @Inject(method = "handleInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiScreen;handleKeyboardInput()V"), cancellable = true)
     public void handleKeyboardInput(CallbackInfo ci) {

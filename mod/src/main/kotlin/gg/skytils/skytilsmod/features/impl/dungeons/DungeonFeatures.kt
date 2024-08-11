@@ -44,6 +44,7 @@ import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo
 import gg.skytils.skytilsmod.listeners.DungeonListener
@@ -143,6 +144,7 @@ object DungeonFeatures : EventSubscriber {
         register(::onWorldChange)
         register(::onBossBarSet)
         register(::onCheckRender)
+        register(::onPuzzleReset)
     }
 
     fun onBlockChange(event: BlockStateUpdateEvent) {
@@ -337,6 +339,13 @@ object DungeonFeatures : EventSubscriber {
         }
         if (event.entity is EntityBlaze && ++blazes == 10 && Skytils.config.sayBlazeDone) {
             Skytils.sendMessageQueue.add("/pc Blaze Done")
+        }
+    }
+
+    fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
+        if (!Utils.inDungeons) return
+        if (event.puzzle == "Higher Or Lower") {
+            blazes = 0
         }
     }
 

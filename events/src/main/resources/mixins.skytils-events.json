@@ -4,6 +4,11 @@
   "package": "gg.skytils.event.mixins",
   "refmap": "mixins.skytils-events.refmap.json",
   "client": [
+    //#if MC>=11300
+    //$$ "MixinKeyboard",
+    //$$ "MixinMouse",
+    //$$ "gui.MixinChatScreen",
+    //#endif
     "MixinMinecraft",
     "entity.MixinBossStatus",
     "entity.MixinEntityPlayer",

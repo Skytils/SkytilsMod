@@ -52,8 +52,15 @@ public class MixinNetworkManager {
 
     @Unique
     private void skytils$postDisconnectEvent() {
-        Minecraft.getMinecraft().addScheduledTask(() -> {
-            EventsKt.postSync(new ClientDisconnectEvent());
-        });
+        Minecraft.getMinecraft()
+        //#if MC>=12000
+        //$$ .execute(
+        //#else
+        .addScheduledTask(
+        //#endif
+            () -> {
+                EventsKt.postSync(new ClientDisconnectEvent());
+            }
+        );
     }
 }

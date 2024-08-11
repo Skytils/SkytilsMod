@@ -21,14 +21,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
 
 plugins {
-    kotlin("jvm") version "1.9.22"
-    kotlin("plugin.serialization") version "1.9.22"
+    kotlin("jvm")
+    kotlin("plugin.serialization")
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("gg.essential.multi-version")
     id("gg.essential.defaults")
-    idea
-    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
-
+    id("gg.essential.multi-version")
     signing
 }
 
@@ -159,7 +156,7 @@ dependencies {
     shadowMe("org.brotli:dec:0.1.2")
     shadowMe("com.aayushatharva.brotli4j:brotli4j:1.16.0")
 
-    shadowMe("gg.skytils:events")
+    shadowMe(project(":events:$platform"))
     shadowMe("gg.skytils.hypixel.types:types")
     shadowMe("gg.skytils.skytilsws.shared:ws-shared")
 

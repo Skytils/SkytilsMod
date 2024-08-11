@@ -57,7 +57,11 @@ public class MixinMinecraft {
             method = "runTick",
             at = @At(
                     value = "INVOKE",
+                    //#if MC>=12000
+                    //$$ target = "Lnet/minecraft/util/profiler/Profiler;pop()V",
+                    //#else
                     target = "Lnet/minecraft/profiler/Profiler;endSection()V",
+                    //#endif
                     shift = At.Shift.BEFORE,
                     ordinal = 0
             )
@@ -66,7 +70,8 @@ public class MixinMinecraft {
         EventsKt.postSync(new TickEvent());
     }
 
-    @WrapOperation(method = "runTick", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;next()Z"))
+    //#if MC<13000
+    @WrapOperation(method = "runTick", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;next()Z", remap = false))
     private boolean mouseInput(Operation<Boolean> original) {
         while(original.call()) {
             if (EventsKt.postCancellableSync(new MouseInputEvent(Mouse.getEventX(), Mouse.getEventY(), Mouse.getEventButton()))) {
@@ -77,7 +82,7 @@ public class MixinMinecraft {
         return false;
     }
 
-    @WrapOperation(method = "runTick", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;next()Z"))
+    @WrapOperation(method = "runTick", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;next()Z", remap = false))
     private boolean keyboardInput(Operation<Boolean> original) {
         while(original.call()) {
             if (EventsKt.postCancellableSync(new KeyboardInputEvent(Keyboard.getEventKey()))) {
@@ -87,6 +92,7 @@ public class MixinMinecraft {
         }
         return false;
     }
+    //#endif
 
     @Inject(method = "displayGuiScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;currentScreen:Lnet/minecraft/client/gui/GuiScreen;", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER), cancellable = true)
     private void openScreen(CallbackInfo ci, @Local(argsOnly = true) LocalRef<GuiScreen> screen) {

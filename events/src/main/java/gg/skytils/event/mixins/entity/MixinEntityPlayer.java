@@ -29,6 +29,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+//#if MC>12000
+//$$ import net.minecraft.util.ActionResult;
+//$$ import net.minecraft.util.Hand;
+//#endif
+
 @Mixin(EntityPlayer.class)
 public class MixinEntityPlayer {
     @Inject(method = "attackTargetEntityWithCurrentItem", at = @At("HEAD"), cancellable = true)
@@ -38,10 +43,36 @@ public class MixinEntityPlayer {
         }
     }
 
-    @Inject(method = "interactWith", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;getCurrentEquippedItem()Lnet/minecraft/item/ItemStack;"), cancellable = true)
-    private void onEntityInteract(Entity targetEntity, CallbackInfoReturnable<Boolean> cir) {
+    @Inject(
+            method =
+            //#if MC>12000
+            //$$ "interact",
+            //#else
+            "interactWith",
+            //#endif
+            at = @At(value = "INVOKE",
+                target =
+                    //#if MC>12000
+                    //$$ "Lnet/minecraft/entity/player/PlayerEntity;getStackInHand(Lnet/minecraft/util/Hand;)Lnet/minecraft/item/ItemStack;",
+                    //#else
+                    "Lnet/minecraft/entity/player/EntityPlayer;getCurrentEquippedItem()Lnet/minecraft/item/ItemStack;",
+                    //#endif
+                ordinal = 0
+            ), cancellable = true)
+    private void onEntityInteract(Entity targetEntity,
+                                  //#if MC>12000
+                                  //$$ Hand hand,
+                                  //$$ CallbackInfoReturnable<ActionResult> cir
+                                  //#else
+                                  CallbackInfoReturnable<Boolean> cir
+                                  //#endif
+    ) {
         if (EventsKt.postCancellableSync(new EntityInteractEvent(targetEntity))) {
+            //#if MC>12000
+            //$$ cir.setReturnValue(ActionResult.FAIL);
+            //#else
             cir.setReturnValue(false);
+            //#endif
         }
     }
 }
