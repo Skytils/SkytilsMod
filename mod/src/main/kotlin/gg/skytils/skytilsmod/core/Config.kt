@@ -450,17 +450,17 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Dungeon Status",
-        description = "Shows information about the current dungeon run that affects its score.",
+        description = "Shows information about the current dungeon run that affects its score. Disabling this will minimize the dungeon score.",
         category = "Dungeons", subcategory = "Score Calculation"
     )
-    var showDungeonStatus = false
+    var showDungeonStatus = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Dungeon Score Breakdown",
         description = "Shows every score category as opposed to only total score.",
         category = "Dungeons", subcategory = "Score Calculation"
     )
-    var showScoreBreakdown = false
+    var showScoreBreakdown = true
 
     @Property(
         type = PropertyType.SWITCH, name = "Score Calculation Party Assist",
