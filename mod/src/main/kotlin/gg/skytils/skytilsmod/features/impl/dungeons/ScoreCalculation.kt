@@ -342,61 +342,50 @@ object ScoreCalculation: EventSubscriber {
             }
         }
 
+    private fun getPuzzleLine(): String {
+        val puzzleColor = if (completedPuzzleCount == puzzleCount) "§a" else if (failedPuzzles.get() > 0) "§c" else "§e"
+
+        return "$puzzleColor$completedPuzzleCount§7/§a$puzzleCount"
+    }
+
+    private fun getSecretLine(): String {
+        if (totalSecrets.get() == 0) {
+            return "§7?"
+        }
+
+        val found = foundSecrets.get()
+        val foundColor = if (found == totalSecrets.get()) "§a" else if (found >= minSecrets.get()) "§e" else "§c"
+
+        val minDisplay = when (val min = minSecrets.get()) {
+            -1 -> "§7?"
+            -2 -> "§c✘"
+            -3 -> "§a✔"
+           else -> "§a${(min - found).takeUnless { it <= 0 } ?: "✔"}"
+        }
+
+        val skipDisplay = when (val skip = skippableSecrets.get()) {
+            -1 -> "§7?"
+            -2 -> "§c✘"
+            -3 -> "§a✔"
+            else -> "§a${totalSecrets.get() - skip}"
+        }
+
+        return "$foundColor$found§7/§a${totalSecrets.get()} §e(min: $minDisplay§e, could skip: $skipDisplay§e)"
+    }
+
     fun updateText(score: Int) {
         Utils.checkThreadAndQueue {
             ScoreCalculationElement.text.clear()
             if (!Utils.inDungeons) return@checkThreadAndQueue
             if (Skytils.config.showDungeonStatus) {
-                ScoreCalculationElement.text.add("§9Dungeon Status")
-                ScoreCalculationElement.text.add("• §eDeaths: ${if (deaths.get() == 0) {
-                    "§a"
-                } else {
-                    "§c"
-                }}${deaths.get()} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}")
-                ScoreCalculationElement.text.add("• §ePuzzles: ${if (completedPuzzleCount == puzzleCount) {
-                    "§a"
-                } else if (failedPuzzles.get() > 0) {
-                    "§c"
-                } else {
-                    "§e"
-                }}$completedPuzzleCount§7/§a$puzzleCount")
-                ScoreCalculationElement.text.add("• §eSecrets: " + if (totalSecrets.get() == 0) {
-                    "§7?"
-                } else {
-                    val found = foundSecrets.get()
-                    (if (found == totalSecrets.get()) {
-                        "§a"
-                    } else if (found >= minSecrets.get()) {
-                        "§e"
-                    } else {
-                        "§c"
-                    }) + found + "§7/§a" + totalSecrets.get() + " §e(min: " + when (val sec = minSecrets.get()) {
-                        -1 -> "§7?"
-                        -2 -> "§c✘"
-                        -3 -> "§a✔"
-                        else -> "§a${(sec - found).takeUnless { it <= 0 } ?: "✔"}"
-                    } + "§e, could skip: " + when (val skip = skippableSecrets.get()) {
-                        -1 -> "§7?"
-                        -2 -> "§c✘"
-                        -3 -> "§a✔"
-                        else -> "§a${totalSecrets.get()  - skip}"
-                    } + "§e)"
-                })
-                ScoreCalculationElement.text.add("• §eCrypts: ${if (crypts.get() >= 5) {
-                    "§a"
-                } else {
-                    "§c"
-                }}${crypts.get().coerceAtMost(5)}")
-                ScoreCalculationElement.text.add("• §eMimic: §l${if ((dungeonFloorNumber ?: 0) >= 6) {
-                    if (mimicKilled.get()) {
-                        "§a✔"
-                    } else {
-                        "§c✘"
-                    }
-                } else {
-                    "§7-"
-                }}")
-                ScoreCalculationElement.text.add("")
+                """|§9Dungeon Status
+                   |• §eDeaths: ${deaths.greenIfEquals(0)} ${if (firstDeathHadSpirit.get()) "§7(§6Spirit§7)" else ""}
+                   |• §ePuzzles: ${getPuzzleLine()}
+                   |• §eSecrets: ${getSecretLine()}
+                   |• §eCrypts: ${crypts.get().coerceAtMost(5).greenIfEquals(5)}
+                   |• §eMimic: §l${if ((dungeonFloorNumber ?: 0) >= 6) (if (mimicKilled.get()) "§a✔" else "§c✘") else "§7-"}
+                   |
+                """.trimMargin().lines().forEach { ScoreCalculationElement.text.add(it) }
             }
             if (Skytils.config.showScoreBreakdown) {
                 ScoreCalculationElement.text.add("§6Dungeon Score")
@@ -738,5 +727,7 @@ object ScoreCalculation: EventSubscriber {
 
     data class FloorRequirement(val secretPercentage: Double = 1.0, val speed: Int = 10 * 60)
 
+    private fun BasicState<Int>.greenIfEquals(other: Int) = this.get().greenIfEquals(other)
+    private fun Int.greenIfEquals(other: Int) = if (other == this) "§a$this" else "§c$this"
     private fun Boolean.ifTrue(num: Int) = if (this) num else 0
 }
