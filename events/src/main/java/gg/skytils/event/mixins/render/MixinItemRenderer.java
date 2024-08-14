@@ -29,7 +29,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(RenderItem.class)
 public class MixinItemRenderer {
-    @Inject(method = "renderItemAndEffectIntoGUI", at = @At("RETURN"))
+    @Inject(method = "renderItemAndEffectIntoGUI", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderItem;renderItemIntoGUI(Lnet/minecraft/item/ItemStack;II)V"))
     private void postRenderItem(ItemStack stack, int xPosition, int yPosition, CallbackInfo ci) {
         EventsKt.postSync(new ItemOverlayPostRenderEvent(stack, xPosition, yPosition));
     }
