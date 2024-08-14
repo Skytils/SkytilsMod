@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinRendererLivingEntity<T extends EntityLivingBase> {
     @Inject(method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", at = @At("HEAD"), cancellable = true)
     private void onRender(T entity, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
-        LivingEntityPreRenderEvent<T> event = new LivingEntityPreRenderEvent<T>(entity, (RendererLivingEntity<T>) (Object) this, x, y, z, partialTicks);
+        LivingEntityPreRenderEvent<T> event = new LivingEntityPreRenderEvent<T>(entity, x, y, z, partialTicks);
         if (EventsKt.postCancellableSync(event)) {
             ci.cancel();
         }
