@@ -167,7 +167,7 @@ dependencies {
     shadowMe("net.hypixel:mod-api:0.4.0")
 
 
-    shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")!!)
+    shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0-beta.1")!!)
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
 }
