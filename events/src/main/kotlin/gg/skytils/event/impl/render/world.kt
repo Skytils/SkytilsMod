@@ -27,4 +27,4 @@ import net.minecraft.util.MovingObjectPosition
  */
 class WorldDrawEvent(val partialTicks: Float) : Event()
 
-class SelectionBoxDrawEvent(val target: MovingObjectPosition, val partialTicks: Float) : CancellableEvent()
+class SelectionBoxDrawEvent(val target: MovingObjectPosition?, val partialTicks: Float) : CancellableEvent()

@@ -29,20 +29,42 @@ import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MovingObjectPosition;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//#if MC>=12000
+//$$ import net.minecraft.client.util.math.MatrixStack;
+//#endif
+
 @Mixin(EntityRenderer.class)
 public class MixinGameRenderer {
-    @Inject(method = "renderWorldPass", at = @At(value = "CONSTANT", args = "stringValue=hand"))
+    @Shadow private Minecraft mc;
+
+    @Inject(method =
+            //#if MC<12000
+            "renderWorldPass",
+            //#else
+            //$$ "renderWorld",
+            //#endif
+            at = @At(value = "CONSTANT", args = "stringValue=hand", shift = At.Shift.BEFORE))
+    //#if MC<12000
     public void renderWorld(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci) {
         EventsKt.postSync(new WorldDrawEvent(partialTicks));
     }
+    //#else
+    //$$ public void renderWorld(float tickDelta, long limitTime, MatrixStack matrices, CallbackInfo ci) {
+    //$$     EventsKt.postSync(new WorldDrawEvent(tickDelta));
+    //$$ }
+    //#endif
 
+    // Moved to WorldRenderer
+    //#if MC<12000
     @WrapWithCondition(method = "renderWorldPass", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderGlobal;drawSelectionBox(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/util/MovingObjectPosition;IF)V"))
     public boolean renderSelectionBox(RenderGlobal instance, EntityPlayer d1, MovingObjectPosition d2, int f, float blockpos, @Local(argsOnly = true) float partialTicks) {
-        SelectionBoxDrawEvent event = new SelectionBoxDrawEvent(Minecraft.getMinecraft().objectMouseOver, partialTicks);
+        SelectionBoxDrawEvent event = new SelectionBoxDrawEvent(this.mc.objectMouseOver, partialTicks);
         return !EventsKt.postCancellableSync(event);
     }
+    //#endif
 }

@@ -96,10 +96,12 @@ object GardenFeatures : EventSubscriber {
     fun onBlockSelect(event: SelectionBoxDrawEvent) {
         if (!Utils.inSkyblock || !Skytils.config.showSamScytheBlocks) return
 
-        if (event.target.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
+        val target = event.target ?: return
+
+        if (target.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
 
         val size = scythes[ItemUtil.getSkyBlockItemID(mc.thePlayer.heldItem)] ?: return
-        val base = event.target.blockPos
+        val base = target.blockPos
         val baseState = mc.theWorld.getBlockState(base)
 
         if (baseState.block !in trashBlocks) return

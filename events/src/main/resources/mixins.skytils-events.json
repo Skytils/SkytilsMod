@@ -8,6 +8,7 @@
     //$$ "MixinKeyboard",
     //$$ "MixinMouse",
     //$$ "gui.MixinChatScreen",
+    //$$ "render.MixinWorldRenderer",
     //#endif
     "MixinMinecraft",
     "entity.MixinBossStatus",
