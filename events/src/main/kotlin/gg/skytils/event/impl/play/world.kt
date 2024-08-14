@@ -25,6 +25,10 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.BlockPos
 import net.minecraft.world.World
 
+//#if MC>=12000
+//$$ import net.minecraft.util.Hand;
+//#endif
+
 /**
  * [gg.skytils.event.mixins.MixinMinecraft.worldChange]
  */
@@ -36,4 +40,9 @@ class WorldUnloadEvent(val world: World) : Event()
  */
 class BlockInteractEvent(val item: ItemStack, val pos: BlockPos) : CancellableEvent()
 
-class EntityInteractEvent(val entity: Entity) : CancellableEvent()
+class EntityInteractEvent(
+    val entity: Entity,
+    //#if MC>=12000
+    //$$ val hand: Hand
+    //#endif
+) : CancellableEvent()

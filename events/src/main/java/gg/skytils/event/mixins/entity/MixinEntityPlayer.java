@@ -67,7 +67,13 @@ public class MixinEntityPlayer {
                                   CallbackInfoReturnable<Boolean> cir
                                   //#endif
     ) {
-        if (EventsKt.postCancellableSync(new EntityInteractEvent(targetEntity))) {
+        if (EventsKt.postCancellableSync(new EntityInteractEvent(
+                //#if MC>=12000
+                //$$ targetEntity, hand
+                //#else
+                targetEntity
+                //#endif
+        ))) {
             //#if MC>12000
             //$$ cir.setReturnValue(ActionResult.FAIL);
             //#else
