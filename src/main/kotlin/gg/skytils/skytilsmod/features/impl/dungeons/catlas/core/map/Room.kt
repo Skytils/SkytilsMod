@@ -42,6 +42,7 @@ class Room(override val x: Int, override val z: Int, var data: RoomData) : Tile 
                 else -> CatlasConfig.colorRoom
             }
         }
+    var uniqueRoom: UniqueRoom? = null
 
     fun getArrayPosition(): Pair<Int, Int> {
         return Pair((x - DungeonScanner.startX) / 16, (z - DungeonScanner.startZ) / 16)
@@ -51,9 +52,13 @@ class Room(override val x: Int, override val z: Int, var data: RoomData) : Tile 
         val unique = DungeonInfo.uniqueRooms.find { it.name == roomName }
 
         if (unique == null) {
-            DungeonInfo.uniqueRooms.add(UniqueRoom(column, row, this))
+            UniqueRoom(column, row, this).let {
+                DungeonInfo.uniqueRooms.add(it)
+                uniqueRoom = it
+            }
         } else {
             unique.addTile(column, row, this)
+            uniqueRoom = unique
         }
     }
 }
