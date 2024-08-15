@@ -51,7 +51,7 @@ object MayorInfo {
     var currentMayor: String? = null
     var mayorPerks = HashSet<String>()
     var currentMinister: String? = null
-    var ministerPerks = HashSet<String>()
+    var ministerPerk: String? = null
     var allPerks = HashSet<String>()
 
     var jerryMayor: Mayor? = null
@@ -137,7 +137,7 @@ object MayorInfo {
         val res = client.get("https://api.hypixel.net/resources/skyblock/election").body<JsonObject>()
         val mayorObj = res["mayor"] as JsonObject
         val newMayor = json.decodeFromJsonElement<Mayor>(mayorObj)
-        val newMinister = mayorObj["minister"]?.let { json.decodeFromJsonElement<Mayor>(it) }
+        val newMinister = mayorObj["minister"]?.let { json.decodeFromJsonElement<Minister>(it) }
         tickTimer(1) {
             currentMayor = newMayor.name
             currentMinister = newMinister?.name
@@ -145,11 +145,12 @@ object MayorInfo {
             if (currentMayor != "Jerry") jerryMayor = null
             mayorPerks.clear()
             mayorPerks.addAll(newMayor.perks.map { it.name })
-            ministerPerks.clear()
-            if (newMinister != null) ministerPerks.addAll(newMinister.perks.map { it.name })
             allPerks.clear()
             allPerks.addAll(mayorPerks)
-            allPerks.addAll(ministerPerks)
+            newMinister?.perk?.name?.let {
+                ministerPerk = it
+                allPerks.add(it)
+            }
         }
     }
 
@@ -188,6 +189,9 @@ class Mayor(val name: String, val perks: List<MayorPerk>)
 
 @Serializable
 class MayorPerk(val name: String, val description: String)
+
+@Serializable
+class Minister(val name: String, val perk: MayorPerk)
 
 @Serializable
 data class JerrySession(
