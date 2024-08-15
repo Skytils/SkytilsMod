@@ -292,7 +292,7 @@ object DungeonListener {
             }
         }
         tickTimer(2, repeats = true) {
-            if (Utils.inDungeons && mc.thePlayer != null && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
+            if (Utils.inDungeons && mc.thePlayer != null && mc.thePlayer.ticksExisted >= 20 && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
                 val tabEntries = TabListUtils.tabEntries
                 var partyCount: Int? = null
                 if (tabEntries.isNotEmpty() && tabEntries[0].second.contains("§r§b§lParty §r§f(")) {
