@@ -116,7 +116,7 @@ dependencies {
     }
 
     shadowMe(platform(kotlin("bom")))
-    shadowMe(platform(ktor("bom", "2.3.11", addSuffix = false)))
+    shadowMe(platform(ktor("bom", "2.3.12", addSuffix = false)))
 
     shadowMe(ktor("serialization-kotlinx-json"))
 
