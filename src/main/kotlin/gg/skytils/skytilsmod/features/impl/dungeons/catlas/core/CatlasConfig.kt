@@ -197,11 +197,11 @@ object CatlasConfig : Vigilant(
         type = PropertyType.SELECTOR,
         description = "Shows names of rooms on map.",
         category = "Rooms",
-        options = ["None", "Puzzles / Trap", "All"],
+        options = ["None", "Puzzles", "Puzzles / Trap", "All"],
         i18nName = "catlas.config.rooms..room_names",
         i18nCategory = "catlas.config.rooms"
     )
-    var mapRoomNames = 1
+    var mapRoomNames = 2
 
     @Property(
         name = "Center Room Names",
