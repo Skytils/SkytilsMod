@@ -154,8 +154,12 @@ dependencies {
         exclude(module = "bcprov-jdk18on")
     }
     compileOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
-    shadowMe("net.hypixel:mod-api:0.4.0")
 
+
+    compileOnly("net.hypixel:mod-api-forge:1.0.1.1") {
+        exclude(group = "me.djtheredstoner", module = "DevAuth-forge-legacy")
+    }
+    shadowMe("net.hypixel:mod-api-forge-tweaker:1.0.1.1")
 
     shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.3.5")!!)
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
@@ -222,7 +226,7 @@ tasks {
         relocate("kotlinx.serialization", "gg.skytils.ktx-serialization")
         relocate("kotlinx.coroutines", "gg.skytils.ktx-coroutines")
         relocate("gg.essential.vigilance", "gg.skytils.vigilance")
-        relocate("net.hypixel", "gg.skytils.hypixel-net")
+        relocate("net.hypixel.modapi.tweaker", "gg.skytils.hypixel-net.modapi.tweaker")
 
         exclude(
             "**/LICENSE_MixinExtras",

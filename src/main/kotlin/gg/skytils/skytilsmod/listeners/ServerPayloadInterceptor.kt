@@ -48,6 +48,7 @@ import kotlin.time.Duration.Companion.minutes
 
 object ServerPayloadInterceptor {
     private val receivedPackets = MutableSharedFlow<ClientboundHypixelPacket>()
+    private var didSetPacketSender = false
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onReceivePacket(event: PacketEvent.ReceiveEvent) {
@@ -104,6 +105,7 @@ object ServerPayloadInterceptor {
                         println("Failed to send packet ${it.identifier}")
                     } != null
                 }
+                didSetPacketSender = true
             }
             Skytils.launch {
                 while (getNetClientHandler() == null) {
@@ -112,7 +114,7 @@ object ServerPayloadInterceptor {
                 }
                 withContext(Dispatchers.MC) {
                     modAPI.subscribeToEventPacket(ClientboundLocationPacket::class.java)
-                    modAPI.invokeSendRegisterPacket(true)
+                    if (didSetPacketSender) modAPI.invokeSendRegisterPacket(true)
                 }
             }
         }
