@@ -148,8 +148,10 @@ object CHWaypoints {
             && mc.thePlayer != null && unformatted.startsWith("[NPC] King Yolkar:")
         ) {
             val yolkar = CrystalHollowsMap.Locations.KingYolkar
-            yolkar.loc.set()
-            yolkar.sendThroughWS()
+            if (!yolkar.loc.exists()) {
+                yolkar.loc.set()
+                yolkar.sendThroughWS()
+            } else yolkar.loc.set()
         }
         if (unformatted.startsWith("You died") || unformatted.startsWith("☠ You were killed")) {
             waypointDelayTicks =
