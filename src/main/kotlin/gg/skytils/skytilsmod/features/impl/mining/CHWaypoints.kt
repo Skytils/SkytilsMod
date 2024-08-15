@@ -209,7 +209,7 @@ object CHWaypoints {
             event.entity is EntityOtherPlayerMP &&
             event.entity.name == "Team Treasurite" &&
             mc.thePlayer.canEntityBeSeen(event.entity) &&
-            event.entity.baseMaxHealth == if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2_000_000.0 else 1_000_000.0
+            event.entity.baseMaxHealth == if (MayorInfo.allPerks.contains("DOUBLE MOBS HP!!!")) 2_000_000.0 else 1_000_000.0
         ) {
             if (!CrystalHollowsMap.Locations.Corleone.loc.exists()) {
                 CrystalHollowsMap.Locations.Corleone.apply {

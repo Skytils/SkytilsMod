@@ -472,7 +472,7 @@ object SlayerFeatures : CoroutineScope {
         val entity = event.target as? EntityLivingBase ?: return
 
         if (!hasSlayerText || !Utils.inSkyblock || event.entity != mc.thePlayer || !Skytils.config.useSlayerHitMethod) return
-        if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * floor(entity.baseMaxHealth).toInt() == expectedMaxHp) {
+        if ((if (MayorInfo.allPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * floor(entity.baseMaxHealth).toInt() == expectedMaxHp) {
             printDevMessage("A valid entity was attacked", "slayer", "seraph", "seraphHit")
             hitMap.compute(entity) { _, int ->
                 return@compute (int ?: 0).inc()

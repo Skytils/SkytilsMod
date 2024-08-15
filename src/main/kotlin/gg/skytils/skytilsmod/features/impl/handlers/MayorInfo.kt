@@ -33,14 +33,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
-import net.minecraft.event.HoverEvent
-import net.minecraft.init.Items
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.IOException
-import java.net.URLEncoder
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.round
@@ -53,6 +50,10 @@ object MayorInfo {
 
     var currentMayor: String? = null
     var mayorPerks = HashSet<String>()
+    var currentMinister: String? = null
+    var ministerPerks = HashSet<String>()
+    var allPerks = HashSet<String>()
+
     var jerryMayor: Mayor? = null
     var newJerryPerks = 0L
     private var lastCheckedElectionOver = 0L
@@ -133,13 +134,22 @@ object MayorInfo {
     }
 
     fun fetchMayorData() = Skytils.IO.launch {
-        val res = json.decodeFromJsonElement<Mayor>(client.get("https://api.hypixel.net/resources/skyblock/election").body<JsonObject>()["mayor"]!!)
+        val res = client.get("https://api.hypixel.net/resources/skyblock/election").body<JsonObject>()
+        val mayorObj = res["mayor"] as JsonObject
+        val newMayor = json.decodeFromJsonElement<Mayor>(mayorObj)
+        val newMinister = mayorObj["minister"]?.let { json.decodeFromJsonElement<Mayor>(it) }
         tickTimer(1) {
-            currentMayor = res.name
+            currentMayor = newMayor.name
+            currentMinister = newMinister?.name
             lastFetchedMayorData = System.currentTimeMillis()
             if (currentMayor != "Jerry") jerryMayor = null
             mayorPerks.clear()
-            mayorPerks.addAll(res.perks.map { it.name })
+            mayorPerks.addAll(newMayor.perks.map { it.name })
+            ministerPerks.clear()
+            if (newMinister != null) ministerPerks.addAll(newMinister.perks.map { it.name })
+            allPerks.clear()
+            allPerks.addAll(mayorPerks)
+            allPerks.addAll(ministerPerks)
         }
     }
 
