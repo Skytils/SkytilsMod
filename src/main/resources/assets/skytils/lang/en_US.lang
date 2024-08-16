@@ -330,6 +330,7 @@ skytils.config.slayer..current_inferno_rng_meter=Current Inferno RNG Meter
 skytils.config.slayer..current_bloodfiend_rng_meter=Current Bloodfiend RNG Meter
 skytils.config.slayer.general.carry_mode=Carry Mode
 skytils.config.slayer.general.use_hits_to_detect_slayer=Use Hits to Detect Slayer
+skytils.config.slayer.general.use_nametag_to_detect_slayer=Use Nametag to Detect Slayer
 skytils.config.slayer.quality_of_life.ping_when_in_atoned_horror_danger_zone=Ping when in Atoned Horror Danger Zone
 skytils.config.slayer.quality_of_life.slayer_boss_hitbox=Slayer Boss Hitbox
 skytils.config.slayer.quality_of_life.slayer_miniboss_spawn_alert=Slayer Miniboss Spawn Alert

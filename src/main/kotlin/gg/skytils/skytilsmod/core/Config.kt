@@ -3491,6 +3491,16 @@ object Config : Vigilant(
     var useSlayerHitMethod = true
 
     @Property(
+        type = PropertyType.SWITCH, name = "Use Nametag to Detect Slayer",
+        description = "Finds your slayer based on the nametag.",
+        category = "Slayer", subcategory = "General",
+        i18nName = "skytils.config.slayer.general.use_nametag_to_detect_slayer",
+        i18nCategory = "skytils.config.slayer",
+        i18nSubcategory = "skytils.config.slayer.general"
+    )
+    var useNametagHitMethod = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Ping when in Atoned Horror Danger Zone",
         description = "Pings when you are standing on the Atoned Horror's TNT target.",
         category = "Slayer", subcategory = "Quality of Life",
