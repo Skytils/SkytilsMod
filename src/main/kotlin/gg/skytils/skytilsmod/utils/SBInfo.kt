@@ -24,6 +24,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
+import net.hypixel.data.type.ServerType
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -54,6 +55,7 @@ object SBInfo {
     var objective: String? = null
     var mode: String? = null
     var server: String? = null
+    var serverType: ServerType? = null
     var currentTimeDate: Date? = null
     var lastLocationPacket: ClientboundLocationPacket? = null
 
@@ -81,6 +83,7 @@ object SBInfo {
     fun onDisconnect(event: ClientDisconnectionFromServerEvent)  {
         mode = null
         server = null
+        serverType = null
         lastLocationPacket = null
     }
 
@@ -90,6 +93,7 @@ object SBInfo {
             Utils.checkThreadAndQueue {
                 mode = event.packet.mode.orElse(null)
                 server = event.packet.serverName
+                serverType = event.packet.serverType.orElse(null)
                 lastLocationPacket = event.packet
                 println(event.packet)
                 LocationChangeEvent(event.packet).postAndCatch()

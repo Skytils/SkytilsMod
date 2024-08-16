@@ -40,6 +40,7 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CyclingTwoColorGradient
 import gg.skytils.skytilsmod.utils.graphics.colors.RainbowColor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import net.hypixel.data.type.GameType
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.client.network.NetHandlerPlayClient
@@ -70,7 +71,7 @@ object Utils {
     var skyblock = false
 
     val inSkyblock: Boolean
-        get() = skyblock || SBInfo.mode == "SKYBLOCK"
+        get() = skyblock || SBInfo.serverType == GameType.SKYBLOCK
 
     @JvmField
     var dungeons = false
