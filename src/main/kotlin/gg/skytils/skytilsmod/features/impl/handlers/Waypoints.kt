@@ -220,18 +220,22 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
     fun computeVisibleWaypoints() {
         if (!Utils.inSkyblock) {
             visibleWaypoints = emptyList()
+            printDevMessage("Waypoints unloaded from compute, reason: SB check", "waypoints")
             return
         }
-        val isUnknownIsland = SkyblockIsland.entries.none { it.mode == SBInfo.mode }
+        val mode = SBInfo.mode
+        val isUnknownIsland = SkyblockIsland.entries.none { it.mode == mode }
         visibleWaypoints = categories.filter {
-            it.island.mode == SBInfo.mode || (isUnknownIsland && it.island == SkyblockIsland.Unknown)
+            it.island.mode == mode || (isUnknownIsland && it.island == SkyblockIsland.Unknown)
         }.flatMap { category ->
             category.waypoints.filter { it.enabled }
         }
+        printDevMessage("Waypoints computed for ${mode}, num: ${visibleWaypoints.size}", "waypoints")
     }
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Unload) {
+        printDevMessage("Waypoints unloaded from world unload", "waypoints")
         visibleWaypoints = emptyList()
     }
 
