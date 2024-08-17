@@ -65,10 +65,10 @@ val UIComponent.childContainers
  * Determines whether a mouse click was consumed or not
  */
 fun UIComponent.clickMouse(x: Double, y: Double, button: Int): Boolean {
-    var consumed = true
+    var consumed = false
     val finalListener: UIComponent.(UIClickEvent) -> Unit = { event ->
         if (event.propagationStopped && event.target != this@clickMouse) {
-            consumed = false
+            consumed = true
         }
     }
 
