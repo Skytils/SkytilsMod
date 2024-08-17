@@ -18,21 +18,26 @@
 
 package gg.skytils.event.mixins.gui;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.play.ChatMessageSentEvent;
 import gg.skytils.event.impl.screen.ScreenKeyInputEvent;
 import gg.skytils.event.impl.screen.ScreenMouseInputEvent;
 import gg.skytils.event.impl.screen.ScreenDrawEvent;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiScreen.class)
 public class MixinGuiScreen {
+    @Unique GuiScreen screen = (GuiScreen) (Object) this;
 
     //#if MC<12000
     @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
@@ -43,23 +48,39 @@ public class MixinGuiScreen {
     }
     //#endif
 
-    @Inject(method = "handleInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiScreen;handleKeyboardInput()V"), cancellable = true)
-    public void handleKeyboardInput(CallbackInfo ci) {
-        if (EventsKt.postCancellableSync(new ScreenKeyInputEvent((GuiScreen) (Object) this, Keyboard.getEventKey()))) {
-            ci.cancel();
+    @WrapOperation(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;next()Z"), remap = false)
+    public boolean handleKeyboardInput(Operation<Boolean> original) {
+        while (Keyboard.next()) {
+            if (EventsKt.postCancellableSync(new ScreenKeyInputEvent(screen, Keyboard.getEventKey()))) {
+                continue;
+            }
+            return true;
         }
+        return false;
     }
 
-    @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-    public void handleMouseInput(int mouseX, int mouseY, int mouseButton, CallbackInfo ci) {
-        if (EventsKt.postCancellableSync(new ScreenMouseInputEvent((GuiScreen) (Object) this, mouseX, mouseY, mouseButton))) {
-            ci.cancel();
+    @WrapOperation(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;next()Z"), remap = false)
+    public boolean handleMouseInput(Operation<Boolean> original) {
+        Minecraft mc = Minecraft.getMinecraft();
+        while (Mouse.next()) {
+            if (
+                    Mouse.getEventButtonState() &&
+                            EventsKt.postCancellableSync(new ScreenMouseInputEvent(
+                                    screen,
+                                    Mouse.getEventX() * screen.width / mc.displayWidth,
+                                    screen.height - Mouse.getY() * screen.height / mc.displayHeight - 1,
+                                    Mouse.getEventButton()
+                            ))) {
+                continue;
+            }
+            return true;
         }
+        return false;
     }
 
     @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
     public void drawScreen(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
-        if (EventsKt.postCancellableSync(new ScreenDrawEvent((GuiScreen) (Object) this, mouseX, mouseY))) {
+        if (EventsKt.postCancellableSync(new ScreenDrawEvent(screen, mouseX, mouseY))) {
             ci.cancel();
         }
     }
