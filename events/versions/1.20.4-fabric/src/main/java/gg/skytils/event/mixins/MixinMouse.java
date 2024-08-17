@@ -33,7 +33,7 @@ public class MixinMouse {
 
     @Shadow private double y;
 
-    @Inject(method = "onMouseButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;getHandle()J", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "onMouseButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;getHandle()J", shift = At.Shift.AFTER, ordinal = 0), cancellable = true)
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci) {
         if (EventsKt.postCancellableSync(new MouseInputEvent((int) this.x, (int) this.y, button))) {
             ci.cancel();
