@@ -164,7 +164,7 @@ object ItemFeatures {
                                     ?: return@also
 
                             val stackingLevel = enchantments.getInteger(stacking.nbtName)
-                            val stackingAmount = extraAttr.getInteger(stacking.nbtNum)
+                            val stackingAmount = extraAttr.getLong(stacking.nbtNum)
 
                             stackingEnchantDisplayText = buildString {
                                 append("§b${stacking.loreName} §e$stackingLevel §f")
