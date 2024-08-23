@@ -48,6 +48,7 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiChat
+import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.network.play.server.S02PacketChat
 import net.minecraft.util.IChatComponent
@@ -256,4 +257,25 @@ object ChatTabs : EventSubscriber {
                 } ?: 0
         }
     }
+}
+
+fun GuiNewChat.getChatLine(mouseX: Double, mouseY: Double): ChatLine? {
+    if (chatOpen && this is AccessorGuiNewChat) {
+        val extraOffset =
+            if (
+                ReflectionHelper.getFieldFor("club.sk1er.patcher.config.PatcherConfig", "chatPosition")
+                    ?.getBoolean(null) == true
+            ) 12 else 0
+        val x = ((mouseX - 3) / chatScale).toInt()
+        val y = (((UResolution.scaledHeight - mouseY) - 30 - extraOffset) / chatScale).toInt()
+
+        if (x >= 0 && y >= 0) {
+            val l = lineCount.coerceAtMost(drawnChatLines.size)
+            if (x <= chatWidth / chatScale && y < UGraphics.getFontHeight() * l + l) {
+                val lineNum = y / UGraphics.getFontHeight() + scrollPos
+                return drawnChatLines.getOrNull(lineNum)
+            }
+        }
+    }
+    return null
 }

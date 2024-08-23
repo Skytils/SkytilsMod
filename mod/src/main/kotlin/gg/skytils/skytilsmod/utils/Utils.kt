@@ -21,8 +21,6 @@ import dev.falsehonesty.asmhelper.AsmHelper
 import dev.falsehonesty.asmhelper.dsl.instructions.Descriptor
 import gg.essential.lib.caffeine.cache.Cache
 import gg.essential.universal.ChatColor
-import gg.essential.universal.UGraphics
-import gg.essential.universal.UResolution
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.essential.vigilance.Vigilant
@@ -36,7 +34,6 @@ import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.asm.SkytilsTransformer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
-import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
@@ -44,8 +41,6 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CyclingTwoColorGradient
 import gg.skytils.skytilsmod.utils.graphics.colors.RainbowColor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import net.minecraft.client.gui.ChatLine
-import net.minecraft.client.gui.GuiNewChat
 import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.client.settings.GameSettings
 import net.minecraft.entity.Entity
@@ -264,28 +259,6 @@ fun Vigilant.openGUI(): Job = Skytils.launch {
 
 val EntityLivingBase.baseMaxHealth: Double
     get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue
-
-fun GuiNewChat.getChatLine(mouseX: Int, mouseY: Int): ChatLine? {
-    if (chatOpen && this is AccessorGuiNewChat) {
-        val extraOffset =
-            if (
-                ReflectionHelper
-                    .getFieldFor("club.sk1er.patcher.config.PatcherConfig", "chatPosition")
-                    ?.getBoolean(null) == true
-            ) 12 else 0
-        val x = ((mouseX - 3) / chatScale).toInt()
-        val y = (((UResolution.scaledHeight - mouseY) - 30 - extraOffset) / chatScale).toInt()
-
-        if (x >= 0 && y >= 0) {
-            val l = lineCount.coerceAtMost(drawnChatLines.size)
-            if (x <= chatWidth / chatScale && y < UGraphics.getFontHeight() * l + l) {
-                val lineNum = y / UGraphics.getFontHeight() + scrollPos
-                return drawnChatLines.getOrNull(lineNum)
-            }
-        }
-    }
-    return null
-}
 
 fun UMessage.append(item: Any) = this.addTextComponent(item)
 fun UTextComponent.setHoverText(text: String): UTextComponent {
