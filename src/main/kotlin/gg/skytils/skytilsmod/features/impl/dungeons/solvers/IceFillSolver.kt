@@ -18,7 +18,6 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.solvers
 
 import gg.essential.universal.UChat
-import gg.essential.universal.UKeyboard
 import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
@@ -107,9 +106,9 @@ object IceFillSolver {
                                             )
 
                                             puzzles = Triple(
-                                                IceFillPuzzle(pos, world, starts.first, ends.first, direction),
+                                                IceFillPuzzle(pos, world, starts.third, ends.third, direction),
                                                 IceFillPuzzle(pos, world, starts.second, ends.second, direction),
-                                                IceFillPuzzle(pos, world, starts.third, ends.third, direction)
+                                                IceFillPuzzle(pos, world, starts.first, ends.first, direction)
                                             )
 
                                             println(
