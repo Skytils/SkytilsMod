@@ -54,8 +54,8 @@ object IceFillSolver {
                 job = Skytils.launch {
                     val playerX = mc.thePlayer.posX.toInt()
                     val playerZ = mc.thePlayer.posZ.toInt()
-                    val xRange = playerX - 25..playerX + 25
-                    val zRange = playerZ - 25..playerZ + 25
+                    val xRange = playerX - 30..playerX + 30
+                    val zRange = playerZ - 30..playerZ + 30
                     findChest@ for (te in world.loadedTileEntityList) {
                         if (te.pos.y == 75 && te is TileEntityChest && te.numPlayersUsing == 0 && te.pos.x in xRange && te.pos.z in zRange
                         ) {
@@ -138,6 +138,7 @@ object IceFillSolver {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Unload) {
+        //TODO: Will only stop the scan task, not currently running path finders
         job?.cancel()
         job = null
         puzzles = null
@@ -174,14 +175,20 @@ object IceFillSolver {
             val startPath = IntArray(n) { -1 }.also { it[0] = startIndex }
 
             if (optimal) {
+                val optimizedMoves = Array(n) {
+                    moves[it]!!.map { map ->
+                        map.key + (map.value.ordinal.toLong() shl 32)
+                    }.toLongArray()
+                }
+
                 return getOptimalPath(
-                    Array(n) { moves[it]!! }, n, startIndex, visited, startPath, 1, facing, 0, Int.MAX_VALUE
+                    optimizedMoves, n, startIndex, visited, startPath, 1, facing.ordinal, 0, Int.MAX_VALUE
                 )?.first?.map { Vec3(spaces.elementAt(it)).addVector(0.5, 0.01, 0.5) }
             } else {
-                val fixed = moves.mapValues { (_, y) -> y.map { it.key } }
+                val simplifiedMoves = moves.mapValues { (_, y) -> y.map { it.key } }
 
                 return getFirstPath(
-                    Array(n) { fixed[it]!! }, n, startIndex, visited, startPath, 1
+                    Array(n) { simplifiedMoves[it]!! }, n, startIndex, visited, startPath, 1
                 )?.map { Vec3(spaces.elementAt(it)).addVector(0.5, 0.01, 0.5) }
             }
         }
@@ -216,8 +223,9 @@ object IceFillSolver {
                     visited[index] = true
                     path[depth] = index
 
-                    val foundPath = getFirstPath(moves, n, index, visited, path, depth + 1)
-                    if (foundPath != null) return foundPath
+                    getFirstPath(moves, n, index, visited, path, depth + 1)?.let {
+                        return it
+                    }
 
                     visited[index] = false
                 }
@@ -226,51 +234,54 @@ object IceFillSolver {
             return null
         }
 
-        //TODO: Maybe make it only return the path and not the corners
         private fun getOptimalPath(
-            moves: Array<Map<Int, EnumFacing>>,
+            moves: Array<LongArray>,
             n: Int,
             visiting: Int,
             visited: BooleanArray,
             path: IntArray,
             depth: Int,
-            lastDirection: EnumFacing,
+            lastDirection: Int,
             corners: Int,
             knownLeastCorners: Int
         ): Pair<List<Int>, Int>? {
+            if (corners >= knownLeastCorners) {
+                return null
+            }
+
             if (depth == n) {
                 return Pair(path.toList(), corners)
             }
 
-
             var bestPath: List<Int>? = null
             var leastCorners = knownLeastCorners
 
-            if (leastCorners > corners) {
-                val move = moves[visiting]
+            val move = moves[visiting]
 
-                for ((index, direction) in move) {
-                    if (!visited[index]) {
-                        visited[index] = true
-                        path[depth] = index
+            for (value in move) {
+                val index = value.toInt()
+                if (visited[index]) continue
 
-                        val newCorners = if (lastDirection != direction) corners + 1 else corners
+                val direction = (value shr 32).toInt()
 
-                        val newPath = getOptimalPath(
-                            moves, n, index, visited, path, depth + 1, direction, newCorners, leastCorners
-                        )
-                        if (newPath != null) {
-                            bestPath = newPath.first
-                            leastCorners = newPath.second
-                        }
+                visited[index] = true
+                path[depth] = index
 
-                        visited[index] = false
-                    }
+                val newCorners = if (lastDirection != direction) corners + 1 else corners
+
+                val newPath = getOptimalPath(
+                    moves, n, index, visited, path, depth + 1, direction, newCorners, leastCorners
+                )
+
+                if (newPath != null) {
+                    bestPath = newPath.first
+                    leastCorners = newPath.second
                 }
+
+                visited[index] = false
             }
 
-            val best = bestPath
-            return if (best != null) Pair(best, leastCorners) else null
+            return bestPath?.let { Pair(it, leastCorners) }
         }
 
         private fun getSpaces(): List<BlockPos> {
