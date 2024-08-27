@@ -28,6 +28,8 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.websocket.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.serialization.ExperimentalSerializationApi
 import java.util.zip.Deflater
@@ -64,34 +66,39 @@ object WSClient {
         }
     }
 
-    suspend fun openConnection() {
+    fun openConnection(): Job {
         if (session != null) error("Session already open")
 
-        wsClient.webSocketSession(System.getProperty("skytils.websocketURL", "wss://ws.skytils.gg/ws")).apply {
-            session = this
-            try {
-                sendSerialized<Packet>(C2SPacketConnect(SkytilsWS.version, Skytils.VERSION))
-                while (true) {
-                    val packet = receiveDeserialized<Packet>()
-                    PacketHandler.processPacket(this@apply, packet)
+        return wsClient.launch {
+            wsClient.webSocketSession(System.getProperty("skytils.websocketURL", "wss://ws.skytils.gg/ws")).apply {
+                session = this
+                try {
+                    sendSerialized<Packet>(C2SPacketConnect(SkytilsWS.version, Skytils.VERSION))
+                    while (true) {
+                        val packet = receiveDeserialized<Packet>()
+                        PacketHandler.processPacket(this@apply, packet)
+                    }
+                } catch(e: ClosedReceiveChannelException) {
+                    e.printStackTrace()
+                    closeExceptionally(e)
+                } catch (e: Throwable) {
+                    e.printStackTrace()
+                    closeExceptionally(e)
+                } finally {
+                    session = null
                 }
-            } catch(e: ClosedReceiveChannelException) {
-                e.printStackTrace()
-                closeExceptionally(e)
-            } catch (e: Throwable) {
-                e.printStackTrace()
-                closeExceptionally(e)
-            } finally {
-                session = null
             }
         }
+
     }
 
-    suspend fun closeConnection() {
+    fun closeConnection() = wsClient.launch {
         session?.close(CloseReason(CloseReason.Codes.NORMAL, "Client closed connection"))
     }
 
     suspend fun sendPacket(packet: Packet) {
         session?.sendSerialized(packet) ?: error("Tried to send packet but session was null")
     }
+
+    fun sendPacketAsync(packet: Packet) = wsClient.launch { sendPacket(packet) }
 }
