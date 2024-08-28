@@ -143,7 +143,7 @@ object DungeonListener {
                     DungeonFeatures.DungeonSecretDisplay.secrets = sec
                     DungeonFeatures.DungeonSecretDisplay.maxSecrets = max
 
-                    setFoundSecrets@ {
+                    run setFoundSecrets@ {
                         val tile = ScanUtils.getRoomFromPos(mc.thePlayer.position)
                         if (tile is Room && tile.data.name != "Unknown") {
                             val room = tile.uniqueRoom ?: return@setFoundSecrets
