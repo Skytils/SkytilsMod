@@ -50,7 +50,7 @@ object IceFillSolver {
         tickTimer(20, repeats = true) {
             if (!Utils.inDungeons || !Skytils.config.iceFillSolver || mc.thePlayer == null) return@tickTimer
             val world: World = mc.theWorld
-            if (DungeonListener.missingPuzzles.contains("Ice Fill") && puzzles == null && (job == null || job?.isActive == false)) {
+            if (DungeonListener.missingPuzzles.contains("Ice Fill") && puzzles == null && job?.isActive != true) {
                 job = Skytils.launch {
                     val playerX = mc.thePlayer.posX.toInt()
                     val playerZ = mc.thePlayer.posZ.toInt()
@@ -106,9 +106,9 @@ object IceFillSolver {
                                             )
 
                                             puzzles = Triple(
-                                                IceFillPuzzle(pos, world, starts.third, ends.third, direction),
+                                                IceFillPuzzle(pos, world, starts.first, ends.first, direction),
                                                 IceFillPuzzle(pos, world, starts.second, ends.second, direction),
-                                                IceFillPuzzle(pos, world, starts.first, ends.first, direction)
+                                                IceFillPuzzle(pos, world, starts.third, ends.third, direction)
                                             )
 
                                             println(
@@ -194,14 +194,15 @@ object IceFillSolver {
         }
 
         fun draw(matrixStack: UMatrixStack, partialTicks: Float) {
-            GlStateManager.pushMatrix()
-            GlStateManager.disableCull()
+            path?.let {
+                GlStateManager.pushMatrix()
+                GlStateManager.disableCull()
 
-            path?.zipWithNext { first, second ->
-                RenderUtil.draw3DLine(first, second, 5, Color.MAGENTA, partialTicks, matrixStack, Funny.alphaMult)
+                it.zipWithNext { first, second ->
+                    RenderUtil.draw3DLine(first, second, 5, Color.MAGENTA, partialTicks, matrixStack, Funny.alphaMult)
+                }
+                GlStateManager.popMatrix()
             }
-
-            GlStateManager.popMatrix()
         }
 
         private fun getFirstPath(
