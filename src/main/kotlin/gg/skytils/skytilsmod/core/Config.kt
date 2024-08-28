@@ -378,7 +378,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.BUTTON, name = "Dungeon Sweat",
-        description = "Click if dungeon sweat???",
+        description = "Click if dungeon sweat???\n§1In memory of AzuredBlue, 2019-2024. §cRIP\n§7Yes this actually does something...",
         category = "Dungeons", subcategory = "Miscellaneous",
         searchTags = ["predev", "pre-dev", "arrow", "tic tac toe", "solver", "device"],
         i18nName = "skytils.config.dungeons.miscellaneous.dungeon_sweat",
