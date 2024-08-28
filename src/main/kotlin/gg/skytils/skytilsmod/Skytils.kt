@@ -546,7 +546,8 @@ class Skytils {
             TrophyFish.loadFromApi()
         }
 
-        WSClient.openConnection()
+        if (config.connectToWS)
+            WSClient.openConnection()
     }
 
     @SubscribeEvent
