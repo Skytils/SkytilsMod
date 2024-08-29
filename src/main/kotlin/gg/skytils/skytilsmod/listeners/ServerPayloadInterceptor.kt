@@ -55,7 +55,11 @@ object ServerPayloadInterceptor {
 
     init {
         neededEvents.forEach {
-            HypixelModAPI.getInstance().subscribeToEventPacket(it.java)
+            runCatching {
+                HypixelModAPI.getInstance().subscribeToEventPacket(it.java)
+            }.onFailure {
+                it.printStackTrace()
+            }
         }
     }
 
