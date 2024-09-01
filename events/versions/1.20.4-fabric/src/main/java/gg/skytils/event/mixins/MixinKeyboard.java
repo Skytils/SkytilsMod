@@ -20,16 +20,27 @@ package gg.skytils.event.mixins;
 
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.play.KeyboardInputEvent;
+import gg.skytils.event.impl.screen.ScreenKeyInputEvent;
 import net.minecraft.client.Keyboard;
+import net.minecraft.client.MinecraftClient;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Keyboard.class)
 public class MixinKeyboard {
+    @Shadow @Final private MinecraftClient client;
+
     @Inject(method = "onKey", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;getHandle()J", shift = At.Shift.AFTER, ordinal = 0), cancellable = true)
     private void onKey(long window, int key, int scancode, int action, int modifiers, CallbackInfo ci) {
+        if (this.client.currentScreen != null &&
+                EventsKt.postCancellableSync(new ScreenKeyInputEvent(this.client.currentScreen, key))) {
+            ci.cancel();
+            return;
+        }
         if (EventsKt.postCancellableSync(new KeyboardInputEvent(key))) {
             ci.cancel();
         }

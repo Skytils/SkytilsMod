@@ -27,13 +27,18 @@ import gg.skytils.event.impl.screen.ScreenMouseInputEvent;
 import gg.skytils.event.impl.screen.ScreenDrawEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+//#if MC>12000
+//$$ import net.minecraft.client.gui.DrawContext;
+//#else
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+//#endif
 
 @Mixin(GuiScreen.class)
 public class MixinGuiScreen {
@@ -46,7 +51,6 @@ public class MixinGuiScreen {
             ci.cancel();
         }
     }
-    //#endif
 
     @WrapOperation(method = "handleInput", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Keyboard;next()Z"), remap = false)
     public boolean handleKeyboardInput(Operation<Boolean> original) {
@@ -77,9 +81,14 @@ public class MixinGuiScreen {
         }
         return false;
     }
+    //#endif
 
     @Inject(method = "drawScreen", at = @At("HEAD"), cancellable = true)
-    public void drawScreen(int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
+    public void drawScreen(
+            //#if MC>12000
+            //$$ DrawContext context,
+            //#endif
+            int mouseX, int mouseY, float partialTicks, CallbackInfo ci) {
         if (EventsKt.postCancellableSync(new ScreenDrawEvent(screen, mouseX, mouseY))) {
             ci.cancel();
         }
