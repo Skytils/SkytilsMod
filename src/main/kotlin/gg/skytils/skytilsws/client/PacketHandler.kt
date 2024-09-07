@@ -18,7 +18,9 @@
 
 package gg.skytils.skytilsws.client
 
+import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Reference
+import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Room
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Unknown
@@ -49,6 +51,7 @@ object PacketHandler : IPacketHandler {
             is S2CPacketAcknowledge -> {
                 if (packet.wsVersion != SkytilsWS.version) {
                     session.close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Incompatible WS version"))
+                    UChat.chat("${Skytils.failPrefix} §cIncompatible WS version. Expected ${packet.wsVersion} but you have protocol version ${SkytilsWS.version}.")
                 } else {
                     coroutineScope {
                         handleLogin(session, packet)
