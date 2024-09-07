@@ -22,6 +22,10 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Room
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.RoomState
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.RoomType
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
@@ -85,6 +89,14 @@ object DungeonTimer {
                 if (Skytils.config.dungeonTimer) UChat.chat(
                     "§4Blood §btook ${diff(bloodOpenTime, dungeonStartTime)} seconds to open."
                 )
+            }
+
+            bloodOpenTime != -1L && bloodClearTime == -1L && message == "§r§c[BOSS] The Watcher§r§f: That will be enough for now.§r" -> {
+                DungeonInfo.uniqueRooms.find { it.mainRoom.data.type == RoomType.BLOOD }?.let {
+                    if (it.mainRoom.state > RoomState.CLEARED) {
+                        it.mainRoom.state = RoomState.CLEARED
+                    }
+                }
             }
 
             message == "§r§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.§r" -> {
