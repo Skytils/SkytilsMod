@@ -38,7 +38,7 @@ class WorldUnloadEvent(val world: World) : Event()
  * Represents right-clicking on a block
  * [gg.skytils.event.mixins.MixinMinecraft.onBlockInteract]
  */
-class BlockInteractEvent(val item: ItemStack, val pos: BlockPos) : CancellableEvent()
+class BlockInteractEvent(val item: ItemStack?, val pos: BlockPos) : CancellableEvent()
 
 class EntityInteractEvent(
     val entity: Entity,
