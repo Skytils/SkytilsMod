@@ -38,6 +38,7 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorCommandHandle
 import gg.skytils.skytilsmod.utils.ModChecker
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsws.client.WSClient
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.fml.common.Loader
@@ -51,6 +52,16 @@ object Config : Vigilant(
     (if (Utils.isBSMod) "BSMod" else "Skytils") + " (${Reference.VERSION})",
     sortingBehavior = ConfigSorting
 ) {
+    @Property(
+        type = PropertyType.SWITCH, name = "Connect to Skytils WS Server",
+        description = "Skytils now can relay information from other Skytils users through our first-party websocket server!\nSome features will be hidden and will not work if this switch isn't on.",
+        category = "General", subcategory = "API",
+        i18nName = "skytils.config.general.api.connect_to_skytils_ws_server",
+        i18nCategory = "skytils.config.general",
+        i18nSubcategory = "skytils.config.general.api"
+    )
+    var connectToWS = true
+
     @Property(
         type = PropertyType.SWITCH, name = "Fetch Kuudra Prices",
         description = "Fetches the Kuudra prices for Skytils to use.\nSkytils currently uses a third-party to retrieve this information.\nSome features will be hidden and will not work if this switch isn't on.",
@@ -367,7 +378,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.BUTTON, name = "Dungeon Sweat",
-        description = "Click if dungeon sweat???",
+        description = "Click if dungeon sweat???\n§1In memory of AzuredBlue, 2019-2024. §cRIP\n§7Yes this actually does something...",
         category = "Dungeons", subcategory = "Miscellaneous",
         searchTags = ["predev", "pre-dev", "arrow", "tic tac toe", "solver", "device"],
         i18nName = "skytils.config.dungeons.miscellaneous.dungeon_sweat",
@@ -4497,6 +4508,16 @@ object Config : Vigilant(
                     RepartyCommand
                 (ClientCommandHandler.instance as AccessorCommandHandler).commandMap["rp"] =
                     RepartyCommand
+            }
+        }
+
+        registerListener("connectToWS") { state: Boolean ->
+            if (state) {
+                if (mc.theWorld != null) {
+                    WSClient.openConnection()
+                }
+            } else {
+                WSClient.closeConnection()
             }
         }
     }

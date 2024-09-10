@@ -274,7 +274,7 @@ object CHWaypoints {
 
             fun sendThroughWS() {
                 if (loc.exists()) {
-                    Skytils.IO.launch {
+                    WSClient.wsClient.launch {
                         WSClient.sendPacket(C2SPacketCHWaypoint(serverId = SBInfo.server ?: "", serverTime = mc.theWorld.worldTime, packetType, loc.locX!!.toInt(), loc.locY!!.toInt(), loc.locZ!!.toInt()))
                     }
                 }

@@ -143,17 +143,18 @@ object DungeonListener {
                     DungeonFeatures.DungeonSecretDisplay.secrets = sec
                     DungeonFeatures.DungeonSecretDisplay.maxSecrets = max
 
-                    IO.launch {
+                    run setFoundSecrets@ {
                         val tile = ScanUtils.getRoomFromPos(mc.thePlayer.position)
                         if (tile is Room && tile.data.name != "Unknown") {
-                            val room = DungeonInfo.uniqueRooms.find { tile in it.tiles } ?: return@launch
+                            val room = tile.uniqueRoom ?: return@setFoundSecrets
                             if (room.foundSecrets != sec) {
                                 room.foundSecrets = sec
                                 if (team.size > 1)
-                                    WSClient.sendPacket(C2SPacketDungeonRoomSecret(SBInfo.server ?: return@launch, room.mainRoom.data.name, sec))
+                                    WSClient.sendPacketAsync(C2SPacketDungeonRoomSecret(SBInfo.server ?: return@setFoundSecrets, room.mainRoom.data.name, sec))
                             }
                         }
                     }
+
                 }.ifNull {
                     DungeonFeatures.DungeonSecretDisplay.secrets = -1
                     DungeonFeatures.DungeonSecretDisplay.maxSecrets = -1
@@ -163,8 +164,8 @@ object DungeonListener {
                         .trim() == "> EXTRA STATS <"
                 ) {
                     if (team.size > 1) {
-                        IO.launch {
-                            WSClient.sendPacket(C2SPacketDungeonEnd(SBInfo.server ?: return@launch))
+                        SBInfo.server?.let {
+                            WSClient.sendPacketAsync(C2SPacketDungeonEnd(it))
                         }
                     }
                     if (Skytils.config.dungeonDeathCounter) {
@@ -204,7 +205,7 @@ object DungeonListener {
                     SpiritLeap.doorOpener = null
                     DungeonInfo.keys--
                 } else if (text == "§r§aStarting in 1 second.§r") {
-                    IO.launch {
+                    Skytils.launch {
                         delay(2000)
                         if (DungeonTimer.dungeonStartTime != -1L && team.size > 1) {
                             val party = async {
@@ -212,17 +213,19 @@ object DungeonListener {
                             }
                             val partyMembers = party.await().members.ifEmpty { setOf(mc.thePlayer.uniqueID) }.mapTo(hashSetOf()) { it.toString() }
                             val entrance = DungeonInfo.uniqueRooms.first { it.mainRoom.data.type == RoomType.ENTRANCE }
-                            WSClient.sendPacket(C2SPacketDungeonStart(
-                                serverId = SBInfo.server ?: return@launch,
-                                floor = DungeonFeatures.dungeonFloor!!,
-                                members = partyMembers,
-                                startTime = DungeonTimer.dungeonStartTime,
-                                entranceLoc = entrance.mainRoom.z * entrance.mainRoom.x
-                            ))
-                            while (DungeonTimer.dungeonStartTime != -1L) {
-                                while (outboundRoomQueue.isNotEmpty()) {
-                                    val packet = outboundRoomQueue.poll() ?: continue
-                                    WSClient.sendPacket(packet)
+                            async(WSClient.wsClient.coroutineContext) {
+                                WSClient.sendPacketAsync(C2SPacketDungeonStart(
+                                    serverId = SBInfo.server ?: return@async,
+                                    floor = DungeonFeatures.dungeonFloor!!,
+                                    members = partyMembers,
+                                    startTime = DungeonTimer.dungeonStartTime,
+                                    entranceLoc = entrance.mainRoom.z * entrance.mainRoom.x
+                                ))
+                                while (DungeonTimer.dungeonStartTime != -1L) {
+                                    while (outboundRoomQueue.isNotEmpty()) {
+                                        val packet = outboundRoomQueue.poll() ?: continue
+                                        WSClient.sendPacketAsync(packet)
+                                    }
                                 }
                             }
                         }
@@ -292,7 +295,7 @@ object DungeonListener {
             }
         }
         tickTimer(2, repeats = true) {
-            if (Utils.inDungeons && mc.thePlayer != null && mc.thePlayer.ticksExisted >= 20 && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
+            if (Utils.inDungeons && mc.thePlayer != null && mc.thePlayer.ticksExisted >= 100 && (DungeonTimer.scoreShownAt == -1L || System.currentTimeMillis() - DungeonTimer.scoreShownAt < 1500)) {
                 val tabEntries = TabListUtils.tabEntries
                 var partyCount: Int? = null
                 if (tabEntries.isNotEmpty() && tabEntries[0].second.contains("§r§b§lParty §r§f(")) {

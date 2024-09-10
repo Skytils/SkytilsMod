@@ -31,9 +31,7 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiNewChat
 import gg.skytils.skytilsmod.utils.RegexAsString
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
-import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.startsWithAny
 import gg.skytils.skytilsmod.utils.stripControlCodes
@@ -352,7 +350,9 @@ object SpamHider : PersistentSave(File(Skytils.modDir, "spamhider.json")) {
                                     )
                                 }
                                 if (lastBlessingType != "") {
-                                    GuiManager.addToast(BlessingToast(lastBlessingType, buffs))
+                                    Utils.checkThreadAndQueue {
+                                        GuiManager.addToast(BlessingToast(lastBlessingType, buffs))
+                                    }
                                 }
                                 cancelChatPacket(event, false)
                             }

@@ -79,8 +79,8 @@ object DungeonScanner {
                 scanRoom(xPos, zPos, z, x)?.let {
                     DungeonInfo.dungeonList[z * 11 + x] = it
                     if (it is Room && it.data.name != "Unknown") {
-                        IO.launch {
-                            DungeonListener.outboundRoomQueue.add(C2SPacketDungeonRoom(SBInfo.server ?: return@launch, it.data.name, xPos, zPos, x, z, it.core, it.isSeparator))
+                        SBInfo.server?.let { server ->
+                            DungeonListener.outboundRoomQueue.add(C2SPacketDungeonRoom(server, it.data.name, xPos, zPos, x, z, it.core, it.isSeparator))
                         }
                     }
                 }
