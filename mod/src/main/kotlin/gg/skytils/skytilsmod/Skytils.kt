@@ -291,7 +291,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             NamespacedCommands,
             DamageSplash,
             Funny,
-            ScoreCalculation,
         ).forEach(MinecraftForge.EVENT_BUS::register)
 
         arrayOf(
@@ -365,6 +364,7 @@ object Skytils : CoroutineScope, EventSubscriber {
             RandomStuff,
             RelicWaypoints,
             ScamCheck,
+            ScoreCalculation,
             SelectAllColorSolver,
             ServerPayloadInterceptor,
             ShootTheTargetSolver,
