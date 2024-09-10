@@ -79,7 +79,7 @@ object AuctionData {
                 }${"-SPLASH".toStringIfTrue(extraAttr.hasKey("splash"))}"
             }
 
-            "RUNE" -> if (extraAttr.hasKey("runes")) {
+            "RUNE", "UNIQUE_RUNE" -> if (extraAttr.hasKey("runes")) {
                 val runes = extraAttr.getCompoundTag("runes")
                 val rune = runes.keySet.firstOrNull()
                 if (rune != null) {
