@@ -63,15 +63,21 @@ object PartyFinderStats {
 
     fun printStats(username: String, withKick: Boolean) {
         Skytils.launch {
-            val uuid = try {
-                MojangUtil.getUUIDFromUsername(username)
+            try {
+                val uuid = MojangUtil.getUUIDFromUsername(username) ?: run {
+                    UChat.chat("$failPrefix §cFailed to get UUID for username $username")
+                    return@launch
+                }
+                val member = API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString()) ?: run {
+                    UChat.chat("$failPrefix §cFailed to get profile information for $username ($uuid)")
+                    return@launch
+                }
+
+                playerStats(username, uuid, member, withKick)
             } catch (e: MojangUtil.MojangException) {
                 e.printStackTrace()
                 UChat.chat("$failPrefix §cFailed to get UUID, reason: ${e.message}")
                 return@launch
-            } ?: return@launch
-            API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString())?.let { member ->
-                playerStats(username, uuid, member, withKick)
             }
         }.invokeOnCompletion { error ->
             if (error != null) {
