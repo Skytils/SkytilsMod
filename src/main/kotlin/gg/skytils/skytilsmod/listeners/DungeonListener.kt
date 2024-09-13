@@ -113,6 +113,7 @@ object DungeonListener {
     private val secretsRegex = Regex("\\s*§7(?<secrets>\\d+)\\/(?<maxSecrets>\\d+) Secrets")
     private val keyPickupRegex = Regex("§r§e§lRIGHT CLICK §r§7on §r§7.+?§r§7 to open it\\. This key can only be used to open §r§a(?<num>\\d+)§r§7 door!§r")
     private val witherDoorOpenedRegex = Regex("^(?:\\[.+?] )?(?<name>\\w+) opened a WITHER door!$")
+    private val terminalCompletedRegex = Regex("§r§.(?<username>\\w+)§r§a (?:activated|completed) a (?<type>device|terminal|lever)! \\(§r§c(?<completed>\\d)§r§a\\/(?<total>\\d)\\)§r")
     private const val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
     val outboundRoomQueue = ConcurrentLinkedQueue<C2SPacketDungeonRoom>()
     var isSoloDungeon = false
@@ -150,7 +151,7 @@ object DungeonListener {
                             if (room.foundSecrets != sec) {
                                 room.foundSecrets = sec
                                 if (team.size > 1)
-                                    WSClient.sendPacketAsync(C2SPacketDungeonRoomSecret(SBInfo.server ?: return@setFoundSecrets, room.mainRoom.data.name, sec))
+                                    WSClient.sendPacketAsync(C2SPacketDungeonRoomSecret(SBInfo.server ?: return@setFoundSecrets, room.mainRoom.data.name, sec, mc.thePlayer.name))
                             }
                         }
                     }
@@ -160,6 +161,17 @@ object DungeonListener {
                     DungeonFeatures.DungeonSecretDisplay.maxSecrets = -1
                 }
             } else {
+                terminalCompletedRegex.find(text)?.let {
+                    val completer = team[it.groups["username"]?.value]
+                    val type = it.groups["type"]?.value
+
+                    if (completer != null && type != null) {
+                        when (type) {
+                            "lever" -> completer.leversDone++
+                            "terminal", "device" -> completer.terminalsDone++
+                        }
+                    }
+                }
                 if (text.stripControlCodes()
                         .trim() == "> EXTRA STATS <"
                 ) {
@@ -180,6 +192,22 @@ object DungeonListener {
                     }
                     if (Skytils.config.autoRepartyOnDungeonEnd) {
                         RepartyCommand.processCommand(mc.thePlayer, emptyArray())
+                    }
+                    if (Skytils.config.runBreakdown) {
+                        tickTimer(6) {
+                            val output = team.map {
+                                //TODO: Maybe also save the rank color?
+                                var output = "§6${it.key}§a | Secrets: §6${it.value.secretsDone}§a | Rooms: §6${it.value.roomsDone}§a | Deaths: §6${it.value.deaths}"
+
+                                if (DungeonFeatures.dungeonFloorNumber == 7) {
+                                    output += "§a | Terminals: §6${it.value.terminalsDone}§a | Levers: §6${it.value.leversDone}"
+                                }
+
+                                output
+                            }
+
+                            UChat.chat(output.joinToString("\n"))
+                        }
                     }
                 } else if (text.startsWith("§r§c ☠ ")) {
                     if (text.endsWith(" §r§7reconnected§r§7.§r")) {
@@ -510,6 +538,11 @@ object DungeonListener {
             }
         var dead = false
         var deaths = 0
+        var secretsDone = 0
+        var roomsDone = 0
+        var terminalsDone = 0
+        var leversDone = 0
+
         var lastLivingStateChange: Long? = null
 
         val mapPlayer = DungeonMapPlayer(this, skin)

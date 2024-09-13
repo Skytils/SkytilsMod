@@ -29,6 +29,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.ScanUtils
 import gg.skytils.skytilsmod.features.impl.mining.CHWaypoints
 import gg.skytils.skytilsmod.features.impl.mining.CHWaypoints.CHInstance
 import gg.skytils.skytilsmod.features.impl.mining.CHWaypoints.chWaypointsList
+import gg.skytils.skytilsmod.listeners.DungeonListener.team
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsws.shared.IPacketHandler
 import gg.skytils.skytilsws.shared.SkytilsWS
@@ -62,6 +63,15 @@ object PacketHandler : IPacketHandler {
                 DungeonInfo.uniqueRooms.find { it.mainRoom.data.name == packet.roomId }?.let {
                     if (packet.secretCount > (it.foundSecrets ?: -1)) {
                         it.foundSecrets = packet.secretCount
+                        val finder = team[packet.finder]
+
+                        if (finder != null) {
+                            finder.secretsDone++
+
+                            if (packet.secretCount == it.mainRoom.data.secrets) {
+                                finder.roomsDone++
+                            }
+                        }
                     }
                 }
             }

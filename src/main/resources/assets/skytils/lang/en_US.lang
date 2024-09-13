@@ -23,6 +23,7 @@ skytils.config.dungeons.miscellaneous.auto_copy_fails_to_clipboard=Auto Copy Fai
 skytils.config.dungeons.quality_of_life.autoreparty_on_dungeon_ending=Auto-Reparty on Dungeon Ending
 skytils.config.dungeons.miscellaneous.death_counter=Death Counter
 skytils.config.dungeons.party_finder.party_finder_stats=Party Finder Stats
+skytils.config.dungeons.miscellaneous.run_breakdown=Run Breakdown
 skytils.config.dungeons.miscellaneous.dungeon_chest_profit=Dungeon Chest Profit
 skytils.config.dungeons.miscellaneous.dungeon_chest_profit_includes_essence=Dungeon Chest Profit Includes Essence
 skytils.config.dungeons.miscellaneous.highlight_unopened_croesus_chests=Highlight Unopened Croesus Chests

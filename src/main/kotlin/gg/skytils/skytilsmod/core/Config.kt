@@ -314,6 +314,16 @@ object Config : Vigilant(
     var partyFinderStats = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Run Breakdown",
+        description = "§b[WIP] Shows a Breakdown on what players did in the dungeon.",
+        category = "Dungeons", subcategory = "Miscellaneous",
+        i18nName = "skytils.config.dungeons.miscellaneous.run_breakdown",
+        i18nCategory = "skytils.config.dungeons",
+        i18nSubcategory = "skytils.config.dungeons.miscellaneous"
+    )
+    var runBreakdown = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Chest Profit",
         description = "Shows the estimated profit for items from chests in dungeons.",
         category = "Dungeons", subcategory = "Miscellaneous",
