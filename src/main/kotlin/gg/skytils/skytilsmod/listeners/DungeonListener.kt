@@ -193,13 +193,13 @@ object DungeonListener {
                     if (Skytils.config.autoRepartyOnDungeonEnd) {
                         RepartyCommand.processCommand(mc.thePlayer, emptyArray())
                     }
-                    if (Skytils.config.runBreakdown) {
+                    if (Skytils.config.runBreakdown != 0) {
                         tickTimer(6) {
                             val output = team.map {
                                 //TODO: Maybe also save the rank color?
                                 var output = "§6${it.key}§a | Secrets: §6${it.value.secretsDone}§a | Rooms: §6${it.value.roomsDone}§a | Deaths: §6${it.value.deaths}"
 
-                                if (DungeonFeatures.dungeonFloorNumber == 7) {
+                                if (Skytils.config.runBreakdown == 2 && DungeonFeatures.dungeonFloorNumber == 7) {
                                     output += "§a | Terminals: §6${it.value.terminalsDone}§a | Levers: §6${it.value.leversDone}"
                                 }
 
