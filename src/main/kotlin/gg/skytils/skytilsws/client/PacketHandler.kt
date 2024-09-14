@@ -29,7 +29,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.ScanUtils
 import gg.skytils.skytilsmod.features.impl.mining.CHWaypoints
 import gg.skytils.skytilsmod.features.impl.mining.CHWaypoints.CHInstance
 import gg.skytils.skytilsmod.features.impl.mining.CHWaypoints.chWaypointsList
-import gg.skytils.skytilsmod.listeners.DungeonListener.team
+import gg.skytils.skytilsmod.listeners.DungeonListener.updateSecrets
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsws.shared.IPacketHandler
 import gg.skytils.skytilsws.shared.SkytilsWS
@@ -63,32 +63,7 @@ object PacketHandler : IPacketHandler {
                 DungeonInfo.uniqueRooms.find { it.mainRoom.data.name == packet.roomId }?.let { room ->
                     if (packet.secretCount > (room.foundSecrets ?: -1)) {
                         room.foundSecrets = packet.secretCount
-                        val finders = team.filter { entry ->
-                            val location = entry.value.player?.playerLocation ?: return@filter false
-                            val tile = ScanUtils.getRoomFromPos(location)
-
-                            tile != null && tile.data.name != "Unknown" && room.mainRoom.data.name == tile.data.name
-                        }
-
-                        if (finders.size >= 2) {
-                            finders.forEach {
-                                it.value.maximumSecretsDone++
-
-                                if (packet.secretCount == room.mainRoom.data.secrets) {
-                                    it.value.maximumRoomsDone++
-                                }
-                            }
-                        } else if (finders.size == 1) {
-                            finders.forEach {
-                                it.value.minimumSecretsDone++
-                                it.value.maximumSecretsDone++
-
-                                if (packet.secretCount == room.mainRoom.data.secrets) {
-                                    it.value.minimumRoomsDone++
-                                    it.value.maximumRoomsDone++
-                                }
-                            }
-                        }
+                        updateSecrets(room)
                     }
                 }
             }

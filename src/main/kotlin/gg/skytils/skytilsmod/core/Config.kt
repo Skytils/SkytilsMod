@@ -315,7 +315,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SELECTOR, name = "Run Breakdown",
-        description = "§b[WIP] Shows a Breakdown on what players did in the dungeon.",
+        description = "§b[WIP] Shows a Breakdown on what players did in the dungeon.\n§eNote: Requires teammates to use Skytils Websocket otherwise it's highly inaccurate.",
         options = ["Disabled", "Enabled", "Enabled + Terminals"],
         category = "Dungeons", subcategory = "Miscellaneous",
         i18nName = "skytils.config.dungeons.miscellaneous.run_breakdown",
