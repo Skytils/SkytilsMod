@@ -60,16 +60,33 @@ object PacketHandler : IPacketHandler {
                 }
             }
             is S2CPacketDungeonRoomSecret -> {
-                DungeonInfo.uniqueRooms.find { it.mainRoom.data.name == packet.roomId }?.let {
-                    if (packet.secretCount > (it.foundSecrets ?: -1)) {
-                        it.foundSecrets = packet.secretCount
-                        val finder = team[packet.finder]
+                DungeonInfo.uniqueRooms.find { it.mainRoom.data.name == packet.roomId }?.let { room ->
+                    if (packet.secretCount > (room.foundSecrets ?: -1)) {
+                        room.foundSecrets = packet.secretCount
+                        val finders = team.filter { entry ->
+                            val location = entry.value.player?.playerLocation ?: return@filter false
+                            val tile = ScanUtils.getRoomFromPos(location)
 
-                        if (finder != null) {
-                            finder.secretsDone++
+                            tile != null && tile.data.name != "Unknown" && room.mainRoom.data.name == tile.data.name
+                        }
 
-                            if (packet.secretCount == it.mainRoom.data.secrets) {
-                                finder.roomsDone++
+                        if (finders.size >= 2) {
+                            finders.forEach {
+                                it.value.maximumSecretsDone++
+
+                                if (packet.secretCount == room.mainRoom.data.secrets) {
+                                    it.value.maximumRoomsDone++
+                                }
+                            }
+                        } else if (finders.size == 1) {
+                            finders.forEach {
+                                it.value.minimumSecretsDone++
+                                it.value.maximumSecretsDone++
+
+                                if (packet.secretCount == room.mainRoom.data.secrets) {
+                                    it.value.minimumRoomsDone++
+                                    it.value.maximumRoomsDone++
+                                }
                             }
                         }
                     }

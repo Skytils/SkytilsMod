@@ -151,7 +151,7 @@ object DungeonListener {
                             if (room.foundSecrets != sec) {
                                 room.foundSecrets = sec
                                 if (team.size > 1)
-                                    WSClient.sendPacketAsync(C2SPacketDungeonRoomSecret(SBInfo.server ?: return@setFoundSecrets, room.mainRoom.data.name, sec, mc.thePlayer.name))
+                                    WSClient.sendPacketAsync(C2SPacketDungeonRoomSecret(SBInfo.server ?: return@setFoundSecrets, room.mainRoom.data.name, sec))
                             }
                         }
                     }
@@ -196,8 +196,16 @@ object DungeonListener {
                     if (Skytils.config.runBreakdown != 0) {
                         tickTimer(6) {
                             val output = team.map {
+                                val secretsDone = "§aSecrets: §6${if (it.value.minimumSecretsDone == it.value.maximumSecretsDone) {
+                                    "${it.value.minimumSecretsDone}"
+                                } else "${it.value.minimumSecretsDone}§a - §6${it.value.maximumSecretsDone}"}"
+
+                                val roomsDone = "§aRooms: §6${if (it.value.minimumRoomsDone == it.value.maximumRoomsDone) {
+                                "${it.value.minimumRoomsDone}"
+                            } else "${it.value.minimumRoomsDone}§a - §6${it.value.maximumRoomsDone}"}"
+
                                 //TODO: Maybe also save the rank color?
-                                var output = "§6${it.key}§a | Secrets: §6${it.value.secretsDone}§a | Rooms: §6${it.value.roomsDone}§a | Deaths: §6${it.value.deaths}"
+                                var output = "§6${it.key}§a | $secretsDone§a | $roomsDone§a | Deaths: §6${it.value.deaths}"
 
                                 if (Skytils.config.runBreakdown == 2 && DungeonFeatures.dungeonFloorNumber == 7) {
                                     output += "§a | Terminals: §6${it.value.terminalsDone}§a | Levers: §6${it.value.leversDone}"
@@ -538,8 +546,10 @@ object DungeonListener {
             }
         var dead = false
         var deaths = 0
-        var secretsDone = 0
-        var roomsDone = 0
+        var minimumSecretsDone = 0
+        var maximumSecretsDone = 0
+        var minimumRoomsDone = 0
+        var maximumRoomsDone = 0
         var terminalsDone = 0
         var leversDone = 0
 
