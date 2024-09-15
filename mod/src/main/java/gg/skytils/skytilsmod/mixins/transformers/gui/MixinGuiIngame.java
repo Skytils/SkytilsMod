@@ -26,7 +26,6 @@ import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.entity.player.EntityPlayer;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -35,27 +34,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(GuiIngame.class)
 public abstract class MixinGuiIngame extends Gui {
 
-    @Shadow
-    protected String recordPlaying;
-
-    @Shadow
-    protected int recordPlayingUpFor;
-
-    @Shadow
-    protected boolean recordIsPlaying;
-
     @ModifyExpressionValue(method = "renderSelectedItem", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/GuiIngame;remainingHighlightTicks:I", opcode = Opcodes.GETFIELD))
     private int alwaysShowItemHighlight(int original) {
         return GuiIngameForgeHookKt.alwaysShowItemHighlight(original);
-    }
-
-    @Inject(method = "setRecordPlaying(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
-    private void onSetActionBar(String message, boolean isPlaying, CallbackInfo ci) {
-        if (GuiIngameHookKt.onSetActionBar(message, isPlaying, ci)) {
-            this.recordPlaying = GuiIngameHookKt.getRecordPlaying();
-            this.recordPlayingUpFor = GuiIngameHookKt.getRecordPlayingUpFor();
-            this.recordIsPlaying = GuiIngameHookKt.getRecordIsPlaying();
-        }
     }
 
     @Inject(method = "renderHotbarItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderItem;renderItemAndEffectIntoGUI(Lnet/minecraft/item/ItemStack;II)V"))

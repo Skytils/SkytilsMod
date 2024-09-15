@@ -19,14 +19,19 @@
 package gg.skytils.skytilsmod.mixins.transformers.renderer;
 
 import gg.skytils.skytilsmod.mixins.hooks.renderer.InventoryEffectRendererHookKt;
-import gg.skytils.skytilsmod.mixins.transformers.gui.MixinGuiContainer;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
+import net.minecraft.inventory.Container;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(InventoryEffectRenderer.class)
-public abstract class MixinInventoryEffectRenderer extends MixinGuiContainer {
+public abstract class MixinInventoryEffectRenderer extends GuiContainer {
+    public MixinInventoryEffectRenderer(Container inventorySlotsIn) {
+        super(inventorySlotsIn);
+    }
+
     @ModifyVariable(method = "updateActivePotionEffects", at = @At("STORE"), ordinal = 0)
     private boolean noDisplayPotionEffects(boolean bool) {
         return InventoryEffectRendererHookKt.noDisplayPotionEffects(bool);

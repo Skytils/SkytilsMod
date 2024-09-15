@@ -18,34 +18,12 @@
 package gg.skytils.skytilsmod.mixins.hooks.gui
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.events.impl.SetActionBarEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.misc.ItemFeatures
 import gg.skytils.skytilsmod.utils.RenderUtil.renderRarity
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.entity.player.EntityPlayer
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
-
-
-var recordPlaying: String? = null
-var recordPlayingUpFor: Int = 0
-var recordIsPlaying: Boolean = false
-
-fun onSetActionBar(message: String, isPlaying: Boolean, ci: CallbackInfo): Boolean {
-    val event = SetActionBarEvent(message, isPlaying)
-    if (event.postAndCatch()) {
-        ci.cancel()
-        return false
-    }
-    if (message != event.message || isPlaying != event.isPlaying) {
-        ci.cancel()
-        recordPlaying = event.message
-        recordPlayingUpFor = 60
-        recordIsPlaying = event.isPlaying
-        return true
-    }
-    return false
-}
 
 fun renderRarityOnHotbar(
     index: Int,

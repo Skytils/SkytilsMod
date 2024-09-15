@@ -20,11 +20,9 @@ package gg.skytils.skytilsmod.mixins.transformers.network;
 
 import gg.skytils.skytilsmod.features.impl.dungeons.MasterMode7Features;
 import gg.skytils.skytilsmod.mixins.extensions.ExtensionEntityLivingBase;
-import gg.skytils.skytilsmod.mixins.hooks.network.NetHandlerPlayClientHookKt;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.Packet;
 import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.server.S0FPacketSpawnMob;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,11 +35,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class MixinNetHandlerPlayClient implements INetHandlerPlayClient {
     @Shadow
     private WorldClient clientWorldController;
-
-    @Inject(method = "addToSendQueue", at = @At("HEAD"), cancellable = true)
-    private void onSendPacket(Packet<?> packet, CallbackInfo ci) {
-        NetHandlerPlayClientHookKt.onSendPacket(packet, ci);
-    }
 
     @Inject(method = "handleSpawnMob", at = @At("TAIL"))
     private void onHandleSpawnMobTail(S0FPacketSpawnMob packetIn, CallbackInfo ci) {

@@ -19,7 +19,6 @@ package gg.skytils.skytilsmod.mixins.hooks.renderer
 
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.events.impl.GuiRenderItemEvent
 import gg.skytils.skytilsmod.features.impl.handlers.GlintCustomizer
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorRenderItem
 import gg.skytils.skytilsmod.utils.ItemUtil.getSkyBlockItemID
@@ -50,23 +49,6 @@ fun renderRarity(stack: ItemStack?, x: Int, y: Int, ci: CallbackInfo) {
             }
         }
     }
-}
-
-fun renderItemOverlayPost(
-    fr: FontRenderer,
-    stack: ItemStack?,
-    xPosition: Int,
-    yPosition: Int,
-    text: String?,
-    ci: CallbackInfo
-) {
-    GuiRenderItemEvent.RenderOverlayEvent.Post(
-        fr,
-        stack,
-        xPosition,
-        yPosition,
-        text
-    ).postAndCatch()
 }
 
 fun renderItemPre(stack: ItemStack, model: IBakedModel, ci: CallbackInfo) {

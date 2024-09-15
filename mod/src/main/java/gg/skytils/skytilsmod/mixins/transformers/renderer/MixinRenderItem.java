@@ -35,11 +35,6 @@ public abstract class MixinRenderItem {
         RenderItemHookKt.renderRarity(stack, x, y, ci);
     }
 
-    @Inject(method = "renderItemOverlayIntoGUI", at = @At("RETURN"))
-    private void renderItemOverlayPost(FontRenderer fr, ItemStack stack, int xPosition, int yPosition, String text, CallbackInfo ci) {
-        RenderItemHookKt.renderItemOverlayPost(fr, stack, xPosition, yPosition, text, ci);
-    }
-
     @Inject(method = "renderItem(Lnet/minecraft/item/ItemStack;Lnet/minecraft/client/resources/model/IBakedModel;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;scale(FFF)V", shift = At.Shift.AFTER))
     private void renderItemPre(ItemStack stack, IBakedModel model, CallbackInfo ci) {
         RenderItemHookKt.renderItemPre(stack, model, ci);

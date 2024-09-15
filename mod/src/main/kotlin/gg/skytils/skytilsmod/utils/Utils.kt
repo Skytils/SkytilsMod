@@ -33,7 +33,6 @@ import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod._event.PacketReceiveEvent
 import gg.skytils.skytilsmod.asm.SkytilsTransformer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
-import gg.skytils.skytilsmod.events.impl.PacketEvent.ReceiveEvent
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
@@ -178,18 +177,8 @@ object Utils {
 
     /**
      * Cancels a chat packet and posts the chat event to the event bus if other mods need it
-     * @param ReceivePacketEvent packet to cancel
+     * @param event packet to cancel
      */
-    fun cancelChatPacket(ReceivePacketEvent: ReceiveEvent) {
-        if (ReceivePacketEvent.packet !is S02PacketChat) return
-        ReceivePacketEvent.isCanceled = true
-        val packet = ReceivePacketEvent.packet
-        checkThreadAndQueue {
-            MinecraftForge.EVENT_BUS.post(MainReceivePacketEvent(mc.netHandler, ReceivePacketEvent.packet))
-            MinecraftForge.EVENT_BUS.post(ClientChatReceivedEvent(packet.type, packet.chatComponent))
-        }
-    }
-
     fun cancelChatPacket(event: PacketReceiveEvent<*>) {
         if (event.packet !is S02PacketChat) return
         event.cancelled = true
