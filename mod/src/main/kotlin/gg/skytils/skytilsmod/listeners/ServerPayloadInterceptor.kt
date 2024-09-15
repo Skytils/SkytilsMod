@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.first
 import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.error.ErrorReason
 import net.hypixel.modapi.packet.ClientboundHypixelPacket
+import net.hypixel.modapi.packet.EventPacket
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
@@ -48,6 +49,18 @@ import kotlin.time.Duration.Companion.minutes
 
 object ServerPayloadInterceptor : EventSubscriber {
     private val receivedPackets = MutableSharedFlow<ClientboundHypixelPacket>()
+    private var didSetPacketSender = false
+    private val neededEvents = mutableSetOf<KClass<out EventPacket>>(ClientboundLocationPacket::class)
+
+    init {
+        neededEvents.forEach {
+            runCatching {
+                HypixelModAPI.getInstance().subscribeToEventPacket(it.java)
+            }.onFailure {
+                it.printStackTrace()
+            }
+        }
+    }
 
     override fun setup() {
         register(::onReceivePacket, EventPriority.Highest)
@@ -108,6 +121,7 @@ object ServerPayloadInterceptor : EventSubscriber {
                         println("Failed to send packet ${it.identifier}")
                     } != null
                 }
+                didSetPacketSender = true
             }
             Skytils.launch {
                 while (mc.netHandler == null) {
@@ -115,8 +129,10 @@ object ServerPayloadInterceptor : EventSubscriber {
                     delay(50L)
                 }
                 withContext(Dispatchers.MC) {
-                    modAPI.subscribeToEventPacket(ClientboundLocationPacket::class.java)
-                    modAPI.invokeSendRegisterPacket(true)
+                    neededEvents.forEach {
+                        HypixelModAPI.getInstance().subscribeToEventPacket(it.java)
+                    }
+                    if (didSetPacketSender) modAPI.invokeSendRegisterPacket(true)
                 }
             }
         }

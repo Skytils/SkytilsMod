@@ -547,6 +547,7 @@ object Skytils : CoroutineScope, EventSubscriber {
         }
     }
 
+
     fun onHypixelPacketFail(event: HypixelPacketFailedEvent) {
         UChat.chat("$failPrefix Mod API request failed: ${event.reason}")
     }
@@ -558,9 +559,8 @@ object Skytils : CoroutineScope, EventSubscriber {
             IO.launch {
                 TrophyFish.loadFromApi()
             }
-            IO.launch {
+            if (config.connectToWS)
                 WSClient.openConnection()
-            }
         }
         //#if MC<11400
         if (!Utils.inSkyblock && Utils.isOnHypixel && event.packet is S3DPacketDisplayScoreboard && event.packet.func_149371_c() == 1) {
@@ -596,9 +596,7 @@ object Skytils : CoroutineScope, EventSubscriber {
         Utils.skyblock = false
         Utils.dungeons = false
 
-        IO.launch {
-            WSClient.closeConnection()
-        }
+        WSClient.closeConnection()
     }
 
     fun onSendPacket(event: PacketSendEvent<*>) {

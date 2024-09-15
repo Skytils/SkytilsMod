@@ -26,6 +26,7 @@ import gg.skytils.event.impl.screen.GuiContainerSlotClickEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.IO
+import gg.skytils.skytilsmod.core.MC
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
 import gg.skytils.skytilsmod.features.impl.handlers.KuudraPriceData
@@ -36,7 +37,9 @@ import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
@@ -191,9 +194,11 @@ object KuudraChestProfit : EventSubscriber {
                 } else {
                     AuctionData.lowestBINs[identifier] ?: 0.0
                 }
-                items.add(KuudraChestLootItem(item.stackSize, displayName, itemValue))
+                withContext(Dispatchers.MC) {
+                    items.add(KuudraChestLootItem(item.stackSize, displayName, itemValue))
 
-                value += itemValue
+                    value += itemValue
+                }
             }
         }
 

@@ -47,7 +47,7 @@ open class Slayer<T : EntityLivingBase>(
         get() = entity.javaClass
     private val currentTier = SlayerFeatures.getTier(name)
     private val expectedHealth =
-        (if ("DOUBLE MOBS HP!!!" in MayorInfo.mayorPerks) 2 else 1) * (SlayerFeatures.BossHealths[name.substringBefore(
+        (if ("DOUBLE MOBS HP!!!" in MayorInfo.allPerks) 2 else 1) * (SlayerFeatures.BossHealths[name.substringBefore(
             " "
         )]?.get(currentTier) ?: 0)
 

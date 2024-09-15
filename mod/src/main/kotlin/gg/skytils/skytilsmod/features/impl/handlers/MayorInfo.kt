@@ -54,6 +54,10 @@ object MayorInfo : EventSubscriber {
 
     var currentMayor: String? = null
     var mayorPerks = HashSet<String>()
+    var currentMinister: String? = null
+    var ministerPerk: String? = null
+    var allPerks = HashSet<String>()
+
     var jerryMayor: Mayor? = null
     var newJerryPerks = 0L
     private var lastCheckedElectionOver = 0L
@@ -137,13 +141,23 @@ object MayorInfo : EventSubscriber {
     }
 
     fun fetchMayorData() = Skytils.IO.launch {
-        val res = json.decodeFromJsonElement<Mayor>(client.get("https://api.hypixel.net/resources/skyblock/election").body<JsonObject>()["mayor"]!!)
+        val res = client.get("https://api.hypixel.net/resources/skyblock/election").body<JsonObject>()
+        val mayorObj = res["mayor"] as JsonObject
+        val newMayor = json.decodeFromJsonElement<Mayor>(mayorObj)
+        val newMinister = mayorObj["minister"]?.let { json.decodeFromJsonElement<Minister>(it) }
         tickTimer(1) {
-            currentMayor = res.name
+            currentMayor = newMayor.name
+            currentMinister = newMinister?.name
             lastFetchedMayorData = System.currentTimeMillis()
             if (currentMayor != "Jerry") jerryMayor = null
             mayorPerks.clear()
-            mayorPerks.addAll(res.perks.map { it.name })
+            mayorPerks.addAll(newMayor.perks.map { it.name })
+            allPerks.clear()
+            allPerks.addAll(mayorPerks)
+            newMinister?.perk?.name?.let {
+                ministerPerk = it
+                allPerks.add(it)
+            }
         }
     }
 
@@ -182,6 +196,9 @@ class Mayor(val name: String, val perks: List<MayorPerk>)
 
 @Serializable
 class MayorPerk(val name: String, val description: String)
+
+@Serializable
+class Minister(val name: String, val perk: MayorPerk)
 
 @Serializable
 data class JerrySession(

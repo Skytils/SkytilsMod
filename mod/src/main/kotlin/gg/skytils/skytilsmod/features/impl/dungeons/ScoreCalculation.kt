@@ -428,7 +428,7 @@ object ScoreCalculation {
     init {
         tickTimer(5, repeats = true) {
             isPaul.set(
-                (MayorInfo.currentMayor == "Paul" && MayorInfo.mayorPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
+                (MayorInfo.allPerks.contains("EZPZ")) || MayorInfo.jerryMayor?.name == "Paul"
             )
         }
     }

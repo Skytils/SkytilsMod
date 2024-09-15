@@ -75,6 +75,9 @@ object MapUpdater {
 
                 if (mapTile.state.ordinal < room.state.ordinal) {
                     room.state = mapTile.state
+                    if (room is Room && room.state == RoomState.GREEN) {
+                        room.uniqueRoom?.foundSecrets = room.uniqueRoom?.foundSecrets?.coerceAtLeast(room.data.secrets)
+                    }
                 }
 
                 if (mapTile is Door && room is Door) {

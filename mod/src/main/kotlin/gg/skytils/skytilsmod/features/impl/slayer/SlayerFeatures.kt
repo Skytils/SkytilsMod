@@ -71,6 +71,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityLiving
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.boss.BossStatus
 import net.minecraft.entity.boss.IBossDisplayData
@@ -364,6 +365,28 @@ object SlayerFeatures : EventSubscriber, CoroutineScope {
                     timerEntityChanged(newName)
                 }
             }
+
+            if (hasSlayerText && slayer == null && Skytils.config.useNametagHitMethod) {
+                val entity = mc.theWorld?.getEntityByID(packet.entityId)
+                printDevMessage("entity is null?", "slayerspam")
+                if (entity != null && entity is EntityArmorStand) {
+                    val name = packet.func_149376_c()?.find { it.dataValueId == 2 }?.`object` as? String
+                    if (name != null) {
+                        printDevMessage("Checking entity nametag $name, was empty ${entity.customNameTag.isEmpty()}", "slayerspam")
+                        if (name.startsWith("§eSpawned by: ") && name.endsWith(mc.thePlayer.name)) {
+                            printDevMessage("Detected spawned text", "slayerspam", "slayer")
+                            mc.theWorld.getEntitiesWithinAABBExcludingEntity(entity, entity.entityBoundingBox.expand(0.5, 0.5, 0.5)).filter {
+                                it is EntityLiving && (if (MayorInfo.allPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * floor(it.baseMaxHealth).toInt() == expectedMaxHp
+                            }.minByOrNull {
+                                it.getDistanceSqToEntity(entity)
+                            }?.let {
+                                printDevMessage("Found entity from nametag", "slayerspam", "slayer")
+                                processSlayerEntity(it)
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         if (packet is S29PacketSoundEffect) {
@@ -467,7 +490,9 @@ object SlayerFeatures : EventSubscriber, CoroutineScope {
             printDevMessage("boss not null", "slayerspam", "seraphspam")
             return
         }
-        processSlayerEntity(event.entity)
+        if (!Skytils.config.useNametagHitMethod) {
+            processSlayerEntity(event.entity)
+        }
     }
 
     fun onClick(event: MouseInputEvent) {
@@ -479,7 +504,7 @@ object SlayerFeatures : EventSubscriber, CoroutineScope {
         val entity = event.target as? EntityLivingBase ?: return
 
         if (!hasSlayerText || !Utils.inSkyblock || event.entity != mc.thePlayer || !Skytils.config.useSlayerHitMethod) return
-        if ((if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * floor(entity.baseMaxHealth).toInt() == expectedMaxHp) {
+        if ((if (MayorInfo.allPerks.contains("DOUBLE MOBS HP!!!")) 2 else 1) * floor(entity.baseMaxHealth).toInt() == expectedMaxHp) {
             printDevMessage("A valid entity was attacked", "slayer", "seraph", "seraphHit")
             hitMap.compute(entity) { _, int ->
                 return@compute (int ?: 0).inc()

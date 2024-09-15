@@ -126,7 +126,7 @@ dependencies {
     }
 
     shadowMe(platform(kotlin("bom")))
-    shadowMe(platform(ktor("bom", "2.3.11", addSuffix = false)))
+    shadowMe(platform(ktor("bom", "2.3.12", addSuffix = false)))
 
     shadowMe(ktor("serialization-kotlinx-json"))
 
@@ -164,11 +164,15 @@ dependencies {
         exclude(module = "bcprov-jdk18on")
     }
     compileOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
-    shadowMe("net.hypixel:mod-api:0.4.0")
 
 
-    shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0-beta.1")!!)
-    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+    compileOnly("net.hypixel:mod-api-forge:1.0.1.1") {
+        exclude(group = "me.djtheredstoner", module = "DevAuth-forge-legacy")
+    }
+    shadowMe("net.hypixel:mod-api-forge-tweaker:1.0.1.1")
+
+    shadowMe(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0-beta.2")!!)
+    annotationProcessor("org.spongepowered:mixin:0.8.7:processor")
     compileOnly("org.spongepowered:mixin:0.8.5")
 }
 
@@ -241,7 +245,7 @@ tasks {
         relocate("kotlinx.serialization", "gg.skytils.ktx-serialization")
         relocate("kotlinx.coroutines", "gg.skytils.ktx-coroutines")
         relocate("gg.essential.vigilance", "gg.skytils.vigilance")
-        relocate("net.hypixel", "gg.skytils.hypixel-net")
+        relocate("net.hypixel.modapi.tweaker", "gg.skytils.hypixel-net.modapi.tweaker")
 
         exclude(
             "**/LICENSE_MixinExtras",

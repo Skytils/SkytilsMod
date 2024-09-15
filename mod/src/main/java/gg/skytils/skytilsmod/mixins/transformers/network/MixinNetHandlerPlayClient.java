@@ -46,9 +46,11 @@ public abstract class MixinNetHandlerPlayClient implements INetHandlerPlayClient
     @Inject(method = "handleSpawnMob", at = @At("TAIL"))
     private void onHandleSpawnMobTail(S0FPacketSpawnMob packetIn, CallbackInfo ci) {
         Entity entity = this.clientWorldController.getEntityByID(packetIn.getEntityID());
-        MasterMode7Features.INSTANCE.onMobSpawned(entity);
-        ((ExtensionEntityLivingBase) entity).getSkytilsHook().onNewDisplayName(
-                entity.getDataWatcher().getWatchableObjectString(2)
-        );
+        if (entity != null) {
+            MasterMode7Features.INSTANCE.onMobSpawned(entity);
+            ((ExtensionEntityLivingBase) entity).getSkytilsHook().onNewDisplayName(
+                    entity.getDataWatcher().getWatchableObjectString(2)
+            );
+        }
     }
 }

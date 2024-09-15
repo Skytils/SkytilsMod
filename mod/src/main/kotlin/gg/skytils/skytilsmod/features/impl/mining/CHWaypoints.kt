@@ -150,7 +150,11 @@ object CHWaypoints : EventSubscriber {
         if ((Skytils.config.crystalHollowWaypoints || Skytils.config.crystalHollowMapPlaces) && Skytils.config.kingYolkarWaypoint && SBInfo.mode == SkyblockIsland.CrystalHollows.mode
             && mc.thePlayer != null && unformatted.startsWith("[NPC] King Yolkar:")
         ) {
-            CrystalHollowsMap.Locations.KingYolkar.loc.set()
+            val yolkar = CrystalHollowsMap.Locations.KingYolkar
+            if (!yolkar.loc.exists()) {
+                yolkar.loc.set()
+                yolkar.sendThroughWS()
+            } else yolkar.loc.set()
         }
         if (unformatted.startsWith("You died") || unformatted.startsWith("☠ You were killed")) {
             waypointDelayTicks =
@@ -210,16 +214,13 @@ object CHWaypoints : EventSubscriber {
             event.entity is EntityOtherPlayerMP &&
             event.entity.name == "Team Treasurite" &&
             mc.thePlayer.canEntityBeSeen(event.entity) &&
-            event.entity.baseMaxHealth == if (MayorInfo.mayorPerks.contains("DOUBLE MOBS HP!!!")) 2_000_000.0 else 1_000_000.0
+            event.entity.baseMaxHealth == if (MayorInfo.allPerks.contains("DOUBLE MOBS HP!!!")) 2_000_000.0 else 1_000_000.0
         ) {
-            if (!CrystalHollowsMap.Locations.Corleone.loc.exists()) {
-                CrystalHollowsMap.Locations.Corleone.apply {
-                    loc.set()
-                    Skytils.IO.launch {
-                        WSClient.sendPacket(C2SPacketCHWaypoint(serverId = SBInfo.server ?: "", serverTime = mc.theWorld.worldTime, packetType, loc.locX!!.toInt(), loc.locY!!.toInt(), loc.locZ!!.toInt()))
-                    }
-                }
-            } else CrystalHollowsMap.Locations.Corleone.loc.set()
+            val corleone = CrystalHollowsMap.Locations.Corleone
+            if (!corleone.loc.exists()) {
+                corleone.loc.set()
+                corleone.sendThroughWS()
+            } else corleone.loc.set()
         }
     }
 
@@ -231,9 +232,7 @@ object CHWaypoints : EventSubscriber {
             CrystalHollowsMap.Locations.cleanNameToLocation[SBInfo.location]?.let {
                 if (!it.loc.exists()) {
                     it.loc.set()
-                    Skytils.IO.launch {
-                        WSClient.sendPacket(C2SPacketCHWaypoint(serverId = SBInfo.server ?: "", serverTime = mc.theWorld.worldTime, it.packetType, it.loc.locX!!.toInt(), it.loc.locY!!.toInt(), it.loc.locZ!!.toInt()))
-                    }
+                    it.sendThroughWS()
                 } else it.loc.set()
             }
         } else if (waypointDelayTicks > 0)
@@ -270,6 +269,14 @@ object CHWaypoints : EventSubscriber {
 
             companion object {
                 val cleanNameToLocation = entries.associateBy { it.cleanName }
+            }
+
+            fun sendThroughWS() {
+                if (loc.exists()) {
+                    WSClient.wsClient.launch {
+                        WSClient.sendPacket(C2SPacketCHWaypoint(serverId = SBInfo.server ?: "", serverTime = mc.theWorld.worldTime, packetType, loc.locX!!.toInt(), loc.locY!!.toInt(), loc.locZ!!.toInt()))
+                    }
+                }
             }
         }
 
