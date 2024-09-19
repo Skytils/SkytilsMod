@@ -222,10 +222,12 @@ object DungeonListener {
                                     entranceLoc = entrance.mainRoom.z * entrance.mainRoom.x
                                 ))
                                 while (DungeonTimer.dungeonStartTime != -1L) {
-                                    while (outboundRoomQueue.isNotEmpty()) {
-                                        val packet = outboundRoomQueue.poll() ?: continue
-                                        WSClient.sendPacketAsync(packet)
+                                    val packet = outboundRoomQueue.poll()
+                                    if (packet == null) {
+                                        delay(50)
+                                        continue
                                     }
+                                    WSClient.sendPacketAsync(packet)
                                 }
                             }
                         }
