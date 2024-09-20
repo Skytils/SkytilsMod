@@ -27,10 +27,19 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//#if MC>12000
+//$$ import net.minecraft.client.font.TextRenderer;
+//$$
+//$$ @Mixin(net.minecraft.client.gui.DrawContext.class)
+//$$ public class MixinItemRenderer {
+//$$     @Inject(method = "drawItemInSlot(Lnet/minecraft/client/font/TextRenderer;Lnet/minecraft/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V"))
+//$$     private void postRenderItem(TextRenderer textRenderer, ItemStack stack, int xPosition, int yPosition, String countOverride, CallbackInfo ci) {
+//#else
 @Mixin(RenderItem.class)
 public class MixinItemRenderer {
     @Inject(method = "renderItemAndEffectIntoGUI", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderItem;renderItemIntoGUI(Lnet/minecraft/item/ItemStack;II)V"))
     private void postRenderItem(ItemStack stack, int xPosition, int yPosition, CallbackInfo ci) {
+//#endif
         EventsKt.postSync(new ItemOverlayPostRenderEvent(stack, xPosition, yPosition));
     }
 }
