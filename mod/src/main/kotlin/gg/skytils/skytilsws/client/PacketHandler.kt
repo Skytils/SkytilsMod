@@ -20,6 +20,7 @@ package gg.skytils.skytilsws.client
 
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Reference
+import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Room
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Unknown

@@ -45,6 +45,7 @@ import net.hypixel.modapi.serializer.PacketSerializer
 import net.minecraft.network.PacketBuffer
 import net.minecraft.network.play.client.C17PacketCustomPayload
 import net.minecraft.network.play.server.S3FPacketCustomPayload
+import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.minutes
 
 object ServerPayloadInterceptor : EventSubscriber {
