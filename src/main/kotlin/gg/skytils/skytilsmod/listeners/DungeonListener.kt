@@ -32,6 +32,7 @@ import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
+import gg.skytils.skytilsmod.events.impl.skyblock.LocationChangeEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
@@ -52,7 +53,10 @@ import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonEnd
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoom
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoomSecret
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket
@@ -64,7 +68,7 @@ import net.minecraftforge.client.event.ClientChatReceivedEvent
 import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.jvm.optionals.getOrNull
 
 object DungeonListener {
     val team = hashMapOf<String, DungeonTeammate>()
@@ -114,7 +118,8 @@ object DungeonListener {
     private val keyPickupRegex = Regex("§r§e§lRIGHT CLICK §r§7on §r§7.+?§r§7 to open it\\. This key can only be used to open §r§a(?<num>\\d+)§r§7 door!§r")
     private val witherDoorOpenedRegex = Regex("^(?:\\[.+?] )?(?<name>\\w+) opened a WITHER door!$")
     private const val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
-    val outboundRoomQueue = ConcurrentLinkedQueue<C2SPacketDungeonRoom>()
+    var outboundRoomQueue = Channel<C2SPacketDungeonRoom>(UNLIMITED)
+    var outboundRoomQueueTask: Deferred<Unit>? = null
     var isSoloDungeon = false
 
     @SubscribeEvent
@@ -125,8 +130,21 @@ object DungeonListener {
         missingPuzzles.clear()
         completedPuzzles.clear()
         teamCached.clear()
-        outboundRoomQueue.clear()
+        printDevMessage("closed room queue world load", "dungeonws")
+        outboundRoomQueue.close()
+        outboundRoomQueueTask?.cancel()
         isSoloDungeon = false
+    }
+
+    @SubscribeEvent
+    fun onLocationUpdate(event: LocationChangeEvent) {
+        if (event.packet.mode.getOrNull() == "dungeon") {
+            printDevMessage("closed room queue", "dungeonws")
+            outboundRoomQueue.close()
+            outboundRoomQueue = Channel(UNLIMITED) {
+                printDevMessage("failed to deliver $it", "dungeonws")
+            }
+        }
     }
 
     @SubscribeEvent
@@ -213,7 +231,8 @@ object DungeonListener {
                             }
                             val partyMembers = party.await().members.ifEmpty { setOf(mc.thePlayer.uniqueID) }.mapTo(hashSetOf()) { it.toString() }
                             val entrance = DungeonInfo.uniqueRooms.first { it.mainRoom.data.type == RoomType.ENTRANCE }
-                            async(WSClient.wsClient.coroutineContext) {
+                            printDevMessage("hi", "dungeonws")
+                            outboundRoomQueueTask = async(IO.coroutineContext) {
                                 WSClient.sendPacketAsync(C2SPacketDungeonStart(
                                     serverId = SBInfo.server ?: return@async,
                                     floor = DungeonFeatures.dungeonFloor!!,
@@ -222,10 +241,14 @@ object DungeonListener {
                                     entranceLoc = entrance.mainRoom.z * entrance.mainRoom.x
                                 ))
                                 while (DungeonTimer.dungeonStartTime != -1L) {
-                                    while (outboundRoomQueue.isNotEmpty()) {
-                                        val packet = outboundRoomQueue.poll() ?: continue
+                                    for (packet in outboundRoomQueue) {
                                         WSClient.sendPacketAsync(packet)
+                                        printDevMessage(packet.toString(), "dungeonws")
                                     }
+                                }
+                            }.also {
+                                it.invokeOnCompletion {
+                                    printDevMessage("loop exit $it", "dungeonws")
                                 }
                             }
                         }

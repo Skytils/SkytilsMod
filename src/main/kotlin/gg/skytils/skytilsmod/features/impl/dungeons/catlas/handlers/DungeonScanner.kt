@@ -18,6 +18,8 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers
 
+import gg.essential.universal.UChat
+import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.IO
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
@@ -26,6 +28,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScann
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.ScanUtils
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.SBInfo
+import gg.skytils.skytilsmod.utils.printDevMessage
 import gg.skytils.skytilsws.shared.packet.C2SPacketDungeonRoom
 import kotlinx.coroutines.launch
 import net.minecraft.init.Blocks
@@ -80,7 +83,13 @@ object DungeonScanner {
                     DungeonInfo.dungeonList[z * 11 + x] = it
                     if (it is Room && it.data.name != "Unknown") {
                         SBInfo.server?.let { server ->
-                            DungeonListener.outboundRoomQueue.add(C2SPacketDungeonRoom(server, it.data.name, xPos, zPos, x, z, it.core, it.isSeparator))
+                            printDevMessage("Sending room data to channel: ${it.data.name}", "dungeonws")
+                            val result = DungeonListener.outboundRoomQueue.trySend(
+                                C2SPacketDungeonRoom(server, it.data.name, xPos, zPos, x, z, it.core, it.isSeparator)
+                            )
+                            if (result.isFailure) {
+                                UChat.chat("${Skytils.failPrefix} §cFailed to send room data to server. ${result.isClosed}")
+                            }
                         }
                     }
                 }
