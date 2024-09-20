@@ -119,7 +119,6 @@ object DungeonListener {
     private val witherDoorOpenedRegex = Regex("^(?:\\[.+?] )?(?<name>\\w+) opened a WITHER door!$")
     private const val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
     var outboundRoomQueue = Channel<C2SPacketDungeonRoom>(UNLIMITED)
-    var outboundRoomQueueTask: Deferred<Unit>? = null
     var isSoloDungeon = false
 
     @SubscribeEvent
@@ -131,8 +130,7 @@ object DungeonListener {
         completedPuzzles.clear()
         teamCached.clear()
         printDevMessage("closed room queue world load", "dungeonws")
-        outboundRoomQueue.close()
-        outboundRoomQueueTask?.cancel()
+        outboundRoomQueue.cancel()
         isSoloDungeon = false
     }
 
@@ -140,7 +138,7 @@ object DungeonListener {
     fun onLocationUpdate(event: LocationChangeEvent) {
         if (event.packet.mode.getOrNull() == "dungeon") {
             printDevMessage("closed room queue", "dungeonws")
-            outboundRoomQueue.close()
+            outboundRoomQueue.cancel()
             outboundRoomQueue = Channel(UNLIMITED) {
                 printDevMessage("failed to deliver $it", "dungeonws")
             }
@@ -225,14 +223,14 @@ object DungeonListener {
                 } else if (text == "§r§aStarting in 1 second.§r") {
                     Skytils.launch {
                         delay(2000)
-                        if (DungeonTimer.dungeonStartTime != -1L && team.size > 1) {
+                        if (DungeonTimer.dungeonStartTime != -1L/* && team.size > 1*/) {
                             val party = async {
                                 ServerboundPartyInfoPacket().getResponse<ClientboundPartyInfoPacket>()
                             }
                             val partyMembers = party.await().members.ifEmpty { setOf(mc.thePlayer.uniqueID) }.mapTo(hashSetOf()) { it.toString() }
                             val entrance = DungeonInfo.uniqueRooms.first { it.mainRoom.data.type == RoomType.ENTRANCE }
                             printDevMessage("hi", "dungeonws")
-                            outboundRoomQueueTask = async(IO.coroutineContext) {
+                            async(IO.coroutineContext) {
                                 WSClient.sendPacketAsync(C2SPacketDungeonStart(
                                     serverId = SBInfo.server ?: return@async,
                                     floor = DungeonFeatures.dungeonFloor!!,
@@ -245,6 +243,7 @@ object DungeonListener {
                                         WSClient.sendPacketAsync(packet)
                                         printDevMessage(packet.toString(), "dungeonws")
                                     }
+                                    printDevMessage("escaped loop", "dungeonws")
                                 }
                             }.also {
                                 it.invokeOnCompletion {
