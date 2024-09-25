@@ -53,10 +53,7 @@ object TriviaSolver {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (event.type == 2.toByte() || !Skytils.config.triviaSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains(
-                "Quiz"
-            )
-        ) return
+        if (event.type == 2.toByte() || !Skytils.config.triviaSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Quiz")) return
         val formatted = event.message.formattedText
 
         if (formatted == "§r§4[STATUE] Oruo the Omniscient§r§f: §r§fI am §r§4Oruo the Omniscient§r§f. I have lived many lives. I have learned all there is to know.§r" && triviaSolutions.size == 0) {
@@ -65,19 +62,15 @@ object TriviaSolver {
         }
 
         if (questionStartRegex.matches(formatted)) {
-            println("XDX: NEW QUESTION DETECTED, CLEARING DATA AND TRACKING LINES")
             reset(trackLines = true)
         }
 
         if (trackLines) {
-            println("XDX: TRACKED LINE")
             lines.add(formatted)
 
             answerRegex.find(formatted)?.destructured?.let { (type, answer) ->
-                println("XDX: TRACKED ANSWER")
                 if (type == "ⓐ") {
                     fullQuestion = lines.subList(1, lines.size - 2).joinToString(" ") { it.stripControlCodes().trim() }
-                    println("XDX: FULL QUESTION IS: \"${fullQuestion}\"")
 
                     if (fullQuestion == "What SkyBlock year is it?") {
                         val currentTime =
@@ -89,7 +82,6 @@ object TriviaSolver {
                         triviaSolutions.entries.find {
                             fullQuestion == it.key
                         }?.let {
-                            println("XDX: FOUND ANSWERS: ${it.value.joinToString(", ")}")
                             correctAnswers.addAll(it.value)
                         }
                     }
@@ -97,13 +89,11 @@ object TriviaSolver {
 
                 if (!SuperSecretSettings.bennettArthur || Funny.ticks % 2 == 0) {
                     if (!correctAnswers.any { it == answer }) {
-                        println("XDX: REPLACED WRONG ANSWER COLOR")
                         event.message = ChatComponentText(formatted.replace("§a", "§c"))
                     } else correctAnswer = answer
                 }
 
                 if (type == "ⓒ") {
-                    println("XDX: STOPPED TRACKING LINES")
                     trackLines = false
                 }
             }
