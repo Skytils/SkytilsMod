@@ -55,9 +55,8 @@ fun showEnchantmentGlint(stack: Any, cir: CallbackInfoReturnable<Boolean>) {
     }
 }
 
-fun modifyDisplayName(s: String): String {
-    var displayName = s
-    if (!Utils.inSkyblock || Skytils.config.starDisplayType == 0 || !displayName.contains("✪")) return displayName
+fun modifyDisplayName(displayName: String): String {
+    if (!Utils.inSkyblock || Skytils.config.starDisplayType == 0 || !displayName.contains(star)) return displayName
 
     try {
         when (Skytils.config.starDisplayType) {
@@ -65,18 +64,16 @@ fun modifyDisplayName(s: String): String {
                 masterStarRegex.find(displayName)?.destructured?.let { (tier) ->
                     val count = masterStars.indexOf(tier) + 1
 
-                    displayName = displayName.replace(masterStarRegex, "")
-                        .replaceFirst("§6" + star.repeat(count), "§c" + "✪".repeat(count) + "§6")
+                    return displayName.replace(masterStarRegex, "")
+                        .replaceFirst("§6" + star.repeat(count), "§c" + star.repeat(count) + "§6")
                 }
             }
 
             2 -> {
                 masterStarRegex.find(displayName)?.destructured?.let { (tier) ->
                     val count = masterStars.indexOf(tier) + 1 + 5
-                    displayName = displayName.replace(starRegex, "").replace(masterStarRegex, "") + "§c$count✪"
-                }.ifNull {
-                    displayName = displayName.replace(starRegex, "") + "§6${displayName.countMatches(star)}✪"
-                }
+                    return displayName.replace(starRegex, "").replace(masterStarRegex, "") + "§c$count$star"
+                } ?: return displayName.replace(starRegex, "") + "§6${displayName.countMatches(star)}$star"
             }
         }
     } catch (ignored: Exception) { }
