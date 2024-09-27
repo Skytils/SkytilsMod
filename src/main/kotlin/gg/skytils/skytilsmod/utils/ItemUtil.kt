@@ -28,7 +28,7 @@ import java.util.*
 import kotlin.math.max
 
 object ItemUtil {
-    private val PET_PATTERN = "§7\\[Lvl \\d+](?: §8\\[.*])? (?<color>§[0-9a-fk-or]).+".toRegex()
+    private val PET_PATTERN = "(?:§e⭐ )?§7\\[Lvl \\d+](?: §8\\[.*])? (?<color>§[0-9a-fk-or]).+".toRegex()
     const val NBT_INTEGER = 3
     private const val NBT_STRING = 8
     private const val NBT_LIST = 9
