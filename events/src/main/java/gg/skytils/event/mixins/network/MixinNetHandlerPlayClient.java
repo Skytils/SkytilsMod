@@ -42,6 +42,7 @@ public class MixinNetHandlerPlayClient {
         });
     }
 
+    //#if MC<12000
     @Inject(method = "handleChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiNewChat;printChatMessage(Lnet/minecraft/util/IChatComponent;)V"), cancellable = true)
     public void onChat(CallbackInfo ci, @Local(argsOnly = true) LocalRef<S02PacketChat> packet) {
         ChatMessageReceivedEvent event = new ChatMessageReceivedEvent(packet.get().getChatComponent());
@@ -59,4 +60,5 @@ public class MixinNetHandlerPlayClient {
         }
         packet.set(new S02PacketChat(event.getMessage(), packet.get().getType()));
     }
+    //#endif
 }

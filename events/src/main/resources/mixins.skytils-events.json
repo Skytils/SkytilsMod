@@ -9,6 +9,7 @@
     //$$ "MixinMouse",
     //$$ "gui.MixinChatScreen",
     //$$ "render.MixinWorldRenderer",
+    //$$ "network.MixinMessageHandler",
     //#endif
     "MixinMinecraft",
     "entity.MixinBossStatus",
