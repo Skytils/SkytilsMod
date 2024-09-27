@@ -27,9 +27,10 @@ import gg.skytils.skytilsmod.utils.ifNull
 import net.minecraft.item.ItemStack
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-const val starPattern = "§6✪"
-val masterStars = ('➊'..'➎').toList()
-val masterStarPattern = Regex("§c[${masterStars.joinToString("")}]")
+const val star = "✪"
+val masterStars = ('➊'..'➎').map { it.toString() }
+val starRegex = Regex("§6${star}+")
+val masterStarRegex = Regex("§c(?<tier>[${masterStars.joinToString("")}])")
 
 fun showEnchantmentGlint(stack: Any, cir: CallbackInfoReturnable<Boolean>) {
     (stack as ItemStack).apply {
@@ -56,30 +57,29 @@ fun showEnchantmentGlint(stack: Any, cir: CallbackInfoReturnable<Boolean>) {
 
 fun modifyDisplayName(s: String): String {
     var displayName = s
-    if (!Utils.inSkyblock) return displayName
+    if (!Utils.inSkyblock || Skytils.config.starDisplayType == 0 || !displayName.contains("✪")) return displayName
+
     try {
-        if (Skytils.config.starDisplayType != 0 && displayName.contains("✪")) {
-            if (Skytils.config.starDisplayType == 2) {
-                masterStarPattern.find(displayName)?.let {
-                    val star = it.value.last()
-                    val count = masterStars.indexOf(star) + 1 + 5
-                    displayName = "${
-                        displayName.replace(starPattern, "")
-                            .replace(masterStarPattern, "")
-                    }§c${count}✪"
-                }.ifNull {
-                    displayName = "${displayName.replace(starPattern, "")}§6${displayName.countMatches(starPattern)}✪"
+        when (Skytils.config.starDisplayType) {
+            1 -> {
+                masterStarRegex.find(displayName)?.destructured?.let { (tier) ->
+                    val count = masterStars.indexOf(tier) + 1
+
+                    displayName = displayName.replace(masterStarRegex, "")
+                        .replaceFirst("§6" + star.repeat(count), "§c" + "✪".repeat(count) + "§6")
                 }
-            } else if (Skytils.config.starDisplayType == 1) {
-                masterStarPattern.find(displayName)?.let {
-                    val star = it.value.last()
-                    val count = masterStars.indexOf(star) + 1
-                    displayName = displayName.replace(masterStarPattern, "")
-                        .replaceFirst(starPattern.repeat(count), "§c✪".repeat(count))
+            }
+
+            2 -> {
+                masterStarRegex.find(displayName)?.destructured?.let { (tier) ->
+                    val count = masterStars.indexOf(tier) + 1 + 5
+                    displayName = displayName.replace(starRegex, "").replace(masterStarRegex, "") + "§c$count✪"
+                }.ifNull {
+                    displayName = displayName.replace(starRegex, "") + "§6${displayName.countMatches(star)}✪"
                 }
             }
         }
-    } catch (ignored: Exception) {
-    }
+    } catch (ignored: Exception) { }
+
     return displayName
 }

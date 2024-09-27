@@ -27,7 +27,7 @@ import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
 import gg.skytils.skytilsmod.features.impl.handlers.AuctionData
-import gg.skytils.skytilsmod.mixins.hooks.item.masterStarPattern
+import gg.skytils.skytilsmod.mixins.hooks.item.masterStarRegex
 import gg.skytils.skytilsmod.mixins.hooks.item.masterStars
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.Utils.inDungeons
@@ -158,8 +158,8 @@ object ContainerSellValue {
         } ?: 0.0
 
         val masterStarCount =
-            if (itemStack.displayName?.contains("✪") == true) masterStarPattern.find(itemStack.displayName)?.let {
-                masterStars.indexOf(it.value.last()) + 1
+            if (itemStack.displayName?.contains("✪") == true) masterStarRegex.find(itemStack.displayName)?.destructured?.let { (tier) ->
+                masterStars.indexOf(tier) + 1
             } ?: 0 else 0
         val masterStarValue = if (masterStarCount > 0) (1..masterStarCount).sumOf { i ->
             AuctionData.lowestBINs[listOf("FIRST", "SECOND", "THIRD", "FOURTH", "FIFTH")[i - 1] + "_MASTER_STAR"] ?: 0.0
