@@ -28,13 +28,14 @@ import java.io.File;
 import java.util.List;
 
 import static gg.skytils.skytilsmod.tweaker.SkytilsSecurityManager.overrideSecurityManager;
+import static gg.skytils.skytilsmod.tweaker.TweakerUtil.registerTransformerExclusions;
 import static gg.skytils.skytilsmod.tweaker.TweakerUtil.runStage;
 
 @SuppressWarnings("unused")
 public class SkytilsTweaker extends EssentialSetupTweaker {
 
     public SkytilsTweaker() throws Throwable {
-        runStage("gg.skytils.skytilsmod.tweaker.DuplicateSkytilsChecker", "checkForDuplicates");
+        DuplicateSkytilsChecker.checkForDuplicates();
         runStage("gg.skytils.skytilsmod.utils.SuperSecretSettings", "load");
         boolean isFML = System.getSecurityManager() != null && System.getSecurityManager().getClass().equals(FMLSecurityManager.class);
         if (System.getProperty("skytils.noSecurityManager") == null && (System.getSecurityManager() == null || isFML || System.getSecurityManager().getClass() == SecurityManager.class)) {
@@ -43,7 +44,15 @@ public class SkytilsTweaker extends EssentialSetupTweaker {
             runStage("gg.skytils.skytilsmod.tweaker.SkytilsSecurityManager", "overrideSecurityManager", isFML);
             System.out.println("Current security manager: " + System.getSecurityManager());
         }
-        runStage("gg.skytils.skytilsmod.tweaker.EssentialPlatformSetup", "setup");
+        registerTransformerExclusions(
+                "kotlin.",
+                "kotlinx.",
+                "gg.skytils.asmhelper.",
+                "gg.skytils.skytilsmod.tweaker.",
+                "gg.skytils.skytilsmod.asm."
+        );
+        DependencyLoader.loadDependencies();
+        runStage("gg.skytils.skytilsmod.utils.EssentialPlatformSetup", "setup");
     }
 
 

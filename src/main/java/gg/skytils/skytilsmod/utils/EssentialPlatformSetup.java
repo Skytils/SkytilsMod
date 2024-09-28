@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2024 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,11 +16,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.tweaker;
+package gg.skytils.skytilsmod.utils;
 
 import gg.essential.universal.UDesktop;
 import gg.skytils.skytilsmod.Reference;
-import net.minecraft.launchwrapper.Launch;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -44,32 +43,15 @@ public class EssentialPlatformSetup {
         }
     }
 
-    @SuppressWarnings("unused")
+
     public static void setup() throws Throwable {
-        boolean isDev = Launch.classLoader.findResource("net/minecraft/world/World.class") != null;
-
-        try {
-            DependencyLoader.loadDependencies();
-        } catch (Throwable t) {
-            t.printStackTrace();
-            throw t;
-        }
-
-        registerTransformerExclusions(
-                "kotlin.",
-                "kotlinx.",
-                "gg.skytils.asmhelper.",
-                "gg.skytils.skytilsmod.tweaker.",
-                "gg.skytils.skytilsmod.asm."
-        );
-
         for (final String url : dataURLCandidates) {
             if (trySetDataUrl(url)) {
                 Reference.dataUrl = url;
                 break;
             }
         }
-        LogManager.getLogger().info("Data URL: " + Reference.dataUrl);
+        LogManager.getLogger().info("Data URL: {}", Reference.dataUrl);
 
         try {
             if (Integer.parseInt(makeRequest(Reference.dataUrl + "api/version").trim()) > Reference.apiVersion) {
