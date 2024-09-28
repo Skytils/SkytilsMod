@@ -27,7 +27,8 @@ import gg.skytils.skytilsmod.utils.ifNull
 import net.minecraft.item.ItemStack
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
-const val starPattern = "§6✪"
+const val starPattern = "§6✪✪✪✪✪"
+const val starPatternSingle = "✪"
 val masterStars = ('➊'..'➎').toList()
 val masterStarPattern = Regex("§c[${masterStars.joinToString("")}]")
 
@@ -68,14 +69,14 @@ fun modifyDisplayName(s: String): String {
                             .replace(masterStarPattern, "")
                     }§c${count}✪"
                 }.ifNull {
-                    displayName = "${displayName.replace(starPattern, "")}§6${displayName.countMatches(starPattern)}✪"
+                    displayName = "${displayName.replace(starPattern, "")}§6${displayName.countMatches(starPatternSingle)}✪"
                 }
             } else if (Skytils.config.starDisplayType == 1) {
                 masterStarPattern.find(displayName)?.let {
                     val star = it.value.last()
                     val count = masterStars.indexOf(star) + 1
                     displayName = displayName.replace(masterStarPattern, "")
-                        .replaceFirst(starPattern.repeat(count), "§c✪".repeat(count))
+                        .replaceFirst("§6${starPatternSingle.repeat(count)}", "§c✪§6".repeat(count))
                 }
             }
         }
