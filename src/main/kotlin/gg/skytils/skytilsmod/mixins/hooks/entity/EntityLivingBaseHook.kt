@@ -50,7 +50,7 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
     }
 
     val isSmol by lazy {
-        Utils.inSkyblock && entity is EntityPlayer && (SuperSecretSettings.smolPeople || isBreefing)
+        Utils.inSkyblock && (entity is EntityPlayer && (SuperSecretSettings.smolPeople || isBreefing)) || (entity is EntityPlayerSP && SuperSecretSettings.smolSelf)
     }
 
     fun modifyPotionActive(potionId: Int, cir: CallbackInfoReturnable<Boolean>) {
