@@ -658,13 +658,13 @@ object ItemFeatures {
                 /*
                 Old Pickonimbuses had 5000 durability. If they were at full durability, they were nerfed to 2000.
                 However, if they were not at full durability, they were left alone. Therefore, it's not really
-                possible to check the true max durability, so we just clamp any durability above 2000 to 2000.
+                possible to check the true max durability.
                 */
                 if (durability < 2000) {
                     RenderUtil.drawDurabilityBar(
                         event.x,
                         event.y,
-                        1 - min(durability, 2000) / 2000.0
+                        1 - durability / 2000.0
                     )
                 }
             }
