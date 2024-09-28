@@ -28,7 +28,7 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
  * @link https://github.com/PikaFan123/rain-timer
  */
 object RainTimer {
-    var nextRain = 1596552707000
+    var nextRain = 1727548440000
 
     init {
         RainTimerGuiElement()
