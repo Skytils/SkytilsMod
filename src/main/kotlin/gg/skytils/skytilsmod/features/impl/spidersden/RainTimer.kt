@@ -28,9 +28,9 @@ import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
  * @link https://github.com/PikaFan123/rain-timer
  */
 object RainTimer {
-    var nextRain = 1727548500000 // Unix-Time of a past rain event start in milliseconds
-    var eventCycleTime = 3600000 // Time between two rain event starts in milliseconds
-    var eventCooldownTime = 2400000 // Time between rain event end and start in milliseconds
+    const val nextRain = 1727548500000 // Unix-Time of a past rain event start in milliseconds
+    const val eventCycleTime = 3600000 // Time between two rain event starts in milliseconds
+    const val eventCooldownTime = 2400000 // Time between rain event end and start in milliseconds
 
     init {
         RainTimerGuiElement()
