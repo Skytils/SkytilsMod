@@ -175,7 +175,7 @@ object AlignmentTaskSolver {
                 val pos = entity.hangingPosition
                 val pending = pendingClicks[pos]
                 if (pending != null) {
-                    val newRot = (event.packet.func_149376_c().find { it.dataValueId == 9 && it.objectType == 0 }?.`object` as? Byte ?: return).toInt()
+                    val newRot = (event.packet.func_149376_c()?.find { it.dataValueId == 9 && it.objectType == 0 }?.`object` as? Byte ?: return).toInt()
                     val currentRot = entity.rotation
                     val delta = getTurnsNeeded(currentRot, newRot)
                     val newPending = pending - delta
