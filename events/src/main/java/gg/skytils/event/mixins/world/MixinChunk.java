@@ -34,7 +34,11 @@ public abstract class MixinChunk {
     @Shadow public abstract IBlockState getBlockState(BlockPos pos);
 
     @Inject(method = "setBlockState", at = @At("HEAD"))
-    private void onBlockChange(BlockPos pos, IBlockState state, CallbackInfoReturnable<IBlockState> cir) {
+    private void onBlockChange(BlockPos pos, IBlockState state,
+                               //#if MC>12000
+                               //$$ boolean moved,
+                               //#endif
+                               CallbackInfoReturnable<IBlockState> cir) {
         IBlockState old = this.getBlockState(pos);
         if (old != state) {
             EventsKt.postSync(new BlockStateUpdateEvent(pos, old, state));
