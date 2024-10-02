@@ -25,14 +25,9 @@ import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.funny.Funny
-import gg.skytils.skytilsmod.utils.SuperSecretSettings
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.startsWithAny
-import gg.skytils.skytilsmod.utils.stripControlCodes
-import net.minecraft.block.BlockButtonStone
+import gg.skytils.skytilsmod.listeners.DungeonListener
+import gg.skytils.skytilsmod.utils.*
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraft.init.Blocks
-import net.minecraft.util.BlockPos
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.EnumFacing
 import net.minecraftforge.client.event.ClientChatReceivedEvent
@@ -45,118 +40,94 @@ import org.lwjgl.input.Keyboard
 import kotlin.math.floor
 
 object TriviaSolver {
+    private val questionStartRegex = Regex("§r§f {32}§r§6§lQuestion #\\d§r")
+    private val answerRegex = Regex("§r§6 (?<type>[ⓐⓑⓒ]) §a(?<answer>[\\w ]+)§r")
+
     val triviaSolutions = hashMapOf<String, List<String>>()
-    var triviaAnswers: List<String>? = null
-    var triviaAnswer: String? = null
+
+    private var lines = mutableListOf<String>()
+    private var trackLines = false
+    private var fullQuestion: String? = null
+    private var correctAnswers = mutableListOf<String>()
+    private var correctAnswer: String? = null
 
     @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
     fun onChat(event: ClientChatReceivedEvent) {
-        if (event.type == 2.toByte()) return
-        val unformatted = event.message.unformattedText.stripControlCodes()
+        if (event.type == 2.toByte() || !Skytils.config.triviaSolver || !Utils.inDungeons || !DungeonListener.missingPuzzles.contains("Quiz")) return
         val formatted = event.message.formattedText
-        if (Skytils.config.triviaSolver && Utils.inDungeons) {
-            if (unformatted.startsWith("[STATUE] Oruo the Omniscient: ") && unformatted.contains("answered Question #") && unformatted.endsWith(
-                    "correctly!"
-                )
-            ) triviaAnswer = null
-            if (unformatted == "[STATUE] Oruo the Omniscient: I am Oruo the Omniscient. I have lived many lives. I have learned all there is to know." && triviaSolutions.size == 0) {
-                UChat.chat("$failPrefix §cSkytils failed to load solutions for Trivia.")
-                DataFetcher.reloadData()
-            }
-            if (unformatted.trim() == "What SkyBlock year is it?") {
-                val currentTime =
-                    (if (DungeonTimer.dungeonStartTime > 0L) DungeonTimer.dungeonStartTime else System.currentTimeMillis()) / 1000.0
-                val diff = floor(currentTime - 1560276000)
-                val year = (diff / 446400 + 1).toInt()
-                triviaAnswers = listOf("Year $year")
-            } else {
-                triviaSolutions.entries.find {
-                    unformatted.contains(it.key)
-                }?.let {
-                    triviaAnswers = it.value
-                }
-            }
 
-            if (triviaAnswers != null && formatted.trim().startsWithAny("§r§6 ⓐ", "§r§6 ⓑ", "§r§6 ⓒ")) {
-                triviaAnswers!!.find {
-                    formatted.endsWith("§a$it§r") && (!SuperSecretSettings.bennettArthur || Funny.ticks % 2 == 0)
-                }.also {
-                    if (it == null) {
-                        event.message = ChatComponentText(formatted.replace("§a", "§c"))
-                    } else {
-                        triviaAnswer = it
-                    }
-                }
-            }
+        if (formatted == "§r§4[STATUE] Oruo the Omniscient§r§f: §r§fI am §r§4Oruo the Omniscient§r§f. I have lived many lives. I have learned all there is to know.§r" && triviaSolutions.size == 0) {
+            UChat.chat("$failPrefix §cSkytils failed to load solutions for Quiz.")
+            DataFetcher.reloadData()
         }
-    }
 
-    //@SubscribeEvent
-    fun onPlayerInteract(event: PlayerInteractEvent) {
-        if (!Utils.inDungeons || !Skytils.config.triviaSolver || event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && event.action != PlayerInteractEvent.Action.LEFT_CLICK_BLOCK) return
-        val block = event.world.getBlockState(event.pos)
-        if (block.block === Blocks.stone_button) {
-            if (triviaAnswer != null) {
-                var answerLabel: EntityArmorStand? = null
-                for (e in mc.theWorld.loadedEntityList) {
-                    if (e !is EntityArmorStand) continue
-                    if (!e.hasCustomName()) continue
-                    val name = e.customNameTag
-                    if (name.contains(triviaAnswer!!) && (name.contains("ⓐ") || name.contains("ⓑ") || name.contains("ⓒ"))) {
-                        answerLabel = e
-                        break
+        if (questionStartRegex.matches(formatted)) {
+            reset(trackLines = true)
+        }
+
+        if (trackLines) {
+            lines.add(formatted)
+
+            answerRegex.find(formatted)?.destructured?.let { (type, answer) ->
+                if (type == "ⓐ") {
+                    fullQuestion = lines.subList(1, lines.size - 2).joinToString(" ") { it.stripControlCodes().trim() }
+
+                    if (fullQuestion == "What SkyBlock year is it?") {
+                        val currentTime =
+                            (if (DungeonTimer.dungeonStartTime > 0L) DungeonTimer.dungeonStartTime else System.currentTimeMillis()) / 1000.0
+                        val diff = floor(currentTime - 1560276000)
+                        val year = (diff / 446400 + 1).toInt()
+                        correctAnswers.add("Year $year")
+                    } else {
+                        triviaSolutions.entries.find {
+                            fullQuestion == it.key
+                        }?.let {
+                            correctAnswers.addAll(it.value)
+                        }
                     }
                 }
-                if (answerLabel != null) {
-                    println("Found Answer Marker " + answerLabel.customNameTag + " at " + answerLabel.posX + ", " + answerLabel.posY + ", " + answerLabel.posZ)
-                    val buttonBlock = BlockPos(answerLabel.posX, 70.0, answerLabel.posZ)
-                    val blockBehind = BlockPos(event.pos.offset(block.getValue(BlockButtonStone.FACING).opposite))
-                    if (mc.theWorld.getBlockState(buttonBlock).block === Blocks.double_stone_slab && mc.theWorld.getBlockState(
-                            blockBehind
-                        ).block === Blocks.double_stone_slab && buttonBlock != blockBehind
-                    ) {
-                        var isRight = false
-                        for (dir in EnumFacing.HORIZONTALS) {
-                            if (buttonBlock.offset(dir) == event.pos) {
-                                isRight = true
-                                break
-                            }
-                        }
-                        if (!isRight) {
-                            println("Wrong button clicked, position: " + event.pos.x + ", " + event.pos.y + ", " + event.pos.z)
-                            if (!(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL) || Keyboard.isKeyDown(Keyboard.KEY_RCONTROL))) {
-                                event.isCanceled = true
-                            }
-                        }
-                    }
+
+                if (!SuperSecretSettings.bennettArthur || Funny.ticks % 2 == 0) {
+                    if (!correctAnswers.any { it == answer }) {
+                        event.message = ChatComponentText(formatted.replace("§a", "§c"))
+                    } else correctAnswer = answer
+                }
+
+                if (type == "ⓒ") {
+                    trackLines = false
                 }
             }
         }
     }
 
     @SubscribeEvent
-    fun onRenderArmorStandPre(event: RenderLivingEvent.Pre<EntityArmorStand?>) {
-        if (Skytils.config.triviaSolver && triviaAnswer != null) {
-            if (event.entity is EntityArmorStand) {
-                val name = event.entity.customNameTag
-                if (name.isNotEmpty() && name.contains("ⓐ") || name.contains("ⓑ") || name.contains("ⓒ")) {
-                    if (!name.contains(triviaAnswer!!)) {
-                        event.isCanceled = true
-                    }
-                }
-            }
+    fun onRenderArmorStandPre(event: RenderLivingEvent.Pre<EntityArmorStand>) {
+        val answer = correctAnswer ?: return
+        if (!Skytils.config.triviaSolver || !DungeonListener.missingPuzzles.contains("Quiz") || event.entity !is EntityArmorStand) return
+
+        val name = event.entity.customNameTag
+
+        if (name.isNotEmpty() && name.containsAny("ⓐ", "ⓑ", "ⓒ") && !name.contains(answer)) {
+            event.isCanceled = true
         }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Unload) {
-        triviaAnswer = null
+        reset()
     }
 
     @SubscribeEvent
     fun onPuzzleReset(event: DungeonEvent.PuzzleEvent.Reset) {
         if (event.puzzle == "Quiz") {
-            triviaAnswer = null
+            reset()
         }
+    }
+
+    private fun reset(trackLines: Boolean = false) {
+        lines.clear()
+        this.trackLines = trackLines
+        fullQuestion = null
+        correctAnswers.clear()
     }
 }
