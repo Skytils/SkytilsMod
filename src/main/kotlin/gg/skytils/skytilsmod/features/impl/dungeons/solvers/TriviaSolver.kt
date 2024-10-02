@@ -107,7 +107,6 @@ object TriviaSolver {
 
         val name = event.entity.customNameTag
 
-        //TODO: Maybe make this a bit better idk
         if (name.isNotEmpty() && name.containsAny("ⓐ", "ⓑ", "ⓒ") && !name.contains(answer)) {
             event.isCanceled = true
         }
