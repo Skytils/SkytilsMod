@@ -36,7 +36,7 @@ This product bundles junixsocket 2.0.4, which is available under the Apache 2.0 
 at dependencyLicenses/junixsocket/APACHE_2.0.txt.
 
 The files log-config.xml and log-config-packets-only-console.xml are modified versions of the file log4j2.xml included
-in MinecraftForge 11.15.1.2318-1.8.9, which is available under the Minecraft Forge Public Licence. The full license is
+in MinecraftForge 11.15.1.2318-1.8.9, which is available under the Minecraft Forge Public License. The full license is
 available at dependencyLicenses/minecraftForge/MINECRAFT_FORGE_LICENSE.txt.
 
 This product bundles SLF4J API Module 1.7.25, which is available under the MIT license. The full license is available at
