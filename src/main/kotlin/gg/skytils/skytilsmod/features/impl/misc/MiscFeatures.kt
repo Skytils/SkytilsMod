@@ -401,22 +401,48 @@ object MiscFeatures {
         if (!Utils.inSkyblock || !Skytils.config.middleClickGUIItems) return
         if (event.clickedButton != 0 || event.clickType != 0 || event.container !is ContainerChest || event.slot == null || !event.slot.hasStack) return
         val chest = event.container
-        if (equalsOneOf(chest.lowerChestInventory.name, "Chest", "Large Chest")) return
-        if (SBInfo.lastOpenContainerName.startsWithAny("Wardrobe", "Drill Anvil", "Anvil", "Storage")) return
-        if (event.slot.inventory === mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return
+        val chestName = chest.lowerChestInventory.name
         val item = event.slot.stack
+
+        if (equalsOneOf(
+                chestName,
+                "Chest",
+                "Large Chest",
+                "Anvil",
+                "Storage",
+                "Drill Anvil",
+                "Enchant Item",
+                "Runic Pedestal",
+                "Rune Removal",
+                "Reforge Anvil",
+                "Reforge Item",
+                "Offer Pets",
+                "Exp Sharing"
+            )
+        ) return
+
+        if (chestName.startsWithAny("Wardrobe")) return
+        if (event.slot.inventory === mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return
+
         if (getSkyBlockItemID(item) == null) {
-            if (SBInfo.lastOpenContainerName.startsWithAny(
-                    "Reforge Item"
-                ) && item.item === Item.getItemFromBlock(Blocks.anvil) && item.displayName == "§aReforge Item"
+            if (chestName.contains("Minion") && equalsOneOf(
+                    item.displayName,
+                    "§aMinion Skin Slot",
+                    "§aFuel",
+                    "§aAutomated Shipping",
+                    "§aUpgrade Slot"
+                )
             ) return
-            if (SBInfo.lastOpenContainerName.startsWithAny(
+            if (chestName == "Beacon"
+                && item.item === Item.getItemFromBlock(Blocks.furnace) && item.displayName == "§6Beacon Power") return
+            if (chestName.startsWithAny(
                     "Salvage Item"
-                ) && item.item === Item.getItemFromBlock(Blocks.beacon) && item.displayName == "§aSalvage Item"
+                ) && item.item === Item.getItemFromBlock(Blocks.beacon) && item.displayName == "§aSalvage Items"
             ) return
             if (ItemUtil.getItemLore(item).asReversed().any {
                     it.contains("-click", true)
                 }) return
+
             event.isCanceled = true
             mc.playerController.windowClick(chest.windowId, event.slotId, 2, 3, mc.thePlayer)
         }
