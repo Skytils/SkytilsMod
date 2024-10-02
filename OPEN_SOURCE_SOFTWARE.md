@@ -10,7 +10,7 @@ Skytils would not be possible without the following open source software:
 | [Minecraft Forge](https://github.com/MinecraftForge/MinecraftForge/tree/1.8.9) | [Minecraft Forge License](https://github.com/MinecraftForge/MinecraftForge/blob/1.8.9/MinecraftForge-License.txt) |
 | [Not Enough Updates](https://github.com/Moulberry/NotEnoughUpdates/)           | [Creative Commons Public License](https://creativecommons.org/licenses/by-nc/3.0/)                                |
 | [Skyblock Addons](https://github.com/BiscuitDevelopment/SkyblockAddons)        | [MIT License](https://choosealicense.com/licenses/mit/)                                                           |
-| [SoopyAddons](https://github.com/Soopyboo32/soopyAddons)                       | Unlicensed                                                                                                        |
+| [SoopyAddons](https://github.com/Soopyboo32/SoopyV2)                           | [GPL 3.0](https://github.com/Soopyboo32/SoopyV2/blob/master/LICENSE)                                                                                                       |
 | [Tic-Tac-Toe](https://github.com/LazoCoder/Tic-Tac-Toe)                        | [GPL 3.0](https://github.com/LazoCoder/Tic-Tac-Toe/blob/master/LICENSE)                                           |
 | [Vigilance](https://github.com/Sk1erLLC/Vigilance)                             | [LGPL 3.0](https://www.gnu.org/licenses/lgpl-3.0-standalone.html)                                                 |
 | [Wynntils](https://github.com/Wynntils/Wynntils)                               | [AGPL 3.0](https://github.com/Wynntils/Wynntils/blob/development/LICENSE)                                         |
