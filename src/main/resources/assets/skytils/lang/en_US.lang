@@ -2,6 +2,7 @@ skytils.config.general.api.connect_to_skytils_ws_server=Connect to Skytils WS Se
 skytils.config.general.api.fetch_kuudra_prices=Fetch Kuudra Prices
 skytils.config.general.api.fetch_lowest_bin_prices=Fetch Lowest BIN Prices
 skytils.config.general.command_aliases.command_alias_mode=Command Alias Mode
+skytils.config.general.command_aliases.command_alias_subcommands=Command Alias Subcommands
 skytils.config.general.local_api.auto_start_local_api=Auto Start Local API
 skytils.config.general.local_api.local_api_password=Local API Password
 skytils.config.general.other.join_the_skytils_discord=Join the Skytils Discord

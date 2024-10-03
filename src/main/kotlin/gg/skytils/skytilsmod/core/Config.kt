@@ -96,6 +96,16 @@ object Config : Vigilant(
     var commandAliasMode = 0
 
     @Property(
+        type = PropertyType.SWITCH, name = "Command Alias Subcommands",
+        description = "§b[BETA] Allows the use of spaces in command aliases to target subcommands.\nThis should only be turned on if used.",
+        category = "General", subcategory = "Command Aliases",
+        i18nName = "skytils.config.general.command_aliases.command_alias_subcommands",
+        i18nCategory = "skytils.config.general",
+        i18nSubcategory = "skytils.config.general.command_aliases"
+    )
+    var commandAliasesSpaces = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Auto Start Local API",
         description = "Automatically launches the Local API on game startup.",
         category = "General", subcategory = "Local API",
