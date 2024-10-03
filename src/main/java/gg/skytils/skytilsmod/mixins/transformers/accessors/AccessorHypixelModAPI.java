@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 import java.util.function.Predicate;
 
-@Mixin(HypixelModAPI.class)
+@Mixin(value = HypixelModAPI.class, remap = false)
 public interface AccessorHypixelModAPI {
     @Accessor
     Predicate<HypixelPacket> getPacketSender();

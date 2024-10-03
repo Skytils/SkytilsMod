@@ -31,7 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = ClientCommandHandler.class)
 public abstract class MixinClientCommandHandler extends CommandHandler implements AccessorCommandHandler {
-    @Inject(method = "<init>", at = @At("RETURN"))
+    @Inject(method = "<init>", at = @At("RETURN"), remap = false)
     private void hijackCommandHandler(CallbackInfo ci) {
         ObservableSet<ICommand> hijacked = new ObservableSet<>(this.getCommandSet());
         NamespacedCommands.INSTANCE.setup(hijacked);
