@@ -23,10 +23,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasElement
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.DungeonMapPlayer
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
-import gg.skytils.skytilsmod.utils.ItemUtil
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.bindColor
-import gg.skytils.skytilsmod.utils.ifNull
+import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -189,10 +186,10 @@ object RenderUtils {
             }
 
             // Handle player names
-            if (CatlasConfig.playerHeads == 2 || CatlasConfig.playerHeads == 1 && Utils.equalsOneOf(
-                    ItemUtil.getSkyBlockItemID(mc.thePlayer.heldItem),
-                    "SPIRIT_LEAP", "INFINITE_SPIRIT_LEAP", "HAUNT_ABILITY"
-                )
+            if (CatlasConfig.playerHeads == 2 || CatlasConfig.playerHeads == 1 && ItemUtil.getSkyBlockItemID(mc.thePlayer.heldItem)
+                    .equalsAnyOf(
+                        "SPIRIT_LEAP", "INFINITE_SPIRIT_LEAP", "HAUNT_ABILITY"
+                    )
             ) {
                 if (!CatlasConfig.mapRotate) {
                     GlStateManager.rotate(-player.yaw + 180f, 0f, 0f, 1f)

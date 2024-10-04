@@ -41,7 +41,6 @@ import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.RenderUtil.renderItem
 import gg.skytils.skytilsmod.utils.RenderUtil.renderTexture
-import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -129,8 +128,7 @@ object MiscFeatures {
     fun onBossBarSet(event: BossBarEvent.Set) {
         val displayData = event.displayData
         if (Utils.inSkyblock) {
-            if (Skytils.config.bossBarFix && equalsOneOf(
-                    displayData.displayName.unformattedText.stripControlCodes(),
+            if (Skytils.config.bossBarFix && displayData.displayName.unformattedText.stripControlCodes().equalsAnyOf(
                     "Wither",
                     "Dinnerbone",
                     "Grumm",
@@ -360,7 +358,7 @@ object MiscFeatures {
             val extraAttributes = getExtraAttributes(item)
             if (event.chestName == "Ophelia") {
                 if (Skytils.config.dungeonPotLock > 0) {
-                    if (slot.inventory === mc.thePlayer.inventory || equalsOneOf(slot.slotNumber, 49, 53)) return
+                    if (slot.inventory === mc.thePlayer.inventory || slot.slotNumber.equalsAnyOf(49, 53)) return
                     if (item.item !== Items.potionitem || extraAttributes == null || !extraAttributes.hasKey("potion_level")) {
                         event.isCanceled = true
                         return
@@ -404,8 +402,7 @@ object MiscFeatures {
         val chestName = chest.lowerChestInventory.name
         val item = event.slot.stack
 
-        if (equalsOneOf(
-                chestName,
+        if (chestName.equalsAnyOf(
                 "Chest",
                 "Large Chest",
                 "Anvil",
@@ -425,8 +422,7 @@ object MiscFeatures {
         if (event.slot.inventory === mc.thePlayer.inventory || GuiScreen.isCtrlKeyDown()) return
 
         if (getSkyBlockItemID(item) == null) {
-            if (chestName.contains("Minion") && equalsOneOf(
-                    item.displayName,
+            if (chestName.contains("Minion") && item.displayName.equalsAnyOf(
                     "§aMinion Skin Slot",
                     "§aFuel",
                     "§aAutomated Shipping",
@@ -434,7 +430,8 @@ object MiscFeatures {
                 )
             ) return
             if (chestName == "Beacon"
-                && item.item === Item.getItemFromBlock(Blocks.furnace) && item.displayName == "§6Beacon Power") return
+                && item.item === Item.getItemFromBlock(Blocks.furnace) && item.displayName == "§6Beacon Power"
+            ) return
             if (chestName.startsWithAny(
                     "Salvage Item"
                 ) && item.item === Item.getItemFromBlock(Blocks.beacon) && item.displayName == "§aSalvage Items"

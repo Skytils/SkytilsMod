@@ -24,6 +24,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonMapColorParser
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.equalsAnyOf
 import net.minecraft.item.ItemMap
 import net.minecraft.util.Vec4b
 import net.minecraft.world.storage.MapData
@@ -55,7 +56,7 @@ object MapUtils {
      */
     fun calibrateMap(): Boolean {
         val (start, size) = findEntranceCorner()
-        if (Utils.equalsOneOf(size, 16, 18)) {
+        if (size.equalsAnyOf(16, 18)) {
             mapRoomSize = size
             startCorner = when (DungeonFeatures.dungeonFloorNumber) {
                 0 -> Pair(22, 22)

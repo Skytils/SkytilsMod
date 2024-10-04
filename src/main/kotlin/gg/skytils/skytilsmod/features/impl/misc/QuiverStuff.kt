@@ -26,6 +26,7 @@ import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.equalsAnyOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -50,7 +51,7 @@ object QuiverStuff {
     fun onReceivePacket(event: MainReceivePacketEvent<*, *>) {
         if (!Utils.inSkyblock || event.packet !is S2FPacketSetSlot || event.packet.func_149173_d() != 44) return
         val stack = event.packet.func_149174_e() ?: return
-        if (!Utils.equalsOneOf(stack.item, Items.arrow, Items.feather)) return
+        if (!stack.item.equalsAnyOf(Items.arrow, Items.feather)) return
         val line = ItemUtil.getItemLore(stack).getOrNull(4) ?: return
         val match = activeArrowRegex.matchEntire(line) ?: return
         selectedType = match.groups["type"]?.value ?: ""

@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.misc.ItemFeatures
 import gg.skytils.skytilsmod.utils.RenderUtil.renderRarity
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.equalsAnyOf
 import net.minecraft.entity.player.EntityPlayer
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 
@@ -61,8 +62,7 @@ fun renderRarityOnHotbar(
 }
 
 fun onWorldBorder(f: Float): Float =
-    if (Skytils.config.worldborderFix && DungeonFeatures.hasBossSpawned && Utils.equalsOneOf(
-            DungeonFeatures.dungeonFloor,
+    if (Skytils.config.worldborderFix && DungeonFeatures.hasBossSpawned && DungeonFeatures.dungeonFloor.equalsAnyOf(
             "F2",
             "M2",
             "F3",

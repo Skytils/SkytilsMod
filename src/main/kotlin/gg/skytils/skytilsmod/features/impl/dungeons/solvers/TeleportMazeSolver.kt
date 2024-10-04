@@ -29,6 +29,7 @@ import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.DevTools
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.equalsAnyOf
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S08PacketPlayerPosLook
@@ -65,8 +66,7 @@ object TeleportMazeSolver {
         event.packet.apply {
             when (this) {
                 is S08PacketPlayerPosLook -> {
-                    if (y == 69.5 && Utils.equalsOneOf(
-                            mc.thePlayer.posY,
+                    if (y == 69.5 && mc.thePlayer.posY.equalsAnyOf(
                             69.5,
                             69.8125
                         ) && abs(x % 1) == 0.5 && abs(z % 1) == 0.5

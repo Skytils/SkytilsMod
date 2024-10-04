@@ -22,6 +22,7 @@ import gg.skytils.skytilsmod.features.impl.farming.GardenFeatures
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.SkyblockIsland
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.equalsAnyOf
 import net.minecraft.block.BlockCarpet
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.block.state.IBlockState
@@ -43,10 +44,10 @@ fun modifyGetModelFromBlockState(
     if (!Utils.inSkyblock || state == null || pos == null) return
     var returnState = state
     if (SBInfo.mode == SkyblockIsland.DwarvenMines.mode) {
-        if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && Utils.equalsOneOf(
-                state.getValue(
-                    BlockCarpet.COLOR
-                ), EnumDyeColor.GRAY, EnumDyeColor.LIGHT_BLUE, EnumDyeColor.YELLOW
+        if (Skytils.config.recolorCarpets && state.block === Blocks.carpet && state.getValue(
+                BlockCarpet.COLOR
+            ).equalsAnyOf(
+                EnumDyeColor.GRAY, EnumDyeColor.LIGHT_BLUE, EnumDyeColor.YELLOW
             )
         ) {
             returnState = state.withProperty(BlockCarpet.COLOR, EnumDyeColor.RED)

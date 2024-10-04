@@ -26,6 +26,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils.mapZ
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.MapUtils.yaw
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.equalsAnyOf
 import net.minecraft.init.Blocks
 import net.minecraft.util.BlockPos
 import net.minecraft.world.storage.MapData
@@ -86,7 +87,7 @@ object MapUpdater {
                     }
                 }
 
-                if (room is Door && Utils.equalsOneOf(room.type, DoorType.ENTRANCE, DoorType.WITHER, DoorType.BLOOD)) {
+                if (room is Door && room.type.equalsAnyOf(DoorType.ENTRANCE, DoorType.WITHER, DoorType.BLOOD)) {
                     if (mapTile is Door && mapTile.type == DoorType.WITHER) {
                         room.opened = false
                     } else if (!room.opened) {
@@ -96,7 +97,7 @@ object MapUpdater {
                         )
                         if (chunk.isLoaded) {
                             if (chunk.getBlockState(BlockPos(room.x, 69, room.z)).block == Blocks.air)
-                            room.opened = true
+                                room.opened = true
                         } else if (mapTile is Door && mapTile.state == RoomState.DISCOVERED) {
                             if (room.type == DoorType.BLOOD) {
                                 val bloodRoom = DungeonInfo.uniqueRooms.find { r ->

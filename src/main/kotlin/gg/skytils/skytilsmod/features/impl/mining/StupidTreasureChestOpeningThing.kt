@@ -106,8 +106,7 @@ object StupidTreasureChestOpeningThing {
                     if (formatted == "§r§aYou uncovered a treasure chest!§r") {
                         lastFoundChest = System.currentTimeMillis()
                         found++
-                    } else if (iLovePain != null && Utils.equalsOneOf(
-                            formatted,
+                    } else if (iLovePain != null && formatted.equalsAnyOf(
                             "§r§6You have successfully picked the lock on this chest!",
                             "§r§aThe remaining contents of this treasure chest were placed in your inventory"
                         )
@@ -149,8 +148,7 @@ object StupidTreasureChestOpeningThing {
                 val x = packet.x
                 val y = packet.y
                 val z = packet.z
-                if (volume == 1f && pitch == 1f && Utils.equalsOneOf(
-                        sound,
+                if (volume == 1f && pitch == 1f && sound.equalsAnyOf(
                         "random.orb",
                         "mob.villager.no"
                     ) && sendHelpPlease.isNotEmpty()

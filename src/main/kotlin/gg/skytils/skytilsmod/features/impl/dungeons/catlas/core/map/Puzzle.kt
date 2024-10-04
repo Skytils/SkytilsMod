@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map
 
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.equalsAnyOf
 
 enum class Puzzle(val roomDataName: String, val tabName: String = roomDataName) {
     BOMB_DEFUSE("Bomb Defuse"),
@@ -36,7 +37,7 @@ enum class Puzzle(val roomDataName: String, val tabName: String = roomDataName) 
 
     companion object {
         fun fromName(name: String): Puzzle? {
-            return entries.find { Utils.equalsOneOf(name, it.roomDataName, it.tabName) }
+            return entries.find { name.equalsAnyOf(it.roomDataName, it.tabName) }
         }
     }
 }

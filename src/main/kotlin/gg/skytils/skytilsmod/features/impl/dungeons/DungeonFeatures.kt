@@ -36,7 +36,6 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorC0EPacketClic
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEnumDyeColor
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.ItemUtil.setLore
-import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -268,8 +267,8 @@ object DungeonFeatures {
         if (!Utils.inDungeons) return
         val displayData = event.displayData
         val unformatted = event.displayData.displayName.unformattedText.stripControlCodes()
-        if (equalsOneOf(dungeonFloor, "F7", "M7")) {
-            if (equalsOneOf(unformatted, "Maxor", "Storm", "Goldor", "Necron")) {
+        if (dungeonFloor.equalsAnyOf("F7", "M7")) {
+            if (unformatted.equalsAnyOf("Maxor", "Storm", "Goldor", "Necron")) {
                 when (Skytils.config.necronHealth) {
                     2 -> {
                         BossStatus.healthScale = displayData.health / displayData.maxHealth
@@ -306,7 +305,7 @@ object DungeonFeatures {
             }
             return
         }
-        if (equalsOneOf(dungeonFloor, "F6", "M6")) {
+        if (dungeonFloor.equalsAnyOf("F6", "M6")) {
             if (terracottaEndTime == -1.0) {
                 if (unformatted.contains("Sadan's Interest Level")) {
                     val length = if (dungeonFloor == "F6") 105 else 115
@@ -416,8 +415,7 @@ object DungeonFeatures {
     fun onRenderLivingPre(event: RenderLivingEvent.Pre<*>) {
         if (Utils.inDungeons) {
             val matrixStack = UMatrixStack()
-            if (Skytils.config.boxSpiritBow && hasBossSpawned && event.entity.isInvisible && equalsOneOf(
-                    dungeonFloor,
+            if (Skytils.config.boxSpiritBow && hasBossSpawned && event.entity.isInvisible && dungeonFloor.equalsAnyOf(
                     "F4",
                     "M4"
                 ) && event.entity is EntityArmorStand && event.entity.heldItem?.item == Items.bow
@@ -465,12 +463,10 @@ object DungeonFeatures {
             if (!mc.renderManager.isDebugBoundingBox) {
                 if (!event.entity.isInvisible) {
                     if (event.entity is EntityBat && Skytils.config.showBatHitboxes && !hasBossSpawned &&
-                        if (MayorInfo.currentMayor == "Derpy") equalsOneOf(
-                            event.entity.maxHealth,
+                        if (MayorInfo.currentMayor == "Derpy") event.entity.maxHealth.equalsAnyOf(
                             200f,
                             800f
-                        ) else equalsOneOf(
-                            event.entity.maxHealth,
+                        ) else event.entity.maxHealth.equalsAnyOf(
                             100f,
                             400f
                         )

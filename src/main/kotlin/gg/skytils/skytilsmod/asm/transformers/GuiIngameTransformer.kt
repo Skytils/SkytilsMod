@@ -23,14 +23,14 @@ import dev.falsehonesty.asmhelper.dsl.instructions.JumpCondition
 import dev.falsehonesty.asmhelper.dsl.instructions.Local
 import dev.falsehonesty.asmhelper.dsl.modify
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.equalsAnyOf
 import gg.skytils.skytilsmod.utils.matches
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
 
 fun injectScoreboardScoreRemover() = modify("net/minecraft/client/gui/GuiIngame") {
     classNode.methods.find {
-        Utils.equalsOneOf(it.name, "renderScoreboard", "a") && Utils.equalsOneOf(
-            it.desc,
+        it.name.equalsAnyOf("renderScoreboard", "a") && it.desc.equalsAnyOf(
             "(Lauk;Lavr;)V",
             "(Lnet/minecraft/scoreboard/ScoreObjective;Lnet/minecraft/client/gui/ScaledResolution;)V"
         )

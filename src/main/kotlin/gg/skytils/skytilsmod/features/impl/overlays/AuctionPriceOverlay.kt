@@ -26,11 +26,8 @@ import gg.skytils.skytilsmod.features.impl.misc.ContainerSellValue
 import gg.skytils.skytilsmod.gui.elements.CleanButton
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiEditSign
-import gg.skytils.skytilsmod.utils.ItemUtil
-import gg.skytils.skytilsmod.utils.NumberUtil
+import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
-import gg.skytils.skytilsmod.utils.SBInfo
-import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
@@ -61,8 +58,7 @@ object AuctionPriceOverlay {
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
         if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
-        if (event.gui is GuiEditSign && Utils.equalsOneOf(
-                SBInfo.lastOpenContainerName,
+        if (event.gui is GuiEditSign && SBInfo.lastOpenContainerName.equalsAnyOf(
                 "Create Auction",
                 "Create BIN Auction"
             )
@@ -79,8 +75,7 @@ object AuctionPriceOverlay {
     fun onGuiKey(event: GuiScreenEvent.KeyboardInputEvent) {
         if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
         if (event.gui is GuiChest && Keyboard.getEventKeyState() && Keyboard.getEventKey() == UKeyboard.KEY_ENTER) {
-            if (Utils.equalsOneOf(
-                    SBInfo.lastOpenContainerName,
+            if (SBInfo.lastOpenContainerName.equalsAnyOf(
                     "Create Auction",
                     "Create BIN Auction"
                 )
@@ -91,8 +86,7 @@ object AuctionPriceOverlay {
                     ), 29, 2, 3
                 )
                 event.isCanceled = true
-            } else if (Utils.equalsOneOf(
-                    SBInfo.lastOpenContainerName,
+            } else if (SBInfo.lastOpenContainerName.equalsAnyOf(
                     "Confirm Auction",
                     "Confirm BIN Auction"
                 )
@@ -111,8 +105,7 @@ object AuctionPriceOverlay {
     fun onSlotClick(event: SlotClickEvent) {
         if (!Utils.inSkyblock || !Skytils.config.betterAuctionPriceInput) return
         if (event.gui is GuiChest) {
-            if (Utils.equalsOneOf(
-                    SBInfo.lastOpenContainerName,
+            if (SBInfo.lastOpenContainerName.equalsAnyOf(
                     "Create Auction",
                     "Create BIN Auction"
                 ) && event.slotId == 31
@@ -124,8 +117,7 @@ object AuctionPriceOverlay {
                     }
                 }
             }
-            if (event.slotId == 11 && Utils.equalsOneOf(
-                    SBInfo.lastOpenContainerName,
+            if (event.slotId == 11 && SBInfo.lastOpenContainerName.equalsAnyOf(
                     "Confirm Auction",
                     "Confirm BIN Auction"
                 )

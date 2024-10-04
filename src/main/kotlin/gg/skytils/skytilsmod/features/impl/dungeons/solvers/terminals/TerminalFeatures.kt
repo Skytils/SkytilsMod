@@ -22,10 +22,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent.SlotClickEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures.dungeonFloorNumber
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
-import gg.skytils.skytilsmod.utils.SuperSecretSettings
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.startsWithAny
-import gg.skytils.skytilsmod.utils.stripControlCodes
+import gg.skytils.skytilsmod.utils.*
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -53,8 +50,7 @@ object TerminalFeatures {
         if (!Skytils.config.middleClickTerminals) return
         if (event.container is ContainerChest) {
             val chestName = event.chestName
-            if (Utils.equalsOneOf(
-                    chestName,
+            if (chestName.equalsAnyOf(
                     "Navigate the maze!",
                     "Correct all the panes!",
                     "Click in order!",
@@ -62,8 +58,7 @@ object TerminalFeatures {
                 ) || chestName.startsWithAny(
                     "What starts with:",
                     "Select all the"
-                ) || (chestName == "Change all to same color!" && event.clickedButton != 1 && Utils.equalsOneOf(
-                    event.clickType,
+                ) || (chestName == "Change all to same color!" && event.clickedButton != 1 && event.clickType.equalsAnyOf(
                     0,
                     1,
                     6

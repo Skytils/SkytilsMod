@@ -22,26 +22,25 @@ import dev.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
 import dev.falsehonesty.asmhelper.dsl.instructions.JumpCondition
 import dev.falsehonesty.asmhelper.dsl.modify
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.equalsAnyOf
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
 
 fun injectNullCheck() = modify("net.minecraft.client.gui.GuiNewChat") {
     classNode.methods.find {
-        Utils.equalsOneOf(it.name, "drawChat", "avt") && it.desc == "(I)V"
+        it.name.equalsAnyOf("drawChat", "avt") && it.desc == "(I)V"
     }?.apply {
         var chatLineVar: VarInsnNode? = null
         for (insn in instructions) {
             if (chatLineVar == null && insn is VarInsnNode && insn.opcode == Opcodes.ASTORE) {
                 val prev = insn.previous
-                if (prev is TypeInsnNode && prev.opcode == Opcodes.CHECKCAST && Utils.equalsOneOf(
-                        prev.desc,
+                if (prev is TypeInsnNode && prev.opcode == Opcodes.CHECKCAST && prev.desc.equalsAnyOf(
                         "net/minecraft/client/gui/ChatLine", "ava"
                     )
                 )
                     chatLineVar = insn
             }
-            if (chatLineVar != null && insn is MethodInsnNode && insn.owner == classNode.name && Utils.equalsOneOf(
-                    insn.name,
+            if (chatLineVar != null && insn is MethodInsnNode && insn.owner == classNode.name && insn.name.equalsAnyOf(
                     "drawRect", "a"
                 ) && insn.desc == "(IIIII)V"
             ) {
@@ -58,14 +57,12 @@ fun injectNullCheck() = modify("net.minecraft.client.gui.GuiNewChat") {
         }
     }
     classNode.methods.find {
-        Utils.equalsOneOf(it.name, "setChatLine", "a") && Utils.equalsOneOf(
-            it.desc,
+        it.name.equalsAnyOf("setChatLine", "a") && it.desc.equalsAnyOf(
             "(Lnet/minecraft/util/IChatComponent;IIZ)V", "(Leu;IIZ)V"
         )
     }?.apply {
         for (insn in instructions) {
-            if (insn.opcode == Opcodes.INVOKESPECIAL && insn is MethodInsnNode && insn.name == "<init>" && Utils.equalsOneOf(
-                    insn.owner,
+            if (insn.opcode == Opcodes.INVOKESPECIAL && insn is MethodInsnNode && insn.name == "<init>" && insn.owner.equalsAnyOf(
                     "net/minecraft/client/gui/ChatLine", "ava"
                 )
             ) {
@@ -82,7 +79,7 @@ fun injectNullCheck() = modify("net.minecraft.client.gui.GuiNewChat") {
         }
     }
     classNode.methods.find {
-        Utils.equalsOneOf(it.name, "refreshChat", "b") && it.desc == "()V"
+        it.name.equalsAnyOf("refreshChat", "b") && it.desc == "()V"
     }?.apply {
         var labelNode: LabelNode? = null
         var incInsn: VarInsnNode? = null
@@ -100,11 +97,10 @@ fun injectNullCheck() = modify("net.minecraft.client.gui.GuiNewChat") {
                         2 -> prev.opcode == Opcodes.ISUB
                         3 -> prev.opcode == Opcodes.ICONST_1
                         4 -> prev is MethodInsnNode && prev.owner == "java/util/List" && prev.name == "size"
-                        5 -> prev is FieldInsnNode && prev.opcode == Opcodes.GETFIELD && Utils.equalsOneOf(
-                            prev.owner,
+                        5 -> prev is FieldInsnNode && prev.opcode == Opcodes.GETFIELD && prev.owner.equalsAnyOf(
                             "net/minecraft/client/gui/GuiNewChat",
                             "avt"
-                        ) && Utils.equalsOneOf(prev.name, "chatLines", "h") && prev.desc == "Ljava/util/List;"
+                        ) && prev.name.equalsAnyOf("chatLines", "h") && prev.desc == "Ljava/util/List;"
 
                         else -> throw NotImplementedError()
                     }
@@ -117,11 +113,10 @@ fun injectNullCheck() = modify("net.minecraft.client.gui.GuiNewChat") {
             }
             if (labelNode != null && incInsn != null && insn is VarInsnNode && insn.opcode == Opcodes.ASTORE) {
                 val temp = insn.previous?.previous?.previous?.previous ?: continue
-                if (temp.opcode == Opcodes.GETFIELD && temp is FieldInsnNode && Utils.equalsOneOf(
-                        temp.owner,
+                if (temp.opcode == Opcodes.GETFIELD && temp is FieldInsnNode && temp.owner.equalsAnyOf(
                         "net/minecraft/client/gui/GuiNewChat",
                         "avt"
-                    ) && Utils.equalsOneOf(temp.name, "chatLines", "h") && temp.desc == "Ljava/util/List;"
+                    ) && temp.name.equalsAnyOf("chatLines", "h") && temp.desc == "Ljava/util/List;"
                 ) {
                     instructions.insert(insn, InsnListBuilder(this).apply {
                         aload(insn.`var`)

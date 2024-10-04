@@ -77,8 +77,7 @@ object AlignmentTaskSolver {
             if (grid.size < 25) {
                 @Suppress("UNCHECKED_CAST")
                 val frames = mc.theWorld.loadedEntityList.filter {
-                    it is EntityItemFrame && box.contains(it.position) && it.displayedItem != null && Utils.equalsOneOf(
-                        it.displayedItem.item,
+                    it is EntityItemFrame && box.contains(it.position) && it.displayedItem != null && it.displayedItem.item.equalsAnyOf(
                         Items.arrow,
                         Item.getItemFromBlock(Blocks.wool)
                     )

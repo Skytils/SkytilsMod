@@ -25,6 +25,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.RoomData
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.equalsAnyOf
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
 import net.minecraft.block.Block
@@ -68,7 +69,7 @@ object ScanUtils {
         val chunk = mc.theWorld.getChunkFromBlockCoords(BlockPos(x, 0, z))
         for (y in 140 downTo 12) {
             val id = Block.blockRegistry.getIDForObject(chunk.getBlock(BlockPos(x, y, z)))
-            if (!Utils.equalsOneOf(id, 5, 54, 146)) {
+            if (!id.equalsAnyOf(5, 54, 146)) {
                 sb.append(id)
             }
         }

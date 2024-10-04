@@ -46,7 +46,6 @@ import gg.skytils.skytilsmod.utils.NumberUtil.romanToDecimal
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
 import gg.skytils.skytilsmod.utils.RenderUtil.renderRarity
 import gg.skytils.skytilsmod.utils.SkillUtils.level
-import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
 import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextAlignment
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer.TextShadow
@@ -192,8 +191,7 @@ object ItemFeatures {
         }
         if (event.container is ContainerChest) {
             val chestName = event.chestName
-            if (chestName.startsWithAny("Salvage", "Ender Chest") || equalsOneOf(
-                    chestName,
+            if (chestName.startsWithAny("Salvage", "Ender Chest") || chestName.equalsAnyOf(
                     "Ophelia",
                     "Trades"
                 ) || (chestName.contains("Backpack") && !chestName.endsWith("Recipe"))
@@ -230,8 +228,7 @@ object ItemFeatures {
                     }
                 }
             }
-            if (Skytils.config.combineHelper && equalsOneOf(
-                    event.chestName,
+            if (Skytils.config.combineHelper && event.chestName.equalsAnyOf(
                     "Anvil",
                     "Attribute Fusion"
                 )
@@ -368,8 +365,7 @@ object ItemFeatures {
                                 val lore = getItemLore(item!!)
                                 for (i in lore.indices) {
                                     val line = lore[i]
-                                    if (line == "§7Cost" && i + 3 < lore.size && equalsOneOf(
-                                            lore[i + 3],
+                                    if (line == "§7Cost" && i + 3 < lore.size && lore[i + 3].equalsAnyOf(
                                             "§eClick to trade!",
                                             "§cNot unlocked!"
                                         )
@@ -498,7 +494,7 @@ object ItemFeatures {
                 val extraAttr = getExtraAttributes(item) ?: return
                 val itemId = getSkyBlockItemID(extraAttr) ?: return
 
-                if (equalsOneOf(itemId, "SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) {
+                if (itemId.equalsAnyOf("SOULFLOW_PILE", "SOULFLOW_BATTERY", "SOULFLOW_SUPERCELL")) {
                     getItemLore(item).find {
                         it.startsWith("§7Internalized: ")
                     }?.substringAfter("§7Internalized: ")?.let { s ->
@@ -551,8 +547,7 @@ object ItemFeatures {
         if (event.entity !== mc.thePlayer) return
         val item = event.entityPlayer.heldItem
         val itemId = getSkyBlockItemID(item) ?: return
-        if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (equalsOneOf(
-                itemId,
+        if (Skytils.config.preventPlacingWeapons && event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK && (itemId.equalsAnyOf(
                 "FLOWER_OF_TRUTH",
                 "BOUQUET_OF_LIES",
                 "MOODY_GRAPPLESHOT",
@@ -734,8 +729,7 @@ object ItemFeatures {
     @SubscribeEvent
     fun onDrawContainerForeground(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!Skytils.config.combineHelper || !Utils.inSkyblock) return
-        if (event.container !is ContainerChest || !equalsOneOf(
-                event.chestName,
+        if (event.container !is ContainerChest || !event.chestName.equalsAnyOf(
                 "Anvil",
                 "Attribute Fusion"
             )
@@ -813,8 +807,7 @@ object ItemFeatures {
         return mc.theWorld.getBlockState(pos).block.material.isSolid && (1..2).all {
             val newPos = pos.up(it)
             val newBlock = mc.theWorld.getBlockState(newPos)
-            if (sideHit === EnumFacing.UP && (equalsOneOf(
-                    newBlock.block,
+            if (sideHit === EnumFacing.UP && (newBlock.block.equalsAnyOf(
                     Blocks.fire,
                     Blocks.skull
                 ) || newBlock.block is BlockLiquid)

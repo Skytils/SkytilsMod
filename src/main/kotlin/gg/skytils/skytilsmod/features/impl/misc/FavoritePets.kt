@@ -21,11 +21,8 @@ package gg.skytils.skytilsmod.features.impl.misc
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.events.impl.GuiContainerEvent
-import gg.skytils.skytilsmod.utils.ItemRarity
-import gg.skytils.skytilsmod.utils.ItemUtil
+import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.RenderUtil.highlight
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.toStringIfTrue
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import net.minecraft.client.gui.GuiButton
@@ -103,8 +100,7 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
         if (!Utils.inSkyblock || !highlighting || event.container !is ContainerChest) return
         val chest = event.container
         if (!chest.lowerChestInventory.name.startsWith("Pets")) return
-        if (event.slot == null || !event.slot.hasStack || event.slotId < 10 || event.slotId > 43 || Utils.equalsOneOf(
-                event.slot.slotNumber % 9,
+        if (event.slot == null || !event.slot.hasStack || event.slotId < 10 || event.slotId > 43 || (event.slot.slotNumber % 9).equalsAnyOf(
                 0,
                 8
             )
@@ -121,8 +117,7 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
         if (!Utils.inSkyblock || !Skytils.config.highlightFavoritePets || event.container !is ContainerChest) return
         val chest = event.container
         if (!chest.lowerChestInventory.name.startsWith("Pets")) return
-        if (!event.slot.hasStack || event.slot.slotNumber < 10 || event.slot.slotNumber > 43 || Utils.equalsOneOf(
-                event.slot.slotNumber % 9,
+        if (!event.slot.hasStack || event.slot.slotNumber < 10 || event.slot.slotNumber > 43 || (event.slot.slotNumber % 9).equalsAnyOf(
                 0,
                 8
             )

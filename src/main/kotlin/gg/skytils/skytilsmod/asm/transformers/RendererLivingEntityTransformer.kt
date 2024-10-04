@@ -21,6 +21,7 @@ package gg.skytils.skytilsmod.asm.transformers
 import dev.falsehonesty.asmhelper.dsl.instructions.InsnListBuilder
 import dev.falsehonesty.asmhelper.dsl.modify
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.equalsAnyOf
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.MethodInsnNode
 import org.objectweb.asm.tree.VarInsnNode
@@ -28,26 +29,24 @@ import org.objectweb.asm.tree.VarInsnNode
 fun changeRenderedName() = modify("net.minecraft.client.renderer.entity.RendererLivingEntity") {
     classNode.apply {
         this.methods.find {
-            Utils.equalsOneOf(
-                it.name,
+            it.name.equalsAnyOf(
                 "renderName",
                 "b"
-            ) && Utils.equalsOneOf(it.desc, "(Lnet/minecraft/entity/EntityLivingBase;DDD)V", "(Lpr;DDD)V")
+            ) && it.desc.equalsAnyOf("(Lnet/minecraft/entity/EntityLivingBase;DDD)V", "(Lpr;DDD)V")
         }?.apply {
             for (insn in instructions) {
                 if (insn is VarInsnNode && insn.opcode == Opcodes.ASTORE) {
                     var prev = insn.previous
                     if (prev is MethodInsnNode && prev.opcode == Opcodes.INVOKEINTERFACE &&
-                        Utils.equalsOneOf(prev.owner, "net/minecraft/util/IChatComponent", "eu") && Utils.equalsOneOf(
-                            prev.name,
+                        prev.owner.equalsAnyOf("net/minecraft/util/IChatComponent", "eu") && prev.name.equalsAnyOf(
                             "getFormattedText", "d"
                         ) && prev.desc == "()Ljava/lang/String;"
                     ) {
                         prev = prev.previous
                         if (prev is MethodInsnNode && prev.opcode == Opcodes.INVOKEVIRTUAL
-                            && Utils.equalsOneOf(prev.owner, "net/minecraft/entity/EntityLivingBase", "pr")
-                            && Utils.equalsOneOf(prev.name, "getDisplayName", "f_")
-                            && Utils.equalsOneOf(prev.desc, "()Lnet/minecraft/util/IChatComponent;", "()Leu;")
+                            && prev.owner.equalsAnyOf("net/minecraft/entity/EntityLivingBase", "pr")
+                            && prev.name.equalsAnyOf("getDisplayName", "f_")
+                            && prev.desc.equalsAnyOf("()Lnet/minecraft/util/IChatComponent;", "()Leu;")
                         ) {
                             prev = prev.previous
                             if (prev is VarInsnNode && prev.opcode == Opcodes.ALOAD && prev.`var` == 1) {

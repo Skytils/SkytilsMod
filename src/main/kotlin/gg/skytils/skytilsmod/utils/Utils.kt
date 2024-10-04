@@ -126,20 +126,6 @@ object Utils {
         shouldBypassVolume = false
     }
 
-    /**
-     * Checks if an object is equal to any of the other objects
-     * @param object Object to compare
-     * @param other Objects being compared
-     * @return boolean
-     */
-    @JvmStatic
-    fun equalsOneOf(`object`: Any?, vararg other: Any): Boolean {
-        for (obj in other) {
-            if (`object` == obj) return true
-        }
-        return false
-    }
-
     fun customColorFromString(string: String?): CustomColor {
         if (string == null) throw NullPointerException("Argument cannot be null!")
         return if (string.startsWith("rainbow(")) {
@@ -431,4 +417,11 @@ fun <T> List<T>.elementPairs() = sequence {
     for (i in 0..<arr.size - 1)
         for (j in i + 1..<arr.size)
             yield(arr[i] to arr[j])
+}
+
+fun Any?.equalsAnyOf(vararg other: Any): Boolean {
+    for (obj in other) {
+        if (this == obj) return true
+    }
+    return false
 }

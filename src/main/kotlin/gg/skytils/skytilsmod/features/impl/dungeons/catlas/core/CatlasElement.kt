@@ -33,6 +33,7 @@ import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.SkyblockIsland
 import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.equalsAnyOf
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
@@ -184,8 +185,7 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
             val name = mutableListOf<String>()
 
-            if ((CatlasConfig.mapRoomNames != 0 && roomType == RoomType.PUZZLE) || (CatlasConfig.mapRoomNames >= 2 && roomType == RoomType.TRAP) || (CatlasConfig.mapRoomNames == 3 && Utils.equalsOneOf(
-                    roomType,
+            if ((CatlasConfig.mapRoomNames != 0 && roomType == RoomType.PUZZLE) || (CatlasConfig.mapRoomNames >= 2 && roomType == RoomType.TRAP) || (CatlasConfig.mapRoomNames == 3 && roomType.equalsAnyOf(
                     RoomType.NORMAL, RoomType.RARE, RoomType.CHAMPION
                 ))
             ) {
