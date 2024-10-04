@@ -653,7 +653,7 @@ object DungeonFeatures {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onTooltip(event: ItemTooltipEvent) {
         if (event.itemStack != null) {
-            if (Utils.inDungeons && Skytils.config.kismetRerollConfirm > 0 && ItemUtil.getDisplayName(event.itemStack)
+            if (Utils.inDungeons && Skytils.config.kismetRerollConfirm > 0 && event.itemStack.displayName
                     .contains("Reroll") && SBInfo.lastOpenContainerName?.endsWith(" Chest") == true
             ) {
                 for (i in event.toolTip.indices) {

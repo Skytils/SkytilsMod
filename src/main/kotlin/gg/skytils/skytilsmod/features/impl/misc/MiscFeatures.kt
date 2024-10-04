@@ -385,7 +385,7 @@ object MiscFeatures {
             val inventory = chest.lowerChestInventory
             val chestName = inventory.displayName.unformattedText
             if (chestName.equals("Storage")) {
-                if (ItemUtil.getDisplayName(event.itemStack).containsAny(
+                if (event.itemStack.displayName.containsAny(
                         "Backpack",
                         "Ender Chest",
                         "Locked Page"
@@ -480,7 +480,7 @@ object MiscFeatures {
                 if (arrowSlot != null && arrowSlot.item == Items.arrow && ItemUtil.getItemLore(item)
                         .lastOrNull() == "§eClick to view!"
                 ) {
-                    var ending = ItemUtil.getDisplayName(item).substringAfterLast(" ", "")
+                    var ending = item.displayName.substringAfterLast(" ", "")
                     if (ending.any { !it.isUpperCase() }) ending = ""
                     stackTip = ending.romanToDecimal().toString()
                 }

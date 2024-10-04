@@ -137,7 +137,7 @@ object FavoritePets : PersistentSave(File(Skytils.modDir, "favoritepets.json")) 
     }
 
     private fun getPetIdFromItem(item: ItemStack): String? {
-        return petNameRegex.find(ItemUtil.getDisplayName(item))?.let { getPetIdFromMatcher(it.groups) }
+        return petNameRegex.find(item.displayName)?.let { getPetIdFromMatcher(it.groups) }
     }
 
 
