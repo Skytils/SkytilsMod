@@ -25,7 +25,7 @@ fun CharSequence?.countMatches(subString: CharSequence): Int = ApacheStringUtils
 fun String?.stripControlCodes(): String = UTextComponent.stripFormatting(this ?: "")
 
 fun CharSequence?.startsWithAny(vararg sequences: CharSequence?) = ApacheStringUtils.startsWithAny(this, *sequences)
-fun CharSequence.startsWithAny(sequences: Iterable<CharSequence>): Boolean = sequences.any { contains(it) }
+fun CharSequence.startsWithAny(sequences: Iterable<CharSequence>): Boolean = sequences.any { startsWith(it) }
 fun CharSequence?.containsAny(vararg sequences: CharSequence?): Boolean {
     if (this == null) return false
     return sequences.any { it != null && this.contains(it) }
