@@ -435,6 +435,9 @@ object DungeonFeatures {
                 GlStateManager.enableDepth()
                 GlStateManager.enableCull()
             }
+            if (event.entity is EntityArmorStand && event.entity.isInvisible && Skytils.config.hideFairies && event.entity.heldItem != null && ItemUtil.getSkullTexture(event.entity.heldItem) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTZjM2UzMWNmYzY2NzMzMjc1YzQyZmNmYjVkOWE0NDM0MmQ2NDNiNTVjZDE0YzljNzdkMjczYTIzNTIifX19") {
+                event.isCanceled = true
+            }
             if (event.entity is EntityArmorStand && event.entity.hasCustomName()) {
                 if (Skytils.config.hideWitherMinerNametags) {
                     val name = event.entity.customNameTag.stripControlCodes()
@@ -457,9 +460,6 @@ object DungeonFeatures {
                     if (!name.startsWith("✯ ") && name.contains("❤") && dungeonMobSpawns.any { it in name }) {
                         mc.theWorld.removeEntity(event.entity)
                     }
-                }
-                if (Skytils.config.hideFairies && event.entity.heldItem != null && ItemUtil.getSkullTexture(event.entity.heldItem) == "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTZjM2UzMWNmYzY2NzMzMjc1YzQyZmNmYjVkOWE0NDM0MmQ2NDNiNTVjZDE0YzljNzdkMjczYTIzNTIifX19") {
-                    event.isCanceled = true
                 }
             }
             if (!mc.renderManager.isDebugBoundingBox) {
