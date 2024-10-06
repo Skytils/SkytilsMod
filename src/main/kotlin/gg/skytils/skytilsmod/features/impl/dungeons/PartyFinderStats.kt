@@ -169,6 +169,12 @@ object PartyFinderStats {
                                     itemIds.contains("SHADOW_FURY") -> add("§8Shadow Fury")
                                     itemIds.contains("FLOWER_OF_TRUTH") -> add("§cFoT")
                                 }
+                                //Tank & Healer
+                                when {
+                                    itemIds.contains("GLOOMLOCK_GRIMOIRE") -> add("§5Gloomlock")
+                                    itemIds.contains("TRIBAL_SPEAR") -> add("§6Tribal Spear")
+                                    itemIds.contains("LAST_BREATH") -> add("§6Last Breath")
+                                }
                                 //Miscellaneous
                                 add(checkItemId(itemIds, "GYROKINETIC_WAND", "§5Gyro"))
                                 add(checkItemId(itemIds, "DARK_CLAYMORE", "§7Claymore"))
@@ -177,6 +183,7 @@ object PartyFinderStats {
                                 checkStonk(itemIds, extraAttribs)?.run { add(this) }
                                 add(checkItemId(itemIds, "BONZO_STAFF", "§9Bonzo Staff"))
                                 add(checkItemId(itemIds, "JERRY_STAFF", "§eJerry-chine"))
+                                add(checkItemId(itemIds, "FIRE_FREEZE_STAFF", "§4Fire Freeze"))
 
                                 remove(null)
                             }
