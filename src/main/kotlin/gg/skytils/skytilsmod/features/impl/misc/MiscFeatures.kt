@@ -78,14 +78,12 @@ import net.minecraftforge.client.event.RenderWorldLastEvent
 import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.event.entity.living.EnderTeleportEvent
 import net.minecraftforge.event.entity.player.ItemTooltipEvent
-import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent
 import java.awt.Color
-import kotlin.time.Duration.Companion.milliseconds
 
 object MiscFeatures {
     private var golemSpawnTime: Long = 0
@@ -417,7 +415,9 @@ object MiscFeatures {
                 "Reforge Anvil",
                 "Reforge Item",
                 "Offer Pets",
-                "Exp Sharing"
+                "Exp Sharing",
+                "Convert to Dungeon Item",
+                "Upgrade Item"
             )
         ) return
 
