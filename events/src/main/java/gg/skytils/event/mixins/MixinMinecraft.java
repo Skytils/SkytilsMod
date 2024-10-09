@@ -70,7 +70,7 @@ public class MixinMinecraft {
         EventsKt.postSync(new TickEvent());
     }
 
-    //#if MC<13000
+    //#if MC<12000
     @WrapOperation(method = "runTick", at = @At(value = "INVOKE", target = "Lorg/lwjgl/input/Mouse;next()Z", remap = false))
     private boolean mouseInput(Operation<Boolean> original) {
         while(original.call()) {
