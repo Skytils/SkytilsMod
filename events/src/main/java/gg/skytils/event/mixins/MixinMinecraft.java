@@ -104,8 +104,16 @@ public class MixinMinecraft {
         this.currentScreen = event.getScreen();
     }
 
+    //#if MC<12000
     @Inject(method = "loadWorld(Lnet/minecraft/client/multiplayer/WorldClient;Ljava/lang/String;)V", at = @At("HEAD"))
-    private void worldChange(WorldClient worldClientIn, String loadingMessage, CallbackInfo ci) {
+    //#else
+    //$$ @Inject(method = {
+    //$$     "joinWorld",
+    //$$     "disconnect(Lnet/minecraft/client/gui/screen/Screen;)V",
+    //$$     "enterReconfiguration"
+    //$$ }, at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;world:Lnet/minecraft/client/world/ClientWorld;", opcode = Opcodes.PUTFIELD))
+    //#endif
+    private void worldChange(CallbackInfo ci) {
         if (this.theWorld != null) {
             EventsKt.postSync(new WorldUnloadEvent(this.theWorld));
         }
