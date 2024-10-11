@@ -106,7 +106,7 @@ object MayorInfo {
         ) return
         if (event.container is ContainerChest) {
             val chestName = event.chestName
-            if (((chestName == "Mayor Jerry" && event.slot.slotNumber == 13) || (chestName == "Calendar and Events" && event.slot.slotNumber == 46)) && event.slot.hasStack) {
+            if (((chestName == "Mayor Jerry" && event.slot.slotNumber == 13) || (chestName == "Calendar and Events" && event.slot.slotNumber == 37)) && event.slot.hasStack) {
                 val lore = ItemUtil.getItemLore(event.slot.stack)
                 if (!lore.contains("§9Perkpocalypse Perks:")) return
                 val endingIn = lore.asReversed().find { it.startsWith("§7Next set of perks in") } ?: return
