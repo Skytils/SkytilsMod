@@ -324,6 +324,17 @@ object Config : Vigilant(
     var partyFinderStats = false
 
     @Property(
+        type = PropertyType.SELECTOR, name = "Run Breakdown",
+        description = "§b[WIP] Shows a Breakdown on what players did in the dungeon.\n§eNote: Requires teammates to use Skytils Websocket otherwise it's highly inaccurate.",
+        options = ["Disabled", "Enabled", "Enabled + Terminals"],
+        category = "Dungeons", subcategory = "Miscellaneous",
+        i18nName = "skytils.config.dungeons.miscellaneous.run_breakdown",
+        i18nCategory = "skytils.config.dungeons",
+        i18nSubcategory = "skytils.config.dungeons.miscellaneous"
+    )
+    var runBreakdown = 0
+
+    @Property(
         type = PropertyType.SWITCH, name = "Dungeon Chest Profit",
         description = "Shows the estimated profit for items from chests in dungeons.",
         category = "Dungeons", subcategory = "Miscellaneous",

@@ -39,6 +39,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.ScoreCalculation
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.DungeonMapPlayer
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.Room
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.RoomType
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.UniqueRoom
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.ScanUtils
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
@@ -117,6 +118,7 @@ object DungeonListener {
     private val secretsRegex = Regex("\\s*§7(?<secrets>\\d+)\\/(?<maxSecrets>\\d+) Secrets")
     private val keyPickupRegex = Regex("§r§e§lRIGHT CLICK §r§7on §r§7.+?§r§7 to open it\\. This key can only be used to open §r§a(?<num>\\d+)§r§7 door!§r")
     private val witherDoorOpenedRegex = Regex("^(?:\\[.+?] )?(?<name>\\w+) opened a WITHER door!$")
+    private val terminalCompletedRegex = Regex("§r§.(?<username>\\w+)§r§a (?:activated|completed) a (?<type>device|terminal|lever)! \\(§r§c(?<completed>\\d)§r§a\\/(?<total>\\d)\\)§r")
     private const val bloodOpenedString = "§r§cThe §r§c§lBLOOD DOOR§r§c has been opened!§r"
     var outboundRoomQueue = Channel<C2SPacketDungeonRoom>(UNLIMITED)
     var isSoloDungeon = false
@@ -165,6 +167,8 @@ object DungeonListener {
                             val room = tile.uniqueRoom ?: return@setFoundSecrets
                             if (room.foundSecrets != sec) {
                                 room.foundSecrets = sec
+                                updateSecrets(room)
+
                                 if (team.size > 1)
                                     WSClient.sendPacketAsync(C2SPacketDungeonRoomSecret(SBInfo.server ?: return@setFoundSecrets, room.mainRoom.data.name, sec))
                             }
@@ -176,9 +180,18 @@ object DungeonListener {
                     DungeonFeatures.DungeonSecretDisplay.maxSecrets = -1
                 }
             } else {
-                if (text.stripControlCodes()
-                        .trim() == "> EXTRA STATS <"
-                ) {
+                terminalCompletedRegex.find(text)?.let {
+                    val completer = team[it.groups["username"]?.value]
+                    val type = it.groups["type"]?.value
+
+                    if (completer != null && type != null) {
+                        when (type) {
+                            "lever" -> completer.leversDone++
+                            "terminal", "device" -> completer.terminalsDone++
+                        }
+                    }
+                }
+                if (text.stripControlCodes().trim() == "> EXTRA STATS <") {
                     if (team.size > 1) {
                         SBInfo.server?.let {
                             WSClient.sendPacketAsync(C2SPacketDungeonEnd(it))
@@ -196,6 +209,35 @@ object DungeonListener {
                     }
                     if (Skytils.config.autoRepartyOnDungeonEnd) {
                         RepartyCommand.processCommand(mc.thePlayer, emptyArray())
+                    }
+                    if (Skytils.config.runBreakdown != 0) {
+                        tickTimer(6) {
+                            val output = team.map {
+                                val secretsDone = "§aSecrets: §6${
+                                    if (it.value.minimumSecretsDone == it.value.maximumSecretsDone) {
+                                        "${it.value.minimumSecretsDone}"
+                                    } else "${it.value.minimumSecretsDone}§a - §6${it.value.maximumSecretsDone}"
+                                }"
+
+                                val roomsDone = "§aRooms: §6${
+                                    if (it.value.minimumRoomsDone == it.value.maximumRoomsDone) {
+                                        "${it.value.minimumRoomsDone}"
+                                    } else "${it.value.minimumRoomsDone}§a - §6${it.value.maximumRoomsDone}"
+                                }"
+
+                                //TODO: Maybe also save the rank color?
+                                var output =
+                                    "§6${it.key}§a | $secretsDone§a | $roomsDone§a | Deaths: §6${it.value.deaths}"
+
+                                if (Skytils.config.runBreakdown == 2 && DungeonFeatures.dungeonFloorNumber == 7) {
+                                    output += "§a | Terminals: §6${it.value.terminalsDone}§a | Levers: §6${it.value.leversDone}"
+                                }
+
+                                output
+                            }
+
+                            UChat.chat(output.joinToString("\n"))
+                        }
                     }
                 } else if (text.startsWith("§r§c ☠ ")) {
                     if (text.endsWith(" §r§7reconnected§r§7.§r")) {
@@ -516,6 +558,41 @@ object DungeonListener {
         }
     }
 
+    fun updateSecrets(room: UniqueRoom) {
+        if (room.mainRoom.data.secrets < 1 || (room.foundSecrets ?: -1) < 1) return
+
+        val finders = team.filter { entry ->
+            val location = entry.value.mapPlayer.getBlockPos()
+            val playerRoom = ScanUtils.getRoomFromPos(location)?.uniqueRoom
+
+            playerRoom != null && playerRoom.name != "Unknown" && room.mainRoom.data.name == playerRoom.name
+        }
+
+        if (finders.size >= 2) {
+            finders.forEach {
+                team[it.key]?.let { member ->
+                    member.maximumSecretsDone++
+
+                    if (room.foundSecrets == room.mainRoom.data.secrets) {
+                        member.maximumRoomsDone++
+                    }
+                }
+            }
+        } else if (finders.size == 1) {
+            finders.forEach {
+                team[it.key]?.let { member ->
+                    member.minimumSecretsDone++
+                    member.maximumSecretsDone++
+
+                    if (room.foundSecrets == room.mainRoom.data.secrets) {
+                        member.minimumRoomsDone++
+                        member.maximumRoomsDone++
+                    }
+                }
+            }
+        }
+    }
+
     data class DungeonTeammate(
         val playerName: String,
         val dungeonClass: DungeonClass,
@@ -532,6 +609,13 @@ object DungeonListener {
             }
         var dead = false
         var deaths = 0
+        var minimumSecretsDone = 0
+        var maximumSecretsDone = 0
+        var minimumRoomsDone = 0
+        var maximumRoomsDone = 0
+        var terminalsDone = 0
+        var leversDone = 0
+
         var lastLivingStateChange: Long? = null
 
         val mapPlayer = DungeonMapPlayer(this, skin)
