@@ -1992,6 +1992,14 @@ object Config : Vigilant(
     var crystalHollowMapPlaces = false
 
     @Property(
+        type = PropertyType.DECIMAL_SLIDER, name = "Crystal Hollows map player arrow scale",
+        description = "Scale the arro indicating the arrorw on the crystal hollows map",
+        category = "Mining", subcategory  = "Crystal Hollows",
+        minF = 0.5f, maxF = 10f, decimalPlaces = 1
+    )
+    var crystalHollowsMapPlayerScale = 1.5F
+    
+    @Property(
         type = PropertyType.SWITCH, name = "Crystal Hollows waypoints",
         description = "Shows waypoints to special places inside the Crystal Hollows.",
         category = "Mining", subcategory = "Crystal Hollows",
