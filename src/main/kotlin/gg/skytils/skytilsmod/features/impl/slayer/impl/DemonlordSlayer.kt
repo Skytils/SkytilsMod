@@ -96,7 +96,7 @@ class DemonlordSlayer(entity: EntityBlaze) :
 
     companion object {
         private const val thrownTexture =
-            "InRleHR1cmVzIjogeyJTS0lOIjogeyJ1cmwiOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS85YzJlOWQ4Mzk1Y2FjZDk5MjI4NjljMTUzNzNjZjdjYjE2ZGEwYTVjZTVmM2M2MzJiMTljZWIzOTI5YzlhMTEifX0="
+            "eyJ0aW1lc3RhbXAiOjE0NzkxODY4NTAxNDQsInByb2ZpbGVJZCI6ImQzMGRjYzE3NzlmOTRlYTdhYTdiMTg4ZGU1N2E0M2FkIiwicHJvZmlsZU5hbWUiOiJoYW9oYW5rbGxpdSIsInNpZ25hdHVyZVJlcXVpcmVkIjp0cnVlLCJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOWMyZTlkODM5NWNhY2Q5OTIyODY5YzE1MzczY2Y3Y2IxNmRhMGE1Y2U1ZjNjNjMyYjE5Y2ViMzkyOWM5YTExIn19fQ=="
         private const val quaziiTexture = // this the wither skeleton
             "ewogICJ0aW1lc3RhbXAiIDogMTU4ODE3NzgxODc4MywKICAicHJvZmlsZUlkIiA6ICIzMDQzZjNkOTliMGY0MDI2OTQwNzcyZDNkZDE2MjRiYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJERU1PTjMxOCIsCiAgInNpZ25hdHVyZVJlcXVpcmVkIiA6IHRydWUsCiAgInRleHR1cmVzIiA6IHsKICAgICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS8xNmNhMTQ1YmE0MzViMzc1Zjc2M2ZmNTNiNGNlMDRiMmEwYzg3M2U4ZmY1NDdlOGIxNGIzOTJmZGU2ZmJmZDk0IgogICAgfQogIH0KfQ=="
         private const val typhoeusTexture = // and this is the pig
@@ -185,7 +185,7 @@ class DemonlordSlayer(entity: EntityBlaze) :
     override fun entityJoinWorld(event: EntityJoinWorldEvent) {
         (event.entity as? EntityArmorStand)?.let { e ->
             tickTimer(1) {
-                if (e.inventory[4]?.takeIf { it.item is ItemSkull }
+                if (e.inventory[0]?.takeIf { it.item is ItemSkull }
                         ?.let { ItemUtil.getSkullTexture(it) == thrownTexture } == true) {
                     printDevMessage(
                         "Found skull armor stand",
