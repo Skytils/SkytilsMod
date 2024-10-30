@@ -211,9 +211,9 @@ object ItemUtil {
         return item
     }
 
-    fun getSkullTexture(item: ItemStack): String? {
-        if (item.item != Items.skull) return null
-        val nbt = item.tagCompound
+    fun getSkullTexture(item: ItemStack?): String? {
+        if (item?.item != Items.skull) return null
+        val nbt = item?.tagCompound ?: return null
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
             .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
