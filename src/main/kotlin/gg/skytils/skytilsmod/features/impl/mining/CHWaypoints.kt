@@ -308,8 +308,8 @@ object CHWaypoints {
 
                 // Rotate about the center to match the player's yaw
                 stack.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
-                stack.scale(scale*1.5,scale*1.5,scale*1.5)
-                stack.translate(-0.125f*scale/1.5, 0.125f*scale/1.5, 0.0)
+                stack.scale(scale,scale,scale)
+                stack.translate((-0.125f*scale).toDouble(), (0.125f*scale).toDouble(), 0.0)
                 UGraphics.color4f(1f, 1f, 1f, 1f)
                 UGraphics.enableAlpha()
                 val d1 = 0.0
