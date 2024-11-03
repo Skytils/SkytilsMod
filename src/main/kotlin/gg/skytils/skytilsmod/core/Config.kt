@@ -1982,16 +1982,6 @@ object Config : Vigilant(
     var crystalHollowMap = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Crystal Hollows map special places",
-        description = "Show special places on the map (like Lost Precusor City).",
-        category = "Mining", subcategory = "Crystal Hollows",
-        i18nName = "skytils.config.mining.crystal_hollows.crystal_hollows_map_special_places",
-        i18nCategory = "skytils.config.mining",
-        i18nSubcategory = "skytils.config.mining.crystal_hollows"
-    )
-    var crystalHollowMapPlaces = false
-
-    @Property(
         type = PropertyType.DECIMAL_SLIDER, name = "Crystal Hollows map player arrow scale",
         description = "Scale the arrow indicating the player on the crystal hollows map",
         category = "Mining", subcategory  = "Crystal Hollows",
@@ -2001,6 +1991,16 @@ object Config : Vigilant(
         i18nSubcategory = "skytils.config.mining.crystal_hollows"
     )
     var crystalHollowsMapPlayerScale = 2.25F
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Crystal Hollows map special places",
+        description = "Show special places on the map (like Lost Precusor City).",
+        category = "Mining", subcategory = "Crystal Hollows",
+        i18nName = "skytils.config.mining.crystal_hollows.crystal_hollows_map_special_places",
+        i18nCategory = "skytils.config.mining",
+        i18nSubcategory = "skytils.config.mining.crystal_hollows"
+    )
+    var crystalHollowMapPlaces = false
     
     @Property(
         type = PropertyType.SWITCH, name = "Crystal Hollows waypoints",
@@ -4487,6 +4487,8 @@ object Config : Vigilant(
         addDependency("showTotalTrophyFish", "trophyFishTracker")
 
         addDependency("shinyPigLocations", "shinyOrbWaypoints")
+
+        addDependency("crystalHollowsMapPlayerScale","crystalHollowMap")
 
         registerListener("protectItemBINThreshold") { _: String ->
             tickTimer(1) {
