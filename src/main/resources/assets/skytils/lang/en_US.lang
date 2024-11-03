@@ -184,6 +184,7 @@ skytils.config.mining.solvers.fetchur_solver=Fetchur Solver
 skytils.config.mining.solvers.puzzler_solver=Puzzler Solver
 skytils.config.mining.crystal_hollows.crystal_hollows_death_waypoints=Crystal Hollows Death Waypoints
 skytils.config.mining.crystal_hollows.crystal_hollows_map=Crystal Hollows map
+skytils.config.mining.crystal_hollows.player_arrow_scaling=Crystal Hollows map player arrow scale
 skytils.config.mining.crystal_hollows.crystal_hollows_map_special_places=Crystal Hollows map special places
 skytils.config.mining.crystal_hollows.crystal_hollows_waypoints=Crystal Hollows waypoints
 skytils.config.mining.crystal_hollows.king_yolkar_waypoint=King Yolkar waypoint
