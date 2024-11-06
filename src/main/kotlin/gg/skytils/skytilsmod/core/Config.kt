@@ -4488,7 +4488,7 @@ object Config : Vigilant(
 
         addDependency("shinyPigLocations", "shinyOrbWaypoints")
 
-        addDependency("crystalHollowsMapPlayerScale","crystalHollowMap")
+        addDependency("crystalHollowsMapPlayerScale", "crystalHollowMap")
 
         registerListener("protectItemBINThreshold") { _: String ->
             tickTimer(1) {
