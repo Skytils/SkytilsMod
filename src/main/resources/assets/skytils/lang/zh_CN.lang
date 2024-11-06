@@ -180,6 +180,7 @@ skytils.config.mining.solvers.fetchur_solver=Fetchur的解密器
 skytils.config.mining.solvers.puzzler_solver=Puzzler的解密器
 skytils.config.mining.crystal_hollows.crystal_hollows_death_waypoints=水晶矿洞死亡路径点
 skytils.config.mining.crystal_hollows.crystal_hollows_map=水晶矿洞地图
+kytils.config.mining.crystal_hollows.player_arrow_scaling=
 skytils.config.mining.crystal_hollows.crystal_hollows_map_special_places=水晶矿洞地图标记特殊地点
 skytils.config.mining.crystal_hollows.crystal_hollows_waypoints=水晶矿洞路径点
 skytils.config.mining.crystal_hollows.king_yolkar_waypoint=哥布林王路径点
