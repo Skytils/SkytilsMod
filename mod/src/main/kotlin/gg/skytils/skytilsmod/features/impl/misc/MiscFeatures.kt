@@ -17,6 +17,12 @@
  */
 package gg.skytils.skytilsmod.features.impl.misc
 
+import gg.essential.elementa.components.UIText
+import gg.essential.elementa.layoutdsl.LayoutScope
+import gg.essential.elementa.state.v2.State
+import gg.essential.elementa.state.v2.effect
+import gg.essential.elementa.state.v2.memo
+import gg.essential.elementa.state.v2.toV1
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UChat
 import gg.essential.universal.UGraphics
@@ -44,6 +50,7 @@ import gg.skytils.skytilsmod._event.RenderHUDEvent
 import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.core.GuiManager.createTitle
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.structure.v2.HudElement
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorEntityArmorstand
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorWorldInfo
@@ -108,6 +115,7 @@ object MiscFeatures : EventSubscriber {
         PlayersInRangeDisplay()
         PlacedSummoningEyeDisplay()
         WorldAgeDisplay()
+        Skytils.guiManager.registerElement(WorldAgeHud())
     }
 
     override fun setup() {
@@ -608,6 +616,27 @@ object MiscFeatures : EventSubscriber {
         init {
             Skytils.guiManager.registerElement(this)
         }
+    }
+
+    class WorldAgeHud : HudElement("World Age Display", 50f, 60f) {
+        @JvmField
+        val dayState: State<String> = State {
+            val day = 100L// (mc.theWorld?.worldInfo as? AccessorWorldInfo)?.realWorldTime?.div(24000)
+            "Day ${day}"
+        }
+
+        override fun LayoutScope.render() {
+            val text = UIText()()
+            println(dayState)
+            effect(text) {
+                text.setText(dayState())
+            }
+        }
+
+        override fun LayoutScope.demoRender() {
+            UIText("Day 0")()
+        }
+
     }
 
     class WorldAgeDisplay : GuiElement("World Age Display", x = 50, y = 60) {

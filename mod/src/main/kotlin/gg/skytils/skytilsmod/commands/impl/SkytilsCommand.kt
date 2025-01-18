@@ -29,6 +29,7 @@ import gg.skytils.skytilsmod.Skytils.prefix
 import gg.skytils.skytilsmod.Skytils.successPrefix
 import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.core.DataFetcher
+import gg.skytils.skytilsmod.core.GuiManager
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.UpdateChecker
 import gg.skytils.skytilsmod.features.impl.dungeons.PartyFinderStats
@@ -232,6 +233,8 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
                 Skytils.displayScreen = ElementaEditingGui()
 
             "oldgui" -> Skytils.displayScreen = VanillaEditingGui()
+
+            "demo" -> Skytils.displayScreen = GuiManager.demoHud
 
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()
             "spam", "spamhider" -> Skytils.displayScreen = SpamHiderGui()

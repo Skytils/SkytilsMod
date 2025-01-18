@@ -18,6 +18,7 @@
 package gg.skytils.skytilsmod.core
 
 import gg.essential.elementa.ElementaVersion
+import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.Window
 import gg.essential.elementa.dsl.pixels
 import gg.essential.universal.UChat
@@ -29,6 +30,7 @@ import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod._event.RenderHUDEvent
 import gg.skytils.skytilsmod.core.structure.GuiElement
+import gg.skytils.skytilsmod.core.structure.v2.HudElement
 import gg.skytils.skytilsmod.gui.editing.VanillaEditingGui
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.graphics.SmartFontRenderer
@@ -44,6 +46,8 @@ import java.io.Writer
 object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")), EventSubscriber {
     val elements = hashMapOf<String, GuiElement>()
     val elementMetadata = hashMapOf<String, GuiElementMetadata>()
+    val hud = Window(ElementaVersion.V5)
+    val demoHud = object : WindowScreen(ElementaVersion.V5) {}
 
     @JvmField
     var title: String? = null
@@ -65,6 +69,11 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")), E
             err.printStackTrace()
             false
         }
+    }
+
+    fun registerElement(e: HudElement) {
+        hud.addChild(e.component)
+        demoHud.window.addChild(e.demoComponent)
     }
 
     fun addToast(toast: Toast) {
