@@ -297,7 +297,7 @@ object CHWaypoints {
                 }
                 val x = (mc.thePlayer.posX - 202).coerceIn(0.0, 624.0)
                 val y = (mc.thePlayer.posZ - 202).coerceIn(0.0, 624.0)
-                val scale = Skytils.config.crystalHollowsMapPlayerScale
+                val playerScale = Skytils.config.crystalHollowsMapPlayerScale
 
                 // player marker code
                 val wr = UGraphics.getFromTessellator()
@@ -308,8 +308,8 @@ object CHWaypoints {
 
                 // Rotate about the center to match the player's yaw
                 stack.rotate((mc.thePlayer.rotationYawHead + 180f) % 360f, 0f, 0f, 1f)
-                stack.scale(scale,scale,scale)
-                stack.translate((-0.125f*scale).toDouble(), (0.125f*scale).toDouble(), 0.0)
+                stack.scale(playerScale, playerScale, 1f)
+                stack.translate((-0.125f*playerScale).toDouble(), (0.125f*playerScale).toDouble(), 0.0)
                 UGraphics.color4f(1f, 1f, 1f, 1f)
                 UGraphics.enableAlpha()
                 val d1 = 0.0

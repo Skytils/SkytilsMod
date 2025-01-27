@@ -2001,7 +2001,7 @@ object Config : Vigilant(
         i18nSubcategory = "skytils.config.mining.crystal_hollows"
     )
     var crystalHollowMapPlaces = false
-    
+
     @Property(
         type = PropertyType.SWITCH, name = "Crystal Hollows waypoints",
         description = "Shows waypoints to special places inside the Crystal Hollows.",
