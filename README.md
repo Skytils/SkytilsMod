@@ -1,9 +1,8 @@
 # SkytilsMod
 
-***
 <p align="center">
   <a href="https://github.com/Skytils/SkytilsMod/releases" target="_blank">
-    <img alt="downloads" src="https://img.shields.io/github/v/release/Skytils/SkytilsMod?color=4166f5&style=flat-square" />
+    <img alt="release" src="https://img.shields.io/github/v/release/Skytils/SkytilsMod?color=4166f5&style=flat-square" />
   </a>
   <a href="https://github.com/Skytils/SkytilsMod/releases" target="_blank">
     <img alt="downloads" src="https://img.shields.io/github/downloads/Skytils/SkytilsMod/total?color=4166f5&style=flat-square" />
@@ -17,10 +16,8 @@
 </p>
 A Hypixel Skyblock Utilities mod.
 
-<p style="font-size: larger">
-09/15/2023:
-If you have a GitHub account, <b>PLEASE CONSIDER STARRING</b> and forking the repository! A new influx of fake respoitories are using botted star and fork counts in order to outrank the search algorithm.
-</p>
+> [!NOTE]
+> 09/15/2023: If you have a GitHub account, **PLEASE CONSIDER STARRING** and forking the repository! A new influx of fake respoitories are using botted star and fork counts in order to outrank the search algorithm.
 
 ## Features
 
@@ -259,22 +256,21 @@ And more to come!
 - /skytils shortcuts - Opens the GUI to modify keybind shortcuts.
 - /skytils spam - Opens the GUI to modify spam filters.
 - /skytils enchant - Opens the GUI to customize enchant names.
-- /skytilscata <player> - Shows information about a player's Catacombs statistics.
-- /skytilsslayer <player> - Shows information about a player's Slayer statistics.
+- /skytilscata \<player> - Shows information about a player's Catacombs statistics.
+- /skytilsslayer \<player> - Shows information about a player's Slayer statistics.
 - /armorcolor <set/clear/clearall> - Changes the color of an armor piece to the hexcode or decimal color provided. (can
   also be accessed by /skytils armorcolor)
-- ~~/blockability [clearall] - Block using the ability on the currently held item~~
+- ~~/blockability \[clearall] - Block using the ability on the currently held item~~
 - /reparty (/rp) - Disbands and sends a party invite to everyone who was in your party.
 - /glintcustomize override <on/off/clear/clearall> - Change the visibility of enchantment glints for the item.
 - /glintcustomize color <set/clear/clearall> - Change the enchant glint color for the item.
-- /trackcooldown <cooldown in seconds> <item ability> - Set a cooldown for an item ability to track
-- /sthw <set/remove/clear/help> <x y z> <name> - Allows to set waypoints while in the Crystal Hollows.
+- /trackcooldown \<cooldown in seconds> <\item ability> - Set a cooldown for an item ability to track
+- /sthw <set/remove/clear/help> \<x y z> \<name> - Allows to set waypoints while in the Crystal Hollows.
 
 </details>
 
-### Credits to Open Source Software
+## Credits to Open Source Software
 
-***
 Skytils would not be possible without other open source projects.
 
 [For more information, click here](https://github.com/Skytils/SkytilsMod/blob/main/OPEN_SOURCE_SOFTWARE.md "Credits")
