@@ -264,7 +264,7 @@ And more to come!
 - /reparty (/rp) - Disbands and sends a party invite to everyone who was in your party.
 - /glintcustomize override <on/off/clear/clearall> - Change the visibility of enchantment glints for the item.
 - /glintcustomize color <set/clear/clearall> - Change the enchant glint color for the item.
-- /trackcooldown \<cooldown in seconds> <\item ability> - Set a cooldown for an item ability to track
+- /trackcooldown \<cooldown in seconds> \<item ability> - Set a cooldown for an item ability to track
 - /sthw <set/remove/clear/help> \<x y z> \<name> - Allows to set waypoints while in the Crystal Hollows.
 
 </details>
