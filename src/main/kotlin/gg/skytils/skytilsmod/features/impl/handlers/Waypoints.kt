@@ -402,7 +402,7 @@ data class Coleweight(
             x,
             y,
             z,
-            options.enabled,
+            true,
             color,
             System.currentTimeMillis(),
             SkyblockIsland.CrystalHollows // We assume Crystal Hollows
@@ -411,7 +411,4 @@ data class Coleweight(
 }
 
 @Serializable
-data class ColeweightOptions @OptIn(ExperimentalSerializationApi::class) constructor(
-    val name: String,
-    @EncodeDefault val enabled: Boolean = true,
-)
+data class ColeweightOptions constructor(val name: String, )
