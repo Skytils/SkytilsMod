@@ -405,7 +405,7 @@ data class Coleweight(
             options.enabled,
             color,
             System.currentTimeMillis(),
-            SkyblockIsland.CrystalHollows
+            SkyblockIsland.CrystalHollows // We assume Crystal Hollows
         )
     }
 }
