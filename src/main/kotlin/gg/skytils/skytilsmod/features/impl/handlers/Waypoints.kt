@@ -29,6 +29,7 @@ import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.events.impl.skyblock.LocationChangeEvent
 import gg.skytils.skytilsmod.tweaker.DependencyLoader
 import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.rendering.addAll
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -141,6 +142,17 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
                     island = island
                 )
             )
+        } else if (str.startsWith("[{")) { // Soopy/Coleweight, we assume it's their format
+            json.decodeFromString<Array<Coleweight>>(str).let {
+                categories.addAll(
+                    WaypointCategory(
+                        name = null,
+                        waypoints = it.map { waypoint -> waypoint.toSkytilsWaypoint() }.toSet(),
+                        isExpanded = true,
+                        island = SkyblockIsland.CrystalHollows // We assume Crystal Hollows
+                    )
+                )
+            }
         } else throw IllegalArgumentException("Unknown waypoint format")
 
         return categories
@@ -206,7 +218,7 @@ object Waypoints : PersistentSave(File(Skytils.modDir, "waypoints.json")) {
         val realPath = if (!path.name.endsWith(".V$version.SkytilsWaypoints")) path.resolveSibling("${path.name}.V$version.SkytilsWaypoints") else path
         when (version) {
             2 -> {
-                if (!DependencyLoader.hasNativeBrotli) error ("Brotli encoder is not available")
+                if (!DependencyLoader.hasNativeBrotli) error("Brotli encoder is not available")
                 BrotliOutputStream(realPath.outputStream(), Encoder.Parameters().apply {
                     setQuality(11)
                 }).use {
@@ -323,6 +335,7 @@ data class WaypointCategory(
     @Serializable(with = SkyblockIsland.ModeSerializer::class)
     var island: SkyblockIsland
 )
+
 @Serializable
 data class Waypoint @OptIn(ExperimentalSerializationApi::class) constructor(
     var name: String,
@@ -370,3 +383,35 @@ data class Waypoint @OptIn(ExperimentalSerializationApi::class) constructor(
         UGraphics.enableDepth()
     }
 }
+
+@Serializable
+data class Coleweight(
+    val x: Int,
+    val y: Int,
+    val z: Int,
+    val r: Int,
+    val g: Int,
+    val b: Int,
+    val options: ColeweightOptions
+) {
+    fun toSkytilsWaypoint(): Waypoint {
+        val color = Color(r * 255, g * 255, b * 255) // We assume that 0 is 0 and 1 is 255
+
+        return Waypoint(
+            options.name,
+            x,
+            y,
+            z,
+            options.enabled,
+            color,
+            System.currentTimeMillis(),
+            SkyblockIsland.CrystalHollows
+        )
+    }
+}
+
+@Serializable
+data class ColeweightOptions @OptIn(ExperimentalSerializationApi::class) constructor(
+    val name: String,
+    @EncodeDefault val enabled: Boolean = true,
+)
