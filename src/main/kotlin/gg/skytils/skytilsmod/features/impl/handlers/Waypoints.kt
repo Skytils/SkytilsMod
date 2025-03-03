@@ -385,17 +385,24 @@ data class Waypoint @OptIn(ExperimentalSerializationApi::class) constructor(
 }
 
 @Serializable
-data class Coleweight(
+data class Coleweight @OptIn(ExperimentalSerializationApi::class) constructor(
     val x: Int,
     val y: Int,
     val z: Int,
-    val r: Int,
-    val g: Int,
-    val b: Int,
+    @EncodeDefault
+    val r: Float = 1f,
+    @EncodeDefault
+    val g: Float = 0f,
+    @EncodeDefault
+    val b: Float = 0f,
     val options: ColeweightOptions
 ) {
     fun toSkytilsWaypoint(): Waypoint {
-        val color = Color(r * 255, g * 255, b * 255) // We assume that 0 is 0 and 1 is 255
+        val color = Color(
+            r.coerceIn(0f..1f),
+            g.coerceIn(0f..1f),
+            b.coerceIn(0f..1f)
+        )
 
         return Waypoint(
             options.name,
@@ -403,12 +410,10 @@ data class Coleweight(
             y,
             z,
             true,
-            color,
-            System.currentTimeMillis(),
-            SkyblockIsland.CrystalHollows // We assume Crystal Hollows
+            color
         )
     }
-}
 
-@Serializable
-data class ColeweightOptions constructor(val name: String, )
+    @Serializable
+    data class ColeweightOptions(val name: String)
+}
