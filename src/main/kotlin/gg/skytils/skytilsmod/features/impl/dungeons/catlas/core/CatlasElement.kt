@@ -135,7 +135,7 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
     private fun getDoorState(door: Door, row: Int, column: Int) : RoomState {
         val rooms = getConnectingRooms(door,row,column) ?: return RoomState.UNDISCOVERED
-        if (rooms.any {it.state == RoomState.UNDISCOVERED}) return RoomState.UNDISCOVERED
+        if (rooms.toList().any {it.state == RoomState.UNDISCOVERED}) return RoomState.UNDISCOVERED
         return RoomState.PREVISITED
     }
 
