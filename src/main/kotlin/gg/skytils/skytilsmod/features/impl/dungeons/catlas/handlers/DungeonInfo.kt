@@ -38,8 +38,6 @@ object DungeonInfo {
     var dungeonMap: MapData? = null
     var guessMapData: MapData? = null
 
-    val preStartVisitedRooms = mutableSetOf<UniqueRoom>()
-
     fun reset() {
         dungeonList.fill(Unknown(0, 0))
         roomCount = 0
@@ -55,7 +53,5 @@ object DungeonInfo {
 
         dungeonMap = null
         guessMapData = null
-
-        preStartVisitedRooms.clear()
     }
 }

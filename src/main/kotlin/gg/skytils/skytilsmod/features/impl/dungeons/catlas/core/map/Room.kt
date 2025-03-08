@@ -40,6 +40,8 @@ class Room(override val x: Int, override val z: Int, var data: RoomData) : Tile 
                 RoomType.RARE -> CatlasConfig.colorRare
                 RoomType.TRAP -> CatlasConfig.colorTrap
                 else -> CatlasConfig.colorRoom
+            }.apply {
+                if (state == RoomState.PREVISITED) return this.darker()
             }
         }
     var uniqueRoom: UniqueRoom? = null

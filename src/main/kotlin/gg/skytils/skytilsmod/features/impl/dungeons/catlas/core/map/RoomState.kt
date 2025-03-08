@@ -22,5 +22,5 @@ package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map
  * [ordinal] matters here, should be in the order of what can happen to a room.
  */
 enum class RoomState {
-    FAILED, GREEN, CLEARED, DISCOVERED, UNOPENED, UNDISCOVERED
+    FAILED, GREEN, CLEARED, DISCOVERED, PREVISITED, UNOPENED, UNDISCOVERED
 }
