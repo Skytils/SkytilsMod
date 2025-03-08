@@ -75,8 +75,11 @@ object MapUpdater {
 
                 if (mapTile.state.ordinal < room.state.ordinal) {
                     room.state = mapTile.state
-                    if (room is Room && room.state == RoomState.GREEN) {
-                        room.uniqueRoom?.foundSecrets = room.uniqueRoom?.foundSecrets?.coerceAtLeast(room.data.secrets)
+                    if (room is Room) {
+                        DungeonInfo.uniqueRooms.find {it.name == room.data.name}?.state = mapTile.state
+                        if (room.state == RoomState.GREEN) {
+                            room.uniqueRoom?.foundSecrets = room.uniqueRoom?.foundSecrets?.coerceAtLeast(room.data.secrets)
+                        }
                     }
                 }
 
