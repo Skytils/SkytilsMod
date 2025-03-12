@@ -91,7 +91,7 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                 val tile = DungeonInfo.dungeonList[y * 11 + x]
 
                 if (tile is Unknown || (tile is Room && tile.state == RoomState.UNDISCOVERED)) continue
-                if (tile is Door && getDoorState(tile,y,x) == RoomState.UNDISCOVERED) continue
+                if (tile is Door && getDoorState(tile, y, x) == RoomState.UNDISCOVERED) continue
 
                 val xOffset = (x shr 1) * (MapUtils.mapRoomSize + connectorSize)
                 val yOffset = (y shr 1) * (MapUtils.mapRoomSize + connectorSize)
@@ -133,9 +133,9 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         GlStateManager.popMatrix()
     }
 
-    private fun getDoorState(door: Door, row: Int, column: Int) : RoomState {
-        val rooms = getConnectingRooms(door,row,column) ?: return RoomState.UNDISCOVERED
-        if (rooms.toList().any {it.state == RoomState.UNDISCOVERED}) return RoomState.UNDISCOVERED
+    private fun getDoorState(door: Door, row: Int, column: Int): RoomState {
+        val rooms = getConnectingRooms(door, row, column) ?: return RoomState.UNDISCOVERED
+        if (rooms.toList().any { it.state == RoomState.UNDISCOVERED }) return RoomState.UNDISCOVERED
         return RoomState.PREVISITED
     }
 
@@ -173,13 +173,13 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
             val yOffsetName = (namePos.second / 2f) * size
 
             val color = if (CatlasConfig.mapColorText) when (room.state) {
-                RoomState.GREEN -> Color(85,255,85).rgb
-                RoomState.CLEARED -> Color(255,255,255).rgb
-                RoomState.FAILED -> Color(255,0,0).rgb
-                RoomState.PREVISITED -> Color(85,85,85).rgb
-                else -> Color(170,170,170).rgb
-            } else Color(255,255,255).rgb
-            
+                RoomState.GREEN -> 0x55FF55
+                RoomState.CLEARED -> 0xFFFFFF
+                RoomState.FAILED -> 0xFF0000
+                RoomState.PREVISITED -> 0x555555
+                else -> 0xAAAAAA
+            } else 0xFFFFFF
+
             val secretCount = room.data.secrets
             val roomType = room.data.type
             val hasSecrets = secretCount > 0
