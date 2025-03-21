@@ -327,7 +327,6 @@ skytils.config.slayer..current_sven_rng_meter=當前狼Slayer的RNG量表
 skytils.config.slayer..current_voidgloom_rng_meter=當前終界使者Slayer的RNG量表
 skytils.config.slayer..current_inferno_rng_meter=當前烈焰使者Slayer的RNG量表
 skytils.config.slayer..current_bloodfiend_rng_meter=當前吸血鬼Slayer的RNG量表
-skytils.config.slayer.quality_of_life.click_to_open_maddox_menu=點選任意處開啟Maddox選單
 skytils.config.slayer.general.carry_mode=帶人模式
 skytils.config.slayer.general.use_hits_to_detect_slayer=以擊中的攻擊偵測Slayer
 skytils.config.slayer.quality_of_life.ping_when_in_atoned_horror_danger_zone=殭屍Slayer的TNT技能危險區警告
