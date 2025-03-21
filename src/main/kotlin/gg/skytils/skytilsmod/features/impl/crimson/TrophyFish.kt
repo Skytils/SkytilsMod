@@ -191,7 +191,7 @@ object TrophyFish {
         override val height: Int // This converts the boolean to an int (1 for true, 0 for false)
             get() = (TrophyFish.entries.size + Config.showTotalTrophyFish.compareTo(false)) * UGraphics.getFontHeight()
         override val width: Int
-            get() = UGraphics.getStringWidth("Steaming Hot Flounder » 999-99-99-9")
+            get() = UGraphics.getStringWidth("Steaming-Hot Flounder » 999-99-99-9")
 
     }
 }
