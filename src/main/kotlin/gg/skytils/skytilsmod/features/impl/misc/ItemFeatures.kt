@@ -90,7 +90,6 @@ object ItemFeatures {
 
     private val headPattern =
         Regex("(?:DIAMOND|GOLD)_(?:(BONZO)|(SCARF)|(PROFESSOR)|(THORN)|(LIVID)|(SADAN)|(NECRON))_HEAD")
-    private val requirementPattern = Regex("CATACOMBS:(?<level>\\d+)")
 
     // TODO: it is possible for 2 items to have the same name but different material
     val itemIdToNameLookup = hashMapOf<String, String>()
@@ -437,17 +436,25 @@ object ItemFeatures {
         if (Skytils.config.showItemQuality && extraAttr != null) {
             val boost = extraAttr.getInteger("baseStatBoostPercentage")
             val tier = extraAttr.getInteger("item_tier")
-
-            if (boost > 0 && tier > 0) {
-                val isMasterMode =
-                    requirementPattern
-                        .matchEntire(
-                            extraAttr.getString("dungeon_skill_req")
-                        )?.groupValues?.get(1)?.toIntOrNull()?.let { it > 24 }
-
-                val floor = when (isMasterMode) {
-                    true -> "§4M${tier - 3}"
-                    false -> "§aF$tier"
+            val req = extraAttr.getString("dungeon_skill_req")
+            
+            if (boost > 0) {
+                val floor = when {
+                    req == "" && tier == 0 -> "§aF0"
+                    req == "CATACOMBS:1" && tier == 1 -> "§aF1"
+                    req == "CATACOMBS:3" && tier == 1 -> "§aF2"
+                    req == "CATACOMBS:5" && tier == 1 -> "§aF3"
+                    req == "CATACOMBS:9" && tier == 1 -> "§aF4"
+                    req == "CATACOMBS:14" && tier == 1 -> "§aF5"
+                    req == "CATACOMBS:19" && tier == 1 -> "§aF6"
+                    req == "CATACOMBS:24" && tier == 1 -> "§aF7"
+                    req == "CATACOMBS:24" && tier == 1 -> "§aM1"
+                    req == "CATACOMBS:26" && tier == 1 -> "§aM2"
+                    req == "CATACOMBS:28" && tier == 1 -> "§aM3"
+                    req == "CATACOMBS:30" && tier == 1 -> "§aM4"
+                    req == "CATACOMBS:32" && tier == 1 -> "§aM5"
+                    req == "CATACOMBS:34" && tier == 1 -> "§aM6"
+                    req == "CATACOMBS:36" && tier == 1 -> "§aM7"
                     else -> "§b$tier"
                 }
 
@@ -458,7 +465,7 @@ object ItemFeatures {
                     else -> "§b"
                 }
 
-                event.toolTip.add("§6Quality Bonus: +$color$boost% §7($floor§7)")
+                event.toolTip.add("§6Quality Bonus: $color+$boost% §7($floor§7)")
             }
         }
 
