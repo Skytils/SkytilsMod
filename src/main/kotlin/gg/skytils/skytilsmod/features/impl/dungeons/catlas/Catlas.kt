@@ -86,7 +86,9 @@ object Catlas {
             ScanUtils.getRoomFromPos(mc.thePlayer.position)?.uniqueRoom?.let { unq ->
                 if (unq.state == RoomState.PREVISITED) return@let
                 unq.state = RoomState.PREVISITED
-                unq.tiles.forEach { it.state = RoomState.PREVISITED }
+                DungeonInfo.dungeonList.filter { (it as? Room)?.uniqueRoom == unq && it.state != RoomState.PREVISITED }.forEach {
+                    it.state = RoomState.PREVISITED
+                }
             }
             DungeonListener.team[mc.thePlayer.name]?.mapPlayer?.yaw = mc.thePlayer.rotationYaw
         }
