@@ -440,7 +440,7 @@ object ItemFeatures {
             
             if (boost > 0) {
                 val floor = when {
-                    req == "" && tier == 0 -> "§aF0"
+                    req == "" && tier == 0 -> "§aE"
                     req == "CATACOMBS:1" && tier == 1 -> "§aF1"
                     req == "CATACOMBS:3" && tier == 2 -> "§aF2"
                     req == "CATACOMBS:5" && tier == 3 -> "§aF3"
