@@ -20,10 +20,8 @@ package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core
 
 import gg.essential.vigilance.Vigilant
 import gg.essential.vigilance.data.*
-import gg.skytils.skytilsmod.utils.DungeonClass
 import java.awt.Color
 import java.io.File
-import java.util.EnumMap
 
 object CatlasConfig : Vigilant(
     File("./config/skytils/catlas/config.toml"),
@@ -155,6 +153,21 @@ object CatlasConfig : Vigilant(
         i18nSubcategory = "catlas.config.map.size"
     )
     var playerHeadScale = 1f
+
+    @Property(
+        name = "",
+        type = PropertyType.DECIMAL_SLIDER,
+        description = "",
+        category = "Map",
+        subcategory = "Size",
+        maxF = 1f,
+        minF = 0f,
+        decimalPlaces = 2,
+        i18nName = "catlas.config.map.size.head_border_scale",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.size"
+    )
+    var playerBorderPercentage = 0.2f
 
     @Property(
         name = "Player Name Scale",
