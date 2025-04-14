@@ -155,9 +155,9 @@ object CatlasConfig : Vigilant(
     var playerHeadScale = 1f
 
     @Property(
-        name = "",
+        name = "Head Class Border Scale",
         type = PropertyType.DECIMAL_SLIDER,
-        description = "",
+        description = "Scale of the class colour outline on the player head",
         category = "Map",
         subcategory = "Size",
         maxF = 1f,
