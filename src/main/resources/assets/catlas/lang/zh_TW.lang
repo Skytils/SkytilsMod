@@ -7,6 +7,7 @@ catlas.config.map.toggle.show_player_names=顯示玩家名稱
 catlas.config.map.toggle.vanilla_head_marker=原版Minecraft地圖標記
 catlas.config.map.size.map_text_scale=地圖文字縮放
 catlas.config.map.size.player_heads_scale=玩家頭顱縮放
+catlas.config.map.size.head_border_scale=Head Border Scale
 catlas.config.map.size.player_name_scale=玩家名稱縮放
 catlas.config.map.render.map_background_color=地圖背景顏色
 catlas.config.map.render.map_border_color=地圖邊框顏色

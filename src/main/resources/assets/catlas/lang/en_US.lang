@@ -8,6 +8,7 @@ catlas.config.map.toggle.show_player_names=Show Player Names
 catlas.config.map.toggle.vanilla_head_marker=Vanilla Head Marker
 catlas.config.map.size.map_text_scale=Map Text Scale
 catlas.config.map.size.player_heads_scale=Player Heads Scale
+catlas.config.map.size.head_border_scale=Head Border Scale
 catlas.config.map.size.player_name_scale=Player Name Scale
 catlas.config.map.render.map_background_color=Map Background Color
 catlas.config.map.render.map_border_color=Map Border Color
