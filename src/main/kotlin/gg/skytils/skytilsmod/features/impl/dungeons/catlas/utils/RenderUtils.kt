@@ -23,11 +23,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasElement
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.DungeonMapPlayer
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
-import gg.skytils.skytilsmod.utils.DungeonClass
-import gg.skytils.skytilsmod.utils.ItemUtil
-import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.bindColor
-import gg.skytils.skytilsmod.utils.ifNull
+import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.Tessellator
@@ -172,7 +168,7 @@ object RenderUtils {
                 tessellator.draw()
                 GlStateManager.rotate(-180f, 0f, 0f, 1f)
             } else {
-                // Render black border around the player head
+                // Render box behind the player head
                 val borderColor = when (player.teammate.dungeonClass) {
                     DungeonClass.ARCHER -> CatlasConfig.colorPlayerArcher
                     DungeonClass.BERSERK -> CatlasConfig.colorPlayerBerserk
@@ -182,7 +178,8 @@ object RenderUtils {
                     else -> Color.BLACK
                 }
 
-                renderRectBorder(-6.0, -6.0, 12.0, 12.0, 1.0, borderColor)
+                renderRect(-6.0, -6.0, 12.0, 12.0, borderColor)
+                GlStateManager.translate(0f,0f,0.1f)
 
                 preDraw()
                 GlStateManager.enableTexture2D()
@@ -190,10 +187,14 @@ object RenderUtils {
 
                 mc.textureManager.bindTexture(player.skin)
 
+                GlStateManager.pushMatrix()
+                val scale = 1f - CatlasConfig.playerBorderPercentage
+                GlStateManager.scale(scale,scale,scale)
                 Gui.drawScaledCustomSizeModalRect(-6, -6, 8f, 8f, 8, 8, 12, 12, 64f, 64f)
                 if (player.renderHat) {
                     Gui.drawScaledCustomSizeModalRect(-6, -6, 40f, 8f, 8, 8, 12, 12, 64f, 64f)
                 }
+                GlStateManager.popMatrix()
 
                 postDraw()
             }
