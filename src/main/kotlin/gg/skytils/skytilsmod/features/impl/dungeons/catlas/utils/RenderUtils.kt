@@ -179,7 +179,7 @@ object RenderUtils {
                 }
 
                 renderRect(-6.0, -6.0, 12.0, 12.0, borderColor)
-                GlStateManager.translate(0f,0f,0.1f)
+                GlStateManager.translate(0f, 0f, 0.1f)
 
                 preDraw()
                 GlStateManager.enableTexture2D()
@@ -189,7 +189,7 @@ object RenderUtils {
 
                 GlStateManager.pushMatrix()
                 val scale = 1f - CatlasConfig.playerBorderPercentage
-                GlStateManager.scale(scale,scale,scale)
+                GlStateManager.scale(scale, scale, scale)
                 Gui.drawScaledCustomSizeModalRect(-6, -6, 8f, 8f, 8, 8, 12, 12, 64f, 64f)
                 if (player.renderHat) {
                     Gui.drawScaledCustomSizeModalRect(-6, -6, 40f, 8f, 8, 8, 12, 12, 64f, 64f)

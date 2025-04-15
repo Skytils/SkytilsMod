@@ -7,7 +7,6 @@ catlas.config.map.toggle.show_player_names=显示玩家名称
 catlas.config.map.toggle.vanilla_head_marker=原版头颅标记
 catlas.config.map.size.map_text_scale=地图文本缩放
 catlas.config.map.size.player_heads_scale=玩家头颅缩放
-catlas.config.map.size.head_border_scale=Head Border Scale
 catlas.config.map.size.player_name_scale=玩家名称缩放
 catlas.config.map.render.map_background_color=地图背景颜色
 catlas.config.map.render.map_border_color=地图边框颜色
