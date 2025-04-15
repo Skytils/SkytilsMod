@@ -139,6 +139,9 @@ object RenderUtils {
                     (mc.thePlayer.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second,
                     0.0
                 )
+                if (CatlasConfig.alwaysShowOwnPlayerOnTop) {
+                    GlStateManager.translate(0f, 0f, 0.2f)
+                }
             } else {
                 player.teammate.player?.also { entityPlayer ->
                     // If the player is loaded in our view, use that location instead (more precise)
