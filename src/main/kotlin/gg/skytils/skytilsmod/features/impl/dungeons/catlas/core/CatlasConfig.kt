@@ -127,6 +127,18 @@ object CatlasConfig : Vigilant(
     var mapVanillaMarker = false
 
     @Property(
+        name = "Show Own Player Marker On Top",
+        type = PropertyType.SWITCH,
+        description = "Always show the player's own head marker above any others on the map.",
+        category = "Map",
+        subcategory = "Toggle",
+        i18nName = "catlas.config.map.toggle.own_marker_on_top",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.toggle"
+    )
+    var alwaysShowOwnPlayerOnTop = false
+
+    @Property(
         name = "Map Text Scale",
         type = PropertyType.DECIMAL_SLIDER,
         description = "Scale of room names and secret counts relative to map size.",
