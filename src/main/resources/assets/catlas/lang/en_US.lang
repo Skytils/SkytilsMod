@@ -6,6 +6,7 @@ catlas.config.map.toggle.hide_in_boss=Hide In Boss
 catlas.config.map.toggle.show_before_start=Show Before Start
 catlas.config.map.toggle.show_player_names=Show Player Names
 catlas.config.map.toggle.vanilla_head_marker=Vanilla Head Marker
+catlas.config.map.toggle.own_marker_on_top=Show Own Player Marker On Top
 catlas.config.map.size.map_text_scale=Map Text Scale
 catlas.config.map.size.player_heads_scale=Player Heads Scale
 catlas.config.map.size.head_border_scale=Head Border Scale
