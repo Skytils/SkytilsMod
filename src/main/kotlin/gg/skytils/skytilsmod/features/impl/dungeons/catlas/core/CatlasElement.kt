@@ -266,9 +266,9 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
     private fun renderPlayerHeads() {
         if (DungeonTimer.bossEntryTime != -1L) return
-        DungeonListener.team.forEach { (name, teammate) ->
-            if (!teammate.dead || teammate.mapPlayer.isOurMarker) {
-                RenderUtils.drawPlayerHead(name, teammate.mapPlayer)
+        DungeonListener.team.toList().sortedBy { if (CatlasConfig.alwaysShowOwnPlayerOnTop ) it.second.playerName != mc.thePlayer.name else true }.forEach {
+            if (!it.second.dead || it.second.mapPlayer.isOurMarker) {
+                RenderUtils.drawPlayerHead(it.first, it.second.mapPlayer)
             }
         }
     }
