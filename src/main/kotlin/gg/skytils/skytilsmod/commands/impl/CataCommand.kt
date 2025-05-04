@@ -28,7 +28,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.utils.*
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Commands
@@ -40,19 +40,18 @@ import kotlin.time.toDuration
 @Commands
 object CataCommand {
     @Command("skytilscata [name]")
-    //TODO: verify coroutines work
     suspend fun processCommand(
         @Argument("name")
-        name: String?
-    ) = withContext(Skytils.IO.coroutineContext) {
+        name: String? = null
+    ) = Skytils.IO.launch {
         val username = name ?: mc.thePlayer.name
         UChat.chat("§aGetting data for ${username}...")
         val uuid = try {
             if (name == null) mc.thePlayer.uniqueID else MojangUtil.getUUIDFromUsername(username)
         } catch (e: MojangUtil.MojangException) {
             UChat.chat("$failPrefix §cFailed to get UUID, reason: ${e.message}")
-            return@withContext
-        } ?: return@withContext
+            return@launch
+        } ?: return@launch
         val profile = try {
             API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString())
         } catch (e: Exception) {
@@ -62,8 +61,8 @@ object CataCommand {
                     e.message
                 }"
             )
-            return@withContext
-        } ?: return@withContext
+            return@launch
+        } ?: return@launch
         displayStats(username, uuid, profile)
     }
 

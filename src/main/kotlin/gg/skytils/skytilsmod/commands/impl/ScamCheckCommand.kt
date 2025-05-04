@@ -24,6 +24,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.misc.ScamCheck
 import gg.skytils.skytilsmod.utils.MojangUtil
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
@@ -34,18 +35,20 @@ object ScamCheckCommand {
 
     @Command("skytilsscamcheck|stsc [name]")
     suspend fun checkScammerStatus(
-        @Argument("name") name: String?
-    ) {
-        // TODO: check coroutine works properly
+        @Argument("name") name: String? = null
+    ) = Skytils.IO.launch {
         val uuid = try {
             if (name == null) mc.thePlayer!!.uniqueID else withContext(Skytils.IO.coroutineContext) { MojangUtil.getUUIDFromUsername(name) }
         } catch (e: MojangUtil.MojangException) {
             UChat.chat("$failPrefix §cFailed to get UUID, reason: ${e.message}")
-            return
-        } ?: return
+            null
+        }
 
-        ScamCheck
-            .checkScammer(uuid, "command")
-            .printResult(name ?: mc.thePlayer!!.name)
+
+        if (uuid != null) {
+            ScamCheck
+                .checkScammer(uuid, "command")
+                .printResult(name ?: mc.thePlayer!!.name)
+        }
     }
 }

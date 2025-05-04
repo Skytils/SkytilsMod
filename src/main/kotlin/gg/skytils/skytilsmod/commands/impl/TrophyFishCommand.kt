@@ -25,6 +25,7 @@ import gg.skytils.skytilsmod.core.MC
 import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
 import gg.skytils.skytilsmod.utils.MojangUtil
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
@@ -36,8 +37,7 @@ object TrophyFishCommand {
     suspend fun reloadData() {
         val text = UMessage("${Skytils.prefix} §9Loading data...").mutable()
         text.chat()
-        // TODO: Verify coroutine works correctly
-        withContext(Skytils.IO.coroutineContext) {
+        Skytils.IO.launch {
             TrophyFish.loadFromApi()
             withContext(Dispatchers.MC) {
                 text.edit("${Skytils.successPrefix} §aLoaded!")
@@ -48,7 +48,7 @@ object TrophyFishCommand {
     @Command("trophyfish|tf|trophy [username]")
     suspend fun displayStats(
         @Argument("username")
-        username: String?,
+        username: String? = null,
         @Flag("total", aliases = ["t"])
         total: Boolean = false
     ) {
@@ -65,10 +65,10 @@ object TrophyFishCommand {
             }
         } else {
             val message = UMessage("${Skytils.prefix} §9Loading trophy fish data for ${username}.").mutable()
-            withContext(Skytils.IO.coroutineContext) {
+            Skytils.IO.launch {
                 val uuid = MojangUtil.getUUIDFromUsername(username) ?: run {
                     message.edit("${Skytils.failPrefix} §cFailed to find minecraft player \"$username\".")
-                    return@withContext
+                    return@launch
                 }
                 val trophyFishData = TrophyFish.getTrophyFishData(uuid)
                 withContext(Dispatchers.MC) {

@@ -23,35 +23,28 @@ import gg.essential.universal.wrappers.message.UMessage
 import gg.skytils.hypixel.types.skyblock.Member
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.core.API
-import gg.skytils.skytilsmod.utils.MojangUtil
-import gg.skytils.skytilsmod.utils.NumberUtil
-import gg.skytils.skytilsmod.utils.SkillUtils
-import gg.skytils.skytilsmod.utils.append
-import gg.skytils.skytilsmod.utils.ifNull
-import gg.skytils.skytilsmod.utils.nonDashedString
-import gg.skytils.skytilsmod.utils.toTitleCase
-import kotlinx.coroutines.withContext
+import gg.skytils.skytilsmod.utils.*
+import kotlinx.coroutines.launch
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Commands
-import java.util.UUID
+import java.util.*
 
 @Commands
 object SlayerCommand {
     @Command("skytilsslayer [name]")
-    //TODO: verify coroutines work
     suspend fun processCommand(
         @Argument("name")
-        name: String?
-    ) = withContext(Skytils.Companion.IO.coroutineContext) {
+        name: String? = null
+    ) = Skytils.IO.launch {
         val username = name ?: Skytils.Companion.mc.thePlayer.name
         UChat.chat("§aGetting data for ${username}...")
         val uuid = try {
             if (name == null) Skytils.Companion.mc.thePlayer.uniqueID else MojangUtil.getUUIDFromUsername(username)
         } catch (e: MojangUtil.MojangException) {
             UChat.chat("${Skytils.Companion.failPrefix} §cFailed to get UUID, reason: ${e.message}")
-            return@withContext
-        } ?: return@withContext
+            return@launch
+        } ?: return@launch
         val profile = try {
             API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString())
         } catch (e: Exception) {
@@ -61,8 +54,8 @@ object SlayerCommand {
                     e.message
                 }"
             )
-            return@withContext
-        } ?: return@withContext
+            return@launch
+        } ?: return@launch
         displayStats(username, uuid, profile)
     }
 
