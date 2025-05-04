@@ -28,6 +28,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
 import gg.skytils.skytilsmod.commands.BaseCommand
+import gg.skytils.skytilsmod.commands.SkytilsCommands
 import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.UpdateChecker
@@ -237,10 +238,7 @@ object SkytilsCommand : BaseCommand("skytils", listOf("st")) {
 
             "keyshortcuts", "shortcuts" -> Skytils.displayScreen = KeyShortcutsGui()
             "spam", "spamhider" -> Skytils.displayScreen = SpamHiderGui()
-            "armorcolor", "armorcolour", "armourcolor", "armourcolour" -> ArmorColorCommand.processCommand(
-                player,
-                args.copyOfRange(1, args.size)
-            )
+            "armorcolor", "armorcolour", "armourcolor", "armourcolour" -> SkytilsCommands.commandExecutor().executeCommand(player, "armorcolor ${args.drop(1).joinToString(" ")}")
 
             "swaphub" -> {
                 if (Utils.inSkyblock) {
