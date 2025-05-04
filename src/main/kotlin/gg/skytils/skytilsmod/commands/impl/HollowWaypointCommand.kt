@@ -32,7 +32,7 @@ import gg.skytils.skytilsmod.utils.setHoverText
 import net.minecraft.event.ClickEvent
 import net.minecraft.util.BlockPos
 import net.minecraft.util.IChatComponent
-import org.incendo.cloud.annotation.specifier.Greedy
+import org.incendo.cloud.annotation.specifier.Quoted
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Commands
@@ -52,9 +52,9 @@ object HollowWaypointCommand {
         checkEnabled()
         UChat.chat(
             "$prefix §e/sthw ➔ Shows all waypoints\n" +
-                    "§e/sthw set name ➔ Sets waypoint at current location\n" +
-                    "§e/sthw set name x y z ➔ Sets waypoint at specified location\n" +
-                    "§e/sthw remove name ➔ Remove the specified waypoint\n" +
+                    "§e/sthw set \"name\" ➔ Sets waypoint at current location\n" +
+                    "§e/sthw set \"name\" x y z ➔ Sets waypoint at specified location\n" +
+                    "§e/sthw remove \"name\" ➔ Remove the specified waypoint\n" +
                     "§e/sthw clear ➔ Removes all waypoints"
         )
     }
@@ -80,7 +80,7 @@ object HollowWaypointCommand {
 
     @Command("skytilshollowwaypoint|sthw set|add <name>")
     fun setWaypoint(
-        @Greedy
+        @Quoted
         @Argument("name")
         name: String
     ) {
@@ -99,7 +99,7 @@ object HollowWaypointCommand {
 
     @Command("skytilshollowwaypoint|sthw set|add <name> <x> <y> <z>")
     fun setWaypoint(
-        @Greedy
+        @Quoted
         @Argument("name")
         name: String,
         @Argument("x")
@@ -115,16 +115,16 @@ object HollowWaypointCommand {
             loc.locX = (x - 200).coerceIn(0.0, 624.0)
             loc.locY = y
             loc.locZ = (z - 200).coerceIn(0.0, 624.0)
-            UChat.chat("$successPrefix §aSuccessfully set location waypoint $name to your current location.")
+            UChat.chat("$successPrefix §aSuccessfully set location waypoint $name to $x $y $z.")
         } else {
             CHWaypoints.waypoints[name] = BlockPos(x, y, z)
-            UChat.chat("$successPrefix §aSuccessfully set waypoint $name to your current location.")
+            UChat.chat("$successPrefix §aSuccessfully set waypoint $name to $x $y $z.")
         }
     }
 
     @Command("skytilshollowwaypoint|sthw remove|delete <name>")
     fun removeWaypoint(
-        @Greedy
+        @Quoted
         @Argument("name")
         name: String
     ) {
