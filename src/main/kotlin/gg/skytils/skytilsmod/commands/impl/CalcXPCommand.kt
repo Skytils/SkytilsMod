@@ -20,23 +20,27 @@ package gg.skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
-import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
-import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.SkillUtils
-import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.command.ICommandSender
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Commands
+import org.incendo.cloud.annotations.suggestion.Suggestions
+import org.incendo.cloud.context.CommandContext
 
-object CalcXPCommand : BaseCommand("skytilscalcxp", aliases = listOf("stcalcxp")) {
-    override fun getCommandUsage(player: EntityPlayerSP): String =
-        "/skytilscalcxp (dungeons/skill/zombie_slayer/spider_slayer/wolf_slayer/enderman_slayer) (start level) (end level)"
-
-    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
-        if (args.size != 3) {
-            UChat.chat("$prefix §b" + getCommandUsage(player))
-            return
-        }
-        val type = args[0].lowercase()
+@Commands
+object CalcXPCommand {
+    @Command("calcxp <type> <start> <end>")
+    fun calcXP(
+        @Argument("type", description = "The type of xp", suggestions = "calcxp_types")
+        type: String,
+        @Argument("start", description = "The starting level")
+        start: Double,
+        @Argument("end", description = "The ending level")
+        end: Double
+    ) {
         val xpMap = when {
             type.endsWith("_slayer") ->
                 SkillUtils.slayerXp[type.substringBefore("_slayer")] ?: run {
@@ -50,8 +54,8 @@ object CalcXPCommand : BaseCommand("skytilscalcxp", aliases = listOf("stcalcxp")
                 return
             }
         }
-        val starting = args[1].toDoubleOrNull()?.coerceIn(0.0, xpMap.keys.last().toDouble()) ?: 0.0
-        val ending = args[2].toDoubleOrNull()?.coerceIn(0.0, xpMap.keys.last().toDouble()) ?: 0.0
+        val starting = start.coerceIn(0.0, xpMap.keys.last().toDouble())
+        val ending = end.coerceIn(0.0, xpMap.keys.last().toDouble())
         if (ending < starting) {
             UChat.chat("$failPrefix §cYour start level must be less than your end level.")
         }
@@ -66,5 +70,12 @@ object CalcXPCommand : BaseCommand("skytilscalcxp", aliases = listOf("stcalcxp")
                     acc + e
                 }
         UChat.chat("$successPrefix §bYou need §6${NumberUtil.nf.format(sum)} xp§b to get from §6$type§b level §6${starting}§b to level §6$ending§b!")
+    }
+
+    private val validTypes: Set<String> = setOf("dungeons", "skill") + SkillUtils.slayerXp.keys.map { it + "_slayer" }
+
+    @Suggestions("calcxp_types")
+    fun xpTypeSuggestions(ctx: CommandContext<ICommandSender>, input: String): Iterable<String> {
+        return validTypes.filter { it.startsWith(input) }
     }
 }

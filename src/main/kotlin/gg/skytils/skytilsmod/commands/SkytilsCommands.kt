@@ -19,6 +19,7 @@
 package gg.skytils.skytilsmod.commands
 
 import gg.skytils.skytilsmod.commands.impl.ArmorColorCommand
+import gg.skytils.skytilsmod.commands.impl.CalcXPCommand
 import net.minecraft.command.ICommandSender
 import org.incendo.cloud.CommandManager
 import org.incendo.cloud.annotations.AnnotationParser
@@ -33,7 +34,10 @@ object SkytilsCommands : CommandManager<ICommandSender>(ExecutionCoordinator.sim
     init {
         annotationParser.installCoroutineSupport()
 
-        annotationParser.parse(ArmorColorCommand)
+        annotationParser.parse(
+            ArmorColorCommand,
+            CalcXPCommand
+        )
     }
 
     override fun hasPermission(
