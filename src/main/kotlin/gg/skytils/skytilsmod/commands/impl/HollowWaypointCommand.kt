@@ -26,106 +26,121 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
-import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.features.impl.mining.CHWaypoints
 import gg.skytils.skytilsmod.utils.append
 import gg.skytils.skytilsmod.utils.setHoverText
-import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.event.ClickEvent
 import net.minecraft.util.BlockPos
 import net.minecraft.util.IChatComponent
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Commands
 
-object HollowWaypointCommand : BaseCommand("skytilshollowwaypoint", listOf("sthw")) {
-    private val syntaxRegex =
-        Regex("^(?:(?:(?<x>-?[\\d.]+) (?<y>-?[\\d.]+) (?<z>-?[\\d.]+) (?<name>.+))|(?<nameonly>.+))\$")
-
-    override fun getCommandUsage(player: EntityPlayerSP): String = "/sthw x y z location"
-
-    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
+@Commands
+object HollowWaypointCommand {
+    private fun checkEnabled() {
         if (!Skytils.config.crystalHollowWaypoints) {
             UChat.chat("$prefix §cCrystal Hollows Waypoints were disabled, but running this command enabled them for you.")
             Skytils.config.crystalHollowWaypoints = true
             Skytils.config.markDirty()
         }
-        if (args.isEmpty()) {
-            val message = UMessage("$prefix §eWaypoints:\n")
-            for (loc in CHWaypoints.CrystalHollowsMap.Locations.entries) {
-                if (!loc.loc.exists()) continue
-                message.append("${loc.displayName} ")
-                message.append(copyMessage("${loc.cleanName}: ${loc.loc}"))
-                message.append(removeMessage(loc.id))
-            }
-            for ((key, value) in CHWaypoints.waypoints) {
-                message.append("§e$key ")
-                message.append(copyMessage("$key: ${value.x} ${value.y} ${value.z}"))
-                message.append(removeMessage(key))
-            }
-            message.append("§eFor more info do /sthw help")
-            message.chat()
-        } else {
-            when (args[0]) {
-                "set", "add" -> {
-                    val remainderString = args.drop(1).joinToString(" ")
-                    val match = syntaxRegex.find(remainderString)
-                        ?: return UChat.chat("$failPrefix /sthw set <x y z> <name>")
-                    val loc: String
-                    val x: Double
-                    val y: Double
-                    val z: Double
-                    if (match.groups["nameonly"] != null) {
-                        loc = match.groups["nameonly"]!!.value
-                        x = mc.thePlayer.posX
-                        y = mc.thePlayer.posY
-                        z = mc.thePlayer.posZ
-                    } else {
-                        loc = match.groups["name"]!!.value
-                        x = match.groups["x"]!!.value.toDouble()
-                        y = match.groups["y"]!!.value.toDouble()
-                        z = match.groups["z"]!!.value.toDouble()
-                    }
-                    val internalLoc = CHWaypoints.CrystalHollowsMap.Locations.entries.find { it.id == loc }?.loc
-                    if (internalLoc != null) {
-                        internalLoc.locX = (x - 200).coerceIn(0.0, 624.0)
-                        internalLoc.locY = y
-                        internalLoc.locZ = (z - 200).coerceIn(0.0, 624.0)
-                    } else {
-                        CHWaypoints.waypoints[loc] = BlockPos(x, y, z)
-                    }
-                    UChat.chat("$successPrefix §aSuccessfully created waypoint $loc")
-                }
+    }
 
-                "remove", "delete" -> {
-                    if (args.size >= 2) {
-                        val name = args.drop(1).joinToString(" ")
-                        if (CHWaypoints.CrystalHollowsMap.Locations.entries
-                                .find { it.id == name }?.loc?.reset() != null
-                        )
-                            UChat.chat("$successPrefix §aSuccessfully removed waypoint ${name}!")
-                        else if (CHWaypoints.waypoints.remove(name) != null)
-                            UChat.chat("$successPrefix §aSuccessfully removed waypoint $name")
-                        else
-                            UChat.chat("$failPrefix §cWaypoint $name does not exist")
-                    } else
-                        UChat.chat("$prefix §b/sthw remove <name>")
-                }
+    @Command("skytilshollowwaypoint|sthw help")
+    fun showHelp() {
+        checkEnabled()
+        UChat.chat(
+            "$prefix §e/sthw ➔ Shows all waypoints\n" +
+                    "§e/sthw set name ➔ Sets waypoint at current location\n" +
+                    "§e/sthw set x y z name ➔ Sets waypoint at specified location\n" +
+                    "§e/sthw remove name ➔ Remove the specified waypoint\n" +
+                    "§e/sthw clear ➔ Removes all waypoints"
+        )
+    }
 
-                "clear" -> {
-                    CHWaypoints.CrystalHollowsMap.Locations.entries.forEach { it.loc.reset() }
-                    CHWaypoints.waypoints.clear()
-                    UChat.chat("$successPrefix §aSuccessfully cleared all waypoints.")
-                }
-
-                else -> {
-                    UChat.chat(
-                        "$prefix §e/sthw ➔ Shows all waypoints\n" +
-                                "§e/sthw set name ➔ Sets waypoint at current location\n" +
-                                "§e/sthw set x y z name ➔ Sets waypoint at specified location\n" +
-                                "§e/sthw remove name ➔ Remove the specified waypoint\n" +
-                                "§e/sthw clear ➔ Removes all waypoints"
-                    )
-                }
-            }
+    @Command("skytilshollowwaypoint|sthw")
+    fun showSummary() {
+        checkEnabled()
+        val message = UMessage("$prefix §eWaypoints:\n")
+        for (loc in CHWaypoints.CrystalHollowsMap.Locations.entries) {
+            if (!loc.loc.exists()) continue
+            message.append("${loc.displayName} ")
+            message.append(copyMessage("${loc.cleanName}: ${loc.loc}"))
+            message.append(removeMessage(loc.id))
         }
+        for ((key, value) in CHWaypoints.waypoints) {
+            message.append("§e$key ")
+            message.append(copyMessage("$key: ${value.x} ${value.y} ${value.z}"))
+            message.append(removeMessage(key))
+        }
+        message.append("§eFor more info do /sthw help")
+        message.chat()
+    }
+
+    @Command("skytilshollowwaypoint|sthw set|add <name>")
+    fun setWaypoint(
+        @Argument("name")
+        name: String
+    ) {
+        checkEnabled()
+        val loc = CHWaypoints.CrystalHollowsMap.Locations.entries.find { it.id == name }?.loc
+        if (loc != null) {
+            loc.locX = (mc.thePlayer.posX - 200).coerceIn(0.0, 624.0)
+            loc.locY = mc.thePlayer.posY
+            loc.locZ = (mc.thePlayer.posZ - 200).coerceIn(0.0, 624.0)
+            UChat.chat("$successPrefix §aSuccessfully set location waypoint $name to your current location.")
+        } else {
+            CHWaypoints.waypoints[name] = BlockPos(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ)
+            UChat.chat("$successPrefix §aSuccessfully set waypoint $name to your current location.")
+        }
+    }
+
+    @Command("skytilshollowwaypoint|sthw set|add <x> <y> <z> <name>")
+    fun setWaypoint(
+        @Argument("x")
+        x: Double,
+        @Argument("y")
+        y: Double,
+        @Argument("z")
+        z: Double,
+        @Argument("name")
+        name: String
+    ) {
+        checkEnabled()
+        val loc = CHWaypoints.CrystalHollowsMap.Locations.entries.find { it.id == name }?.loc
+        if (loc != null) {
+            loc.locX = (x - 200).coerceIn(0.0, 624.0)
+            loc.locY = y
+            loc.locZ = (z - 200).coerceIn(0.0, 624.0)
+            UChat.chat("$successPrefix §aSuccessfully set location waypoint $name to your current location.")
+        } else {
+            CHWaypoints.waypoints[name] = BlockPos(x, y, z)
+            UChat.chat("$successPrefix §aSuccessfully set waypoint $name to your current location.")
+        }
+    }
+
+    @Command("skytilshollowwaypoint|sthw remove|delete <name>")
+    fun removeWaypoint(
+        @Argument("name")
+        name: String
+    ) {
+        checkEnabled()
+        if (CHWaypoints.CrystalHollowsMap.Locations.entries
+                .find { it.id == name }?.loc?.reset() != null
+        )
+            UChat.chat("$successPrefix §aSuccessfully removed waypoint §e${name}§a!")
+        else if (CHWaypoints.waypoints.remove(name) != null)
+            UChat.chat("$successPrefix §aSuccessfully removed waypoint §e$name§a.")
+        else
+            UChat.chat("$failPrefix §cWaypoint §e$name§c does not exist")
+    }
+
+    @Command("skytilshollowwaypoint|sthw clear")
+    fun clearWaypoints() {
+        checkEnabled()
+        CHWaypoints.CrystalHollowsMap.Locations.entries.forEach { it.loc.reset() }
+        CHWaypoints.waypoints.clear()
+        UChat.chat("$successPrefix §aSuccessfully cleared all waypoints.")
     }
 
     private fun copyMessage(text: String): IChatComponent {

@@ -37,6 +37,7 @@ object SkytilsCommands : CommandManager<ICommandSender>(ExecutionCoordinator.sim
             ArmorColorCommand,
             CalcXPCommand,
             GlintCustomizeCommand,
+            HollowWaypointCommand,
             ItemCycleCommand,
             OrderedWaypointCommand,
             ProtectItemCommand,
