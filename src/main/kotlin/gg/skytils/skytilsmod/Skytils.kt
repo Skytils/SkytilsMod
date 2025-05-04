@@ -459,10 +459,6 @@ class Skytils {
         cch.registerCommand(SlayerCommand)
         cch.registerCommand(TrophyFishCommand)
 
-        if (!cch.commands.containsKey("glintcustomize")) {
-            cch.registerCommand(GlintCustomizeCommand)
-        }
-
         if (!cch.commands.containsKey("protectitem")) {
             cch.registerCommand(ProtectItemCommand)
         }
