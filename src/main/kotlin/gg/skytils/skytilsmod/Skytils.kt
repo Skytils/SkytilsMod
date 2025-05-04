@@ -461,16 +461,6 @@ class Skytils {
             cch.registerCommand(TrackCooldownCommand)
         }
 
-        cch.commandSet.add(RepartyCommand)
-        cch.commandMap["skytilsreparty"] = RepartyCommand
-        if (config.overrideReparty || !cch.commands.containsKey("reparty")) {
-            cch.commandMap["reparty"] = RepartyCommand
-        }
-
-        if (config.overrideReparty || !cch.commands.containsKey("rp")) {
-            cch.commandMap["rp"] = RepartyCommand
-        }
-
         if (UpdateChecker.currentVersion.specialVersionType != UpdateChecker.UpdateType.RELEASE && config.updateChannel == 2) {
             if (ModChecker.canShowNotifications) {
                 EssentialAPI.getNotifications().push("Skytils Update Checker", "You are on a development version of Skytils. Click here to change your update channel to pre-release.") {

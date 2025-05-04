@@ -185,7 +185,7 @@ object DungeonListener {
                         }
                     }
                     if (Skytils.config.autoRepartyOnDungeonEnd) {
-                        RepartyCommand.processCommand(mc.thePlayer, emptyArray())
+                        RepartyCommand.performReparty()
                     }
                 } else if (text.startsWith("§r§c ☠ ")) {
                     if (text.endsWith(" §r§7reconnected§r§7.§r")) {

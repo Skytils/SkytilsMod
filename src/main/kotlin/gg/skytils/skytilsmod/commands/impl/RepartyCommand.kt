@@ -19,12 +19,14 @@ package gg.skytils.skytilsmod.commands.impl
 
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.utils.Utils
-import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.WrongUsageException
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Commands
+import org.incendo.cloud.annotations.Flag
 
-object RepartyCommand : BaseCommand("skytilsreparty", listOf("reparty", "rp")) {
+@Commands
+object RepartyCommand {
 
     @JvmField
     var gettingParty = false
@@ -50,9 +52,13 @@ object RepartyCommand : BaseCommand("skytilsreparty", listOf("reparty", "rp")) {
     @JvmField
     var partyThread: Thread? = null
 
-    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
+    @Command("reparty|rp")
+    fun performReparty(
+        @Flag("fail", aliases = ["f"])
+        fail: Boolean = false,
+    ) {
         if (!Utils.isOnHypixel) throw WrongUsageException("You must be on Hypixel to use this command.")
-        if (args.isNotEmpty() && (args[0].startsWith("fail") || args[0] == "f")) {
+        if (fail) {
             partyThread = Thread {
                 try {
                     Skytils.sendMessageQueue.add("/p ${repartyFailList.joinToString(" ")}")
