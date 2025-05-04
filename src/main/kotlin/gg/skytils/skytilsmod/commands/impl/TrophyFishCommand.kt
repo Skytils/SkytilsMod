@@ -21,63 +21,66 @@ package gg.skytils.skytilsmod.commands.impl
 import gg.essential.universal.UChat
 import gg.essential.universal.wrappers.message.UMessage
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.core.MC
 import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
 import gg.skytils.skytilsmod.utils.MojangUtil
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.minecraft.client.entity.EntityPlayerSP
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Flag
 
-object TrophyFishCommand : BaseCommand("trophy", aliases = listOf("tf", "trophyfish")) {
+object TrophyFishCommand {
 
-    fun displayStats(username: String, total: Boolean) {
-        val message = UMessage("${Skytils.prefix} §9Loading trophy fish data for ${username}.").mutable()
-        Skytils.IO.launch {
-            val uuid = MojangUtil.getUUIDFromUsername(username) ?: run {
-                message.edit("${Skytils.failPrefix} §cFailed to find minecraft player \"$username\".")
-                return@launch
-            }
-            val trophyFishData = TrophyFish.getTrophyFishData(uuid)
+    @Command("trophyfish|tf|trophy reload")
+    suspend fun reloadData() {
+        val text = UMessage("${Skytils.prefix} §9Loading data...").mutable()
+        text.chat()
+        // TODO: Verify coroutine works correctly
+        withContext(Skytils.IO.coroutineContext) {
+            TrophyFish.loadFromApi()
             withContext(Dispatchers.MC) {
-                if (trophyFishData == null) {
-                    message.edit("${Skytils.failPrefix} §cFailed to retrieve trophy fish data for ${username}.")
-                } else message.edit("${Skytils.prefix} §bTrophy Fish for $username\n" +
-                        TrophyFish.generateTrophyFishList(trophyFishData, total).joinToString("\n") +
-                        if (total) {
-                            "\n" + TrophyFish.generateTotalTrophyFish(trophyFishData)
-                        } else ""
-                )
+                text.edit("${Skytils.successPrefix} §aLoaded!")
             }
         }
     }
 
-    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
-        when(args.getOrNull(0)) {
-            "reload" -> {
-                val text = UMessage("${Skytils.prefix} §9Loading data...").mutable()
-                text.chat()
-                Skytils.IO.launch {
-                    TrophyFish.loadFromApi()
-                    withContext(Dispatchers.MC) {
-                        text.edit("${Skytils.successPrefix} §aLoaded!")
-                    }
-                }
-            }
-            "total" -> {
+    @Command("trophyfish|tf|trophy [username]")
+    suspend fun displayStats(
+        @Argument("username")
+        username: String?,
+        @Flag("total", aliases = ["t"])
+        total: Boolean = false
+    ) {
+        if (username == null) {
+            if (total) {
                 UChat.chat(
                     TrophyFish.generateLocalTrophyFishList(true).joinToString("\n") +
                             "\n" + TrophyFish.generateLocalTotalTrophyFish()
                 )
-            }
-            null -> {
+            } else{
                 UChat.chat(
                     TrophyFish.generateLocalTrophyFishList(false).joinToString("\n")
                 )
             }
-            else -> {
-                displayStats(args[0], "total" in args.map(String::lowercase))
+        } else {
+            val message = UMessage("${Skytils.prefix} §9Loading trophy fish data for ${username}.").mutable()
+            withContext(Skytils.IO.coroutineContext) {
+                val uuid = MojangUtil.getUUIDFromUsername(username) ?: run {
+                    message.edit("${Skytils.failPrefix} §cFailed to find minecraft player \"$username\".")
+                    return@withContext
+                }
+                val trophyFishData = TrophyFish.getTrophyFishData(uuid)
+                withContext(Dispatchers.MC) {
+                    if (trophyFishData == null) {
+                        message.edit("${Skytils.failPrefix} §cFailed to retrieve trophy fish data for ${username}.")
+                    } else message.edit("${Skytils.prefix} §bTrophy Fish for $username\n" +
+                            TrophyFish.generateTrophyFishList(trophyFishData, total).joinToString("\n") +
+                            if (total) {
+                                "\n" + TrophyFish.generateTotalTrophyFish(trophyFishData)
+                            } else ""
+                    )
+                }
             }
         }
     }

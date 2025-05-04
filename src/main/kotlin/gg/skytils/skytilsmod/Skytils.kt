@@ -452,7 +452,6 @@ class Skytils {
 
         cch.registerCommand(CataCommand)
         cch.registerCommand(SlayerCommand)
-        cch.registerCommand(TrophyFishCommand)
 
         if (UpdateChecker.currentVersion.specialVersionType != UpdateChecker.UpdateType.RELEASE && config.updateChannel == 2) {
             if (ModChecker.canShowNotifications) {
