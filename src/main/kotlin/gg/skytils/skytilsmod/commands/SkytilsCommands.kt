@@ -22,6 +22,7 @@ import gg.skytils.skytilsmod.commands.impl.ArmorColorCommand
 import gg.skytils.skytilsmod.commands.impl.CalcXPCommand
 import gg.skytils.skytilsmod.commands.impl.GlintCustomizeCommand
 import gg.skytils.skytilsmod.commands.impl.OrderedWaypointCommand
+import gg.skytils.skytilsmod.commands.impl.ProtectItemCommand
 import net.minecraft.command.ICommandSender
 import org.incendo.cloud.CommandManager
 import org.incendo.cloud.annotations.AnnotationParser
@@ -40,7 +41,8 @@ object SkytilsCommands : CommandManager<ICommandSender>(ExecutionCoordinator.sim
             ArmorColorCommand,
             CalcXPCommand,
             GlintCustomizeCommand,
-            OrderedWaypointCommand
+            OrderedWaypointCommand,
+            ProtectItemCommand
         )
     }
 

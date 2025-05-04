@@ -457,10 +457,6 @@ class Skytils {
         cch.registerCommand(SlayerCommand)
         cch.registerCommand(TrophyFishCommand)
 
-        if (!cch.commands.containsKey("protectitem")) {
-            cch.registerCommand(ProtectItemCommand)
-        }
-
         if (!cch.commands.containsKey("trackcooldown")) {
             cch.registerCommand(TrackCooldownCommand)
         }
