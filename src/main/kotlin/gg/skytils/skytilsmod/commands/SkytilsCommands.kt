@@ -36,6 +36,7 @@ object SkytilsCommands : CommandManager<ICommandSender>(ExecutionCoordinator.sim
         annotationParser.parse(
             ArmorColorCommand,
             CalcXPCommand,
+            CataCommand,
             GlintCustomizeCommand,
             HollowWaypointCommand,
             ItemCycleCommand,

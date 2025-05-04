@@ -1,6 +1,6 @@
 /*
  * Skytils - Hypixel Skyblock Quality of Life Mod
- * Copyright (C) 2020-2023 Skytils
+ * Copyright (C) 2020-2025 Skytils
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -16,33 +16,62 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.commands.stats.impl
+package gg.skytils.skytilsmod.commands.impl
 
+import gg.essential.universal.UChat
 import gg.essential.universal.utils.MCHoverEventAction
 import gg.essential.universal.wrappers.message.UMessage
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.hypixel.types.skyblock.Member
+import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
-import gg.skytils.skytilsmod.commands.stats.StatCommand
+import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.API
-import gg.skytils.skytilsmod.utils.NumberUtil.nf
-import gg.skytils.skytilsmod.utils.SkillUtils
-import gg.skytils.skytilsmod.utils.append
-import gg.skytils.skytilsmod.utils.formattedName
-import gg.skytils.skytilsmod.utils.setHoverText
+import gg.skytils.skytilsmod.utils.*
+import kotlinx.coroutines.withContext
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Commands
 import java.util.*
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
+@Commands
+object CataCommand {
+    @Command("skytilscata [name]")
+    //TODO: verify coroutines work
+    suspend fun processCommand(
+        @Argument("name")
+        name: String?
+    ) = withContext(Skytils.IO.coroutineContext) {
+        val username = name ?: mc.thePlayer.name
+        UChat.chat("§aGetting data for ${username}...")
+        val uuid = try {
+            if (name == null) mc.thePlayer.uniqueID else MojangUtil.getUUIDFromUsername(username)
+        } catch (e: MojangUtil.MojangException) {
+            UChat.chat("$failPrefix §cFailed to get UUID, reason: ${e.message}")
+            return@withContext
+        } ?: return@withContext
+        val profile = try {
+            API.getSelectedSkyblockProfile(uuid)?.members?.get(uuid.nonDashedString())
+        } catch (e: Exception) {
+            e.printStackTrace()
+            UChat.chat(
+                "$failPrefix §cUnable to retrieve profile information: ${
+                    e.message
+                }"
+            )
+            return@withContext
+        } ?: return@withContext
+        displayStats(username, uuid, profile)
+    }
 
-object CataCommand : StatCommand("skytilscata") {
-
-    override fun displayStats(username: String, uuid: UUID, profileData: Member) {
+    suspend fun displayStats(username: String, uuid: UUID, profileData: Member) {
         val playerResponse = try {
             API.getPlayerSync(uuid)
         } catch (e: Throwable) {
-            printMessage(
+            UChat.chat(
                 "$failPrefix §cFailed to get dungeon stats: ${
                     e.message
                 }"
@@ -52,13 +81,13 @@ object CataCommand : StatCommand("skytilscata") {
 
         try {
             val dungeonsData = profileData.dungeons ?: run {
-                printMessage("$failPrefix §c${username} has not entered any dungeons!")
+                UChat.chat("$failPrefix §c${username} has not entered any dungeons!")
                 return
             }
 
             val catacombsObj = dungeonsData.dungeon_types["catacombs"]
             if (catacombsObj?.experience == null) {
-                printMessage("$failPrefix §c${username} has not entered The Catacombs!")
+                UChat.chat("$failPrefix §c${username} has not entered The Catacombs!")
                 return
             }
             val cataData = catacombsObj.normal
@@ -113,40 +142,40 @@ object CataCommand : StatCommand("skytilscata") {
                 )
                 .append("§a§l➜ Catacombs Levels:\n")
                 .append(
-                    UTextComponent("§d ☠ Cata Level: §l➡ §e${nf.format(cataLevel)}\n").setHover(
+                    UTextComponent("§d ☠ Cata Level: §l➡ §e${NumberUtil.nf.format(cataLevel)}\n").setHover(
                         MCHoverEventAction.SHOW_TEXT,
-                        "§e${nf.format(catacombsObj.experience)} XP"
+                        "§e${NumberUtil.nf.format(catacombsObj.experience)} XP"
                     )
                 )
-                .append("§9 ☠ Class Avg: §l➡ §e${nf.format(classAvgCapped)} §7(${nf.format(classAvgOverflow)})\n\n")
+                .append("§9 ☠ Class Avg: §l➡ §e${NumberUtil.nf.format(classAvgCapped)} §7(${NumberUtil.nf.format(classAvgOverflow)})\n\n")
                 .append(
-                    UTextComponent("§6 ☣ Archer Level: §l➡ §e${nf.format(archLevel)}\n").setHover(
+                    UTextComponent("§6 ☣ Archer Level: §l➡ §e${NumberUtil.nf.format(archLevel)}\n").setHover(
                         MCHoverEventAction.SHOW_TEXT,
-                        "§e${nf.format(archXP)} XP"
-                    )
-                )
-                .append(
-                    UTextComponent("§c ⚔ Berserk Level: §l➡ §e${nf.format(bersLevel)}\n").setHover(
-                        MCHoverEventAction.SHOW_TEXT,
-                        "§e${nf.format(bersXP)} XP"
+                        "§e${NumberUtil.nf.format(archXP)} XP"
                     )
                 )
                 .append(
-                    UTextComponent("§a ❤ Healer Level: §l➡ §e${nf.format(healerLevel)}\n").setHover(
+                    UTextComponent("§c ⚔ Berserk Level: §l➡ §e${NumberUtil.nf.format(bersLevel)}\n").setHover(
                         MCHoverEventAction.SHOW_TEXT,
-                        "§e${nf.format(healerXP)} XP"
+                        "§e${NumberUtil.nf.format(bersXP)} XP"
                     )
                 )
                 .append(
-                    UTextComponent("§b ✎ Mage Level: §l➡ §e${nf.format(mageLevel)}\n").setHover(
+                    UTextComponent("§a ❤ Healer Level: §l➡ §e${NumberUtil.nf.format(healerLevel)}\n").setHover(
                         MCHoverEventAction.SHOW_TEXT,
-                        "§e${nf.format(mageXP)} XP"
+                        "§e${NumberUtil.nf.format(healerXP)} XP"
                     )
                 )
                 .append(
-                    UTextComponent("§7 ❈ Tank Level: §l➡ §e${nf.format(tankLevel)}\n\n").setHover(
+                    UTextComponent("§b ✎ Mage Level: §l➡ §e${NumberUtil.nf.format(mageLevel)}\n").setHover(
                         MCHoverEventAction.SHOW_TEXT,
-                        "§e${nf.format(tankXP)} XP"
+                        "§e${NumberUtil.nf.format(mageXP)} XP"
+                    )
+                )
+                .append(
+                    UTextComponent("§7 ❈ Tank Level: §l➡ §e${NumberUtil.nf.format(tankLevel)}\n\n").setHover(
+                        MCHoverEventAction.SHOW_TEXT,
+                        "§e${NumberUtil.nf.format(tankXP)} XP"
                     )
                 )
                 .append("§a§l➜ Floor Completions:\n")
@@ -239,10 +268,10 @@ object CataCommand : StatCommand("skytilscata") {
 
             component
                 .append("§a§l➜ Miscellaneous:\n")
-                .append(" §aTotal Secrets Found: §l➡ §e${nf.format(secrets)}\n")
+                .append(" §aTotal Secrets Found: §l➡ §e${NumberUtil.nf.format(secrets)}\n")
                 .append(
                     " §aBlood Mobs Killed: §l➡ §e${
-                        nf.format(
+                        NumberUtil.nf.format(
                             (profileData.player_stats.kills["watcher_summon_undead"]?.toInt() ?: 0) +
                                     (profileData.player_stats.kills["master_watcher_summon_undead"]?.toInt() ?: 0)
                         )
@@ -250,7 +279,7 @@ object CataCommand : StatCommand("skytilscata") {
                 )
                 .chat()
         } catch (e: Throwable) {
-            printMessage("$failPrefix §cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
+            UChat.chat("${Skytils.Companion.failPrefix} §cCatacombs XP Lookup Failed: ${e.message ?: e::class.simpleName}")
             e.printStackTrace()
         }
     }
