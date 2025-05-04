@@ -26,7 +26,10 @@ import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.ClientCommandHandler
 import org.incendo.cloud.Command
+import org.incendo.cloud.exception.CommandExecutionException
+import org.incendo.cloud.exception.CommandParseException
 import org.incendo.cloud.internal.CommandRegistrationHandler
+import java.util.concurrent.CompletionException
 
 object LegacyForgeRegistrationHandler : CommandRegistrationHandler<ICommandSender> {
     private val proxiedCommands = mutableMapOf<Command<ICommandSender>, ICommand>()
@@ -51,7 +54,21 @@ object LegacyForgeRegistrationHandler : CommandRegistrationHandler<ICommandSende
                 SkytilsCommands.commandExecutor().executeCommand(sender, input)
                     .exceptionally {
                         it.printStackTrace()
-                        UChat.chat("$failPrefix §cAn error occurred while executing the command. ($input)")
+                        val exception = (it as? CompletionException)?.cause ?: it
+                        when (exception) {
+                            is net.minecraft.command.CommandException -> {
+                                UChat.chat("$failPrefix §c${exception.message} ($input)")
+                            }
+                            is CommandParseException -> {
+                                UChat.chat("$failPrefix §cFailed to parse $input: ${exception.message}")
+                            }
+                            is CommandExecutionException -> {
+                                UChat.chat("$failPrefix §cFailed to execute $input: ${exception.message}")
+                            }
+                            else -> {
+                                UChat.chat("$failPrefix §cAn error occurred while executing the command. See logs for more details. ($input)")
+                            }
+                        }
                         null
                     }
                     .join()
