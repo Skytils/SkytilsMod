@@ -52,7 +52,7 @@ object HollowWaypointCommand {
         UChat.chat(
             "$prefix §e/sthw ➔ Shows all waypoints\n" +
                     "§e/sthw set name ➔ Sets waypoint at current location\n" +
-                    "§e/sthw set x y z name ➔ Sets waypoint at specified location\n" +
+                    "§e/sthw set name x y z ➔ Sets waypoint at specified location\n" +
                     "§e/sthw remove name ➔ Remove the specified waypoint\n" +
                     "§e/sthw clear ➔ Removes all waypoints"
         )
@@ -95,16 +95,16 @@ object HollowWaypointCommand {
         }
     }
 
-    @Command("skytilshollowwaypoint|sthw set|add <x> <y> <z> <name>")
+    @Command("skytilshollowwaypoint|sthw set|add <name> <x> <y> <z>")
     fun setWaypoint(
+        @Argument("name")
+        name: String,
         @Argument("x")
         x: Double,
         @Argument("y")
         y: Double,
         @Argument("z")
         z: Double,
-        @Argument("name")
-        name: String
     ) {
         checkEnabled()
         val loc = CHWaypoints.CrystalHollowsMap.Locations.entries.find { it.id == name }?.loc
