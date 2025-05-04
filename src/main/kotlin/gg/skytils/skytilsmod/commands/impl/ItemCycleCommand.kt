@@ -24,100 +24,202 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
-import gg.skytils.skytilsmod.commands.BaseCommand
+import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.features.impl.handlers.ItemCycle
 import gg.skytils.skytilsmod.features.impl.handlers.ItemCycle.getIdentifier
 import gg.skytils.skytilsmod.gui.itemcycle.ItemCycleGui
 import gg.skytils.skytilsmod.utils.SkyblockIsland
-import net.minecraft.client.entity.EntityPlayerSP
+import gg.skytils.skytilsmod.utils.setHoverText
 import net.minecraft.command.WrongUsageException
-import java.util.UUID
+import net.minecraft.item.ItemStack
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Commands
+import org.incendo.cloud.annotations.Default
+import java.util.*
 
-object ItemCycleCommand : BaseCommand("skytilsitemcycle", aliases = listOf("stic")) {
-    override fun getCommandUsage(player: EntityPlayerSP): String = "/stic"
+@Commands
+object ItemCycleCommand {
 
-    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
-        val subcommand = args.getOrNull(0)?.lowercase()
-        when (subcommand) {
-            "create" -> {
-                val item = mc.thePlayer.heldItem?.getIdentifier() ?: throw WrongUsageException("You must be holding an item to create a cycle.")
-                val id = UUID.randomUUID()
-                val name = args.getOrNull(1) ?: id.toString()
+    private fun getHeldItemIdentifier(): ItemCycle.Cycle.ItemIdentifier {
+        val heldItemStack: ItemStack = mc.thePlayer?.heldItem
+            ?: throw WrongUsageException("§cYou must be holding an item.")
+        return heldItemStack.getIdentifier()
+            ?: throw WrongUsageException("§cCould not get identifier for the held item.")
+    }
 
-                ItemCycle.cycles[id] = ItemCycle.Cycle(UUID.randomUUID(), name, hashSetOf(), item)
+    private fun getCycle(id: UUID): ItemCycle.Cycle {
+        return ItemCycle.cycles[id]
+            ?: throw WrongUsageException("§cNo cycle found with ID: $id")
+    }
 
-                UTextComponent("$successPrefix §fCreated a new no-op cycle with id $id")
-                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/stic condition $id")
-                    .chat()
-            }
-            "condition" -> {
-                val id = args.getOrNull(1)?.let { UUID.fromString(it) } ?: throw WrongUsageException("You must specify a cycle id.")
-                val cycle = ItemCycle.cycles[id] ?: throw WrongUsageException("No cycle with id $id found.")
+    @Command("skytilsitemcycle|stic")
+    fun openGui() {
+        Skytils.displayScreen = ItemCycleGui()
+    }
 
-                when (args.getOrNull(2)) {
-                    "clear" -> {
-                        cycle.conditions.clear()
-                        UChat.chat("$successPrefix §fCleared all conditions for cycle with id $id")
-                    }
-                    "add" -> {
-                        val negated = args.getOrNull(4)?.toBoolean() ?: false
-                        when (args.getOrNull(3)) {
-                            "island" -> {
-                                val islands = args.getOrNull(5)?.split(",")?.mapNotNullTo(hashSetOf()) { SkyblockIsland.byMode[it] } ?: throw WrongUsageException("You must specify an island mode.")
-                                val cond = ItemCycle.Cycle.Condition.IslandCondition(islands, negated)
-                                cycle.conditions.add(cond)
-                                UTextComponent("$successPrefix §fAdded a new island condition with id ${cond.uuid} to cycle")
-                                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/stic condition $id remove ${cond.uuid}")
-                                    .chat()
-                            }
-                            "click" -> {
-                                val button = args.getOrNull(5)?.toIntOrNull() ?: throw WrongUsageException("You must specify a button id.")
-                                val type = args.getOrNull(6)?.toIntOrNull() ?: throw WrongUsageException("You must specify a click type.")
-                                val cond = ItemCycle.Cycle.Condition.ClickCondition(button, type, negated)
-                                cycle.conditions.add(cond)
-                                UTextComponent("$successPrefix §fAdded a new click condition with id ${cond.uuid} to cycle")
-                                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/stic condition $id remove ${cond.uuid}")
-                                    .chat()
-                            }
-                            "item" -> {
-                                val item = mc.thePlayer.heldItem?.getIdentifier() ?: throw WrongUsageException("You must be holding an item to create a cycle.")
-                                val cond = ItemCycle.Cycle.Condition.ItemCondition(item, negated)
-                                cycle.conditions.add(cond)
-                                UTextComponent("$successPrefix §fAdded a new item condition with id ${cond.uuid} to cycle")
-                                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/stic condition $id remove ${cond.uuid}")
-                                    .chat()
-                            }
-                        }
-                    }
-                    "remove" -> {
-                        val condId = args.getOrNull(3)?.let { UUID.fromString(it) } ?: throw WrongUsageException("You must specify a condition id.")
-                        if (cycle.conditions.removeAll { it.uuid == condId })
-                            UChat.chat("$successPrefix §fRemoved condition with id $condId from cycle with id $id")
-                        else
-                            UChat.chat("$failPrefix §cNo condition with id $condId found in cycle with id $id")
-                    }
-                }
-            }
-            "target" -> {
-                val id = args.getOrNull(1)?.let { UUID.fromString(it) } ?: throw WrongUsageException("You must specify a cycle id.")
-                val cycle = ItemCycle.cycles[id] ?: throw WrongUsageException("No cycle with id $id found.")
+    @Command("skytilsitemcycle|stic create [name]")
+    fun createCycle(
+        @Argument(value = "name", description = "Optional name for the cycle") name: String?
+    ) {
+        val startItemIdentifier = getHeldItemIdentifier()
+        val cycleId = UUID.randomUUID()
+        val cycleName = name ?: cycleId.toString()
 
-                cycle.swapTo =  mc.thePlayer.heldItem?.getIdentifier() ?: throw WrongUsageException("You must be holding an item to bind a new target.")
+        val newCycle = ItemCycle.Cycle(cycleId, cycleName, hashSetOf(), startItemIdentifier)
+        ItemCycle.cycles[cycleId] = newCycle
+        PersistentSave.markDirty<ItemCycle>()
 
-                UTextComponent("$successPrefix §fBound the current held item to the cycle with id $id")
-                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/stic condition $id")
-                    .chat()
-            }
-            "delete" -> {
-                val id = args.getOrNull(1)?.let { UUID.fromString(it) } ?: throw WrongUsageException("You must specify a cycle id.")
-                if (ItemCycle.cycles.remove(id) != null)
-                    UChat.chat("$successPrefix §fRemoved cycle with id $id")
-                else
-                    UChat.chat("$failPrefix §cNo cycle with id $id found")
-            }
-            else -> {
-                Skytils.displayScreen = ItemCycleGui()
-            }
+        UChat.chat(
+            UTextComponent("$successPrefix §fCreated new cycle '$cycleName' (§e${cycleId}§f).")
+                .appendSibling(
+                    UTextComponent(" §7§o[Click to Add Condition]")
+                        .setHoverText("§eOpens command suggestion")
+                        .setClick(MCClickEventAction.SUGGEST_COMMAND, "/stic condition $cycleId add ")
+                )
+        )
+    }
+
+    @Command("skytilsitemcycle|stic target <id>")
+    fun setTarget(
+        @Argument("id", description = "The UUID of the cycle") id: UUID
+    ) {
+        val cycle = getCycle(id) // Throws if cycle not found
+        val targetItemIdentifier = getHeldItemIdentifier() // Throws if no item held
+
+        cycle.swapTo = targetItemIdentifier
+        PersistentSave.markDirty<ItemCycle>()
+
+        UChat.chat(
+            UTextComponent("$successPrefix §fSet target item for cycle '${cycle.name}' (§e${id}§f).")
+                .appendSibling(
+                    UTextComponent(" §7§o[Click to Edit Conditions]")
+                        .setHoverText("§eOpens command suggestion")
+                        .setClick(MCClickEventAction.SUGGEST_COMMAND, "/stic condition $id ")
+                )
+        )
+    }
+
+    @Command("skytilsitemcycle|stic delete <id>")
+    fun deleteCycle(
+        @Argument("id", description = "The UUID of the cycle to delete") id: UUID
+    ) {
+        if (ItemCycle.cycles.remove(id) != null) {
+            PersistentSave.markDirty<ItemCycle>()
+            UChat.chat("$successPrefix §fRemoved cycle with ID §e$id§f.")
+        } else {
+            UChat.chat("$failPrefix §cNo cycle found with ID §e$id§c.")
         }
+    }
+
+    @Command("skytilsitemcycle|stic condition <id> clear")
+    fun conditionClear(
+        @Argument("id", description = "The UUID of the cycle") id: UUID
+    ) {
+        val cycle = getCycle(id)
+        if (cycle.conditions.isEmpty()) {
+            UChat.chat("$failPrefix §cCycle '${cycle.name}' already has no conditions.")
+            return
+        }
+        cycle.conditions.clear()
+        PersistentSave.markDirty<ItemCycle>()
+        UChat.chat("$successPrefix §fCleared all conditions for cycle '${cycle.name}' (§e$id§f).")
+    }
+
+    @Command("skytilsitemcycle|stic condition <id> remove <conditionId>")
+    fun conditionRemove(
+        @Argument("id", description = "The UUID of the cycle") id: UUID,
+        @Argument("conditionId", description = "The UUID of the condition to remove") conditionId: UUID
+    ) {
+        val cycle = getCycle(id)
+        val removed = cycle.conditions.removeIf { it.uuid == conditionId }
+
+        if (removed) {
+            PersistentSave.markDirty<ItemCycle>()
+            UChat.chat("$successPrefix §fRemoved condition §e$conditionId§f from cycle '${cycle.name}'.")
+        } else {
+            UChat.chat("$failPrefix §cNo condition with ID §e$conditionId§c found in cycle '${cycle.name}'.")
+        }
+    }
+
+    @Command("skytilsitemcycle|stic condition <id> add island <islandModes> [negated]")
+    fun conditionAddIsland(
+        @Argument("id") id: UUID,
+        @Argument("islandModes", description = "Comma-separated list of SkyblockIsland internal names (e.g., dynamic,combat_1)") modes: String,
+        @Argument(value = "negated", description = "Whether the condition should be inverted") @Default("false") negated: Boolean
+    ) {
+        val cycle = getCycle(id)
+        // Parse the comma-separated string into a set of SkyblockIsland objects
+        val islands: HashSet<SkyblockIsland> = modes.split(',')
+            .mapNotNullTo(hashSetOf()) { modeName ->
+                SkyblockIsland.byMode[modeName.trim()] // Find island by internal name/mode
+                    ?: run {
+                        UChat.chat("$failPrefix §cUnknown island mode: '$modeName'. Skipping.")
+                        null // Silently skip unknown islands, or throw error
+                    }
+            }
+
+        if (islands.isEmpty()) {
+            throw WrongUsageException("§cNo valid islands specified in '$modes'. See SkyblockIsland internal names.")
+        }
+
+        val condition = ItemCycle.Cycle.Condition.IslandCondition(islands, negated)
+        cycle.conditions.add(condition)
+        PersistentSave.markDirty<ItemCycle>()
+
+        val negationText = if (negated) " (Not Active)" else ""
+        UChat.chat(UTextComponent("$successPrefix §fAdded Island condition${negationText} for islands [${islands.joinToString { it.name }}] to cycle '${cycle.name}'.")
+            .appendSibling(
+                UTextComponent(" §7§o[Click to Remove]")
+                    .setHoverText("§cUUID: ${condition.uuid}")
+                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/stic condition $id remove ${condition.uuid}")
+            ))
+    }
+
+    @Command("skytilsitemcycle|stic condition <id> add click <button> <type> [negated]")
+    fun conditionAddClick(
+        @Argument("id") id: UUID,
+        @Argument("button", description = "Mouse button ID (0=Left, 1=Right, 2=Middle, ...)") button: Int,
+        @Argument("type", description = "Minecraft Click Type") type: Int,
+        @Argument(value = "negated") @Default("false") negated: Boolean
+    ) {
+        val cycle = getCycle(id)
+        val condition = ItemCycle.Cycle.Condition.ClickCondition(button, type, negated)
+        cycle.conditions.add(condition)
+        PersistentSave.markDirty<ItemCycle>()
+
+        val negationText = if (negated) " (Not Active)" else ""
+        val typeDesc = when(type) { 0 -> "Press"; 1 -> "Release"; 2 -> "Held"; else -> "Unknown Type"}
+        UChat.chat(
+            UTextComponent("$successPrefix §fAdded Click condition${negationText} (Button $button, Type $typeDesc) to cycle '${cycle.name}'.")
+            .appendSibling(
+                UTextComponent(" §7§o[Click to Remove]")
+                    .setHoverText("§cUUID: ${condition.uuid}")
+                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/stic condition $id remove ${condition.uuid}")
+            )
+        )
+    }
+
+    @Command("skytilsitemcycle|stic condition <id> add item [negated]")
+    fun conditionAddItem(
+        @Argument("id") id: UUID,
+        @Argument(value = "negated") @Default("false") negated: Boolean
+    ) {
+        val cycle = getCycle(id)
+        val itemIdentifier = getHeldItemIdentifier() // Throws if no item held
+
+        val condition = ItemCycle.Cycle.Condition.ItemCondition(itemIdentifier, negated)
+        cycle.conditions.add(condition)
+        PersistentSave.markDirty<ItemCycle>()
+
+        val negationText = if (negated) " (Not Held)" else " (Held)"
+        UChat.chat(
+            UTextComponent("$successPrefix §fAdded Item condition${negationText} for item '${itemIdentifier.id}' to cycle '${cycle.name}'.")
+                .appendSibling(
+                    UTextComponent(" §7§o[Click to Remove]")
+                        .setHoverText("§cUUID: ${condition.uuid}")
+                        .setClick(MCClickEventAction.SUGGEST_COMMAND, "/stic condition $id remove ${condition.uuid}")
+                )
+        )
     }
 }
