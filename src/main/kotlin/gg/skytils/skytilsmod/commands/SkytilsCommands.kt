@@ -31,24 +31,29 @@ object SkytilsCommands : CommandManager<ICommandSender>(ExecutionCoordinator.sim
     val annotationParser = AnnotationParser(this, ICommandSender::class.java)
 
     init {
-        annotationParser.installCoroutineSupport()
+        runCatching {
+            annotationParser.installCoroutineSupport()
 
-        annotationParser.parse(
-            ArmorColorCommand,
-            CalcXPCommand,
-            CataCommand,
-            GlintCustomizeCommand,
-            HollowWaypointCommand,
-            ItemCycleCommand,
-            OrderedWaypointCommand,
-            ProtectItemCommand,
-            RepartyCommand,
-            ScamCheckCommand,
-            SkytilsCommand,
-            SlayerCommand,
-            TrackCooldownCommand,
-            TrophyFishCommand
-        )
+            val parsedCommands = annotationParser.parse(
+                ArmorColorCommand,
+                CalcXPCommand,
+                CataCommand,
+                GlintCustomizeCommand,
+                HollowWaypointCommand,
+                ItemCycleCommand,
+                OrderedWaypointCommand,
+                ProtectItemCommand,
+                RepartyCommand,
+                ScamCheckCommand,
+                SkytilsCommand,
+                SlayerCommand,
+                TrackCooldownCommand,
+                TrophyFishCommand
+            )
+            println("Parsed ${parsedCommands.size} commands.")
+        }.onFailure {
+            it.printStackTrace()
+        }
     }
 
     override fun hasPermission(
