@@ -44,6 +44,7 @@ object SkytilsCommands : CommandManager<ICommandSender>(ExecutionCoordinator.sim
             ProtectItemCommand,
             RepartyCommand,
             ScamCheckCommand,
+            SkytilsCommand,
             SlayerCommand,
             TrackCooldownCommand,
             TrophyFishCommand

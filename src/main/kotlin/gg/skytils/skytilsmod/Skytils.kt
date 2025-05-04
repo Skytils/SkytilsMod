@@ -22,7 +22,6 @@ import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
 import gg.skytils.skytilsmod.commands.SkytilsCommands
-import gg.skytils.skytilsmod.commands.impl.*
 import gg.skytils.skytilsmod.core.*
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
@@ -446,7 +445,6 @@ class Skytils {
         if (cch !is AccessorCommandHandler) throw RuntimeException(
             "Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils."
         )
-        cch.registerCommand(SkytilsCommand)
 
         if (UpdateChecker.currentVersion.specialVersionType != UpdateChecker.UpdateType.RELEASE && config.updateChannel == 2) {
             if (ModChecker.canShowNotifications) {
