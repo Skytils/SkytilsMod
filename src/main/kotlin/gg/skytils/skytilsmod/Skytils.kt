@@ -440,12 +440,6 @@ class Skytils {
     fun loadComplete(event: FMLLoadCompleteEvent) {
         SkytilsCommands
 
-        val cch = ClientCommandHandler.instance
-
-        if (cch !is AccessorCommandHandler) throw RuntimeException(
-            "Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils."
-        )
-
         if (UpdateChecker.currentVersion.specialVersionType != UpdateChecker.UpdateType.RELEASE && config.updateChannel == 2) {
             if (ModChecker.canShowNotifications) {
                 EssentialAPI.getNotifications().push("Skytils Update Checker", "You are on a development version of Skytils. Click here to change your update channel to pre-release.") {
