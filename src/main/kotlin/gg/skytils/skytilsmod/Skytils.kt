@@ -451,7 +451,6 @@ class Skytils {
         cch.registerCommand(SkytilsCommand)
 
         cch.registerCommand(CataCommand)
-        cch.registerCommand(FragBotCommand)
         cch.registerCommand(HollowWaypointCommand)
         cch.registerCommand(ItemCycleCommand)
         cch.registerCommand(OrderedWaypointCommand)
