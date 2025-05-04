@@ -21,6 +21,7 @@ package gg.skytils.skytilsmod
 import gg.essential.api.EssentialAPI
 import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
+import gg.skytils.skytilsmod.commands.SkytilsCommands
 import gg.skytils.skytilsmod.commands.impl.*
 import gg.skytils.skytilsmod.commands.stats.impl.CataCommand
 import gg.skytils.skytilsmod.commands.stats.impl.SlayerCommand
@@ -440,6 +441,8 @@ class Skytils {
 
     @Mod.EventHandler
     fun loadComplete(event: FMLLoadCompleteEvent) {
+        SkytilsCommands
+
         val cch = ClientCommandHandler.instance
 
         if (cch !is AccessorCommandHandler) throw RuntimeException(
