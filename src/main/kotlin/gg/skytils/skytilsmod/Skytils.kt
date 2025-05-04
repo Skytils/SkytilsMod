@@ -457,10 +457,6 @@ class Skytils {
         cch.registerCommand(SlayerCommand)
         cch.registerCommand(TrophyFishCommand)
 
-        if (!cch.commands.containsKey("trackcooldown")) {
-            cch.registerCommand(TrackCooldownCommand)
-        }
-
         if (UpdateChecker.currentVersion.specialVersionType != UpdateChecker.UpdateType.RELEASE && config.updateChannel == 2) {
             if (ModChecker.canShowNotifications) {
                 EssentialAPI.getNotifications().push("Skytils Update Checker", "You are on a development version of Skytils. Click here to change your update channel to pre-release.") {

@@ -20,22 +20,23 @@ package gg.skytils.skytilsmod.commands.impl
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
-import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
-import gg.skytils.skytilsmod.commands.BaseCommand
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
-import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.command.WrongUsageException
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Commands
 
-object TrackCooldownCommand : BaseCommand("trackcooldown", listOf("cooldowntracker")) {
-    override fun getCommandUsage(player: EntityPlayerSP): String = "/trackcooldown <cooldown> <ability>"
-
-    override fun processCommand(player: EntityPlayerSP, args: Array<String>) {
+@Commands
+object TrackCooldownCommand {
+    @Command("trackcooldown|cooldowntracker <seconds> <ability>")
+    fun trackCooldown(
+        @Argument("seconds") seconds: Double,
+        @Argument("ability") ability: String
+    ) {
         if (!Skytils.config.itemCooldownDisplay) return UChat.chat("$failPrefix §cYou must turn on Item Cooldown Display to use this command!")
-        if (args.size < 2) UChat.chat("$prefix ${getCommandUsage(player)}")
-        val seconds = args[0].toDoubleOrNull() ?: throw WrongUsageException("You must specify a valid number")
-        val ability = args.drop(1).joinToString(" ")
+        if (seconds < 0) throw WrongUsageException("You must specify a valid number")
         if (ability.isBlank()) throw WrongUsageException("You must specify valid arguments.")
         if (CooldownTracker.itemCooldowns[ability] == seconds) {
             CooldownTracker.itemCooldowns.remove(ability)
