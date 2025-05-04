@@ -30,6 +30,7 @@ import net.minecraft.command.SyntaxErrorException
 import net.minecraft.command.WrongUsageException
 import net.minecraft.item.ItemArmor
 import net.minecraft.item.ItemStack
+import org.incendo.cloud.annotation.specifier.Greedy
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Commands
@@ -56,6 +57,7 @@ object ArmorColorCommand {
 
     @Command("armorcolor set <color>")
     fun setCurrent(
+        @Greedy
         @Argument("color", description = "The color to set the armor to")
         color: String
     ) {

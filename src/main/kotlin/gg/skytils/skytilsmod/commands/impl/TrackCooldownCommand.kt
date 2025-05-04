@@ -24,6 +24,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.features.impl.handlers.CooldownTracker
 import net.minecraft.command.WrongUsageException
+import org.incendo.cloud.annotation.specifier.Greedy
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Commands
@@ -33,6 +34,7 @@ object TrackCooldownCommand {
     @Command("trackcooldown|cooldowntracker <seconds> <ability>")
     fun trackCooldown(
         @Argument("seconds") seconds: Double,
+        @Greedy
         @Argument("ability") ability: String
     ) {
         if (!Skytils.config.itemCooldownDisplay) return UChat.chat("$failPrefix §cYou must turn on Item Cooldown Display to use this command!")

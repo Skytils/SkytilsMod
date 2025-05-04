@@ -65,11 +65,13 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.item.EntityArmorStand
+import org.incendo.cloud.annotation.specifier.Greedy
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Commands
 import org.incendo.cloud.annotations.suggestion.Suggestions
 import org.incendo.cloud.context.CommandContext
+import org.incendo.cloud.parser.standard.StringParser
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -109,7 +111,7 @@ object SkytilsCommand {
             .dayOfMonth) % MiningFeatures.fetchurItems.size])
     }
 
-    @Command("skytils}st stats [name]")
+    @Command("skytils|st stats [name]")
     fun stats(
         @Argument("name", description = "The name of the player to get stats for")
         name: String?
@@ -129,6 +131,7 @@ object SkytilsCommand {
 
     @Command("skytils|st resettracker <tracker>")
     fun resetTracker(
+        @Greedy
         @Argument("tracker", description = "The tracker to reset", suggestions = "skytilstrackers")
         tracker: String
     ) {
@@ -374,8 +377,9 @@ object SkytilsCommand {
         PersistentSave.markDirty<PricePaid>()
     }
 
-    @Command("skytils}st resetelement <name>")
+    @Command("skytils|st resetelement <name>")
     fun resetElement(
+        @Greedy
         @Argument("name", description = "The name of the element to reset", suggestions = "skytilsguielements")
         name: String
     ) {

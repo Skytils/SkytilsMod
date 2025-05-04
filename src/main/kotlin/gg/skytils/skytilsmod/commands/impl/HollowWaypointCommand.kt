@@ -32,6 +32,7 @@ import gg.skytils.skytilsmod.utils.setHoverText
 import net.minecraft.event.ClickEvent
 import net.minecraft.util.BlockPos
 import net.minecraft.util.IChatComponent
+import org.incendo.cloud.annotation.specifier.Greedy
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Commands
@@ -79,6 +80,7 @@ object HollowWaypointCommand {
 
     @Command("skytilshollowwaypoint|sthw set|add <name>")
     fun setWaypoint(
+        @Greedy
         @Argument("name")
         name: String
     ) {
@@ -97,6 +99,7 @@ object HollowWaypointCommand {
 
     @Command("skytilshollowwaypoint|sthw set|add <name> <x> <y> <z>")
     fun setWaypoint(
+        @Greedy
         @Argument("name")
         name: String,
         @Argument("x")
@@ -121,6 +124,7 @@ object HollowWaypointCommand {
 
     @Command("skytilshollowwaypoint|sthw remove|delete <name>")
     fun removeWaypoint(
+        @Greedy
         @Argument("name")
         name: String
     ) {
