@@ -42,6 +42,7 @@ object SkytilsCommands : CommandManager<ICommandSender>(ExecutionCoordinator.sim
             OrderedWaypointCommand,
             ProtectItemCommand,
             RepartyCommand,
+            ScamCheckCommand,
             TrackCooldownCommand
         )
     }

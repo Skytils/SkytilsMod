@@ -451,7 +451,6 @@ class Skytils {
         cch.registerCommand(SkytilsCommand)
 
         cch.registerCommand(CataCommand)
-        cch.registerCommand(ScamCheckCommand)
         cch.registerCommand(SlayerCommand)
         cch.registerCommand(TrophyFishCommand)
 

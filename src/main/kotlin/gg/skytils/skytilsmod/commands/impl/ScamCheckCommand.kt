@@ -18,12 +18,34 @@
 
 package gg.skytils.skytilsmod.commands.impl
 
-import gg.skytils.skytilsmod.commands.stats.StatCommand
+import gg.essential.universal.UChat
+import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
+import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.misc.ScamCheck
-import java.util.*
+import gg.skytils.skytilsmod.utils.MojangUtil
+import kotlinx.coroutines.withContext
+import org.incendo.cloud.annotations.Argument
+import org.incendo.cloud.annotations.Command
+import org.incendo.cloud.annotations.Commands
 
-object ScamCheckCommand : StatCommand("skytilsscamcheck", needProfile = false, listOf("stsc")) {
-    override suspend fun displayStats(username: String, uuid: UUID) {
-        val check = ScamCheck.checkScammer(uuid, "command").printResult(username)
+@Commands
+object ScamCheckCommand {
+
+    @Command("skytilsscamcheck|stsc [name]")
+    suspend fun checkScammerStatus(
+        @Argument("name") name: String?
+    ) {
+        // TODO: check coroutine works properly
+        val uuid = try {
+            if (name == null) mc.thePlayer!!.uniqueID else withContext(Skytils.IO.coroutineContext) { MojangUtil.getUUIDFromUsername(name) }
+        } catch (e: MojangUtil.MojangException) {
+            UChat.chat("$failPrefix §cFailed to get UUID, reason: ${e.message}")
+            return
+        } ?: return
+
+        ScamCheck
+            .checkScammer(uuid, "command")
+            .printResult(name ?: mc.thePlayer!!.name)
     }
 }
