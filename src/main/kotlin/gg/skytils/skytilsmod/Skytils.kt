@@ -23,7 +23,6 @@ import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
 import gg.skytils.skytilsmod.commands.SkytilsCommands
 import gg.skytils.skytilsmod.commands.impl.*
-import gg.skytils.skytilsmod.commands.stats.impl.SlayerCommand
 import gg.skytils.skytilsmod.core.*
 import gg.skytils.skytilsmod.events.impl.MainReceivePacketEvent
 import gg.skytils.skytilsmod.events.impl.PacketEvent
@@ -448,8 +447,6 @@ class Skytils {
             "Skytils was unable to mixin to the CommandHandler. Please report this on our Discord at discord.gg/skytils."
         )
         cch.registerCommand(SkytilsCommand)
-
-        cch.registerCommand(SlayerCommand)
 
         if (UpdateChecker.currentVersion.specialVersionType != UpdateChecker.UpdateType.RELEASE && config.updateChannel == 2) {
             if (ModChecker.canShowNotifications) {
