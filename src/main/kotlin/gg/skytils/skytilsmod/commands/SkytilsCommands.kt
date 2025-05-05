@@ -19,16 +19,17 @@
 package gg.skytils.skytilsmod.commands
 
 import gg.skytils.skytilsmod.commands.impl.*
+import gg.skytils.skytilsmod.commands.utils.legacy.LegacyForgeRegistrationHandler
 import net.minecraft.command.ICommandSender
 import org.incendo.cloud.CommandManager
 import org.incendo.cloud.annotations.AnnotationParser
 import org.incendo.cloud.execution.ExecutionCoordinator
 import org.incendo.cloud.kotlin.coroutines.annotations.installCoroutineSupport
 
-object SkytilsCommands : CommandManager<ICommandSender>(ExecutionCoordinator.simpleCoordinator(),
+object SkytilsCommands : CommandManager<SkytilsCommandSender>(ExecutionCoordinator.simpleCoordinator(),
     LegacyForgeRegistrationHandler
 ) {
-    val annotationParser = AnnotationParser(this, ICommandSender::class.java)
+    val annotationParser = AnnotationParser(this, SkytilsCommandSender::class.java)
 
     init {
         runCatching {

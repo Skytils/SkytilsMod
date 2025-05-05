@@ -21,9 +21,9 @@ package gg.skytils.skytilsmod.commands.impl
 import gg.essential.universal.UChat
 import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
+import gg.skytils.skytilsmod.commands.SkytilsCommandSender
 import gg.skytils.skytilsmod.utils.NumberUtil
 import gg.skytils.skytilsmod.utils.SkillUtils
-import net.minecraft.command.ICommandSender
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Commands
@@ -75,7 +75,7 @@ object CalcXPCommand {
     private val validTypes: Set<String> = setOf("dungeons", "skill") + SkillUtils.slayerXp.keys.map { it + "_slayer" }
 
     @Suggestions("calcxp_types")
-    fun xpTypeSuggestions(ctx: CommandContext<ICommandSender>, input: String): Iterable<String> {
+    fun xpTypeSuggestions(ctx: CommandContext<SkytilsCommandSender>, input: String): Iterable<String> {
         return validTypes.filter { it.startsWith(input) }
     }
 }

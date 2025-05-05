@@ -26,6 +26,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.Skytils.Companion.prefix
 import gg.skytils.skytilsmod.Skytils.Companion.successPrefix
+import gg.skytils.skytilsmod.commands.SkytilsCommandSender
 import gg.skytils.skytilsmod.core.DataFetcher
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.core.UpdateChecker
@@ -62,7 +63,6 @@ import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.packet.ClientboundHypixelPacket
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.command.ICommandSender
 import net.minecraft.command.WrongUsageException
 import net.minecraft.entity.item.EntityArmorStand
 import org.incendo.cloud.annotation.specifier.Greedy
@@ -71,7 +71,6 @@ import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Commands
 import org.incendo.cloud.annotations.suggestion.Suggestions
 import org.incendo.cloud.context.CommandContext
-import org.incendo.cloud.parser.standard.StringParser
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
@@ -142,7 +141,7 @@ object SkytilsCommand {
     }
 
     @Suggestions("skytilstrackers")
-    fun trackerSuggestions(ctx: CommandContext<ICommandSender>, input: String): Iterable<String> {
+    fun trackerSuggestions(ctx: CommandContext<SkytilsCommandSender>, input: String): Iterable<String> {
         return Tracker.TRACKERS.map { it.id }.filter { it.startsWith(input) }
     }
 
@@ -389,7 +388,7 @@ object SkytilsCommand {
     }
 
     @Suggestions("skytilsguielements")
-    fun elementSuggestions(ctx: CommandContext<ICommandSender>, input: String): Iterable<String> {
+    fun elementSuggestions(ctx: CommandContext<SkytilsCommandSender>, input: String): Iterable<String> {
         return Skytils.guiManager.searchElements(input).map { it.name }
     }
 
