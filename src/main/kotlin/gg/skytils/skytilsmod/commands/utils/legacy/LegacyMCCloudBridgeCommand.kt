@@ -41,27 +41,28 @@ class LegacyMCCloudBridgeCommand(val command: Command<SkytilsCommandSender>): Co
         args: Array<String>
     ) {
         val input = "${commandName}${args.joinToString(separator = " ", prefix = " ")}"
-        SkytilsCommands.commandExecutor().executeCommand(sender, input)
-            .exceptionally {
-                it.printStackTrace()
-                val exception = (it as? CompletionException)?.cause ?: it
-                when (exception) {
-                    is CommandException -> {
-                        UChat.chat("$failPrefix §c${exception.message} ($input)")
-                    }
-                    is CommandParseException -> {
-                        UChat.chat("$failPrefix §cFailed to parse $input: ${exception.message}")
-                    }
-                    is CommandExecutionException -> {
-                        UChat.chat("$failPrefix §cFailed to execute $input: ${exception.message}")
-                    }
-                    else -> {
-                        UChat.chat("$failPrefix §cAn error occurred while executing the command. See logs for more details. ($input)")
-                    }
+        runCatching {
+            SkytilsCommands.commandExecutor().executeCommand(sender, input).join()
+        }.onFailure {
+            val exception = (it as? CompletionException)?.cause ?: it
+            when (exception) {
+                is CommandException -> {
+                    UChat.chat("$failPrefix §c${exception.message} ($input)")
                 }
-                null
+                is CommandParseException -> {
+                    UChat.chat("$failPrefix §cFailed to parse $input: ${exception.message}")
+                }
+                is CommandExecutionException -> {
+                    UChat.chat("$failPrefix §cFailed to execute $input: ${exception.message}")
+                }
+                else -> {
+                    UChat.chat("$failPrefix §cAn error occurred while executing the command. See logs for more details. ($input)")
+                }
             }
-            .join()
+            // Re-throw the exception so Forge returns the proper result code
+            // This does create 2 different messages though
+            throw exception
+        }
     }
 
     override fun getRequiredPermissionLevel(): Int = 0
