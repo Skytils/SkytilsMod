@@ -190,16 +190,6 @@ object Config : Vigilant(
     var reopenOptionsMenu = true
 
     @Property(
-        type = PropertyType.SWITCH, name = "Override other reparty commands",
-        description = "Uses Skytils' reparty command instead of other mods'. \n§cRequires restart to disable.\nThis setting is now obsolete.",
-        category = "General", subcategory = "Reparty",
-        i18nName = "skytils.config.general.reparty.override_other_reparty_commands",
-        i18nCategory = "skytils.config.general",
-        i18nSubcategory = "skytils.config.general.reparty"
-    )
-    var overrideReparty = true
-
-    @Property(
         type = PropertyType.SWITCH, name = "Coop Add Confirmation",
         description = "Requires you to run the /coopadd command twice to add a member.",
         category = "General", subcategory = "Hypixel",
@@ -4532,12 +4522,6 @@ object Config : Vigilant(
                         }
                     }
                 }
-            }
-        }
-
-        registerListener("overrideReparty") { state: Boolean ->
-            if (state) {
-
             }
         }
 

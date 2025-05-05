@@ -166,12 +166,7 @@ dependencies {
     }
     compileOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
 
-    // shadowMe("com.mojang:brigadier:1.3.10")
-    // shadowMe("org.incendo:cloud-brigadier:2.0.0-beta.10")
-    // shadowMe("org.incendo:cloud-minecraft-modded:2.0.0-beta.9")
-    //annotationProcessor(
     shadowMe("org.incendo:cloud-kotlin-coroutines-annotations:2.0.0") { excludeKotlin() }
-    //)
     shadowMe("org.incendo:cloud-kotlin-extensions:2.0.0") { excludeKotlin() }
 
     compileOnly("net.hypixel:mod-api-forge:1.0.1.2") {
