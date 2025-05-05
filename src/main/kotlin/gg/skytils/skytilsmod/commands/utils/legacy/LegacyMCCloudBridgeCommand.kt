@@ -47,21 +47,20 @@ class LegacyMCCloudBridgeCommand(val command: Command<SkytilsCommandSender>): Co
             val exception = (it as? CompletionException)?.cause ?: it
             when (exception) {
                 is CommandException -> {
-                    UChat.chat("$failPrefix §c${exception.message} ($input)")
+                    throw CommandExceptionWrapper(exception, "$failPrefix §c${exception.message} ($input)")
                 }
                 is CommandParseException -> {
-                    UChat.chat("$failPrefix §cFailed to parse $input: ${exception.message}")
+                    throw CommandExceptionWrapper(exception, "$failPrefix §cFailed to parse $input: ${exception.message}")
                 }
                 is CommandExecutionException -> {
-                    UChat.chat("$failPrefix §cFailed to execute $input: ${exception.message}")
+                    exception.printStackTrace()
+                    throw CommandExceptionWrapper(exception, "$failPrefix §cFailed to execute $input: ${exception.message}")
                 }
                 else -> {
-                    UChat.chat("$failPrefix §cAn error occurred while executing the command. See logs for more details. ($input)")
+                    exception.printStackTrace()
+                    throw CommandExceptionWrapper(exception, "$failPrefix §cAn error occurred while executing the command. See logs for more details. ($input)")
                 }
             }
-            // Re-throw the exception so Forge returns the proper result code
-            // This does create 2 different messages though
-            throw exception
         }
     }
 
@@ -88,4 +87,6 @@ class LegacyMCCloudBridgeCommand(val command: Command<SkytilsCommandSender>): Co
             UChat.chat("$failPrefix §cAn error occurred while tab completing the command. (${input})")
         }.getOrNull()
     }
+
+    class CommandExceptionWrapper(override val cause: Throwable, override val message: String) : CommandException(message)
 }
