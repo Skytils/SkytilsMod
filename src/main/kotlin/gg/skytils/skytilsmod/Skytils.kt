@@ -329,6 +329,8 @@ class Skytils {
             SoundQueue,
             UpdateChecker,
 
+            NEUCompatibility,
+
             AlignmentTaskSolver,
             AntiFool,
             ArmorColor,
