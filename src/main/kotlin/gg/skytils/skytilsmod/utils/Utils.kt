@@ -81,7 +81,7 @@ object Utils {
     var dungeons = false
 
     val inDungeons: Boolean
-        get() = dungeons || SBInfo.mode == "dungeon"
+        get() = dungeons || SBInfo.mode == SkyblockIsland.Dungeon.mode
 
     @JvmField
     var isOnHypixel = false
@@ -389,10 +389,7 @@ val gg.skytils.hypixel.types.player.Player.rank_prefix
         "MVP" -> "§b[MVP]"
         "MVP_PLUS" -> "§b[MVP${ChatColor.valueOf(plus_color)}+§b]"
         "MVP_PLUS_PLUS" -> "${ChatColor.valueOf(mvp_plus_plus_color)}[MVP${ChatColor.valueOf(plus_color)}++${ChatColor.valueOf(mvp_plus_plus_color)}]"
-        "HELPER" -> "§9[HELPER]"
-        "MODERATOR" -> "§2[MOD]"
-        "GAME_MASTER" -> "§2[GM]"
-        "ADMIN" -> "§c[ADMIN]"
+        "STAFF" -> "§c[§6ዞ§c]"
         "YOUTUBER" -> "§c[§fYOUTUBE§c]"
         else -> "§7"
     }
