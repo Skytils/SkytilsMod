@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.utils.graphics
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
 import gg.skytils.skytilsmod.utils.graphics.colors.MinecraftChatColors
+import gg.skytils.skytilsmod.utils.stripControlCodes
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.GlStateManager
@@ -54,7 +55,7 @@ class SmartFontRenderer : FontRenderer(
         } else if (customColor === CommonColors.CRITICAL) {
             return drawCritText(text, x, y, alignment, shadow)
         }
-        val drawnText = text.replace("§\\[\\d+\\.?\\d*,\\d+\\.?\\d*,\\d+\\.?\\d*]".toRegex(), "")
+        val drawnText = text.stripControlCodes()
         return when (alignment) {
             TextAlignment.MIDDLE -> drawString(
                 text,
