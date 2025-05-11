@@ -92,7 +92,7 @@ object WSClient {
                     closeExceptionally(e)
                 } finally {
                     if (mc.theWorld != null) {
-                        UChat.chat("${Skytils.failPrefix} §cConnection to SkytilsWS lost (reason: ${closeReason.await()})")
+                        UChat.chat("${Skytils.failPrefix} §cConnection to SkytilsWS lost ${closeReason.await()}")
                     }
                     session = null
                 }

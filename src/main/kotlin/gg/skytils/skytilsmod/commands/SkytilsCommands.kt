@@ -20,7 +20,6 @@ package gg.skytils.skytilsmod.commands
 
 import gg.skytils.skytilsmod.commands.impl.*
 import gg.skytils.skytilsmod.commands.utils.legacy.LegacyForgeRegistrationHandler
-import net.minecraft.command.ICommandSender
 import org.incendo.cloud.CommandManager
 import org.incendo.cloud.annotations.AnnotationParser
 import org.incendo.cloud.execution.ExecutionCoordinator
@@ -58,7 +57,7 @@ object SkytilsCommands : CommandManager<SkytilsCommandSender>(ExecutionCoordinat
     }
 
     override fun hasPermission(
-        sender: ICommandSender,
+        sender: SkytilsCommandSender,
         permission: String
     ): Boolean = true
 }

@@ -30,6 +30,7 @@ import gg.skytils.skytilsmod.Reference
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
+import gg.skytils.skytilsmod.features.impl.handlers.CommandAliases
 import gg.skytils.skytilsmod.features.impl.trackers.Tracker
 import gg.skytils.skytilsmod.gui.features.PotionNotificationsGui
 import gg.skytils.skytilsmod.gui.features.ProtectItemGui
@@ -178,6 +179,16 @@ object Config : Vigilant(
         i18nSubcategory = "skytils.config.general.other"
     )
     var configButtonOnPause = true
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Disable Volume Overrides",
+        description = "Disables overriding your volume to play sounds at max category volume.",
+        category = "General", subcategory = "Other",
+        i18nName = "skytils.config.general.other.disable_volume_overrides",
+        i18nCategory = "skytils.config.general",
+        i18nSubcategory = "skytils.config.general.other"
+    )
+    var disableVolumeOverrides = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Reopen Options Menu",
@@ -2129,6 +2140,16 @@ object Config : Vigilant(
         i18nSubcategory = "skytils.config.miscellaneous.items"
     )
     var pricePaid = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Block Zapper: Left Click to Undo",
+        description = "Left clicking the block zapper will automatically run /undozap",
+        category = "Miscellaneous", subcategory = "Items",
+        i18nName = "skytils.config.miscellaneous.items.block_zapper_left_click_to_undo",
+        i18nCategory = "skytils.config.miscellaneous",
+        i18nSubcategory = "skytils.config.miscellaneous.items"
+    )
+    var blockZapperLeftClickUndo = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Disable Block Animation",
@@ -4382,6 +4403,10 @@ object Config : Vigilant(
     var windHider = 0
 
     init {
+        registerListener("commandAliasesSpaces") { prop: Boolean ->
+            CommandAliases.recreateMap(prop)
+        }
+
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
 
         addDependency("samScytheColor", "showSamScytheBlocks")

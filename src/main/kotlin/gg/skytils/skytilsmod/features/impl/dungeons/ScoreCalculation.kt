@@ -348,6 +348,7 @@ object ScoreCalculation {
     fun onTabChange(event: MainReceivePacketEvent<*, *>) {
         if (
             !Utils.inDungeons ||
+            DungeonTimer.scoreShownAt != -1L ||
             event.packet !is S38PacketPlayerListItem ||
             (event.packet.action != S38PacketPlayerListItem.Action.UPDATE_DISPLAY_NAME &&
                     event.packet.action != S38PacketPlayerListItem.Action.ADD_PLAYER)

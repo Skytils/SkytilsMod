@@ -34,7 +34,7 @@ plugins {
     signing
 }
 
-version = "1.11.0-pre3"
+version = "1.11.0"
 group = "gg.skytils"
 
 repositories {
@@ -101,12 +101,17 @@ val shadowMeMod: Configuration by configurations.creating {
 
 dependencies {
     shadowMe("gg.essential:loader-launchwrapper:1.2.3")
-    implementation("gg.essential:essential-1.8.9-forge:16425+g3a090c5c88") {
+    implementation("gg.essential:essential-1.8.9-forge:17141+gd6f4cfd3a8") {
         exclude(module = "asm")
         exclude(module = "asm-commons")
         exclude(module = "asm-tree")
         exclude(module = "gson")
         exclude(module = "vigilance")
+    }
+    implementation("gg.essential:universalcraft-1.8.9-forge") {
+        version {
+            strictly("[401,)")
+        }
     }
     shadowMe("com.github.Skytils.Vigilance:vigilance-1.8.9-forge:afb0909442") {
         isTransitive = false

@@ -32,9 +32,34 @@ import java.util.*
 import kotlin.collections.sortedMapOf
 
 object CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json")) {
-    val aliases: MutableMap<String, String> by lazy {
-        if (Skytils.config.commandAliasesSpaces) sortedMapOf(Comparator.comparingInt(String::length).reversed())
-        else hashMapOf()
+    val aliases get() = _aliases
+
+    private var _aliases: MutableMap<String, String> = hashMapOf()
+
+    private val comparator = Comparator.comparingInt(String::length)
+        .reversed()
+        .thenComparing(Comparator.naturalOrder())
+
+    fun recreateMap(commandAliasSpaces: Boolean) {
+        _aliases =
+            if (commandAliasSpaces) sortedMapOf<String, String>(
+                comparator
+            ).apply {
+                putAll(_aliases)
+            }
+            else HashMap(_aliases)
+    }
+
+    fun sanityCheck() {
+        if (Skytils.config.commandAliasesSpaces) {
+            if (_aliases !is SortedMap) error("Command Aliases map is supposed to be sorted, but isn't!")
+        } else {
+            if (_aliases is SortedMap) error("Command Aliases map is supposed to be unsorted, but isn't!")
+        }
+    }
+
+    init {
+        recreateMap(Skytils.config.commandAliasesSpaces)
     }
 
     @SubscribeEvent

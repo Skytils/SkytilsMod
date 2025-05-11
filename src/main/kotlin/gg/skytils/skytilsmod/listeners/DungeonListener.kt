@@ -256,7 +256,7 @@ object DungeonListener {
                 }
             }
         }
-        else if (event.packet is S38PacketPlayerListItem) {
+        else if (event.packet is S38PacketPlayerListItem && DungeonTimer.scoreShownAt == -1L) {
             val action = event.packet.action
             val entries = event.packet.entries
 

@@ -48,13 +48,15 @@ public abstract class MixinMinecraft implements Executor {
     private void clickMouse(CallbackInfo info) {
         if (!Utils.INSTANCE.getInSkyblock()) return;
 
-        ItemStack item = this.thePlayer.getHeldItem();
-        if (item != null) {
-            NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
-            String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
+        if (Skytils.Companion.getConfig().getBlockZapperLeftClickUndo()) {
+            ItemStack item = this.thePlayer.getHeldItem();
+            if (item != null) {
+                NBTTagCompound extraAttr = ItemUtil.getExtraAttributes(item);
+                String itemId = ItemUtil.getSkyBlockItemID(extraAttr);
 
-            if (Objects.equals(itemId, "BLOCK_ZAPPER")) {
-                Skytils.sendMessageQueue.add("/undozap");
+                if (Objects.equals(itemId, "BLOCK_ZAPPER")) {
+                    Skytils.sendMessageQueue.add("/undozap");
+                }
             }
         }
     }

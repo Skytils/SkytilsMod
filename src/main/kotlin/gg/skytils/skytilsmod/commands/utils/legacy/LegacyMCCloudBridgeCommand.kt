@@ -50,7 +50,7 @@ class LegacyMCCloudBridgeCommand(val command: Command<SkytilsCommandSender>): Co
                     throw CommandExceptionWrapper(exception, "$failPrefix §c${exception.message} ($input)")
                 }
                 is CommandParseException -> {
-                    throw CommandExceptionWrapper(exception, "$failPrefix §cFailed to parse $input: ${exception.message}")
+                    throw CommandExceptionWrapper(exception, "$failPrefix §cFailed to parse $input: ${exception::class.java.simpleName} ${exception.message}")
                 }
                 is CommandExecutionException -> {
                     exception.printStackTrace()
