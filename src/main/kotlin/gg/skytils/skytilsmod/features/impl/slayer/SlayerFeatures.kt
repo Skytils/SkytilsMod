@@ -254,12 +254,12 @@ object SlayerFeatures : CoroutineScope {
 
     @SubscribeEvent
     fun onRenderLivingPre(event: RenderLivingEvent.Pre<EntityLivingBase>) {
-        if (!Utils.inSkyblock) return
+        if (!Utils.inSkyblock || !Skytils.config.slayerBossHitbox || mc.renderManager.isDebugBoundingBox) return
         if (event.entity is EntityArmorStand) {
             val entity = event.entity as EntityArmorStand
             if (!entity.hasCustomName()) return
             val name = entity.displayName.unformattedText
-            if (Skytils.config.slayerBossHitbox && name.endsWith("§c❤") && !name.endsWith("§e0§c❤") && !mc.renderManager.isDebugBoundingBox) {
+            if (name.endsWith("§c❤") && !name.endsWith("§e0§c❤")) {
                 val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
                 if (ZOMBIE_MINIBOSSES.any { name.contains(it) } || BLAZE_MINIBOSSES.any { name.contains(it) }) {
                     drawOutlinedBoundingBox(
