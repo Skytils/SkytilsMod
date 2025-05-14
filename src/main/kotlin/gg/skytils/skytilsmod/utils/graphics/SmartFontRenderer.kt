@@ -17,15 +17,14 @@
  */
 package gg.skytils.skytilsmod.utils.graphics
 
+import gg.skytils.skytilsmod.utils.graphics.ScreenRenderer.Companion.mc
 import gg.skytils.skytilsmod.utils.graphics.colors.CommonColors
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
 import gg.skytils.skytilsmod.utils.graphics.colors.MinecraftChatColors
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
 import java.awt.Color
-import java.util.*
 import kotlin.math.PI
 import kotlin.math.cos
 
@@ -35,9 +34,9 @@ import kotlin.math.cos
  * @author Wynntils
  */
 class SmartFontRenderer : FontRenderer(
-    Minecraft.getMinecraft().gameSettings,
+    mc.gameSettings,
     ResourceLocation("textures/font/ascii.png"),
-    Minecraft.getMinecraft().textureManager,
+    mc.textureManager,
     false
 ) {
     fun drawString(
@@ -113,8 +112,8 @@ class SmartFontRenderer : FontRenderer(
             val z = 2000.0f
             val color = Color.HSBtoRGB((time % z.toInt()).toFloat() / z, 0.8f, 0.8f)
             val red = (color shr 16 and 255).toFloat() / 255.0f
-            val blue = (color shr 8 and 255).toFloat() / 255.0f
-            val green = (color and 255).toFloat() / 255.0f
+            val green = (color shr 8 and 255).toFloat() / 255.0f
+            val blue = (color and 255).toFloat() / 255.0f
 
             // rendering shadows
             val originPosX = posX
@@ -227,7 +226,7 @@ class SmartFontRenderer : FontRenderer(
     }
 
     private fun drawChars(text: String, color: Int, shadow: TextShadow?): Float {
-        var color1 = color
+        var currentColor = color
         if (text.isEmpty()) return (-CHAR_SPACING).toFloat()
         var textLength = 0f
         var obfuscated = false
@@ -245,11 +244,11 @@ class SmartFontRenderer : FontRenderer(
                     when (text[index + 1]) {
                         'k' -> {
                             obfuscated = true
-                            index++ // skips the the next char
+                            index++ // skips the next char
                         }
                         'o' -> {
                             italic = true
-                            index++ // skips the the next char
+                            index++ // skips the next char
                         }
                         'l' -> {
                             bold = true
@@ -260,7 +259,7 @@ class SmartFontRenderer : FontRenderer(
                             italic = false
                             bold = false
                             detectedColor = 0xFFFFFF
-                            index++ // skips the the next char
+                            index++ // skips the next char
                         }
                     }
                 } else { // if a valid color is found remove special effects
@@ -271,21 +270,19 @@ class SmartFontRenderer : FontRenderer(
                 }
                 if (detectedColor != null) {
                     detectedColor = detectedColor and 0xFFFFFF
-                    detectedColor = detectedColor or (color1 and -0x1000000)
-                    color1 = detectedColor
+                    detectedColor = detectedColor or (currentColor and -0x1000000)
+                    currentColor = detectedColor
                 }
                 index++
                 continue
             }
             var character = text[index]
             if (obfuscated) {
-                val characters =
-                    "\u0020\u0021\"\u0023\u0024\u0025\u0026\u0027\u0028\u0029\u002a\u002b\u002c\u002d\u002e\u002f\u0030\u0031\u0032\u0033\u0034\u0035\u0036\u0037\u0038\u0039\u003a\u003b\u003c\u003d\u003e\u003f\u0040\u0041\u0042\u0043\u0044\u0045\u0046\u0047\u0048\u0049\u004a\u004b\u004c\u004d\u004e\u004f\u0050\u0051\u0052\u0053\u0054\u0055\u0056\u0057\u0058\u0059\u005a\u005b\\\u005d\u005e\u005f\u0060\u0061\u0062\u0063\u0064\u0065\u0066\u0067\u0068\u0069\u006a\u006b\u006c\u006d\u006e\u006f\u0070\u0071\u0072\u0073\u0074\u0075\u0076\u0077\u0078\u0079\u007a\u007b\u007c\u007d\u007e\u00a1\u00a3\u00aa\u00ab\u00ac\u00ae\u00b0\u00b1\u00b2\u00b7\u00ba\u00bb\u00bc\u00bd\u00bf\u00c0\u00c1\u00c2\u00c4\u00c5\u00c6\u00c7\u00c8\u00c9\u00ca\u00cb\u00cd\u00d1\u00d3\u00d4\u00d5\u00d6\u00d7\u00d8\u00da\u00dc\u00df\u00e0\u00e1\u00e2\u00e3\u00e4\u00e5\u00e6\u00e7\u00e8\u00e9\u00ea\u00eb\u00ec\u00ed\u00ee\u00ef\u00f1\u00f2\u00f3\u00f4\u00f5\u00f6\u00f7\u00f8\u00f9\u00fa\u00fb\u00fc\u00ff\u011f\u0130\u0131\u0152\u0153\u015e\u015f\u0174\u0175\u017e\u0192\u0207\u0393\u0398\u03a3\u03a6\u03a9\u03b1\u03b2\u03b4\u03bc\u03c0\u03c3\u03c4\u207f\u2205\u2208\u2219\u221a\u221e\u2229\u2248\u2261\u2264\u2265\u2320\u2321\u2500\u2502\u250c\u2510\u2514\u2518\u251c\u2524\u252c\u2534\u253c\u2550\u2551\u2552\u2553\u2554\u2555\u2556\u2557\u2558\u2559\u255a\u255b\u255c\u255d\u255e\u255f\u2560\u2561\u2562\u2563\u2564\u2565\u2566\u2567\u2568\u2569\u256a\u256b\u256c\u2580\u2584\u2588\u258c\u2590\u2591\u2592\u2593\u25a0"
-                if (characters.contains(character.toString())) {
+                if (character in OBFUSCATION_ALLOWED_CHARACTER_SET) {
                     val width = getCharWidth(character)
                     var newCharacter: Char
                     do {
-                        newCharacter = characters[Random().nextInt(characters.length)]
+                        newCharacter = OBFUSCATION_ALLOWED_CHARACTERS.random()
                     } while (width != getCharWidth(newCharacter))
                     character = newCharacter
                 }
@@ -293,7 +290,7 @@ class SmartFontRenderer : FontRenderer(
             val x = posX
             val y = posY
             val offset = if (unicodeFlag) 0.5f else 1f
-            val alpha = (color1 shr 24 and 0xFF) / 255f
+            val alpha = (currentColor shr 24 and 0xFF) / 255f
             setColor(0f, 0f, 0f, alpha)
             when (shadow) {
                 TextShadow.OUTLINE -> {
@@ -326,9 +323,9 @@ class SmartFontRenderer : FontRenderer(
             }
             posX = x
             posY = y
-            val red = (color1 shr 16 and 0xFF) / 255f
-            val green = (color1 shr 8 and 0xFF) / 255f
-            val blue = (color1 and 0xFF) / 255f
+            val red = (currentColor shr 16 and 0xFF) / 255f
+            val green = (currentColor shr 8 and 0xFF) / 255f
+            val blue = (currentColor and 0xFF) / 255f
             // Alpha calculated for shadow
             setColor(red, green, blue, alpha)
             var charLength = renderChar(character, italic)
@@ -371,7 +368,11 @@ class SmartFontRenderer : FontRenderer(
         const val CHAR_SPACING = 0
         const val CHAR_HEIGHT = 9
 
-        // Array of 16 CustomColors where minecraftColors[0xX] is the colour for §X
+        private const val OBFUSCATION_ALLOWED_CHARACTERS =
+            "\u0020\u0021\"\u0023\u0024\u0025\u0026\u0027\u0028\u0029\u002a\u002b\u002c\u002d\u002e\u002f\u0030\u0031\u0032\u0033\u0034\u0035\u0036\u0037\u0038\u0039\u003a\u003b\u003c\u003d\u003e\u003f\u0040\u0041\u0042\u0043\u0044\u0045\u0046\u0047\u0048\u0049\u004a\u004b\u004c\u004d\u004e\u004f\u0050\u0051\u0052\u0053\u0054\u0055\u0056\u0057\u0058\u0059\u005a\u005b\\\u005d\u005e\u005f\u0060\u0061\u0062\u0063\u0064\u0065\u0066\u0067\u0068\u0069\u006a\u006b\u006c\u006d\u006e\u006f\u0070\u0071\u0072\u0073\u0074\u0075\u0076\u0077\u0078\u0079\u007a\u007b\u007c\u007d\u007e\u00a1\u00a3\u00aa\u00ab\u00ac\u00ae\u00b0\u00b1\u00b2\u00b7\u00ba\u00bb\u00bc\u00bd\u00bf\u00c0\u00c1\u00c2\u00c4\u00c5\u00c6\u00c7\u00c8\u00c9\u00ca\u00cb\u00cd\u00d1\u00d3\u00d4\u00d5\u00d6\u00d7\u00d8\u00da\u00dc\u00df\u00e0\u00e1\u00e2\u00e3\u00e4\u00e5\u00e6\u00e7\u00e8\u00e9\u00ea\u00eb\u00ec\u00ed\u00ee\u00ef\u00f1\u00f2\u00f3\u00f4\u00f5\u00f6\u00f7\u00f8\u00f9\u00fa\u00fb\u00fc\u00ff\u011f\u0130\u0131\u0152\u0153\u015e\u015f\u0174\u0175\u017e\u0192\u0207\u0393\u0398\u03a3\u03a6\u03a9\u03b1\u03b2\u03b4\u03bc\u03c0\u03c3\u03c4\u207f\u2205\u2208\u2219\u221a\u221e\u2229\u2248\u2261\u2264\u2265\u2320\u2321\u2500\u2502\u250c\u2510\u2514\u2518\u251c\u2524\u252c\u2534\u253c\u2550\u2551\u2552\u2553\u2554\u2555\u2556\u2557\u2558\u2559\u255a\u255b\u255c\u255d\u255e\u255f\u2560\u2561\u2562\u2563\u2564\u2565\u2566\u2567\u2568\u2569\u256a\u256b\u256c\u2580\u2584\u2588\u258c\u2590\u2591\u2592\u2593\u25a0"
+        private val OBFUSCATION_ALLOWED_CHARACTER_SET = OBFUSCATION_ALLOWED_CHARACTERS.toSet()
+
+        // Array of 16 CustomColors where minecraftColors[0xX] is the color for §X
         private val minecraftColors = MinecraftChatColors.set.asInts()
         private fun decodeCommonColor(character: Char): Int? {
             if (character in '0'..'9') return minecraftColors[character - '0']

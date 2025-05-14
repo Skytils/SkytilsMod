@@ -809,7 +809,7 @@ class ScreenRenderer {
 
     companion object {
         val fontRenderer: SmartFontRenderer by lazy {
-            if (!Minecraft.getMinecraft().isCallingFromMinecraftThread) error("ScreenRenderer cannot continue loading because it is not on the main thread")
+            if (!mc.isCallingFromMinecraftThread) error("ScreenRenderer cannot continue loading because it is not on the main thread")
             SmartFontRenderer()
         }
         val mc: Minecraft by lazy {
@@ -847,11 +847,11 @@ class ScreenRenderer {
 
         @JvmStatic
         fun init() {
-            if (Minecraft.getMinecraft().gameSettings.language != null) {
-                fontRenderer.unicodeFlag = Minecraft.getMinecraft().isUnicode
-                fontRenderer.bidiFlag = Minecraft.getMinecraft().languageManager.isCurrentLanguageBidirectional
+            if (mc.gameSettings.language != null) {
+                fontRenderer.unicodeFlag = mc.isUnicode
+                fontRenderer.bidiFlag = mc.languageManager.isCurrentLanguageBidirectional
             }
-            (Minecraft.getMinecraft().resourceManager as IReloadableResourceManager).registerReloadListener(fontRenderer)
+            (mc.resourceManager as IReloadableResourceManager).registerReloadListener(fontRenderer)
         }
     }
 }
