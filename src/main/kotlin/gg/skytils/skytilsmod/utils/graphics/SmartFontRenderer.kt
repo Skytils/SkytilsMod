@@ -54,11 +54,10 @@ class SmartFontRenderer : FontRenderer(
         } else if (customColor === CommonColors.CRITICAL) {
             return drawCritText(text, x, y, alignment, shadow)
         }
-        val drawnText = text.replace("§\\[\\d+\\.?\\d*,\\d+\\.?\\d*,\\d+\\.?\\d*]".toRegex(), "")
         return when (alignment) {
             TextAlignment.MIDDLE -> drawString(
                 text,
-                x - getStringWidth(drawnText) / 2.0f,
+                x - getStringWidth(text) / 2.0f,
                 y,
                 customColor,
                 TextAlignment.LEFT_RIGHT,
@@ -66,7 +65,7 @@ class SmartFontRenderer : FontRenderer(
             )
             TextAlignment.RIGHT_LEFT -> drawString(
                 text,
-                x - getStringWidth(drawnText),
+                x - getStringWidth(text),
                 y,
                 customColor,
                 TextAlignment.LEFT_RIGHT,
