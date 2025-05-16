@@ -26,9 +26,11 @@ import gg.skytils.skytilsmod.events.impl.PacketEvent
 import gg.skytils.skytilsmod.events.impl.skyblock.DungeonEvent
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonFeatures
 import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasBossElement
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasElement
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.dev.TopographyGenerator
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.MapUpdater
@@ -103,6 +105,10 @@ object Catlas {
             }
             MapUpdater.updatePlayersUsingEntity()
         }
+
+        if (CatlasConfig.bossMapEnabled && DungeonTimer.bossEntryTime != -1L) {
+            MapUpdater.updatePlayersUsingEntity()
+        }
     }
 
     @SubscribeEvent
@@ -164,10 +170,12 @@ object Catlas {
     }
 
     init {
+        CatlasBossElement
         CatlasElement
 
         arrayOf(
             MimicDetector,
+            TopographyGenerator
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 }
