@@ -23,6 +23,8 @@ import gg.essential.universal.utils.MCClickEventAction
 import gg.essential.universal.wrappers.message.UTextComponent
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.commands.SkytilsCommands
+import net.minecraft.block.BlockDynamicLiquid
+import net.minecraft.block.BlockStaticLiquid
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.texture.TextureAtlasSprite
 import net.minecraft.client.renderer.texture.TextureMap
@@ -153,7 +155,7 @@ object TopographyGenerator {
                 val image = BufferedImage(sprite.iconWidth, sprite.iconHeight, BufferedImage.TYPE_INT_ARGB)
                 val frameData = sprite.getFrameTextureData(0)[0]
                 for (pixelY in 0 until sprite.iconHeight) {
-                    for (pixelX in 0 until sprite.iconHeight) {
+                    for (pixelX in 0 until sprite.iconWidth) {
                         val index = sprite.iconWidth * pixelY + pixelX
                         val color = frameData[index]
                         image.setRGB(pixelX, pixelY, color)
@@ -199,7 +201,7 @@ object TopographyGenerator {
         val registryName = blockState.block.registryName
         if (registryName != null) {
             // Construct texture name like "minecraft:blocks/stone"
-            val textureName = "${registryName.split(":")[0]}:blocks/${registryName.split(":")[1]}"
+            val textureName = "${registryName.split(":")[0]}:blocks/${registryName.split(":")[1]}${if (blockState.block is BlockStaticLiquid) "_still" else if (blockState.block is BlockDynamicLiquid) "flow" else ""}"
             try {
                 val sprite = textureMap.getAtlasSprite(textureName)
                 if (sprite != null && sprite.iconName != "missingno" && sprite.iconName != null) {
