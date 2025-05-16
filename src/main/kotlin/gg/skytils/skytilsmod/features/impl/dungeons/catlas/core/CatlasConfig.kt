@@ -220,6 +220,42 @@ object CatlasConfig : Vigilant(
     var mapBorderWidth = 3f
 
     @Property(
+        name = "Boss Map Enabled",
+        type = PropertyType.SWITCH,
+        description = "Render the boss map!",
+        category = "Boss Map",
+        subcategory = "Toggle",
+        i18nName = "catlas.config.boss_map.toggle.boss_map_enabled",
+        i18nCategory = "catlas.config.boss_map",
+        i18nSubcategory = "catlas.config.boss_map.toggle"
+    )
+    var bossMapEnabled = false
+
+    @Property(
+        name = "Boss Map Player Icons",
+        type = PropertyType.SWITCH,
+        description = "Render the player icons on the boss map.",
+        category = "Boss Map",
+        subcategory = "Icons",
+        i18nName = "catlas.config.boss_map.icons.player_icons",
+        i18nCategory = "catlas.config.boss_map",
+        i18nSubcategory = "catlas.config.boss_map.icons"
+    )
+    var bossMapPlayerIcons = true
+
+    @Property(
+        name = "Boss Map Terminal Icons",
+        type = PropertyType.SWITCH,
+        description = "Render the terminal icons on the boss map.",
+        category = "Boss Map",
+        subcategory = "Icons",
+        i18nName = "catlas.config.boss_map.icons.terminal_icons",
+        i18nCategory = "catlas.config.boss_map",
+        i18nSubcategory = "catlas.config.boss_map.icons"
+    )
+    var bossMapTerminalIcons = true
+
+    @Property(
         name = "Room Names",
         type = PropertyType.SELECTOR,
         description = "Shows names of rooms on map.",
@@ -611,6 +647,10 @@ object CatlasConfig : Vigilant(
         initialize()
         setCategoryDescription(
             "Map", "Catlas is a fork of works created by SkyblockAddons contributors (including Phoube and TirelessTraveler), UnclaimedBloom6, and Harry282"
+        )
+
+        setCategoryDescription(
+            "Boss Map", "Boss Maps might not be allowed on Hypixel. Use at your own risk.\nModifications that alter the look and feel of the in-game head-up display (HUD), without adding extra information which would normally be unavailable to the player [are allowed]... mini-maps, other player health/armor indicators, player distance/range, etc. are not."
         )
     }
 
