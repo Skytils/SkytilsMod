@@ -25,7 +25,7 @@ import gg.skytils.skytilsmod.utils.RenderUtil
 
 object TerminalIconRenderer : IconRenderer() {
     override fun draw(iconCtx: IconContext) {
-        if (CatlasConfig.bossMapTerminalIcons) return
+        if (!CatlasConfig.bossMapTerminalIcons) return
         F7Terminals.entries.forEach { terminal ->
             UGraphics.pushMatrix()
             UGraphics.translate(iconCtx.worldToIconX(terminal.pos.x), iconCtx.worldToIconY(terminal.pos.z), 0.0)

@@ -168,7 +168,7 @@ object TopographyGenerator {
                 g.drawImage(image, 0, 0, 16, 16, null)
                 g.dispose()
                 textureCache[blockState] = finalImage
-                return image
+                return finalImage
             }
         } catch (e: Exception) {
             println("Error getting texture for ${blockState.block.registryName}: ${e.message}")

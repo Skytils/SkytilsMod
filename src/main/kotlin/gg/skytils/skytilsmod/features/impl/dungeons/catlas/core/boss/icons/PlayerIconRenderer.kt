@@ -22,18 +22,17 @@ import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils.RenderUtils
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import net.minecraft.client.renderer.GlStateManager
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 object PlayerIconRenderer : IconRenderer() {
     override fun draw(iconCtx: IconContext) {
         if (!CatlasConfig.bossMapPlayerIcons) return
         DungeonListener.team.forEach { (name, teammate) ->
-            if (!teammate.dead || teammate.mapPlayer.isOurMarker && teammate.player != null) {
+            val player = teammate.player ?: return@forEach
+            if (!teammate.dead || teammate.mapPlayer.isOurMarker) {
                 GlStateManager.pushMatrix()
                 GlStateManager.translate(
-                    iconCtx.worldToIconX(teammate.player!!.posX.toInt()),
-                    iconCtx.worldToIconY(teammate.player!!.posZ.toInt()),
+                    iconCtx.worldToIconX(player.posX.toInt()),
+                    iconCtx.worldToIconY(player.posZ.toInt()),
                     0.0
                 )
                 RenderUtils.drawPlayerHead(name, teammate.mapPlayer)
