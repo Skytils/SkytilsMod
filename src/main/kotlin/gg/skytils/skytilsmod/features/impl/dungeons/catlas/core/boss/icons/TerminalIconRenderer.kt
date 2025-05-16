@@ -29,7 +29,8 @@ object TerminalIconRenderer : IconRenderer() {
         F7Terminals.entries.forEach { terminal ->
             UGraphics.pushMatrix()
             UGraphics.translate(iconCtx.worldToIconX(terminal.pos.x), iconCtx.worldToIconY(terminal.pos.z), 0.0)
-            RenderUtil.renderItem(terminal.type.item, 0, 0)
+            UGraphics.scale(0.3f, 0.3f, 1f)
+            RenderUtil.renderItem(terminal.type.item, -8, -8)
             UGraphics.popMatrix()
         }
     }
