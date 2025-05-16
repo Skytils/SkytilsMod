@@ -29,6 +29,7 @@ import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasElement
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.map.*
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.dev.TopographyGenerator
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonInfo
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.DungeonScanner
 import gg.skytils.skytilsmod.features.impl.dungeons.catlas.handlers.MapUpdater
@@ -168,6 +169,7 @@ object Catlas {
 
         arrayOf(
             MimicDetector,
+            TopographyGenerator
         ).forEach(MinecraftForge.EVENT_BUS::register)
     }
 }
