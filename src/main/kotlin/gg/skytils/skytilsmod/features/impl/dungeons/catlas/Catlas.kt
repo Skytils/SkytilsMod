@@ -105,6 +105,10 @@ object Catlas {
             }
             MapUpdater.updatePlayersUsingEntity()
         }
+
+        if (CatlasConfig.bossMapEnabled && DungeonTimer.bossEntryTime != -1L) {
+            MapUpdater.updatePlayersUsingEntity()
+        }
     }
 
     @SubscribeEvent
