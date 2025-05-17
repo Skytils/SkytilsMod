@@ -22,8 +22,7 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.tickTimer
 import gg.skytils.skytilsmod.listeners.DungeonListener
-import gg.skytils.skytilsmod.utils.RenderUtil
-import gg.skytils.skytilsmod.utils.Utils
+import gg.skytils.skytilsmod.utils.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.minecraft.block.Block
@@ -90,8 +89,8 @@ object WaterBoardSolver {
                                             ) {
                                                 chestPos = potentialChestPos
                                                 roomFacing = direction
-                                                println("Water board chest is at $chestPos")
-                                                println("Water board room is facing $direction")
+                                                printDevMessage("Water board chest is at $chestPos","waterboard")
+                                                printDevMessage("Water board room is facing $direction","waterboard")
                                                 break@findChest
                                             }
                                         }
@@ -235,38 +234,66 @@ object WaterBoardSolver {
         val renderTimes = HashMap<LeverBlock, Int>()
         var matching = 0
         val matrixStack = UMatrixStack()
-        for (color in WoolColor.entries) {
+
+        for (color in WoolColor.entries.filter { it.isExtended }) {
             val renderColor = Color(color.dyeColor.mapColor.colorValue).brighter()
-            if (color.isExtended) {
-                val solution = solutions[color] ?: continue
-                for ((lever, switched) in leverStates) {
-                    if (switched && !solution.contains(lever) || !switched && solution.contains(lever)) {
-                        val pos = lever.leverPos
-                        val displayed =
-                            renderTimes.compute(lever) { _: LeverBlock?, v: Int? -> v?.inc() ?: 0 }
-                        RenderUtil.drawLabel(
-                            Vec3(pos!!.up()).addVector(0.5, 0.5 + 0.5 * displayed!!, 0.5),
-                            "§l" + color.name,
-                            renderColor,
-                            event.partialTicks,
-                            matrixStack
-                        )
+            val solution = solutions[color] ?: continue
+
+            for ((lever, switched) in leverStates) {
+                if (switched != solution.contains(lever)) {
+                    val displayed = renderTimes.compute(lever) { _: LeverBlock?, v: Int? -> v?.inc() ?: 0 }
+
+                    when (Skytils.config.waterBoardSolverBoxes) {
+                        1 -> { // filled
+                            val pos = lever.solutionBlockPos!!
+                            val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
+                            RenderUtil.drawFilledBoundingBox(
+                                matrixStack,
+                                pos.up(1+displayed!!).toBoundingBox().expandBlock().offset(-viewerX, -viewerY, -viewerZ),
+                                renderColor,
+                                0.6f
+                            )
+                        }
+                        2 -> { // outlined
+                            val pos = lever.solutionBlockPos!!
+                            RenderUtil.drawOutlinedBoundingBox(
+                                pos.up(1+displayed!!).toBoundingBox().expandBlock(),
+                                renderColor,
+                                4f,
+                                event.partialTicks
+                            )
+                        }
+                        else -> { // text
+                            val pos = lever.leverPos
+                            RenderUtil.drawLabel(
+                                Vec3(pos!!.up()).addVector(
+                                    0.5,
+                                    0.5 + 0.5 * displayed!!,
+                                    0.5
+                                ),
+                                "§l" + color.name,
+                                renderColor,
+                                event.partialTicks,
+                                matrixStack
+                            )
+                        }
                     }
                 }
-                if (leverStates.entries.all { (key, value) ->
-                        value && solution.contains(key) || !value && !solution.contains(
-                            key
-                        )
-                    }) {
-                    RenderUtil.drawLabel(
-                        Vec3(chestPos!!.offset(roomFacing!!.opposite, 17).up(5)).addVector(
-                            0.5,
-                            0.5 + 0.5 * matching,
-                            0.5
-                        ), "§l" + color.name, renderColor, event.partialTicks, matrixStack
-                    )
-                    matching++
-                }
+            }
+            if (leverStates.entries.all { (key, value) ->
+                value == solution.contains(key)
+            }) {
+                RenderUtil.drawLabel(
+                    Vec3(chestPos!!.offset(roomFacing!!.opposite, 17).up(5)).addVector(
+                        0.5,
+                        0.5 + 0.5 * matching,
+                        0.5
+                    ), "§l" + color.name,
+                    renderColor,
+                    event.partialTicks,
+                    matrixStack
+                )
+                matching++
             }
         }
     }
@@ -315,6 +342,16 @@ object WaterBoardSolver {
                 val shiftBy = ordinal % 3 * 5
                 val leverSide = if (ordinal < 3) roomFacing!!.rotateY() else roomFacing!!.rotateYCCW()
                 return chestPos!!.up(5).offset(leverSide.opposite, 6).offset(
+                    roomFacing!!.opposite, 2 + shiftBy
+                ).offset(leverSide)
+            }
+
+        val solutionBlockPos: BlockPos?
+            get() {
+                if (chestPos == null || roomFacing == null) return null
+                val shiftBy = ordinal % 3 * 5
+                val leverSide = if (ordinal < 3) roomFacing!!.rotateY() else roomFacing!!.rotateYCCW()
+                return chestPos!!.up(5).offset(leverSide.opposite, 7).offset(
                     roomFacing!!.opposite, 2 + shiftBy
                 ).offset(leverSide)
             }
