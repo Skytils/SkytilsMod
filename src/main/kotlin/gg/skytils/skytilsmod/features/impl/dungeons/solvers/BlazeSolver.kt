@@ -68,14 +68,14 @@ object BlazeSolver {
     }
 
     fun detectOrientation() {
-        if (blazeMode == 0 && orderedBlazes.size > 0 && mc.thePlayer != null) {
+        if (blazeMode == 0 && orderedBlazes.isNotEmpty() && mc.thePlayer != null) {
             Skytils.launch {
                 val blazes = mc.theWorld.getEntities(
                     EntityBlaze::class.java
                 ) { blaze: EntityBlaze? -> mc.thePlayer.getDistanceSqToEntity(blaze) < 100 * 100 }
                 if (blazes.size > 10) {
                     println("More than 10 blazes, was there an update?")
-                } else if (blazes.size > 0) {
+                } else if (blazes.isNotEmpty()) {
                     val diffY = 5 * (10 - blazes.size)
                     val blaze = blazes[0]
                     val blazeX = blaze.posX.toInt()

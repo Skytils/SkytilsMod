@@ -268,7 +268,7 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         if (DungeonTimer.bossEntryTime != -1L) return
         DungeonListener.team.forEach { (name, teammate) ->
             if (!teammate.dead || teammate.mapPlayer.isOurMarker) {
-                RenderUtils.drawPlayerHead(name, teammate.mapPlayer)
+                RenderUtils.drawPlayerHeadOnMap(name, teammate.mapPlayer)
             }
         }
     }
@@ -352,10 +352,8 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
     override val toggled: Boolean
         get() = CatlasConfig.mapEnabled
-    override val height: Int
-        get() = 128
-    override val width: Int
-        get() = 128
+    override val height: Int = 128
+    override val width: Int = 128
 
     init {
         Skytils.guiManager.registerElement(this)

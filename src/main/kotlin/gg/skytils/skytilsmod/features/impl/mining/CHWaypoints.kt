@@ -145,7 +145,7 @@ object CHWaypoints {
                                 UTextComponent("§f${loc.displayName} ")
                                     .setClick(
                                         MCClickEventAction.RUN_COMMAND,
-                                        "/skytilshollowwaypoint set $x $y $z ${loc.id}"
+                                        "/skytilshollowwaypoint set '${loc.id}' $x $y $z"
                                     )
                                     .setHoverText("§eSet waypoint for ${loc.displayName}")
                             )
@@ -153,7 +153,7 @@ object CHWaypoints {
                                 UTextComponent("§e[Custom]")
                                     .setClick(
                                         MCClickEventAction.SUGGEST_COMMAND,
-                                        "/skytilshollowwaypoint set $x $y $z name_here"
+                                        "/sthw set 'name_here' $x $y $z"
                                     )
                                     .setHoverText("§eSet custom waypoint")
                             ).chat()
@@ -189,7 +189,7 @@ object CHWaypoints {
                 UChat.chat(
                     UTextComponent("$prefix §eClick to set a death waypoint at ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z}").setClick(
                         MCClickEventAction.RUN_COMMAND,
-                        "/sthw set ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z} Last Death"
+                        "/sthw set 'Last Death' ${lastTPLoc!!.x} ${lastTPLoc!!.y} ${lastTPLoc!!.z}"
                     )
                 )
             }
@@ -206,14 +206,14 @@ object CHWaypoints {
             if (loc.loc.exists()) continue
             message.append(
                 UTextComponent("${loc.displayName.substring(0, 2)}[${loc.displayName}] ")
-                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/sthw set $x $y $z ${loc.id}")
+                    .setClick(MCClickEventAction.SUGGEST_COMMAND, "/sthw set '${loc.id}' $x $y $z")
                     .setHoverText("§eSet waypoint for ${loc.cleanName}")
             )
         }
         message.append(
             UTextComponent("§e[Custom]").setClick(
                 MCClickEventAction.SUGGEST_COMMAND,
-                "/sthw set $x $y $z Name"
+                "/sthw set 'Name' $x $y $z"
             ).setHoverText("§eSet waypoint for custom location")
         )
         message.chat()

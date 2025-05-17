@@ -129,94 +129,96 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun drawPlayerHead(name: String, player: DungeonMapPlayer) {
+    fun drawPlayerHeadOnMap(name: String, player: DungeonMapPlayer) {
         GlStateManager.pushMatrix()
-        try {
-            // Translates to the player's location which is updated every tick.
-            if (player.isOurMarker || name == mc.thePlayer.name) {
+
+        // Translates to the player's location which is updated every tick.
+        if (player.isOurMarker || name == mc.thePlayer.name) {
+            GlStateManager.translate(
+                (mc.thePlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first,
+                (mc.thePlayer.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second,
+                0.0
+            )
+        } else {
+            player.teammate.player?.also { entityPlayer ->
+                // If the player is loaded in our view, use that location instead (more precise)
                 GlStateManager.translate(
-                    (mc.thePlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first,
-                    (mc.thePlayer.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second,
+                    (entityPlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first,
+                    (entityPlayer.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second,
                     0.0
                 )
-            } else {
-                player.teammate.player?.also { entityPlayer ->
-                    // If the player is loaded in our view, use that location instead (more precise)
-                    GlStateManager.translate(
-                        (entityPlayer.posX - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first,
-                        (entityPlayer.posZ - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second,
-                        0.0
-                    )
-                }.ifNull {
-                    GlStateManager.translate(player.mapX.toFloat(), player.mapZ.toFloat(), 0f)
-                }
+            }.ifNull {
+                GlStateManager.translate(player.mapX.toFloat(), player.mapZ.toFloat(), 0f)
+            }
+        }
+
+        drawPlayerHead(name, player)
+        GlStateManager.popMatrix()
+    }
+
+    fun drawPlayerHead(name: String, player: DungeonMapPlayer) {
+        GlStateManager.pushMatrix()
+        // Apply head rotation and scaling
+        GlStateManager.rotate(player.yaw + 180f, 0f, 0f, 1f)
+        GlStateManager.scale(CatlasConfig.playerHeadScale, CatlasConfig.playerHeadScale, 1f)
+
+        if (CatlasConfig.mapVanillaMarker && (player.isOurMarker || name == mc.thePlayer.name)) {
+            GlStateManager.rotate(180f, 0f, 0f, 1f)
+            GlStateManager.color(1f, 1f, 1f, 1f)
+            mc.textureManager.bindTexture(mapIcons)
+            worldRenderer.begin(7, DefaultVertexFormats.POSITION_TEX)
+            worldRenderer.pos(-6.0, 6.0, 0.0).tex(0.0, 0.0).endVertex()
+            worldRenderer.pos(6.0, 6.0, 0.0).tex(1.0, 0.0).endVertex()
+            worldRenderer.pos(6.0, -6.0, 0.0).tex(1.0, 1.0).endVertex()
+            worldRenderer.pos(-6.0, -6.0, 0.0).tex(0.0, 1.0).endVertex()
+            tessellator.draw()
+            GlStateManager.rotate(-180f, 0f, 0f, 1f)
+        } else {
+            // Render box behind the player head
+            val borderColor = when (player.teammate.dungeonClass) {
+                DungeonClass.ARCHER -> CatlasConfig.colorPlayerArcher
+                DungeonClass.BERSERK -> CatlasConfig.colorPlayerBerserk
+                DungeonClass.HEALER -> CatlasConfig.colorPlayerHealer
+                DungeonClass.MAGE -> CatlasConfig.colorPlayerMage
+                DungeonClass.TANK -> CatlasConfig.colorPlayerTank
+                else -> Color.BLACK
             }
 
-            // Apply head rotation and scaling
-            GlStateManager.rotate(player.yaw + 180f, 0f, 0f, 1f)
-            GlStateManager.scale(CatlasConfig.playerHeadScale, CatlasConfig.playerHeadScale, 1f)
+            renderRect(-6.0, -6.0, 12.0, 12.0, borderColor)
+            GlStateManager.translate(0f, 0f, 0.1f)
 
-            if (CatlasConfig.mapVanillaMarker && (player.isOurMarker || name == mc.thePlayer.name)) {
-                GlStateManager.rotate(180f, 0f, 0f, 1f)
-                GlStateManager.color(1f, 1f, 1f, 1f)
-                mc.textureManager.bindTexture(mapIcons)
-                worldRenderer.begin(7, DefaultVertexFormats.POSITION_TEX)
-                worldRenderer.pos(-6.0, 6.0, 0.0).tex(0.0, 0.0).endVertex()
-                worldRenderer.pos(6.0, 6.0, 0.0).tex(1.0, 0.0).endVertex()
-                worldRenderer.pos(6.0, -6.0, 0.0).tex(1.0, 1.0).endVertex()
-                worldRenderer.pos(-6.0, -6.0, 0.0).tex(0.0, 1.0).endVertex()
-                tessellator.draw()
-                GlStateManager.rotate(-180f, 0f, 0f, 1f)
-            } else {
-                // Render box behind the player head
-                val borderColor = when (player.teammate.dungeonClass) {
-                    DungeonClass.ARCHER -> CatlasConfig.colorPlayerArcher
-                    DungeonClass.BERSERK -> CatlasConfig.colorPlayerBerserk
-                    DungeonClass.HEALER -> CatlasConfig.colorPlayerHealer
-                    DungeonClass.MAGE -> CatlasConfig.colorPlayerMage
-                    DungeonClass.TANK -> CatlasConfig.colorPlayerTank
-                    else -> Color.BLACK
-                }
+            preDraw()
+            GlStateManager.enableTexture2D()
+            GlStateManager.color(1f, 1f, 1f, 1f)
 
-                renderRect(-6.0, -6.0, 12.0, 12.0, borderColor)
-                GlStateManager.translate(0f, 0f, 0.1f)
+            mc.textureManager.bindTexture(player.skin)
 
-                preDraw()
-                GlStateManager.enableTexture2D()
-                GlStateManager.color(1f, 1f, 1f, 1f)
-
-                mc.textureManager.bindTexture(player.skin)
-
-                GlStateManager.pushMatrix()
-                val scale = 1f - CatlasConfig.playerBorderPercentage
-                GlStateManager.scale(scale, scale, scale)
-                Gui.drawScaledCustomSizeModalRect(-6, -6, 8f, 8f, 8, 8, 12, 12, 64f, 64f)
-                if (player.renderHat) {
-                    Gui.drawScaledCustomSizeModalRect(-6, -6, 40f, 8f, 8, 8, 12, 12, 64f, 64f)
-                }
-                GlStateManager.popMatrix()
-
-                postDraw()
+            GlStateManager.pushMatrix()
+            val scale = 1f - CatlasConfig.playerBorderPercentage
+            GlStateManager.scale(scale, scale, scale)
+            Gui.drawScaledCustomSizeModalRect(-6, -6, 8f, 8f, 8, 8, 12, 12, 64f, 64f)
+            if (player.renderHat) {
+                Gui.drawScaledCustomSizeModalRect(-6, -6, 40f, 8f, 8, 8, 12, 12, 64f, 64f)
             }
+            GlStateManager.popMatrix()
 
-            // Handle player names
-            if (CatlasConfig.playerHeads == 2 || CatlasConfig.playerHeads == 1 && Utils.equalsOneOf(
-                    ItemUtil.getSkyBlockItemID(mc.thePlayer.heldItem),
-                    "SPIRIT_LEAP", "INFINITE_SPIRIT_LEAP", "HAUNT_ABILITY"
-                )
-            ) {
-                if (!CatlasConfig.mapRotate) {
-                    GlStateManager.rotate(-player.yaw + 180f, 0f, 0f, 1f)
-                }
-                GlStateManager.translate(0f, 10f, 0f)
-                GlStateManager.scale(CatlasConfig.playerNameScale, CatlasConfig.playerNameScale, 1f)
-                mc.fontRendererObj.drawString(
-                    name, -mc.fontRendererObj.getStringWidth(name) / 2f, 0f, 0xffffff, true
-                )
+            postDraw()
+        }
+
+        // Handle player names
+        if (CatlasConfig.playerHeads == 2 || CatlasConfig.playerHeads == 1 && Utils.equalsOneOf(
+                ItemUtil.getSkyBlockItemID(mc.thePlayer.heldItem),
+                "SPIRIT_LEAP", "INFINITE_SPIRIT_LEAP", "HAUNT_ABILITY"
+            )
+        ) {
+            if (!CatlasConfig.mapRotate) {
+                GlStateManager.rotate(-player.yaw + 180f, 0f, 0f, 1f)
             }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
+            GlStateManager.translate(0f, 10f, 0f)
+            GlStateManager.scale(CatlasConfig.playerNameScale, CatlasConfig.playerNameScale, 1f)
+            mc.fontRendererObj.drawString(
+                name, -mc.fontRendererObj.getStringWidth(name) / 2f, 0f, 0xffffff, true
+            )
         }
         GlStateManager.popMatrix()
     }

@@ -179,17 +179,11 @@ class Skytils {
         @JvmField
         var displayScreen: GuiScreen? = null
 
-        @JvmField
-        val threadPool = Executors.newFixedThreadPool(10) as ThreadPoolExecutor
-
-        @JvmField
-        val dispatcher = threadPool.asCoroutineDispatcher()
-
         val IO = object : CoroutineScope {
             override val coroutineContext = Dispatchers.IO + SupervisorJob() + CoroutineName("Skytils IO")
         }
 
-        override val coroutineContext: CoroutineContext = dispatcher + SupervisorJob() + CoroutineName("Skytils")
+        override val coroutineContext: CoroutineContext = Dispatchers.Default + SupervisorJob() + CoroutineName("Skytils")
 
         val deobfEnvironment by lazy {
             Launch.blackboard.getOrDefault("fml.deobfuscatedEnvironment", false) as Boolean
