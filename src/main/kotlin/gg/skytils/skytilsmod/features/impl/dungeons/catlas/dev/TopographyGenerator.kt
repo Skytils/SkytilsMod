@@ -35,6 +35,7 @@ import net.minecraft.world.World
 import org.incendo.cloud.annotations.Argument
 import org.incendo.cloud.annotations.Command
 import org.incendo.cloud.annotations.Commands
+import org.incendo.cloud.annotations.Flag
 import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.RenderingHints
@@ -42,6 +43,8 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
 import javax.imageio.ImageIO
+import kotlin.math.max
+import kotlin.math.min
 
 /**
 * The goal of this class is to generate an image that stitches together the textures of the highest blocks in the dungeon
@@ -53,7 +56,15 @@ object TopographyGenerator {
     }
 
     @Command("skytils|st dungeonmap stitch <x1> <y1> <z1> <x2> <y2> <z2>")
-    fun stitch(@Argument("x1") x1: Int, @Argument("y1") y1: Int, @Argument("z1") z1: Int, @Argument("x2") x2: Int, @Argument("y2") y2: Int, @Argument("z2") z2: Int) {
+    fun stitch(
+        @Argument("x1") x1: Int,
+        @Argument("y1") y1: Int,
+        @Argument("z1") z1: Int,
+        @Argument("x2") x2: Int,
+        @Argument("y2") y2: Int,
+        @Argument("z2") z2: Int,
+        @Flag("fit") fit: Boolean = false
+    ) {
         val region = AxisAlignedBB(x1.toDouble(), y1.toDouble(), z1.toDouble(), x2.toDouble(), y2.toDouble(), z2.toDouble())
         val width = (region.maxX - region.minX + 1).toInt()
         val height = (region.maxZ - region.minZ + 1).toInt()
@@ -71,7 +82,14 @@ object TopographyGenerator {
         )
 
         val graphics = outputImage.createGraphics()
+        graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR) // Use nearest neighbor for blocky look
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
 
+        var minXDraw = Int.MAX_VALUE
+        var maxXDraw = Int.MIN_VALUE
+        var minYDraw = Int.MAX_VALUE
+        var maxYDraw = Int.MIN_VALUE
         for (imgXIndex in 0 until width) {
             for (imgZIndex in 0 until height) {
 
@@ -92,11 +110,17 @@ object TopographyGenerator {
                     }
                 }
 
-                val imagePixelX = imgXIndex * texturePx
-                val imagePixelY = imgZIndex * texturePx
-
                 if (highestBlock != null) {
+                    val imagePixelX = imgXIndex * texturePx
+                    val imagePixelY = imgZIndex * texturePx
                     drawBlockTexture(graphics, highestBlock, imagePixelX, imagePixelY, texturePx)
+
+                    if (fit) {
+                        minXDraw = min(minXDraw, imagePixelX)
+                        maxXDraw = max(maxXDraw, imagePixelX)
+                        minYDraw = min(minYDraw, imagePixelY)
+                        maxYDraw = max(maxYDraw, imagePixelY)
+                    }
                 }
             }
         }
@@ -104,9 +128,25 @@ object TopographyGenerator {
 
         try {
             val outputFile = File("dungeon_topography_map.png")
-            ImageIO.write(outputImage, "PNG", outputFile)
+            if (!fit) {
+                ImageIO.write(outputImage, "PNG", outputFile)
+            } else {
+                val fittedWorldMinX = region.minX.toInt() + (minXDraw / texturePx)
+                val fittedWorldMinZ = region.minZ.toInt() + (minYDraw / texturePx)
+
+                val imgXIndexOfMax = (maxXDraw + 1 - texturePx) / texturePx
+                val fittedWorldMaxX = region.minX.toInt() + imgXIndexOfMax
+
+                val imgZIndexOfMax = (maxYDraw + 1 - texturePx) / texturePx
+                val fittedWorldMaxZ = region.minZ.toInt() + imgZIndexOfMax
+
+                UChat.chat("§bFitted image corresponds to world area:")
+                UChat.chat("§b  X: [$fittedWorldMinX, $fittedWorldMaxX]")
+                UChat.chat("§b  Z: [$fittedWorldMinZ, $fittedWorldMaxZ]")
+                ImageIO.write(outputImage.getSubimage(minXDraw, minYDraw, maxXDraw - minXDraw + 1, maxYDraw - minYDraw + 1), "PNG", outputFile)
+            }
             UChat.chat(
-                UTextComponent("§aTopography map successfully generated and saved to: ${outputFile.absolutePath}")
+                UTextComponent("§aTopography map successfully generated and saved to: ${outputFile.absolutePath}\n")
                     .setClick(MCClickEventAction.OPEN_FILE, outputFile.absolutePath)
             )
         } catch (e: IOException) {
@@ -162,13 +202,8 @@ object TopographyGenerator {
                     }
                 }
 
-                val finalImage = BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB)
-                val g = finalImage.createGraphics()
-                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR) // Use nearest neighbor for blocky look
-                g.drawImage(image, 0, 0, 16, 16, null)
-                g.dispose()
-                textureCache[blockState] = finalImage
-                return finalImage
+                textureCache[blockState] = image
+                return image
             }
         } catch (e: Exception) {
             println("Error getting texture for ${blockState.block.registryName}: ${e.message}")
