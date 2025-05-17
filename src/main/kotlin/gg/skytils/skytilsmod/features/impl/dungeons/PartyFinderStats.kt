@@ -62,7 +62,7 @@ object PartyFinderStats {
     }
 
     fun printStats(username: String, withKick: Boolean) {
-        Skytils.launch {
+        Skytils.IO.launch {
             try {
                 val uuid = MojangUtil.getUUIDFromUsername(username) ?: run {
                     UChat.chat("$failPrefix §cFailed to get UUID for username $username")
