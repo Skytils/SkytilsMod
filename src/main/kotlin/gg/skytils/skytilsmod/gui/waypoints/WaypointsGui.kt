@@ -308,13 +308,13 @@ class WaypointsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reopenab
             val island = SkyblockIsland.entries[selection]
             val comparator = SortingOptions.entries[SortingOptions.lastSelected].comparator
             // Sort the categories by their highest value, and then add the waypoints in each category sorted by their values
-            Waypoints.categories.sortedWith { a, b ->
-                comparator.compare(
-                    a.waypoints.maxWithOrNull(comparator) ?: return@sortedWith 0,
-                    b.waypoints.maxWithOrNull(comparator) ?: return@sortedWith 0
-                )
-            }.filter {
+            Waypoints.categories.filter {
                 it.island == island
+            }.sortedWith { a, b ->
+                Comparator.nullsFirst(comparator).compare(
+                    a.waypoints.maxWithOrNull(comparator),
+                    b.waypoints.maxWithOrNull(comparator)
+                )
             }.forEach {
                 val category = addNewCategory(it.name ?: "", isExpanded = it.isExpanded)
                 for (waypoint in it.waypoints.sortedWith(comparator)) {
