@@ -356,7 +356,7 @@ object DungeonListener {
 
                     teammate.player = mc.theWorld.playerEntities.find {
                         it.name == teammate.playerName && it.uniqueID.version() == 4
-                    }
+                    } as AbstractClientPlayer
 
                     old?.locationSkin?.let { teammate.skin = it }
 
@@ -396,7 +396,7 @@ object DungeonListener {
     fun onJoinWorld(event: EntityJoinWorldEvent) {
         // S0CPacketSpawnPlayer
         if (event.entity is AbstractClientPlayer && event.entity.uniqueID.version() == 4) {
-            team[event.entity.name]?.player = event.entity as EntityPlayer
+            team[event.entity.name]?.player = event.entity as AbstractClientPlayer
         }
     }
 
@@ -487,7 +487,7 @@ object DungeonListener {
         var tabEntryIndex: Int,
         var skin: ResourceLocation
     ) {
-        var player: EntityPlayer? = null
+        var player: AbstractClientPlayer? = null
             set(value) {
                 field = value
                 if (value != null) {
