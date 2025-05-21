@@ -89,8 +89,8 @@ object WaterBoardSolver {
                                             ) {
                                                 chestPos = potentialChestPos
                                                 roomFacing = direction
-                                                printDevMessage("Water board chest is at $chestPos","waterboard")
-                                                printDevMessage("Water board room is facing $direction","waterboard")
+                                                printDevMessage("Water board chest is at $chestPos", "waterboard")
+                                                printDevMessage("Water board room is facing $direction", "waterboard")
                                                 break@findChest
                                             }
                                         }
@@ -241,7 +241,7 @@ object WaterBoardSolver {
 
             for ((lever, switched) in leverStates) {
                 if (switched != solution.contains(lever)) {
-                    val displayed = renderTimes.compute(lever) { _: LeverBlock?, v: Int? -> v?.inc() ?: 0 }
+                    val displayed = renderTimes.compute(lever) { _, v: Int? -> v?.inc() ?: 0 }
 
                     when (Skytils.config.waterBoardSolverBoxes) {
                         1 -> { // filled

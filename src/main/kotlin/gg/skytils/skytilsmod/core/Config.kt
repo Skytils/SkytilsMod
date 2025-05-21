@@ -1295,7 +1295,7 @@ object Config : Vigilant(
         type = PropertyType.SELECTOR, name = "Water Board Solver Boxes",
         description = "§b[WIP] §rDisplays the solution as boxes above the levers instead of text.",
         category = "Dungeons", subcategory = "Solvers",
-        options = ["Text (default)","Filled Box","Outlined Box"],
+        options = ["Text (default)", "Filled Box", "Outlined Box"],
         i18nName = "skytils.config.dungeons.solvers.water_board_solver_boxes",
         i18nCategory = "skytils.config.dungeons",
         i18nSubcategory = "skytils.config.dungeons.solvers"
@@ -4487,7 +4487,7 @@ object Config : Vigilant(
         addDependency("nextBlazeColor", "showNextBlaze")
         addDependency("lineToNextBlazeColor", "lineToNextBlaze")
         addDependency("teleportMazeSolverColor", "teleportMazeSolver")
-        addDependency("waterBoardSolverBoxes","waterBoardSolver")
+        addDependency("waterBoardSolverBoxes", "waterBoardSolver")
         addDependency("ticTacToeSolverColor", "ticTacToeSolver")
         addDependency("clickInOrderFirst", "clickInOrderTerminalSolver")
         addDependency("clickInOrderSecond", "clickInOrderTerminalSolver")
