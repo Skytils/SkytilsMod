@@ -94,6 +94,7 @@ import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.client.settings.KeyBinding
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.launchwrapper.Launch
+import net.minecraft.network.PacketBuffer
 import net.minecraft.network.play.client.C01PacketChatMessage
 import net.minecraft.network.play.server.*
 import net.minecraftforge.client.event.GuiOpenEvent
@@ -556,7 +557,12 @@ class Skytils {
             }
         }
         if (!Utils.isOnHypixel && event.packet is S3FPacketCustomPayload && event.packet.channelName == "MC|Brand") {
-            val brand = event.packet.bufferData.readStringFromBuffer(Short.MAX_VALUE.toInt())
+            val buffer = event.packet.bufferData
+
+            val bufferCpy = PacketBuffer(buffer.duplicate())
+            bufferCpy.resetReaderIndex()
+
+            val brand = bufferCpy.readStringFromBuffer(Short.MAX_VALUE.toInt())
             if (brand.lowercase().contains("hypixel")) {
                 Utils.isOnHypixel = true
             }
