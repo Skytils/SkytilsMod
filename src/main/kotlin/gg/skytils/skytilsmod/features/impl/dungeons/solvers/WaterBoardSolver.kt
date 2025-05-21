@@ -235,13 +235,14 @@ object WaterBoardSolver {
         var matching = 0
         val matrixStack = UMatrixStack()
 
-        for (color in WoolColor.entries.filter { it.isExtended }) {
+        for (color in WoolColor.entries) {
+            if (!color.isExtended) continue
             val renderColor = Color(color.dyeColor.mapColor.colorValue).brighter()
             val solution = solutions[color] ?: continue
 
             for ((lever, switched) in leverStates) {
                 if (switched != solution.contains(lever)) {
-                    val displayed = renderTimes.compute(lever) { _, v: Int? -> v?.inc() ?: 0 }
+                    val displayed = renderTimes.compute(lever) { _, v: Int? -> v?.inc() ?: 0 }!!
 
                     when (Skytils.config.waterBoardSolverBoxes) {
                         1 -> { // filled
@@ -249,26 +250,29 @@ object WaterBoardSolver {
                             val (viewerX, viewerY, viewerZ) = RenderUtil.getViewerPos(event.partialTicks)
                             RenderUtil.drawFilledBoundingBox(
                                 matrixStack,
-                                pos.up(1+displayed!!).toBoundingBox().expandBlock().offset(-viewerX, -viewerY, -viewerZ),
+                                pos.up(1 + displayed).toBoundingBox().expandBlock()
+                                    .offset(-viewerX, -viewerY, -viewerZ),
                                 renderColor,
                                 0.6f
                             )
                         }
+
                         2 -> { // outlined
                             val pos = lever.solutionBlockPos!!
                             RenderUtil.drawOutlinedBoundingBox(
-                                pos.up(1+displayed!!).toBoundingBox().expandBlock(),
+                                pos.up(1 + displayed).toBoundingBox().expandBlock(),
                                 renderColor,
                                 4f,
                                 event.partialTicks
                             )
                         }
+
                         else -> { // text
                             val pos = lever.leverPos
                             RenderUtil.drawLabel(
                                 Vec3(pos!!.up()).addVector(
                                     0.5,
-                                    0.5 + 0.5 * displayed!!,
+                                    0.5 + 0.5 * displayed,
                                     0.5
                                 ),
                                 "§l" + color.name,
@@ -281,8 +285,9 @@ object WaterBoardSolver {
                 }
             }
             if (leverStates.entries.all { (key, value) ->
-                value == solution.contains(key)
-            }) {
+                    value == solution.contains(key)
+                }
+            ) {
                 RenderUtil.drawLabel(
                     Vec3(chestPos!!.offset(roomFacing!!.opposite, 17).up(5)).addVector(
                         0.5,
