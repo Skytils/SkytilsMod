@@ -119,6 +119,7 @@ skytils.config.dungeons.solvers.tic_tac_toe_solver=Tic Tac Toe Solver
 skytils.config.dungeons.solvers.tic_tac_toe_solver_color=Tic Tac Toe Solver Color
 skytils.config.dungeons.solvers.trivia_solver=Trivia Solver
 skytils.config.dungeons.solvers.water_board_solver=Water Board Solver
+skytils.config.dungeons.solvers.water_board_solver_boxes=Water Board Solver Boxes
 skytils.config.dungeons.solvers.find_correct_livid=Find correct Livid
 skytils.config.dungeons.solvers.type_of_livid_finder=Type of Livid Finder
 skytils.config.dungeons.tank_helper_tools.boxed_tanks=Boxed Tanks

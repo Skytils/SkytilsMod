@@ -1292,6 +1292,17 @@ object Config : Vigilant(
     var waterBoardSolver = false
 
     @Property(
+        type = PropertyType.SELECTOR, name = "Water Board Solver Boxes",
+        description = "§b[WIP] §rDisplays the solution as boxes above the levers instead of text.",
+        category = "Dungeons", subcategory = "Solvers",
+        options = ["Text (default)", "Filled Box", "Outlined Box"],
+        i18nName = "skytils.config.dungeons.solvers.water_board_solver_boxes",
+        i18nCategory = "skytils.config.dungeons",
+        i18nSubcategory = "skytils.config.dungeons.solvers"
+    )
+    var waterBoardSolverBoxes = 0
+
+    @Property(
         type = PropertyType.SWITCH, name = "Find correct Livid",
         description = "Shows the hp of the correct livid on F5 and M5",
         category = "Dungeons", subcategory = "Solvers",
@@ -4476,6 +4487,7 @@ object Config : Vigilant(
         addDependency("nextBlazeColor", "showNextBlaze")
         addDependency("lineToNextBlazeColor", "lineToNextBlaze")
         addDependency("teleportMazeSolverColor", "teleportMazeSolver")
+        addDependency("waterBoardSolverBoxes", "waterBoardSolver")
         addDependency("ticTacToeSolverColor", "ticTacToeSolver")
         addDependency("clickInOrderFirst", "clickInOrderTerminalSolver")
         addDependency("clickInOrderSecond", "clickInOrderTerminalSolver")
