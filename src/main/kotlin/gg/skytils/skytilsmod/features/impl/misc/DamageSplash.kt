@@ -56,6 +56,7 @@ object DamageSplash {
         val damageMatcher = damagePattern.matchEntire(strippedName) ?: return
         e.isCanceled = true
         entity.worldObj.removeEntity(e.entity)
+        if (Skytils.config.customDamageSplash == 3) return
         if (Skytils.config.hideDamageInBoss && DungeonFeatures.hasBossSpawned) return
         val name = entity.customNameTag
         val damage = damageMatcher.groups[1]!!.value.run {

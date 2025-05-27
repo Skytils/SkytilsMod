@@ -2825,7 +2825,7 @@ object Config : Vigilant(
         type = PropertyType.SELECTOR, name = "Custom Damage Splash Style",
         description = "§b[WIP] §rReplaces Skyblock damage splashes with custom rendered ones.",
         category = "Miscellaneous", subcategory = "Quality of Life",
-        options = ["Off", "Comma", "Truncate"],
+        options = ["Off", "Comma", "Truncate","Hidden"],
         i18nName = "skytils.config.miscellaneous.quality_of_life.custom_damage_splash_style",
         i18nCategory = "skytils.config.miscellaneous",
         i18nSubcategory = "skytils.config.miscellaneous.quality_of_life"
