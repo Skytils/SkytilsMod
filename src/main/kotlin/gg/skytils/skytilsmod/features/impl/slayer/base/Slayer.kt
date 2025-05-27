@@ -24,7 +24,7 @@ import gg.skytils.skytilsmod.features.impl.slayer.SlayerFeatures
 import gg.skytils.skytilsmod.features.impl.slayer.impl.DemonlordSlayer
 import gg.skytils.skytilsmod.utils.baseMaxHealth
 import gg.skytils.skytilsmod.utils.printDevMessage
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -53,9 +53,10 @@ open class Slayer<T : EntityLivingBase>(
 
     init {
         SlayerFeatures.launch {
-            val (n, t) = detectSlayerEntities().first()
-            nameEntity = n
-            timerEntity = t
+            detectSlayerEntities().firstOrNull()?.let { (n, t) ->
+                nameEntity = n
+                timerEntity = t
+            }
         }
     }
 
@@ -111,7 +112,7 @@ open class Slayer<T : EntityLivingBase>(
                     "slayer"
                 )
                 SlayerFeatures.slayer = null
-                throw Exception("Wrong entity!")
+                return@tickTask null
             }
         }
     open fun tick(event: TickEvent.ClientTickEvent) {}
