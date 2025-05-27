@@ -429,6 +429,16 @@ object Config : Vigilant(
     var necronPhaseTimer = false
 
     @Property(
+        type = PropertyType.SWITCH, name = "Goldor Terminal Attribution",
+        description = "Displays how many terminals teammates did in phase 3",
+        category = "Dungeons", subcategory = "Miscellaneous",
+        i18nName = "skytils.config.dungeons.miscellaneous.terminal_attribution",
+        i18nCategory = "skytils.config.dungeons",
+        i18nSubcategory = "skytils.config.dungeons.miscellaneous"
+    )
+    var terminalAttribution = false
+
+    @Property(
         type = PropertyType.SWITCH, name = "Red Screen Fix",
         description = "Fixes an issue in The Catacombs Floors 2 and 3 where the screen turns red on fancy graphics.",
         category = "Dungeons", subcategory = "Miscellaneous",
