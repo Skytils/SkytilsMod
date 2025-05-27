@@ -28,6 +28,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.failPrefix
 import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.API
 import gg.skytils.skytilsmod.utils.*
+import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
 import gg.skytils.skytilsmod.utils.NumberUtil.toRoman
 import gg.skytils.skytilsmod.utils.SkillUtils.level
 import kotlinx.coroutines.launch
@@ -104,6 +105,12 @@ object PartyFinderStats {
                     val name = playerResponse.formattedName
 
                     val secrets = playerResponse.achievements.getOrDefault("skyblock_treasure_hunter", 0)
+                    val comps = cataData.tier_completions.values
+                    val masterComps = masterCataData?.tier_completions?.values ?: emptyList()
+                    val runs = comps.sum() - (cataData.tier_completions["total"] ?: 0.0) +
+                            masterComps.sum() - (masterCataData?.tier_completions?.get("total") ?: 0.0)
+                    val secretsPerRun = (secrets.toDouble() / runs).roundToPrecision(2)
+
                     val component = UMessage("&2&m--------------------------------\n").append(
                         "$name §8» §dCata §9${
                             NumberUtil.nf.format(cataLevel)
@@ -240,6 +247,7 @@ object PartyFinderStats {
                         UTextComponent("§5Miscellanous: §7(Hover)\n\n").setHoverText(
                             """
                                 #§aTotal Secrets Found: §l§e${NumberUtil.nf.format(secrets)}
+                                #§aSecrets Per Run: §l§e${NumberUtil.nf.format(secretsPerRun)}
                                 #§aBlood Mobs Killed: §l§e${NumberUtil.nf.format(bloodMobsKilled)}
                                 #§dMagical Power: §l§e$magicalPower
                             """.trimMargin("#")
