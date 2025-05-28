@@ -19,6 +19,7 @@ package gg.skytils.skytilsmod.mixins.hooks.inventory
 
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals.SelectAllColorSolver
 import gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals.StartsWithSequenceSolver
+import gg.skytils.skytilsmod.features.impl.dungeons.solvers.terminals.TerminalFeatures
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
@@ -27,7 +28,7 @@ import net.minecraft.world.ILockableContainer
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 fun markTerminalItems(slot: Slot, cir: CallbackInfoReturnable<ItemStack?>) {
-    if (!Utils.inSkyblock || slot.inventory !is ILockableContainer) return
+    if (!Utils.inSkyblock || slot.inventory !is ILockableContainer || !TerminalFeatures.isInPhase3()) return
     val original = slot.inventory.getStackInSlot(slot.slotIndex) ?: return
     if (!original.isItemEnchanted && (SelectAllColorSolver.shouldClick.contains(slot.slotNumber) ||
                 StartsWithSequenceSolver.shouldClick.contains(slot.slotNumber))
