@@ -210,7 +210,11 @@ object RenderUtils {
             GlStateManager.translate(0f, 10f, 0f)
             GlStateManager.scale(CatlasConfig.playerNameScale, CatlasConfig.playerNameScale, 1f)
             mc.fontRendererObj.drawString(
-                name, -mc.fontRendererObj.getStringWidth(name) / 2f, 0f, 0xffffff, true
+                if (!CatlasConfig.useClassForPlayerNames) name else player.teammate.dungeonClass.className,
+                -mc.fontRendererObj.getStringWidth(if (!CatlasConfig.useClassForPlayerNames) name else player.teammate.dungeonClass.className) / 2f,
+                0f,
+                if (CatlasConfig.colorPlayerNames) player.teammate.dungeonClass.color.rgb else 0xffffff,
+                true
             )
         }
         GlStateManager.popMatrix()
