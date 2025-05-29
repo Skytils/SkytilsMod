@@ -437,7 +437,7 @@ object CatlasConfig : Vigilant(
         i18nCategory = "catlas.config.colors",
         i18nSubcategory = "catlas.config.colors.players"
     )
-    var colorPlayerArcher = Color(247 ,156 ,165 , 255)
+    var colorPlayerArcher = Color(247, 156, 165, 255)
 
     @Property(
         name = "Player Border Color (Berserk)",
