@@ -55,7 +55,7 @@ fun modifyActionBarScale() {
         val element: GuiElement = MiscFeatures.ActionBarDummy
 
         if (element.scale != 1f) {
-            GlStateManager.scale(element.scale.toDouble(), element.scale.toDouble(), 0.0)
+            GlStateManager.scale(element.scale.toDouble(), element.scale.toDouble(), 1.0)
         }
     }
 }
