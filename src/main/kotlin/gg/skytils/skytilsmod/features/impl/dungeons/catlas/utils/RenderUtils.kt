@@ -175,14 +175,7 @@ object RenderUtils {
             GlStateManager.rotate(-180f, 0f, 0f, 1f)
         } else {
             // Render box behind the player head
-            val borderColor = when (player.teammate.dungeonClass) {
-                DungeonClass.ARCHER -> CatlasConfig.colorPlayerArcher
-                DungeonClass.BERSERK -> CatlasConfig.colorPlayerBerserk
-                DungeonClass.HEALER -> CatlasConfig.colorPlayerHealer
-                DungeonClass.MAGE -> CatlasConfig.colorPlayerMage
-                DungeonClass.TANK -> CatlasConfig.colorPlayerTank
-                else -> Color.BLACK
-            }
+            val borderColor = player.teammate.dungeonClass.color
 
             renderRect(-6.0, -6.0, 12.0, 12.0, borderColor)
             GlStateManager.translate(0f, 0f, 0.1f)
