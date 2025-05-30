@@ -205,7 +205,7 @@ object MiscFeatures {
         if (!Utils.inSkyblock) return
         if (Skytils.config.bossBarFix && event.entity is IBossDisplayData && event.entity.isInvisible && event.entity.hasCustomName()) {
             event.result = Event.Result.ALLOW
-        } else if (Skytils.config.hideDyingMobs && event.entity is EntityLivingBase && (event.entity.health <= 0 || event.entity.isDead)) {
+        } else if (Skytils.config.hideDyingMobs && event.entity is EntityLivingBase && (event.entity.isDead || event.entity.health <= 0)) {
             event.isCanceled = true
         } else if (event.entity is EntityFallingBlock) {
             val entity = event.entity
