@@ -356,7 +356,7 @@ object DungeonListener {
 
                     teammate.player = mc.theWorld.playerEntities.find {
                         it.name == teammate.playerName && it.uniqueID.version() == 4
-                    } as AbstractClientPlayer
+                    } as? AbstractClientPlayer
 
                     old?.locationSkin?.let { teammate.skin = it }
 
