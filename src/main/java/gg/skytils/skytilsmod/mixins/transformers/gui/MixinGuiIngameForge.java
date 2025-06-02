@@ -53,7 +53,7 @@ public abstract class MixinGuiIngameForge extends GuiIngame {
         GuiIngameForgeHookKt.modifyActionBarPosition(args);
     }
 
-    @Inject(method = "renderRecordOverlay", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/client/renderer/GlStateManager;translate(FFF)V"))
+    @Inject(method = "renderRecordOverlay", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/client/renderer/GlStateManager;translate(FFF)V"), allow = 1)
     private void modifyActionBarScale(int width, int height, float partialTicks, CallbackInfo ci) {
         GuiIngameForgeHookKt.modifyActionBarScale();
     }
