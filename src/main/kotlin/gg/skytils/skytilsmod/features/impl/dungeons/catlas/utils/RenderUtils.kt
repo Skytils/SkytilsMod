@@ -209,9 +209,10 @@ object RenderUtils {
             }
             GlStateManager.translate(0f, 10f, 0f)
             GlStateManager.scale(CatlasConfig.playerNameScale, CatlasConfig.playerNameScale, 1f)
+            val renderName = if (!CatlasConfig.useClassForPlayerNames) name else player.teammate.dungeonClass.className
             mc.fontRendererObj.drawString(
-                if (!CatlasConfig.useClassForPlayerNames) name else player.teammate.dungeonClass.className,
-                -mc.fontRendererObj.getStringWidth(if (!CatlasConfig.useClassForPlayerNames) name else player.teammate.dungeonClass.className) / 2f,
+                renderName,
+                -mc.fontRendererObj.getStringWidth(renderName) / 2f,
                 0f,
                 if (CatlasConfig.colorPlayerNames) player.teammate.dungeonClass.color.rgb else 0xffffff,
                 true
