@@ -129,10 +129,18 @@ object CataCommand {
                 )
 
             val secrets = playerResponse?.achievements?.getOrDefault("skyblock_treasure_hunter", 0) ?: 0
-            val comps = cataData.tier_completions.values
-            val masterComps = masterCataData?.tier_completions?.values ?: emptyList()
-            val runs = comps.sum() - (cataData.tier_completions["total"] ?: 0.0) +
-                    masterComps.sum() - (masterCataData?.tier_completions?.get("total") ?: 0.0)
+            var runs = 0.0
+            val profiles = API.getSkyblockProfiles(uuid) ?: emptyList()
+            for(profileName in profiles) {
+                val profile = profileName.members.get(uuid.nonDashedString())
+                val profileDungeonData = profile?.dungeons?.dungeon_types?.get("catacombs")
+                if(profileDungeonData?.experience == null) continue
+
+                val comps = profileDungeonData.normal.tier_completions.values
+                val masterComps = profileDungeonData.master?.tier_completions?.values ?: emptyList()
+                runs += comps.sum() - (profileDungeonData.normal.tier_completions["total"] ?: 0.0) +
+                        masterComps.sum() - (profileDungeonData.master?.tier_completions?.get("total") ?: 0.0)
+            }
             val secretsPerRun = (secrets.toDouble() / runs).roundToPrecision(2)
 
             val classAvgOverflow = (archLevel + bersLevel + healerLevel + mageLevel + tankLevel) / 5.0
