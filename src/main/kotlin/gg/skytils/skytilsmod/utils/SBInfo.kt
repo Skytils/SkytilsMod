@@ -36,7 +36,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent
 import java.text.ParseException
-import org.apache.commons.lang3.time.FastDateFormat
+import java.text.SimpleDateFormat
 import java.util.*
 
 /**
@@ -62,8 +62,6 @@ object SBInfo {
     @JvmField
     var lastOpenContainerName: String? = null
     private val junkRegex = Regex("[^\u0020-\u0127û]")
-
-    private val parseFormat = FastDateFormat.getInstance("hh:mm a", Locale.ROOT)
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onGuiOpen(event: GuiOpenEvent) {
@@ -119,6 +117,7 @@ object SBInfo {
                     time = matcher.groupValues[0].stripControlCodes().trim()
                     try {
                         val timeSpace = time.replace("am", " am").replace("pm", " pm")
+                        val parseFormat = SimpleDateFormat("hh:mm a")
                         currentTimeDate = parseFormat.parse(timeSpace)
                     } catch (_: ParseException) {
                     }

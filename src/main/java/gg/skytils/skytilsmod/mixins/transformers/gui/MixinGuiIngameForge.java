@@ -26,10 +26,8 @@ import net.minecraftforge.client.GuiIngameForge;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArgs;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 @Mixin(GuiIngameForge.class)
@@ -51,11 +49,6 @@ public abstract class MixinGuiIngameForge extends GuiIngame {
     @ModifyArgs(method = "renderRecordOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;translate(FFF)V"))
     private void modifyActionBarPosition(Args args) {
         GuiIngameForgeHookKt.modifyActionBarPosition(args);
-    }
-
-    @Inject(method = "renderRecordOverlay", at = @At(value = "INVOKE", shift = At.Shift.AFTER, target = "Lnet/minecraft/client/renderer/GlStateManager;translate(FFF)V"), allow = 1)
-    private void modifyActionBarScale(int width, int height, float partialTicks, CallbackInfo ci) {
-        GuiIngameForgeHookKt.modifyActionBarScale();
     }
 
     @ModifyVariable(method = "renderHealth", at = @At(value = "STORE"), ordinal = 1, remap = false)
