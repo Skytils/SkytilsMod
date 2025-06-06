@@ -43,7 +43,7 @@ object RandomStuff {
     fun onCheckRenderEvent(event: CheckRenderEntityEvent<*>) {
         if (!Skytils.config.randomStuff || !Utils.inSkyblock) return
         event.apply {
-            if (entity.isInvisible && DungeonTimer.phase1ClearTime != -1L && DungeonTimer.bossClearTime == -1L && entity is EntityArmorStand) {
+            if (DungeonTimer.phase1ClearTime != -1L && DungeonTimer.bossClearTime == -1L && entity is EntityArmorStand && entity.isInvisible) {
                 val nn = entity.inventory.filterNotNull()
                 if (nn.size != 1) return
                 if (nn.first().item !is ItemBlock) return

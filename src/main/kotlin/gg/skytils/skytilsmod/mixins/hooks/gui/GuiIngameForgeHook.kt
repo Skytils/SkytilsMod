@@ -22,6 +22,7 @@ import gg.skytils.skytilsmod.Skytils.Companion.mc
 import gg.skytils.skytilsmod.core.structure.GuiElement
 import gg.skytils.skytilsmod.features.impl.misc.MiscFeatures
 import gg.skytils.skytilsmod.utils.Utils
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args
 
@@ -46,6 +47,16 @@ fun modifyActionBarPosition(args: Args) {
         val element: GuiElement = MiscFeatures.ActionBarDummy
         args.set(0, element.scaleX)
         args.set(1, element.scaleY + 4f)
+    }
+}
+
+fun modifyActionBarScale() {
+    if (Skytils.config.moveableActionBar && Utils.inSkyblock) {
+        val element: GuiElement = MiscFeatures.ActionBarDummy
+
+        if (element.scale != 1f) {
+            GlStateManager.scale(element.scale.toDouble(), element.scale.toDouble(), 1.0)
+        }
     }
 }
 
