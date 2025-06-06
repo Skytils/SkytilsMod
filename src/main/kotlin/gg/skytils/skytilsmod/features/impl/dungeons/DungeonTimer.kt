@@ -56,11 +56,6 @@ object DungeonTimer {
     var witherDoors = 0
     var scoreShownAt = -1L
 
-    val players = mutableListOf<String>()
-    val levers = mutableListOf<Int>()
-    val terminals = mutableListOf<Int>()
-    val devices = mutableListOf<Int>()
-
     init {
         DungeonTimerElement()
         NecronPhaseTimerElement()
@@ -182,11 +177,6 @@ object DungeonTimer {
                     }
 
                     message.endsWith(" is opening!§r") && terminalClearTime == -1L -> {
-                        if(Skytils.config.terminalAttribution) {
-                            UChat.chat("§2§lTerminal Attribution:")
-                            for (i in 0..(players.size - 1))
-                                UChat.chat("§a${players[i]} §8| §aDevices: §6${devices[i]} §8| §aTerminals: §6${terminals[i]} §8| §aLevers: §6${levers[i]}")
-                        }
                         terminalClearTime = System.currentTimeMillis()
                         if (Skytils.config.necronPhaseTimer) UChat.chat(
                             "§eTerminals §btook ${diff(terminalClearTime, phase2ClearTime)} seconds."
@@ -206,22 +196,6 @@ object DungeonTimer {
                             "§4Necron §btook ${diff(phase4ClearTime, phase3ClearTime)} seconds."
                         )
                     }
-                }
-            }
-
-            dungeonFloorNumber == 7 && (message.contains("§r§a activated a terminal!") || message.contains("§r§a activated a lever!") || message.contains("§r§a completed a device!")) -> {
-                val ign = unformatted.substringBefore(" ")
-                if(!players.contains(ign)) {
-                    players.add(ign)
-                    devices.add(0)
-                    terminals.add(0)
-                    levers.add(0)
-                }
-
-                when {
-                    message.contains("device") -> devices[players.indexOf(ign)]++
-                    message.contains("terminal") -> terminals[players.indexOf(ign)]++
-                    message.contains("lever") -> levers[players.indexOf(ign)]++
                 }
             }
 
@@ -261,10 +235,6 @@ object DungeonTimer {
         giantsClearTime = -1
         witherDoors = 0
         scoreShownAt = -1
-        players.clear()
-        terminals.clear()
-        devices.clear()
-        levers.clear()
     }
 
     class DungeonTimerElement : GuiElement("Dungeon Timer", x = 200, y = 80) {

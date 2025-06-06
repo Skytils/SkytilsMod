@@ -43,12 +43,12 @@ object CataCommand {
     @Command("skytilscata [name]")
     suspend fun processCommand(
         @Argument("name")
-        name: String = ""
+        name: String? = null
     ) = Skytils.IO.launch {
-        val username = if(name.equals("")) mc.thePlayer.name else name
+        val username = name ?: mc.thePlayer.name
         UChat.chat("§aGetting data for ${username}...")
         val uuid = try {
-            MojangUtil.getUUIDFromUsername(username)
+            if (name == null) mc.thePlayer.uniqueID else MojangUtil.getUUIDFromUsername(username)
         } catch (e: MojangUtil.MojangException) {
             UChat.chat("$failPrefix §cFailed to get UUID, reason: ${e.message}")
             return@launch

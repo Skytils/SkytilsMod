@@ -31,7 +31,6 @@ skytils.config.dungeons.miscellaneous.dungeon_start_confirmation=进入地牢确
 skytils.config.dungeons.miscellaneous.dungeon_sweat=地牢彩蛋
 skytils.config.dungeons.miscellaneous.dungeon_timer=地牢计时器
 skytils.config.dungeons.miscellaneous.necron_phase_timer=F7/M7 Boss阶段计时器
-skytils.config.dungeons.miscellaneous.terminal_attribution=Goldor Terminal Attribution
 skytils.config.dungeons.miscellaneous.red_screen_fix=边界外红屏修复
 skytils.config.dungeons.miscellaneous.show_decimal_seconds_on_timers=计时器显示小数秒数
 skytils.config.dungeons.miscellaneous.sadan_phase_timer=F6/M6 Boss阶段计时器

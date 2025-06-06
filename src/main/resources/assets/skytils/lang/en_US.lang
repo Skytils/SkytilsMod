@@ -34,7 +34,6 @@ skytils.config.dungeons.miscellaneous.dungeon_start_confirmation=Dungeon Start C
 skytils.config.dungeons.miscellaneous.dungeon_sweat=Dungeon Sweat
 skytils.config.dungeons.miscellaneous.dungeon_timer=Dungeon Timer
 skytils.config.dungeons.miscellaneous.necron_phase_timer=Necron Phase Timer
-skytils.config.dungeons.miscellaneous.terminal_attribution=Goldor Terminal Attribution
 skytils.config.dungeons.miscellaneous.red_screen_fix=Red Screen Fix
 skytils.config.dungeons.miscellaneous.show_decimal_seconds_on_timers=Show Decimal Seconds on Timers
 skytils.config.dungeons.miscellaneous.sadan_phase_timer=Sadan Phase Timer
