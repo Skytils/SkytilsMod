@@ -247,7 +247,7 @@ object PartyFinderStats {
                         UTextComponent("§5Miscellanous: §7(Hover)\n\n").setHoverText(
                             """
                                 #§aTotal Secrets Found: §l§e${NumberUtil.nf.format(secrets)}
-                                ##§aSecrets Per Run: §l§e${NumberUtil.nf.format(secretsPerRun)}
+                                #§aSecrets Per Run: §l§e${NumberUtil.nf.format(secretsPerRun)}
                                 #§aBlood Mobs Killed: §l§e${NumberUtil.nf.format(bloodMobsKilled)}
                                 #§dMagical Power: §l§e$magicalPower
                             """.trimMargin("#")
