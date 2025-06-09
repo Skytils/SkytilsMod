@@ -64,13 +64,13 @@ enum class DungeonClass {
     val apiName = name.lowercase()
     val color: Color
         get() = when (this) {
-        ARCHER -> CatlasConfig.colorPlayerArcher
-        BERSERK -> CatlasConfig.colorPlayerBerserk
-        HEALER -> CatlasConfig.colorPlayerHealer
-        MAGE -> CatlasConfig.colorPlayerMage
-        TANK -> CatlasConfig.colorPlayerTank
-        else -> Color.BLACK
-    }
+            ARCHER -> CatlasConfig.colorPlayerArcher
+            BERSERK -> CatlasConfig.colorPlayerBerserk
+            HEALER -> CatlasConfig.colorPlayerHealer
+            MAGE -> CatlasConfig.colorPlayerMage
+            TANK -> CatlasConfig.colorPlayerTank
+            else -> Color.BLACK
+        }
 
     override fun toString(): String {
         return this.className

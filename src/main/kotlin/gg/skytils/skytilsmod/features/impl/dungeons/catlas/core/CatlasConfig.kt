@@ -127,14 +127,14 @@ object CatlasConfig : Vigilant(
     var mapVanillaMarker = false
 
     @Property(
-    name = "Show Class Name Instead of Player Names",
-    type = PropertyType.SWITCH,
-    description = "Show the class name under player heads instead of the player name",
-    category = "Map",
-    subcategory = "Toggle",
-    i18nName = "catlas.config.map.toggle.player_class_name",
-    i18nCategory = "catlas.config.map",
-    i18nSubcategory = "catlas.config.map.toggle"
+        name = "Show Class Name Instead of Player Names",
+        type = PropertyType.SWITCH,
+        description = "Show the class name under player heads instead of the player name",
+        category = "Map",
+        subcategory = "Toggle",
+        i18nName = "catlas.config.map.toggle.player_class_name",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.toggle"
     )
     var useClassForPlayerNames = false
 
