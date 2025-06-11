@@ -98,8 +98,7 @@ object Catlas {
             ScanUtils.getRoomFromPos(mc.thePlayer.position)?.uniqueRoom?.let { unq ->
                 if (unq.state == RoomState.PREVISITED) return@let
                 unq.state = RoomState.PREVISITED
-                // TODO: unq.tiles does not work here, figure out why #536
-                DungeonInfo.dungeonList.filter { (it as? Room)?.uniqueRoom == unq && it.state != RoomState.PREVISITED }.forEach {
+                unq.tiles.forEach {
                     it.state = RoomState.PREVISITED
                 }
             }

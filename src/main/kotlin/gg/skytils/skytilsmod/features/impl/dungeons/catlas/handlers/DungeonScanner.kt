@@ -163,7 +163,7 @@ object DungeonScanner {
                     } else {
                         Room(x, z, it.data).apply {
                             isSeparator = true
-                            uniqueRoom = DungeonInfo.uniqueRooms[data.name]
+                            addToUnique(row, column)
                         }
                     }
                 }
