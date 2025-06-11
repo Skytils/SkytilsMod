@@ -96,11 +96,15 @@ object Catlas {
 
         if (CatlasConfig.mapShowBeforeStart && DungeonTimer.dungeonStartTime == -1L) {
             ScanUtils.getRoomFromPos(mc.thePlayer.position)?.uniqueRoom?.let { unq ->
-                if (unq.state == RoomState.PREVISITED) return@let
+                if (unq.state == RoomState.PREVISITED && unq.detailedPrevisit) return@let
+
+                val chunk = mc.theWorld.getChunkFromChunkCoords(mc.thePlayer.chunkCoordX, mc.thePlayer.chunkCoordZ)
+                val isOutOfBounds = mc.thePlayer.posY < 69 || mc.thePlayer.posY > chunk.getHeight(mc.thePlayer.position)
                 unq.state = RoomState.PREVISITED
                 unq.tiles.forEach {
                     it.state = RoomState.PREVISITED
                 }
+                if (!isOutOfBounds) unq.detailedPrevisit = true
             }
             MapUpdater.updatePlayersUsingEntity()
         }
