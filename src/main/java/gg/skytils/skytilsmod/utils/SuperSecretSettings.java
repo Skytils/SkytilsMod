@@ -44,6 +44,7 @@ public class SuperSecretSettings {
     public static boolean noSychic = false;
     public static boolean palworld = false;
     public static boolean sheepifyRebellion = false;
+    public static boolean smolSelf = false;
     public static boolean smolPeople = false;
     public static boolean tryItAndSee = false;
     public static boolean twilightGiant = false;
@@ -114,6 +115,7 @@ public class SuperSecretSettings {
         noSychic = settings.contains("nosychic");
         palworld = settings.contains("palworld");
         sheepifyRebellion = settings.contains("sheepifyRebellion");
+        smolSelf = settings.contains("smolself");
         smolPeople = settings.contains("smolpeople");
         tryItAndSee = settings.contains("tryItAndSee");
         twilightGiant = settings.contains("twilightGiant");
