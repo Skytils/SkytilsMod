@@ -42,7 +42,8 @@ object PartyFeatures {
             "mute",
             "challenge",
             "answer",
-            "join"
+            "join",
+            "private"
         )
 
     @SubscribeEvent
