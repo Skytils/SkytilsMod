@@ -175,14 +175,7 @@ object RenderUtils {
             GlStateManager.rotate(-180f, 0f, 0f, 1f)
         } else {
             // Render box behind the player head
-            val borderColor = when (player.teammate.dungeonClass) {
-                DungeonClass.ARCHER -> CatlasConfig.colorPlayerArcher
-                DungeonClass.BERSERK -> CatlasConfig.colorPlayerBerserk
-                DungeonClass.HEALER -> CatlasConfig.colorPlayerHealer
-                DungeonClass.MAGE -> CatlasConfig.colorPlayerMage
-                DungeonClass.TANK -> CatlasConfig.colorPlayerTank
-                else -> Color.BLACK
-            }
+            val borderColor = player.teammate.dungeonClass.color
 
             renderRect(-6.0, -6.0, 12.0, 12.0, borderColor)
             GlStateManager.translate(0f, 0f, 0.1f)
@@ -216,8 +209,13 @@ object RenderUtils {
             }
             GlStateManager.translate(0f, 10f, 0f)
             GlStateManager.scale(CatlasConfig.playerNameScale, CatlasConfig.playerNameScale, 1f)
+            val renderName = if (!CatlasConfig.useClassForPlayerNames) name else player.teammate.dungeonClass.className
             mc.fontRendererObj.drawString(
-                name, -mc.fontRendererObj.getStringWidth(name) / 2f, 0f, 0xffffff, true
+                renderName,
+                -mc.fontRendererObj.getStringWidth(renderName) / 2f,
+                0f,
+                if (CatlasConfig.colorPlayerNames) player.teammate.dungeonClass.color.rgb else 0xffffff,
+                true
             )
         }
         GlStateManager.popMatrix()

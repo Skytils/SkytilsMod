@@ -127,6 +127,30 @@ object CatlasConfig : Vigilant(
     var mapVanillaMarker = false
 
     @Property(
+        name = "Show Class Name Instead of Player Names",
+        type = PropertyType.SWITCH,
+        description = "Show the class name under player heads instead of the player name",
+        category = "Map",
+        subcategory = "Toggle",
+        i18nName = "catlas.config.map.toggle.player_class_name",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.toggle"
+    )
+    var useClassForPlayerNames = false
+
+    @Property(
+        name = "Color Player Names By Class",
+        type = PropertyType.SWITCH,
+        description = "Colors player names according to their class",
+        category = "Map",
+        subcategory = "Toggle",
+        i18nName = "catlas.config.map.toggle.name_class_color",
+        i18nCategory = "catlas.config.map",
+        i18nSubcategory = "catlas.config.map.toggle"
+    )
+    var colorPlayerNames = false
+
+    @Property(
         name = "Map Text Scale",
         type = PropertyType.DECIMAL_SLIDER,
         description = "Scale of room names and secret counts relative to map size.",
@@ -413,7 +437,7 @@ object CatlasConfig : Vigilant(
         i18nCategory = "catlas.config.colors",
         i18nSubcategory = "catlas.config.colors.players"
     )
-    var colorPlayerArcher = Color(0, 0, 0, 255)
+    var colorPlayerArcher = Color(247, 156, 165, 255)
 
     @Property(
         name = "Player Border Color (Berserk)",
@@ -425,7 +449,7 @@ object CatlasConfig : Vigilant(
         i18nCategory = "catlas.config.colors",
         i18nSubcategory = "catlas.config.colors.players"
     )
-    var colorPlayerBerserk = Color(0, 0, 0, 255)
+    var colorPlayerBerserk = Color(245, 184, 127, 255)
 
     @Property(
         name = "Player Border Color (Healer)",
@@ -437,7 +461,7 @@ object CatlasConfig : Vigilant(
         i18nCategory = "catlas.config.colors",
         i18nSubcategory = "catlas.config.colors.players"
     )
-    var colorPlayerHealer = Color(0, 0, 0, 255)
+    var colorPlayerHealer = Color(207, 158, 240, 255)
 
     @Property(
         name = "Player Border Color (Mage)",
@@ -449,7 +473,7 @@ object CatlasConfig : Vigilant(
         i18nCategory = "catlas.config.colors",
         i18nSubcategory = "catlas.config.colors.players"
     )
-    var colorPlayerMage = Color(0, 0, 0, 255)
+    var colorPlayerMage = Color(148, 193, 242, 255)
 
     @Property(
         name = "Player Border Color (Tank)",
@@ -461,7 +485,7 @@ object CatlasConfig : Vigilant(
         i18nCategory = "catlas.config.colors",
         i18nSubcategory = "catlas.config.colors.players"
     )
-    var colorPlayerTank = Color(0, 0, 0, 255)
+    var colorPlayerTank = Color(148, 242, 151, 255)
 
     @Property(
         name = "Blood Room",

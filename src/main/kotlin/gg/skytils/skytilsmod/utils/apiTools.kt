@@ -21,6 +21,7 @@ package gg.skytils.skytilsmod.utils
 import gg.skytils.hypixel.types.player.Player
 import gg.skytils.hypixel.types.skyblock.Profile
 import gg.skytils.hypixel.types.util.Inventory
+import gg.skytils.skytilsmod.features.impl.dungeons.catlas.core.CatlasConfig
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -61,6 +62,15 @@ enum class DungeonClass {
 
     val className = name.toTitleCase()
     val apiName = name.lowercase()
+    val color: Color
+        get() = when (this) {
+            ARCHER -> CatlasConfig.colorPlayerArcher
+            BERSERK -> CatlasConfig.colorPlayerBerserk
+            HEALER -> CatlasConfig.colorPlayerHealer
+            MAGE -> CatlasConfig.colorPlayerMage
+            TANK -> CatlasConfig.colorPlayerTank
+            else -> Color.BLACK
+        }
 
     override fun toString(): String {
         return this.className
