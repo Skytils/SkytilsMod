@@ -193,10 +193,10 @@ dependencies {
     relocated(implementation("gg.skytils.hypixel.types:types") { excludeKotlin() })
     relocated(implementation("gg.skytils.skytilsws.shared:ws-shared") { excludeKotlin() })
 
-    include(implementation("org.bouncycastle:bcpg-jdk18on:1.78.1") {
+    include(implementation("org.bouncycastle:bcpg-jdk18on:1.81") {
         exclude(module = "bcprov-jdk18on")
     })
-    compileOnly("org.bouncycastle:bcprov-jdk18on:1.78.1")
+    compileOnly("org.bouncycastle:bcprov-jdk18on:1.81")
 
     if (platform.isFabric && !isLegacyFabric) {
         modImplementation("org.incendo:cloud-fabric:2.0.0-beta.10")
