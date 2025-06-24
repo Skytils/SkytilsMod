@@ -250,7 +250,7 @@ object RenderUtil {
         shadow: Boolean = true, scale: Float = 1f, background: Boolean = true
     ) {
         matrixStack.push()
-        DrawHelper.setupCameraTransformations(matrixStack)
+        DrawHelper.cameraOffset(matrixStack)
         DrawHelper.drawNametag(matrixStack, str, x, y, z, shadow, scale, background)
         matrixStack.pop()
     }

@@ -189,6 +189,10 @@ object DrawHelper {
         buffer.pos(matrices, x2, y, 0.0).tex(u2, v1).color(color).endVertex()
     }
 
+    /**
+     * Draws a nametag at the given position.
+     * This method will apply the camera rotation for you, but not the camera offset.
+    */
     fun drawNametag(matrices: UMatrixStack, text: String, x: Double, y: Double, z: Double, shadow: Boolean = true, scale: Float = 1f, background: Boolean = true, throughWalls: Boolean = false) {
         matrices.push()
         matrices.translate(x, y + 0.5, z)
