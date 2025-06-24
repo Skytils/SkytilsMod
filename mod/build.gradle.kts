@@ -218,7 +218,7 @@ dependencies {
         compileOnly("net.hypixel:mod-api:1.0.1")
     }
 
-    val mixinExtrasVersion = "0.5.0-rc.2"
+    val mixinExtrasVersion = "0.5.0-rc.3"
     if (platform.isFabric) {
         include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixinExtrasVersion}")!!)!!)
     } else {
