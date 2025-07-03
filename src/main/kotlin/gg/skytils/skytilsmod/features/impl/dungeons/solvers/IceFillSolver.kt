@@ -27,6 +27,7 @@ import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.ifNull
+import gg.skytils.skytilsmod.features.impl.dungeons.DungeonTimer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.minecraft.client.renderer.GlStateManager
@@ -127,7 +128,7 @@ object IceFillSolver {
 
     @SubscribeEvent
     fun onWorldRender(event: RenderWorldLastEvent) {
-        if (!Utils.inDungeons || !Skytils.config.iceFillSolver || "Ice Fill" !in DungeonListener.incompletePuzzles) return
+        if (!Skytils.config.iceFillSolver || !Utils.inDungeons || DungeonTimer.bossEntryTime != -1L || "Ice Fill" !in DungeonListener.incompletePuzzles) return
         val (three, five, seven) = puzzles ?: return
         val matrixStack = UMatrixStack.Compat.get()
         three.draw(matrixStack, event.partialTicks)

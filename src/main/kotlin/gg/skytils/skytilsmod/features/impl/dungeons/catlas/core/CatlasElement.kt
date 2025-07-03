@@ -163,6 +163,7 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         DungeonInfo.uniqueRooms.values.forEach { unq ->
             val room = unq.mainRoom
             if (room.state == RoomState.UNDISCOVERED || room.state == RoomState.UNOPENED) return@forEach
+            if (unq.state == RoomState.PREVISITED && !unq.detailedPrevisit) return@forEach
             val halfRoom = (DungeonMapColorParser.halfRoom.takeUnless { it == -1 } ?: 8)
             val size = MapUtils.mapRoomSize + (DungeonMapColorParser.quarterRoom.takeUnless { it == -1 } ?: 4)
             val checkPos = unq.getCheckmarkPosition()

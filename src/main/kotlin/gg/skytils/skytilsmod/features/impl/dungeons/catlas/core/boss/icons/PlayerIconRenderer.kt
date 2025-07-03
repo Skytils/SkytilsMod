@@ -29,6 +29,8 @@ object PlayerIconRenderer : IconRenderer() {
         DungeonListener.team.forEach { (name, teammate) ->
             val player = teammate.player ?: return@forEach
             if (!teammate.dead || teammate.mapPlayer.isOurMarker) {
+                val layer = iconCtx.map.getLayer(player)
+                if (layer != iconCtx.layer) return@forEach
                 GlStateManager.pushMatrix()
                 GlStateManager.translate(
                     iconCtx.worldToIconX(player.posX.toInt()),

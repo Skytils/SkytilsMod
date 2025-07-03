@@ -383,7 +383,7 @@ fun MethodInsnNode.matches(owner: String?, name: String?, desc: String?): Boolea
 }
 
 val gg.skytils.hypixel.types.player.Player.rank_prefix
-    get() = when(rank) {
+    get() = when (rank) {
         "VIP" -> "§a[VIP]"
         "VIP_PLUS" -> "§a[VIP§6+§a]"
         "MVP" -> "§b[MVP]"
