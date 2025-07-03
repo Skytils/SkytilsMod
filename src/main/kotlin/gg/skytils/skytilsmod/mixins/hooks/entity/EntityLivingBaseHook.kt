@@ -44,13 +44,11 @@ class EntityLivingBaseHook(val entity: EntityLivingBase) {
     }
 
     val isBreefing by lazy {
-        entity.name == "Breefing" && (SuperSecretSettings.breefingDog || Random.nextInt(
-            100
-        ) < 3)
+        entity.name == "Breefing" && (SuperSecretSettings.breefingDog || Random.nextInt(100) < 3)
     }
 
     val isSmol by lazy {
-        Utils.inSkyblock && entity is EntityPlayer && (SuperSecretSettings.smolPeople || isBreefing)
+        Utils.inSkyblock && entity is EntityPlayer && ((entity is EntityPlayerSP && SuperSecretSettings.smolMe) || (SuperSecretSettings.smolPeople && entity.uniqueID.version() == 4) || isBreefing)
     }
 
     fun modifyPotionActive(potionId: Int, cir: CallbackInfoReturnable<Boolean>) {
