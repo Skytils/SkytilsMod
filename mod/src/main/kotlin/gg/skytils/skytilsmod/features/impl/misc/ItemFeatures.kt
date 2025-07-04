@@ -593,7 +593,7 @@ object ItemFeatures : EventSubscriber {
         }
 
         // If the block has its own onUse method that overrides the one in AbstractBlock, it is interactable
-        return block.javaClass.methods.find { it.name == onUseMethodName }?.declaringClass == block.javaClass
+        return block.javaClass.declaredMethods.any { it.name == onUseMethodName }
     }
 
     fun onRenderItemOverlayPost(event: GuiContainerPostDrawSlotEvent) {
