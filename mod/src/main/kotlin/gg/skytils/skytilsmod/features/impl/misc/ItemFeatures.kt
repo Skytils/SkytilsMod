@@ -566,7 +566,8 @@ object ItemFeatures : EventSubscriber {
                 "WEIRD_TUBA",
                 "WEIRDER_TUBA",
                 "PUMPKIN_LAUNCHER",
-                "FIRE_FREEZE_STAFF"
+                "FIRE_FREEZE_STAFF",
+                "GEMSTONE_GAUNTLET"
             ))
         ) {
             val block = mc.world?.getBlockState(event.pos) ?: return
