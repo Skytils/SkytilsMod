@@ -74,10 +74,9 @@ object DrawHelper {
     fun setupContainerScreenTransformations(matrices: UMatrixStack, aboveItems: Boolean = false) {
         var currentScreen = mc.currentScreen
         if (currentScreen is PopupScreen) {
-            currentScreen = (
-                    currentScreen as? AccessorPopupBackground                                        // Cast to AccessorPopupBackground
-                        ?: error("Current PopupScreen does not implement AccessorPopupBackground")   // Error upon fail
-                    ).underlyingScreen                                                               // Grab backgroundScreen if casting succeeded
+            val accessor = currentScreen as? AccessorPopupBackground
+                ?: error("Current PopupScreen does not implement AccessorPopupBackground")
+            currentScreen = accessor.underlyingScreen
         }
         val screen = currentScreen as? AccessorGuiContainer ?: error("Current ${currentScreen?.javaClass?.simpleName ?: "screen"} does not implement AccessorGuiContainer")
         matrices.translate(screen.guiLeft.toFloat(), screen.guiTop.toFloat(), 0f)
