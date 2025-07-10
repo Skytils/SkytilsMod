@@ -105,6 +105,7 @@
   "client": [
     "accessors.AccessorMultiplayerServerListWidget",
     "accessors.AccessorNetHandlerPlayClient",
+    "accessors.AccessorPopupBackground",
     "events.MixinGuiIngame",
     "events.MixinNetHandlerPlayClient",
     "events.MixinNetworkManager",

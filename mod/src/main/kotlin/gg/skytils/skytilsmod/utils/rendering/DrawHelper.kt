@@ -18,14 +18,15 @@
 
 package gg.skytils.skytilsmod.utils.rendering
 
-import com.mojang.blaze3d.systems.RenderSystem
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.render.URenderPipeline
 import gg.essential.universal.vertex.UBufferBuilder
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorPopupBackground
 import net.minecraft.client.font.TextRenderer
+import net.minecraft.client.gui.screen.PopupScreen
 import net.minecraft.client.render.OverlayTexture
 import net.minecraft.client.texture.GlTexture
 import net.minecraft.item.ItemDisplayContext
@@ -71,7 +72,9 @@ object DrawHelper {
      * @param aboveItems If true, the Z-level will be set to render above items.
      */
     fun setupContainerScreenTransformations(matrices: UMatrixStack, aboveItems: Boolean = false) {
-        val screen = mc.currentScreen as? AccessorGuiContainer ?: error("Current screen does not implement AccessorGuiContainer")
+        var currentScreen = mc.currentScreen
+        if (currentScreen is PopupScreen) { currentScreen = (currentScreen as? AccessorPopupBackground ?: error("Current PopupScreen does not implement AccessorPopupBackground")).underlyingScreen }
+        val screen = currentScreen as? AccessorGuiContainer ?: error("Current ${currentScreen?.javaClass?.simpleName ?: "screen"} does not implement AccessorGuiContainer")
         matrices.translate(screen.guiLeft.toFloat(), screen.guiTop.toFloat(), 0f)
         if (aboveItems) {
             matrices.translate(0f, 0f, 100f + 150f + 1f)
