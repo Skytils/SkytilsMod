@@ -73,7 +73,7 @@ object DrawHelper {
      */
     fun setupContainerScreenTransformations(matrices: UMatrixStack, aboveItems: Boolean = false) {
         var currentScreen = mc.currentScreen
-        if (currentScreen is PopupScreen) {
+        while (currentScreen is PopupScreen) {
             val accessor = currentScreen as? AccessorPopupBackground
                 ?: error("Current PopupScreen does not implement AccessorPopupBackground")
             currentScreen = accessor.underlyingScreen
