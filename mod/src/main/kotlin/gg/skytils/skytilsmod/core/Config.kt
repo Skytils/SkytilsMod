@@ -4440,7 +4440,7 @@ object Config : Vigilant(
 
     init {
         registerListener("commandAliasesSpaces") { prop: Boolean ->
-            CommandAliases.setup(prop)
+            CommandAliases.refresh(allowSpaces = prop)
         }
 
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")

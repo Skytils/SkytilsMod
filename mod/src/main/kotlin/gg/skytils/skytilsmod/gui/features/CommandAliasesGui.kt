@@ -163,7 +163,7 @@ class CommandAliasesGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reo
         }
 
         PersistentSave.markDirty<CommandAliases>()
-        CommandAliases.setup(customRemovalKeys = aliasKeys)
+        CommandAliases.refresh(customRemovalKeys = aliasKeys)
         UChat.chat("$prefix §6You may need to switch servers to apply changes to aliases.")
     }
 }
