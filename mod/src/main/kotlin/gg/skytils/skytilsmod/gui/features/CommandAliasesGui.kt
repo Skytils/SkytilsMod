@@ -30,8 +30,10 @@ import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.constraints.SiblingConstraint
 import gg.essential.elementa.dsl.*
 import gg.essential.elementa.effects.OutlineEffect
+import gg.essential.universal.UChat
 import gg.essential.universal.UKeyboard
 import gg.essential.vigilance.utils.onLeftClick
+import gg.skytils.skytilsmod.Skytils.prefix
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.features.impl.handlers.CommandAliases
 import gg.skytils.skytilsmod.gui.ReopenableGUI
@@ -145,6 +147,7 @@ class CommandAliasesGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reo
     }
 
     override fun onScreenClose() {
+        val aliasKeys = CommandAliases.aliases.keys.toSet() // Make sure to copy with toSet()
         super.onScreenClose()
         CommandAliases.aliases.clear()
 
@@ -160,5 +163,7 @@ class CommandAliasesGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reo
         }
 
         PersistentSave.markDirty<CommandAliases>()
+        CommandAliases.setup(customRemovalKeys = aliasKeys)
+        UChat.chat("$prefix §6You may need to switch servers to apply changes to aliases.")
     }
 }
