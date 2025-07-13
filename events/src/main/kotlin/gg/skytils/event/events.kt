@@ -20,6 +20,7 @@ package gg.skytils.event
 
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 
 suspend fun <T : Event> post(event: T) =
@@ -45,16 +46,19 @@ inline fun <reified T : Event> on(priority: EventPriority = EventPriority.Normal
 
 suspend inline fun <reified T : Event> await(priority: EventPriority = EventPriority.Normal) =
     suspendCancellableCoroutine { coroutine ->
+        val resumed = AtomicBoolean(false)
         lateinit var deregister: () -> Boolean
 
         deregister = priority.subscribe<T> { event ->
-            if (coroutine.isActive) {
+            if (resumed.compareAndSet(false, true)) {
                 deregister()
                 coroutine.resume(event)
             }
         }
         coroutine.invokeOnCancellation {
-            deregister()
+            if (resumed.compareAndSet(false, true)) {
+                deregister()
+            }
         }
     }
 
