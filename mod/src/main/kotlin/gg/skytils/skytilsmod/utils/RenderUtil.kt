@@ -566,13 +566,13 @@ object RenderUtil {
         color: Color,
         partialTicks: Float
     ) {
-        val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
+        // TODO: convert this to VertexRendering#drawOutline
         val matrixStack = UMatrixStack()
+        DrawHelper.setupCameraTransformations(matrixStack)
         drawFilledBoundingBox(
             matrixStack,
             Box(pos)
-                .expandBlock()
-                .offset(-viewerX, -viewerY, -viewerZ),
+                .expandBlock(),
             color
         )
     }

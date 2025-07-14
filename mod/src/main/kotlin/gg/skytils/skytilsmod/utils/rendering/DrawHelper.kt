@@ -78,7 +78,7 @@ object DrawHelper {
                 ?: error("Current PopupScreen does not implement AccessorPopupBackground")
             currentScreen = accessor.underlyingScreen
         }
-        val screen = currentScreen as? AccessorGuiContainer ?: error("Current ${currentScreen?.javaClass?.simpleName ?: "screen"} does not implement AccessorGuiContainer")
+        val screen = currentScreen as? AccessorGuiContainer ?: return
         matrices.translate(screen.guiLeft.toFloat(), screen.guiTop.toFloat(), 0f)
         if (aboveItems) {
             matrices.translate(0f, 0f, 100f + 150f + 1f)

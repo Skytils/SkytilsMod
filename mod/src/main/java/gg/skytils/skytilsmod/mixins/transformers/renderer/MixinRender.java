@@ -45,6 +45,6 @@ public abstract class MixinRender<T extends Entity> {
 
     @Inject(method = "renderLabelIfPresent", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;translate(DDD)V", shift = At.Shift.AFTER))
     private void renderLivingLabel(EntityRenderState state, Text text, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci) {
-        RenderHookKt.renderLivingLabel(state, text, ci);
+        RenderHookKt.renderLivingLabel(state, text, matrices, ci);
     }
 }

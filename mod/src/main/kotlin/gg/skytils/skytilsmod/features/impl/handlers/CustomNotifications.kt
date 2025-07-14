@@ -33,7 +33,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
-import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket
 import java.io.File
 import java.io.Reader
@@ -43,9 +42,9 @@ object CustomNotifications : PersistentSave(File(Skytils.modDir, "customnotifica
     val notifications = hashSetOf<Notification>()
 
     fun onMessage(event: PacketReceiveEvent<*>) {
-        if (!Utils.inSkyblock || event.packet !is ChatMessageS2CPacket || notifications.isEmpty()) return
+        if (!Utils.inSkyblock || event.packet !is GameMessageS2CPacket || event.packet.overlay || notifications.isEmpty()) return
         Skytils.launch {
-            val formatted = event.packet.unsignedContent?.formattedText ?: return@launch
+            val formatted = event.packet.content?.formattedText ?: return@launch
             for ((regex, text, displayTicks, enabled) in notifications) {
                 if (!enabled) continue
                 val match = regex.find(formatted) ?: continue

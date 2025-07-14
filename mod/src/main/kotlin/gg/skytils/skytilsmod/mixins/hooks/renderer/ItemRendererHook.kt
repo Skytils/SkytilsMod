@@ -19,11 +19,11 @@
 package gg.skytils.skytilsmod.mixins.hooks.renderer
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation
-import gg.essential.universal.UMatrixStack
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.utils.SuperSecretSettings
 import gg.skytils.skytilsmod.utils.Utils
 import net.minecraft.client.network.AbstractClientPlayerEntity
+import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.item.ItemStack
 
 
@@ -36,13 +36,11 @@ import net.minecraft.item.ItemStack
 //$$ }
 //#endif
 
-fun modifySize() {
+fun modifySize(matrixStack: MatrixStack) {
     val scale = Skytils.config.itemScale * if (SuperSecretSettings.twilightGiant) 5f else 1f
-    val matrixStack = UMatrixStack()
     matrixStack.scale(scale, scale, scale)
     if (scale < 1) {
         val offset = 1 - scale
         matrixStack.translate(-offset, offset, 0f)
     }
-    matrixStack.applyToGlobalState()
 }

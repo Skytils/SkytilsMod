@@ -50,7 +50,7 @@ import gg.skytils.skytilsmod.utils.*
 import net.minecraft.client.gui.hud.ChatHudLine
 import net.minecraft.client.gui.screen.ChatScreen
 import net.minecraft.client.gui.hud.ChatHud
-import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket
+import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket
 import net.minecraft.text.Text
 import java.awt.Color
 
@@ -67,23 +67,25 @@ object ChatTabs : EventSubscriber {
     }
 
     fun onChat(event: PacketReceiveEvent<*>) {
-        if (!Utils.isOnHypixel || !Skytils.config.chatTabs || event.packet !is ChatMessageS2CPacket) return
+        if (!Utils.isOnHypixel || !Skytils.config.chatTabs || event.packet !is GameMessageS2CPacket || event.packet.overlay) return
 
         // FIXME: Check if this value is accurate
-        val style = event.packet.unsignedContent?.style ?: return
+        val style = event.packet.content?.style ?: return
         style as ExtensionChatStyle
         if (style.skytilsChatTabType == null) {
-            val cc = event.packet.unsignedContent ?: return
+            val cc = event.packet.content ?: return
             val formatted = cc.formattedText
             style.skytilsChatTabType = ChatTab.entries.filter { it.isValid(cc, formatted) }.toTypedArray()
         }
     }
 
-    @JvmStatic
-    fun setBGColor(origColor: Int, line: ChatHudLine): Int {
-        if (line != hoveredChatLine) return origColor
-        return RenderUtil.mixColors(Color(origColor), Color.RED).rgb
-    }
+    //#if MC==10809
+    //$$ @JvmStatic
+    //$$ fun setBGColor(origColor: Int, line: ChatHudLine): Int {
+    //$$     if (line != hoveredChatLine) return origColor
+    //$$     return RenderUtil.mixColors(Color(origColor), Color.RED).rgb
+    //$$ }
+    //#endif
 
     fun shouldAllow(component: Text): Boolean {
         if (!Utils.isOnHypixel || !Skytils.config.chatTabs) return true

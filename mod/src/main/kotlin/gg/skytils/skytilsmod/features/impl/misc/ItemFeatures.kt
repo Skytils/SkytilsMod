@@ -579,7 +579,7 @@ object ItemFeatures : EventSubscriber {
 
     fun onRenderItemOverlayPost(event: GuiContainerPostDrawSlotEvent) {
         val item = event.slot.stack ?: return
-        if (!Utils.inSkyblock || item.count != 1 || item.get(DataComponentTypes.CUSTOM_DATA)?.nbt?.contains("SkytilsNoItemOverlay") == true) return
+        if (!Utils.inSkyblock || item.count != 1 || item.get(DataComponentTypes.CUSTOM_DATA)?.contains("SkytilsNoItemOverlay") == true) return
         val matrixStack = UMatrixStack()
         DrawHelper.setupContainerScreenTransformations(matrixStack, aboveItems = true)
         var stackTip = ""
@@ -696,7 +696,10 @@ object ItemFeatures : EventSubscriber {
             }
         }
         if (stackTip.isNotEmpty()) {
-            UGraphics.drawString(matrixStack, stackTip, 0f, 0f, Color.WHITE.rgb, false)
+            matrixStack.push()
+            matrixStack.translate(event.slot.x + 17f - UGraphics.getStringWidth(stackTip), event.slot.y + 9f, 0f)
+            UGraphics.drawString(matrixStack, stackTip, 0f, 0f, Color.WHITE.rgb, true)
+            matrixStack.pop()
         }
     }
 

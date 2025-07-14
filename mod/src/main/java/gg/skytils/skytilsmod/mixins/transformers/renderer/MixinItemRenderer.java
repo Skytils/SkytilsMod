@@ -46,6 +46,6 @@ public abstract class MixinItemRenderer {
 
     @Inject(method = "applySwingOffset", at = @At(value = "TAIL"))
     private void modifySize(MatrixStack matrices, Arm arm, float swingProgress, CallbackInfo ci) {
-        ItemRendererHookKt.modifySize();
+        ItemRendererHookKt.modifySize(matrices);
     }
 }
