@@ -96,6 +96,7 @@ import net.minecraft.world.BlockStateRaycastContext
 import java.awt.Color
 import java.time.Instant
 import java.util.Optional
+import java.util.WeakHashMap
 import kotlin.jvm.optionals.getOrDefault
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.pow
@@ -587,13 +588,19 @@ object ItemFeatures : EventSubscriber {
         "(Lnet/minecraft/class_2680;Lnet/minecraft/class_1937;Lnet/minecraft/class_2338;Lnet/minecraft/class_1657;Lnet/minecraft/class_3965;)Lnet/minecraft/class_1269;"
     )
 
+    private val interactableBlockCache = WeakHashMap<Class<out Block>, Boolean>()
+
     private fun isInteractable(block: Block): Boolean {
         if (Utils.inDungeons && (block === Blocks.COAL_BLOCK || block === Blocks.RED_TERRACOTTA)) {
             return true
         }
 
+        val clazz = block.javaClass
+
         // If the block has its own onUse method that overrides the one in AbstractBlock, it is interactable
-        return block.javaClass.declaredMethods.any { it.name == onUseMethodName }
+        return interactableBlockCache.getOrPut(clazz) {
+            clazz.declaredMethods.any { it.name == onUseMethodName }
+        }
     }
 
     fun onRenderItemOverlayPost(event: GuiContainerPostDrawSlotEvent) {
