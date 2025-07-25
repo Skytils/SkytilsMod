@@ -45,33 +45,33 @@ object EnchantNames : EventSubscriber, PersistentSave(File(Skytils.modDir, "ench
         if (replacements.count() == 0) return
         event.tooltip.replaceAll {
             var line = it.formattedText
+            var replacedAnything = false
             enchantRegex.findAll(
                 line
             ).forEach { result ->
                 val color = result.groups["color"]!!.value
                 val enchant = result.groups["enchant"]!!.value
+                if (replacements[enchant] == null) return@forEach
                 val level = result.groups["level"]!!.value
                 val suffix = result.groups["suffix"]?.value ?: ""
                 if (DevTools.getToggle("enchantNames")) {
                     println(enchant)
                     println(result.groups)
                 }
+                replacedAnything = true
                 line = line.replace(
                     result.value,
                     buildString {
                         append(color)
                         if (DevTools.getToggle("enchantNames")) append("{")
-                        if (replacements[enchant] != null)
-                            append("§o${enchant.replaceEnchantNames()}")
-                        else
-                            append(enchant)
+                        append("§o${enchant.replaceEnchantNames()}")
                         append(level)
                         if (DevTools.getToggle("enchantNames")) append("}")
                         append(suffix)
                     }
                 )
             }
-            textComponent(line)
+            if (replacedAnything) textComponent(line) else it
         }
     }
 

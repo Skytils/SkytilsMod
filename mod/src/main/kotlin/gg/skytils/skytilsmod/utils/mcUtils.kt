@@ -129,12 +129,24 @@ val Text.formattedText: String
         siblings.forEach { append(it.formattedText) }
     }
 
+fun formattingFromHex(hex: String): Formatting? {
+    val colorInt = hex.removePrefix("#").toIntOrNull(16) ?: return null
+    return Formatting.entries.firstOrNull {
+        it.colorValue == colorInt
+    }
+}
 
 fun serializeFormattingToString(style: Style): String = buildString {
     style.color?.name
         ?.let { name ->
             Formatting.byName(name)?.toString()
-                ?: if (Skytils.usingAaronMod && name == "#AA5500") "§z" else null // TODO: Support all hex codes with a custom system
+                ?: if (Skytils.usingAaronMod && name.equals("#AA5500", ignoreCase = true)) {
+                    "§z"
+                } else {
+                    name.takeIf { it.startsWith('#') } // TODO: Support all hex codes with a custom system like §#
+                        ?.let(::formattingFromHex)
+                        ?.toString()
+                }
         }
         ?.let(::append)
     if (style.isBold) append("§l")
