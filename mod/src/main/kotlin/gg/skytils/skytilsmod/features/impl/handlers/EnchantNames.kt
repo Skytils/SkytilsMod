@@ -42,7 +42,7 @@ object EnchantNames : EventSubscriber, PersistentSave(File(Skytils.modDir, "ench
     }
 
     fun onTooltip(event: ItemTooltipEvent) {
-        if (replacements.count() == 0) return
+        if (replacements.isEmpty()) return
         event.tooltip.replaceAll {
             var line = it.formattedText
             var replacedAnything = false

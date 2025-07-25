@@ -139,13 +139,15 @@ fun formattingFromHex(hex: String): Formatting? {
 fun serializeFormattingToString(style: Style): String = buildString {
     style.color?.name
         ?.let { name ->
-            Formatting.byName(name)?.toString()
-                ?: if (Skytils.usingAaronMod && name.equals("#AA5500", ignoreCase = true)) {
-                    "§z"
-                } else {
-                    name.takeIf { it.startsWith('#') } // TODO: Support all hex codes with a custom system like §#
-                        ?.let(::formattingFromHex)
-                        ?.toString()
+            Formatting.byName(name)?.toString() // Done first because most text will use this
+                ?: when {
+                    Skytils.usingAaronMod && name.equals("#AA5500", ignoreCase = true) ->
+                        "§z"
+
+                    name.startsWith('#') ->
+                        formattingFromHex(name)?.toString() // TODO: Support all hex codes with a custom system like §#
+
+                    else -> null
                 }
         }
         ?.let(::append)
