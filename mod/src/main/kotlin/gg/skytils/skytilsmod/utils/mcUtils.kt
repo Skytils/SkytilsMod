@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.utils
 
 import gg.essential.elementa.unstable.state.v2.State
 import gg.essential.universal.wrappers.UPlayer
+import gg.skytils.skytilsmod.Skytils
 import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import net.minecraft.item.ItemStack
@@ -130,7 +131,12 @@ val Text.formattedText: String
 
 
 fun serializeFormattingToString(style: Style): String = buildString {
-    style.color?.name?.let(Formatting::byName)?.let(::append)
+    style.color?.name
+        ?.let { name ->
+            Formatting.byName(name)?.toString()
+                ?: if (Skytils.usingAaronMod && name == "#AA5500") "§z" else null // TODO: Support all hex codes with a custom system
+        }
+        ?.let(::append)
     if (style.isBold) append("§l")
     if (style.isItalic) append("§o")
     if (style.isUnderlined) append("§n")

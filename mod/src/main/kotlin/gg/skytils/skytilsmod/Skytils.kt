@@ -166,6 +166,9 @@ object Skytils : CoroutineScope, EventSubscriber {
     var usingSBA = false
 
     @JvmField
+    var usingAaronMod = false
+
+    @JvmField
     var jarFile: File? = null
     private var lastChatMessage = 0L
 
@@ -420,6 +423,7 @@ object Skytils : CoroutineScope, EventSubscriber {
         usingLabymod = isModLoaded("labymod")
         usingNEU = isModLoaded("notenoughupdates")
         usingSBA = isModLoaded("skyblockaddons")
+        usingAaronMod = isModLoaded("aaron-mod")
 
         MayorInfo.fetchMayorData()
 

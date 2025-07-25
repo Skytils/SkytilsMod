@@ -34,7 +34,7 @@ import java.io.Writer
 
 object EnchantNames : EventSubscriber, PersistentSave(File(Skytils.modDir, "enchantnames.json")) {
     private val enchantRegex =
-        Regex("(?<color>(?:§[0-9a-fzl]){1,2})(?<enchant> ?[\\w ]+[\\w \\-]*?)(?<level> [IVXLCDM0-9]{1,3})(?<suffix>§[9d], )?")
+        Regex("(?<color>(?:§[0-9a-fzlr]){1,2})(?<enchant> ?[\\w ]+[\\w \\-]*?)(?<level> [IVXLCDM0-9]{1,3})(?<suffix>§[9d], )?")
     val replacements = hashMapOf<String, String>()
 
     override fun setup() {
@@ -42,6 +42,7 @@ object EnchantNames : EventSubscriber, PersistentSave(File(Skytils.modDir, "ench
     }
 
     fun onTooltip(event: ItemTooltipEvent) {
+        if (replacements.count() == 0) return
         event.tooltip.replaceAll {
             var line = it.formattedText
             enchantRegex.findAll(
