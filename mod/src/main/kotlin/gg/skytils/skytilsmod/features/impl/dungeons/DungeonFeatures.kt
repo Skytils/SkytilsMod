@@ -476,7 +476,7 @@ object DungeonFeatures : EventSubscriber {
                     if (name.contains("Terracotta ")) mc.world?.removeEntity(event.entity.id, Entity.RemovalReason.DISCARDED)
                 }
                 if (Skytils.config.hideNonStarredNametags) {
-                    if (!name.startsWith("✯ ") && name.contains("❤") && dungeonMobSpawns.any { it in name }) {
+                    if (!name.takeWhile{!it.isLetter()}.contains("✯ ") && name.contains("❤") && dungeonMobSpawns.any { it in name }) {
                         mc.world?.removeEntity(event.entity.id, Entity.RemovalReason.DISCARDED)
                     }
                 }
