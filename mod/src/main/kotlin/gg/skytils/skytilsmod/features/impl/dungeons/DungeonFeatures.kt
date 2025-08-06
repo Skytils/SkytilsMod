@@ -530,7 +530,7 @@ object DungeonFeatures : EventSubscriber {
                 } else {
                     if (!hasBossSpawned && Skytils.config.boxStarredMobs && event.entity is ArmorStandEntity && event.entity.hasCustomName() && event.entity.isCustomNameVisible) {
                         val name = event.entity.name.formattedText
-                        if (name.startsWith("§6✯ ") && name.endsWith("§c❤")) {
+                        if (name.takeWhile{!it.isLetter()}.contains("✯ ") && name.endsWith("§c❤")) {
                             val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
                             val color = Skytils.config.boxStarredMobsColor
                             if ("Spider" in name) {
