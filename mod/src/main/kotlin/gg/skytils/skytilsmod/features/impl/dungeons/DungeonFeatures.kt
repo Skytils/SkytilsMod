@@ -476,7 +476,7 @@ object DungeonFeatures : EventSubscriber {
                     if (name.contains("Terracotta ")) mc.world?.removeEntity(event.entity.id, Entity.RemovalReason.DISCARDED)
                 }
                 if (Skytils.config.hideNonStarredNametags) {
-                    if (!name.takeWhile{!it.isLetter()}.contains("✯ ") && name.contains("❤") && dungeonMobSpawns.any { it in name }) {
+                    if (!name.contains("✯ ") && name.contains("❤") && dungeonMobSpawns.any { it in name }) {
                         mc.world?.removeEntity(event.entity.id, Entity.RemovalReason.DISCARDED)
                     }
                 }
@@ -530,7 +530,7 @@ object DungeonFeatures : EventSubscriber {
                 } else {
                     if (!hasBossSpawned && Skytils.config.boxStarredMobs && event.entity is ArmorStandEntity && event.entity.hasCustomName() && event.entity.isCustomNameVisible) {
                         val name = event.entity.name.formattedText
-                        if (name.takeWhile{!it.isLetter()}.contains("✯ ") && name.endsWith("§c❤")) {
+                        if (name.contains("✯ ") && name.endsWith("§c❤")) {
                             val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
                             val color = Skytils.config.boxStarredMobsColor
                             if ("Spider" in name) {
