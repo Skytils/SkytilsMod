@@ -234,7 +234,7 @@ object DrawHelper {
     fun drawNametag(matrices: UMatrixStack, text: String, x: Double, y: Double, z: Double, shadow: Boolean = true, scale: Float = 1f, background: Boolean = true, throughWalls: Boolean = false) {
         matrices.push()
         matrices.translate(x, y + 0.5, z)
-        matrices.multiply(mc.gameRenderer.camera.rotation)
+matrices.multiply(mc.entityRenderDispatcher.rotation)
         // TODO: fix fov drifting issues for nametags
         matrices.scale(0.025f, -0.025f, 0.025f)
         matrices.scale(scale, scale, scale)
