@@ -1879,7 +1879,7 @@ object Config : Vigilant(
     )
     var showKuudraLowestBinPrice = false
 
-    //# if MC>=10900
+    //# if MC>12000
     @Property(
         type = PropertyType.SWITCH, name = "Glass Pane Desync Fix",
         description = "Fixes glass pane shape desync in modern versions.",
