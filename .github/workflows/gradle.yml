@@ -1,6 +1,11 @@
-name: build-ci
 
-on: [ push, pull_request ]
+name: build-ci (1.21.5)
+
+on:
+  pull_request:
+    branches: [ 2.x ]
+  push:
+    branches: [ 2.x ]
 
 jobs:
   build:
@@ -14,14 +19,14 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
       - name: Execute Gradle build
-        run: chmod +x gradlew; ./gradlew build --stacktrace
+        run: chmod +x gradlew; ./gradlew :mod:1.21.5-fabric:build --stacktrace
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: ./build/libs
+          path: ./mod/versions/1.21.5-fabric/build/libs
           if-no-files-found: error
