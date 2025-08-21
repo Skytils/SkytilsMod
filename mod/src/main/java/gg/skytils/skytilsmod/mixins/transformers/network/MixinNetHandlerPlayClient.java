@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //# if MC>12000
 import gg.skytils.skytilsmod.Skytils;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.block.PaneBlock;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.block.BlockState;
@@ -84,30 +85,16 @@ public abstract class MixinNetHandlerPlayClient implements ClientPlayPacketListe
     @Unique
     private BlockState updateState(BlockPos pos, BlockState state){
         int validConnect = 0;
-        if (state.get(PaneBlock.NORTH)){
-            if (client.world.getBlockState(pos.north()).isAir()){
-                state = state.with(PaneBlock.NORTH, false);
+        for (Direction dir : PaneBlock.FACING_PROPERTIES.keySet()){
+            BooleanProperty property = PaneBlock.FACING_PROPERTIES.get(dir);
+            if (state.get(property)){
+                if (client.world.getBlockState(pos.offset(dir)).isAir()){
+                    state = state.with(property, false);
+                }
+                else validConnect++;
             }
-            else validConnect++;
         }
-        if (state.get(PaneBlock.EAST)){
-            if (client.world.getBlockState(pos.east()).isAir()) {
-                state = state.with(PaneBlock.EAST, false);
-            }
-            else validConnect++;
-        }
-        if (state.get(PaneBlock.SOUTH)){
-            if (client.world.getBlockState(pos.south()).isAir()){
-                state = state.with(PaneBlock.SOUTH, false);
-            }
-            else validConnect++;
-        }
-        if (state.get(PaneBlock.WEST)){
-            if (client.world.getBlockState(pos.west()).isAir()){
-                state = state.with(PaneBlock.WEST, false);
-            }
-            else validConnect++;
-        }
+
         if (validConnect == 0){
             state = state.with(PaneBlock.NORTH, true)
                     .with(PaneBlock.EAST, true)
