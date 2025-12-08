@@ -82,14 +82,14 @@ object SlayerFeatures : EventSubscriber, CoroutineScope {
     override val coroutineContext = Executors.newSingleThreadExecutor().asCoroutineDispatcher() + SupervisorJob()
 
     private val ZOMBIE_MINIBOSSES = arrayOf(
-        "§cRevenant Sycophant",
-        "§cRevenant Champion",
-        "§4Deformed Revenant",
-        "§cAtoned Champion",
-        "§4Atoned Revenant"
+        "Revenant Sycophant",
+        "Revenant Champion",
+        "Deformed Revenant",
+        "Atoned Champion",
+        "Atoned Revenant"
     )
-    private val SPIDER_MINIBOSSES = arrayOf("§cTarantula Vermin", "§cTarantula Beast", "§4Mutant Tarantula")
-    private val WOLF_MINIBOSSES = arrayOf("§cPack Enforcer", "§cSven Follower", "§4Sven Alpha")
+    private val SPIDER_MINIBOSSES = arrayOf("Tarantula Vermin", "Tarantula Beast", "Mutant Tarantula")
+    private val WOLF_MINIBOSSES = arrayOf("Pack Enforcer", "Sven Follower", "Sven Alpha")
     private val ENDERMAN_MINIBOSSES = arrayOf("Voidling Devotee", "Voidling Radical", "Voidcrazed Maniac")
     private val BLAZE_MINIBOSSES = arrayOf("Flare Demon", "Kindleheart Demon", "Burningsoul Demon")
 
@@ -97,7 +97,7 @@ object SlayerFeatures : EventSubscriber, CoroutineScope {
     // but that requires a more extensive testing of all skyblock timers,
     // something I am not quite particularly fond of doing
     internal val timerRegex =
-        Regex("(?:§[8bef]§l(ASHEN|CRYSTAL|AURIC|SPIRIT)§[8bef] ♨\\d |§4§lIMMUNE )?§c\\d+:\\d+(?:§r)?")
+        Regex("(?:§r)?(?:§[8bef]§l(ASHEN|CRYSTAL|AURIC|SPIRIT)§[8bef] ♨\\d |§4§lIMMUNE )?§c\\d+:\\d+(?:§r)?")
     internal val totemRegex = Regex("§6§l(?<time>\\d+)s §c§l(?<hits>\\d+) hits")
     var slayer: Slayer<*>? = null
         set(value) {
@@ -117,8 +117,8 @@ object SlayerFeatures : EventSubscriber, CoroutineScope {
         slayer = try {
             when (entity) {
                 is ZombieEntity -> RevenantSlayer(entity)
-                is SpiderEntity -> Slayer(entity, "Tarantula Broodfather", "§5☠ §4Tarantula Broodfather")
-                is WolfEntity -> Slayer(entity, "Sven Packmaster", "§c☠ §fSven Packmaster")
+                is SpiderEntity -> Slayer(entity, "Tarantula Broodfather", "§4Tarantula Broodfather")
+                is WolfEntity -> Slayer(entity, "Sven Packmaster", "§fSven Packmaster")
                 is EndermanEntity -> SeraphSlayer(entity)
                 is BlazeEntity -> DemonlordSlayer(entity)
                 is OtherClientPlayerEntity -> {
@@ -256,7 +256,7 @@ object SlayerFeatures : EventSubscriber, CoroutineScope {
             val entity = event.entity as ArmorStandEntity
             if (!entity.hasCustomName()) return
             val name = entity.displayName?.string ?: return
-            if (Skytils.config.slayerBossHitbox && name.endsWith("§c❤") && !name.endsWith("§e0§c❤") && !mc.entityRenderDispatcher.shouldRenderHitboxes()) {
+            if (Skytils.config.slayerBossHitbox && name.endsWith("❤") && !name.endsWith(" 0❤") && !mc.entityRenderDispatcher.shouldRenderHitboxes()) {
                 val (x, y, z) = RenderUtil.fixRenderPos(event.x, event.y, event.z)
                 if (ZOMBIE_MINIBOSSES.any { name.contains(it) } || BLAZE_MINIBOSSES.any { name.contains(it) }) {
                     drawOutlinedBoundingBox(

@@ -29,8 +29,8 @@ import net.minecraft.util.math.BlockPos
  *
  * Subtype of [Slayer]
  */
-abstract class ThrowingSlayer<T : MobEntity>(entity: T, name: String, nameStart: String) : Slayer<T>(
-    entity, name, nameStart,
+abstract class ThrowingSlayer<T : MobEntity>(entity: T, name: String, nameContains: String) : Slayer<T>(
+    entity, name, nameContains,
 ) {
     var thrownLocation: BlockPos? = null
     var thrownEntity: ArmorStandEntity? = null

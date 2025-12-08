@@ -42,7 +42,7 @@ import net.minecraft.item.ItemStack
 open class Slayer<T : LivingEntity>(
     val entity: T,
     private val name: String,
-    private vararg val nameStart: String,
+    private vararg val nameContains: String,
 ) {
     var nameEntity: ArmorStandEntity? = null
     var timerEntity: ArmorStandEntity? = null
@@ -84,7 +84,7 @@ open class Slayer<T : LivingEntity>(
             for (nearby in nearbyArmorStands) {
                 when {
                     nearby.displayName?.formattedText?.startsWith("§8[§7Lv") == true -> continue
-                    nameStart.any { nearby.displayName?.formattedText?.startsWith(it) == true } -> {
+                    nameContains.any { nearby.displayName?.formattedText?.contains(it) == true } -> {
                         printDevMessage(
                             { "expected tier $currentTier, hp $expectedHealth - spawned hp ${entity.baseMaxHealth.toInt()}" },
                             "slayer"

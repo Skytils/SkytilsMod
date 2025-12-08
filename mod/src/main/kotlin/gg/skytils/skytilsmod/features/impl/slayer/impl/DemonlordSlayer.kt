@@ -52,7 +52,7 @@ import net.minecraft.util.math.BlockPos
 import java.awt.Color
 
 class DemonlordSlayer(entity: BlazeEntity) :
-    ThrowingSlayer<BlazeEntity>(entity, "Inferno Demonlord", "§c☠ §bInferno Demonlord") {
+    ThrowingSlayer<BlazeEntity>(entity, "Inferno Demonlord", "§bInferno Demonlord") {
     var totemEntity: ArmorStandEntity? = null
     var totemPos: BlockPos? = null
 
