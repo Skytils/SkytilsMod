@@ -56,7 +56,11 @@ object DrawHelper {
      * This is useful for rendering things in world space, as it will negate the camera rotation.
      */
     fun cameraRotation(matrices: UMatrixStack) {
-        matrices.multiply(mc.gameRenderer.camera.rotation.conjugate(Quaternionf()))
+        //#if MC>12000
+        matrices.multiply(mc.gameRenderer.camera.rotation.conjugate(Quaternionf()).mul(70f/mc.options.fov.value.coerceAtLeast(1)))
+        //#else
+        //$$matrices.multiply(mc.gameRenderer.camera.rotation.conjugate(Quaternionf()))
+        //#endif
     }
 
     /**
@@ -232,9 +236,9 @@ object DrawHelper {
     fun drawNametag(matrices: UMatrixStack, text: String, x: Double, y: Double, z: Double, shadow: Boolean = true, scale: Float = 1f, background: Boolean = true, throughWalls: Boolean = false) {
         matrices.push()
         matrices.translate(x, y + 0.5, z)
-        matrices.multiply(mc.entityRenderDispatcher.rotation)
+matrices.multiply(mc.entityRenderDispatcher.rotation)
+        // TODO: fix fov drifting issues for nametags
         matrices.scale(0.025f, -0.025f, 0.025f)
-
         matrices.scale(scale, scale, scale)
         val centerPos = UGraphics.getStringWidth(text) / -2f
         val backgroundColor = if (!background) 0 else (mc.options.getTextBackgroundOpacity(0.25f) * 255).toInt() shl 24
