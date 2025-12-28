@@ -234,7 +234,7 @@ dependencies {
         include(modImplementation("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)
     }
 
-    val mixinExtrasVersion = "0.5.0-rc.2"
+    val mixinExtrasVersion = "0.5.0"
     if (platform.isFabric) {
         include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixinExtrasVersion}")!!)!!)
     } else {
