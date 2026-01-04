@@ -85,7 +85,7 @@ object MimicDetector : EventSubscriber {
                         //$$ ?.getOrCreateSubNbt("SkullOwner", false)
                         //$$ ?.getString("Id")?.getOrNull() == "ae55953f-605e-3c71-a813-310c028de150"
                         //#else
-                        .get(DataComponentTypes.PROFILE)?.id?.getOrNull() == mimicSkullUUID
+                        .get(DataComponentTypes.PROFILE)?.gameProfile?.id == mimicSkullUUID
                         //#endif
                 }) {
                 ScoreCalculation.mimicKilled.set(true)

@@ -18,7 +18,6 @@
 package gg.skytils.skytilsmod.utils.graphics.colors
 
 import gg.skytils.skytilsmod.utils.Utils.colorFromString
-import gg.skytils.skytilsmod.utils.bindColor
 import java.awt.Color
 import kotlin.math.min
 
@@ -46,7 +45,9 @@ class CyclingTwoColorGradient(var color1: Color, var color2: Color, var speed: D
         return Color(r, g, b, a)
     }
 
-    override fun applyColor() = getCurrentColor().bindColor()
+    // no-op as it's currently unused
+    // FIXME
+    override fun applyColor() {}//getCurrentColor().bindColor()
 
     override fun toHSV(): FloatArray {
         val color = getCurrentColor()

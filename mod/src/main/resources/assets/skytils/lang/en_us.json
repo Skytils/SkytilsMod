@@ -174,6 +174,7 @@
     "skytils.config.kuudra.price_checking.kuudra_chest_profit_includes_essence": "Kuudra Chest Profit Includes Essence",
     "skytils.config.kuudra.price_checking.kuudra_chest_profit_subtracts_key": "Kuudra Chest Profit Subtracts Key",
     "skytils.config.kuudra.price_checking.show_kuudra_lowest_bin_price": "Show Kuudra Lowest BIN Price",
+    "skytils.config.mining.quality_of_life.glass_pane_desync_fix": "Glass Pane Desync Fix",
     "skytils.config.mining.quality_of_life.dark_mode_mist": "Dark Mode Mist",
     "skytils.config.mining.quality_of_life.highlight_completed_commissions": "Highlight Completed Commissions",
     "skytils.config.mining.quality_of_life.highlight_disabled_hotm_perks": "Highlight Disabled HOTM Perks",

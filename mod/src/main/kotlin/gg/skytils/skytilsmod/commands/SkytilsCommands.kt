@@ -19,6 +19,8 @@
 package gg.skytils.skytilsmod.commands
 
 import gg.skytils.skytilsmod.commands.impl.*
+import kotlinx.coroutines.asCoroutineDispatcher
+import net.minecraft.client.MinecraftClient
 import org.incendo.cloud.annotations.AnnotationParser
 import org.incendo.cloud.execution.ExecutionCoordinator
 import org.incendo.cloud.fabric.FabricClientCommandManager
@@ -47,7 +49,7 @@ object SkytilsCommands {
 
     init {
         runCatching {
-            annotationParser.installCoroutineSupport()
+            annotationParser.installCoroutineSupport(context = MinecraftClient.getInstance().asCoroutineDispatcher())
 
             val parsedCommands = annotationParser.parse(
                 ArmorColorCommand,

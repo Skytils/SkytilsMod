@@ -84,7 +84,14 @@ object Ping : EventSubscriber {
             lastOldServerPing = System.currentTimeMillis()
             AccessorMultiplayerServerListWidget.getThreadPool()
                 .submit {
-                    oldServerPinger.add(dummyServerInfo, {}, { pingCacheState.set { dummyServerInfo.ping.toDouble() } })
+                    oldServerPinger.add(
+                        dummyServerInfo,
+                        {},
+                        { pingCacheState.set { dummyServerInfo.ping.toDouble() } },
+                        //#if MC>=12111
+                        //$$ net.minecraft.network.NetworkingBackend.remote(net.minecraft.client.MinecraftClient.getInstance().options.shouldUseNativeTransport())
+                        //#endif
+                    )
                 }
         }
     }

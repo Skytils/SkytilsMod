@@ -23,6 +23,7 @@ import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.formattedText
 import net.minecraft.client.render.entity.state.EntityRenderState
+import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.Entity
 import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3d
@@ -41,9 +42,9 @@ fun removeEntityOnFire(
 fun renderLivingLabel(
     state: EntityRenderState,
     text: Text,
+    matrixStack: MatrixStack,
     ci: CallbackInfo
 ) {
-    val matrixStack = UMatrixStack()
     val str = text.string
     if (Skytils.config.lowerEndermanNametags &&
         (str.contains('❤') || str.dropLastWhile { it == 's' }.endsWith(" Hit")) &&
@@ -54,5 +55,4 @@ fun renderLivingLabel(
         val vec3 = Vec3d(state.x - player.x, 0.0, state.z - player.z).normalize()
         matrixStack.translate(-vec3.x, -1.5, -vec3.z)
     }
-    matrixStack.applyToGlobalState()
 }

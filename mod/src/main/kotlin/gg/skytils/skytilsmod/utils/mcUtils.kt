@@ -20,6 +20,7 @@ package gg.skytils.skytilsmod.utils
 
 import gg.essential.elementa.unstable.state.v2.State
 import gg.essential.universal.wrappers.UPlayer
+import gg.skytils.skytilsmod.Skytils
 import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen
 import net.minecraft.item.ItemStack
@@ -128,9 +129,28 @@ val Text.formattedText: String
         siblings.forEach { append(it.formattedText) }
     }
 
+fun formattingFromHex(hex: String): Formatting? {
+    val colorInt = hex.removePrefix("#").toIntOrNull(16) ?: return null
+    return Formatting.entries.firstOrNull {
+        it.colorValue == colorInt
+    }
+}
 
 fun serializeFormattingToString(style: Style): String = buildString {
-    style.color?.name?.let(Formatting::byName)?.let(::append)
+    style.color?.name
+        ?.let { name ->
+            Formatting.byName(name)?.toString() // Done first because most text will use this
+                ?: when {
+                    Skytils.usingAaronMod && name.equals("#AA5500", ignoreCase = true) ->
+                        "§z"
+
+                    name.startsWith('#') ->
+                        formattingFromHex(name)?.toString() // TODO: Support all hex codes with a custom system like §#
+
+                    else -> null
+                }
+        }
+        ?.let(::append)
     if (style.isBold) append("§l")
     if (style.isItalic) append("§o")
     if (style.isUnderlined) append("§n")

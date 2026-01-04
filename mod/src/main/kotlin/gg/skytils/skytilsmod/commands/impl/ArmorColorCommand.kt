@@ -89,9 +89,10 @@ object ArmorColorCommand {
         val extraAttributes = ItemUtil.getExtraAttributes(item)
         //#if MC>=12100
         val uuid = extraAttributes?.getString("uuid", null) ?:
+            throw IllegalArgumentException("This item does not have a UUID!")
         //#else
         //$$ if (extraAttributes == null || !extraAttributes.hasKey("uuid"))
-        throw IllegalArgumentException("This item does not have a UUID!")
+        //$$     throw IllegalArgumentException("This item does not have a UUID!")
         //$$ val uuid = extraAttributes.getString("uuid")
         //#endif
 

@@ -49,8 +49,8 @@ import gg.skytils.skytilsmod.utils.toast.*
 import kotlinx.serialization.*
 import net.minecraft.client.network.OtherClientPlayerEntity
 import net.minecraft.item.Items
-import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket
 import net.minecraft.network.packet.s2c.play.EntityAnimationS2CPacket
+import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket
 import net.minecraft.text.Text
 import java.io.File
 import java.io.Reader
@@ -210,9 +210,9 @@ object SpamHider : EventSubscriber, PersistentSave(File(Skytils.modDir, "spamhid
             if (entity.mainHandStack?.item != deadBush || entity.squaredDistanceTo(mc.player) > 4 * 4) return
             lastSpooked = System.currentTimeMillis()
         }
-        if (packet !is ChatMessageS2CPacket) return
-        val unformatted = packet.unsignedContent?.string?.stripControlCodes() ?: return
-        val formatted = packet.unsignedContent?.formattedText ?: return
+        if (packet !is GameMessageS2CPacket || packet.overlay) return
+        val unformatted = packet.content?.string?.stripControlCodes() ?: return
+        val formatted = packet.content?.formattedText ?: return
 
         // Profile
         if (formatted.startsWith("§aYou are playing on profile:")) {
@@ -781,9 +781,9 @@ object SpamHider : EventSubscriber, PersistentSave(File(Skytils.modDir, "spamhid
     }
 
     private fun cancelChatPacket(event: PacketReceiveEvent<*>, addToSpam: Boolean) {
-        if (event.packet !is ChatMessageS2CPacket) return
-        event.packet.unsignedContent?.let { messagesToHide.add(it) }
-        if (addToSpam) newMessage(event.packet.unsignedContent?.formattedText)
+        if (event.packet !is GameMessageS2CPacket) return
+        event.packet.content?.let { messagesToHide.add(it) }
+        if (addToSpam) newMessage(event.packet.content?.formattedText)
     }
 
     private fun handleChat(event: ChatMessageReceivedEvent) {

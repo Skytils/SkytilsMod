@@ -17,6 +17,7 @@
  */
 package gg.skytils.skytilsmod.utils
 
+import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
 import com.mojang.authlib.properties.PropertyMap
 import gg.skytils.skytilsmod.utils.ItemRarity.Companion.RARITY_PATTERN
@@ -89,7 +90,7 @@ object ItemUtil {
      */
     @JvmStatic
     fun getExtraAttributes(item: ItemStack?): NbtCompound? =
-        item?.get(DataComponentTypes.CUSTOM_DATA)?.nbt
+        item?.get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()
 
     /**
      * Returns the Skyblock Item ID of a given Skyblock Extra Attributes NBT Compound
@@ -153,9 +154,20 @@ object ItemUtil {
             ?.getOrNull()
             ?.run(PET_PATTERN::matches) ?: false
 
+    private fun profileComponent(uuid: UUID, propertyMap: PropertyMap): ProfileComponent =
+        //#if MC>=12110
+        //$$ ProfileComponent.ofStatic(GameProfile(uuid, "", propertyMap))
+        //#else
+        ProfileComponent(Optional.empty(), Optional.of(uuid), propertyMap)
+        //#endif
+
     fun setSkullTexture(item: ItemStack, texture: String, SkullOwner: String): ItemStack {
-        item.set(DataComponentTypes.PROFILE, ProfileComponent(Optional.empty(), Optional.of(UUID.fromString(SkullOwner)),
-            PropertyMap().apply {
+        item.set(DataComponentTypes.PROFILE, profileComponent(UUID.fromString(SkullOwner),
+            PropertyMap(
+                //#if MC>=12110
+                //$$ com.google.common.collect.LinkedHashMultimap.create()
+                //#endif
+            ).apply {
                 put("textures", Property("Value", texture))
             }))
         /*val textureTagCompound = NbtCompound()
@@ -179,7 +191,13 @@ object ItemUtil {
     }
 
     fun getSkullTexture(item: ItemStack?): String? =
-        item?.get(DataComponentTypes.PROFILE)?.properties?.get("textures")?.first()?.value
+        item?.get(DataComponentTypes.PROFILE)?.run {
+            //#if MC>=1211
+            //$$ gameProfile.properties
+            //#else
+            properties
+            //#endif
+        }?.get("textures")?.first()?.value
 
     // TODO: fix later
     fun ItemStack.setLore(lines: List<String>): ItemStack {

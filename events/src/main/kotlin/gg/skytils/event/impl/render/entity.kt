@@ -21,7 +21,6 @@ package gg.skytils.event.impl.render
 import gg.skytils.event.CancellableEvent
 import gg.skytils.event.Event
 import net.minecraft.client.render.entity.EntityRenderer
-import net.minecraft.client.render.entity.LivingEntityRenderer
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 
@@ -37,28 +36,19 @@ import net.minecraft.client.render.entity.state.LivingEntityRenderState
  * [gg.skytils.event.mixins.render.MixinRendererLivingEntity.onRender]
  */
 class LivingEntityPreRenderEvent
-//#if MC<12000
-//$$     <T : LivingEntity>
-    //#else
-    //#if MC<12100
-    //$$ <T : LivingEntity, M: EntityModel<T>>
-    //#else
     <T : LivingEntity, S : LivingEntityRenderState, M : EntityModel<in S>>
-    //#endif
-    //#endif
     (
         val entity: T,
-        //#if MC<12000
-        //$$ val renderer: LivingEntityRenderer<T>,
-        //#else
-        //#if MC<12100
-        //$$ val renderer: LivingEntityRenderer<T, M>,
-        //#else
         val renderer: EntityRenderer<T, S>,
-        //#endif
-        //#endif
+        val state: S,
         val x: Double, val y: Double, val z: Double, val partialTicks: Float
-    ) : CancellableEvent()
+    ) : CancellableEvent() {
+    //#if MC>12105
+    //$$ val hitboxesEnabled = net.minecraft.client.MinecraftClient.getInstance().debugHudEntryList.isEntryVisible(net.minecraft.client.gui.hud.debug.DebugHudEntries.ENTITY_HITBOXES)
+    //#else
+    val hitboxesEnabled = state.hitbox != null
+    //#endif
+}
 
 /**
  * [gg.skytils.event.mixins.render.MixinRendererLivingEntity.onRenderPost]

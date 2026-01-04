@@ -64,15 +64,15 @@ public class MixinRendererLivingEntity
     //$$ private void onRender(T entity, double x, double y, double z, float entityYaw, float partialTicks, CallbackInfo ci) {
     //#else
     @Inject(method = "render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/EntityRenderDispatcher;render(Lnet/minecraft/entity/Entity;DDDFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;ILnet/minecraft/client/render/entity/EntityRenderer;)V"), cancellable = true)
-    private void onRender(Entity entity, double x, double y, double z, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci, @Local EntityRenderer<T, S> renderer) {
+    private void onRender(Entity entity, double x, double y, double z, float tickProgress, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, CallbackInfo ci, @Local EntityRenderer<T, S> renderer, @Local S renderState) {
     //#endif
         // the Ender Dragon is not a LivingEntityRenderer, despite being a LivingEntity
         if (!(entity instanceof LivingEntity)) return;
         Entity viewEntity = MinecraftClient.getInstance().getCameraEntity();
         if (viewEntity == null) return;
-        double renderX = entity.lastRenderX + (entity.getPos().x - entity.lastRenderX - viewEntity.getPos().x + viewEntity.lastRenderX) * tickProgress - viewEntity.lastRenderX;
-        double renderY = entity.lastRenderY + (entity.getPos().y - entity.lastRenderY - viewEntity.getPos().y + viewEntity.lastRenderY) * tickProgress - viewEntity.lastRenderY;
-        double renderZ = entity.lastRenderZ + (entity.getPos().z - entity.lastRenderZ - viewEntity.getPos().z + viewEntity.lastRenderZ) * tickProgress - viewEntity.lastRenderZ;
+        double renderX = entity.lastRenderX + (entity.getX() - entity.lastRenderX - viewEntity.getX() + viewEntity.lastRenderX) * tickProgress - viewEntity.lastRenderX;
+        double renderY = entity.lastRenderY + (entity.getY() - entity.lastRenderY - viewEntity.getY() + viewEntity.lastRenderY) * tickProgress - viewEntity.lastRenderY;
+        double renderZ = entity.lastRenderZ + (entity.getZ() - entity.lastRenderZ - viewEntity.getZ() + viewEntity.lastRenderZ) * tickProgress - viewEntity.lastRenderZ;
         @SuppressWarnings("unchecked")
         //#if MC<12000
         //$$ LivingEntityPreRenderEvent<T>
@@ -94,6 +94,7 @@ public class MixinRendererLivingEntity
                     renderer,
                     //#endif
                     //#endif
+                    renderState,
                     renderX, renderY, renderZ, tickProgress);
         if (EventsKt.postCancellableSync(event)) {
             ci.cancel();

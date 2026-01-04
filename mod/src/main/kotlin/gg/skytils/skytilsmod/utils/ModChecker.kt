@@ -30,12 +30,6 @@ import java.awt.event.MouseEvent
 import java.net.URI
 import javax.swing.*
 
-//Wif FORGE
-//$$ import net.minecraftforge.common.ForgeVersion
-//$$ import net.minecraftforge.fml.common.FMLCommonHandler
-//$$ import net.minecraftforge.fml.common.Loader
-//#endif
-
 
 object ModChecker {
     val isModded by lazy {

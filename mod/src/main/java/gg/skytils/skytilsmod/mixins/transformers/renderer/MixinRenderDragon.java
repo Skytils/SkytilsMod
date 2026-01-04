@@ -62,12 +62,6 @@ public abstract class MixinRenderDragon {
         MasterMode7Features.INSTANCE.afterRenderHurtFrame((EnderDragonEntityRenderer) (Object) this, entitylivingbaseIn, f, g, h, i, j, scaleFactor, ci);
     }*/
 
-    ///#if MC==10809
-    //$$ @Inject(method = "getTexture", at = @At("HEAD"), cancellable = true)
-    //$$ private void replaceEntityTexture(EnderDragonEntity entity, CallbackInfoReturnable<Identifier> cir) {
-    //$$    MasterMode7Features.INSTANCE.getEntityTexture(entity, cir);
-    //$$ }
-    //#else
     @Definition(id = "getBuffer", method = "Lnet/minecraft/client/render/VertexConsumerProvider;getBuffer(Lnet/minecraft/client/render/RenderLayer;)Lnet/minecraft/client/render/VertexConsumer;")
     @Definition(id = "DRAGON_CUTOUT", field = "Lnet/minecraft/client/render/entity/EnderDragonEntityRenderer;DRAGON_CUTOUT:Lnet/minecraft/client/render/RenderLayer;")
     @Expression("?.getBuffer(DRAGON_CUTOUT)")
@@ -76,5 +70,4 @@ public abstract class MixinRenderDragon {
         @Nullable Entity entity = ((ExtensionEntityRenderState) state).getSkytilsEntity();
         return MasterMode7Features.INSTANCE.getDragonCutoutLayer(entity, renderLayer);
     }
-    //#endif
 }

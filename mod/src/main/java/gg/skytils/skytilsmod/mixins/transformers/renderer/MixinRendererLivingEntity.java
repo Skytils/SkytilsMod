@@ -49,7 +49,7 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity> {
     @Inject(method = "scale", at = @At("RETURN"))
     private void scale(LivingEntityRenderState state, MatrixStack matrices, CallbackInfo ci) {
         if (state instanceof BatEntityRenderState) {
-            RenderBatHookKt.preRenderBat();
+            RenderBatHookKt.preRenderBat(matrices);
         }
     }
 }

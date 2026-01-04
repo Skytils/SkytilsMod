@@ -28,7 +28,6 @@ import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.multiplatform.blockPos
 import net.minecraft.entity.mob.ZombieEntity
 import net.minecraft.block.Blocks
-import net.minecraft.block.TerracottaBlock
 import net.minecraft.registry.tag.BlockTags
 import net.minecraft.util.math.BlockPos
 
@@ -73,7 +72,7 @@ class RevenantSlayer(entity: ZombieEntity) :
                                 blockUnder.block === Blocks.QUARTZ_STAIRS || blockUnder.block === Blocks.ACACIA_STAIRS -> true
                                 blockUnder.block == Blocks.ACACIA_SLAB -> true
                                 blockUnder.isIn(BlockTags.TERRACOTTA) -> {
-                                    val color = (blockUnder.block as TerracottaBlock).defaultMapColor.id
+                                    val color = blockUnder.block.defaultMapColor.id
                                     color == 0 || color == 8 || color == 14
                                 }
 

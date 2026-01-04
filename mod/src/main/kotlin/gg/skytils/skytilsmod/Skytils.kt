@@ -32,7 +32,6 @@ import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod._event.PacketSendEvent
 import gg.skytils.skytilsmod.commands.SkytilsCommands
 import gg.skytils.skytilsmod.core.*
-import gg.skytils.skytilsmod.features.impl.crimson.KuudraChestProfit
 import gg.skytils.skytilsmod.features.impl.crimson.KuudraFeatures
 import gg.skytils.skytilsmod.features.impl.crimson.TrophyFish
 import gg.skytils.skytilsmod.features.impl.dungeons.*
@@ -73,6 +72,7 @@ import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorSettingsGui
 import gg.skytils.skytilsmod.tweaker.DependencyLoader
 import gg.skytils.skytilsmod.utils.*
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
+import gg.skytils.skytilsmod.utils.multiplatform.nbt
 import gg.skytils.skytilsws.client.WSClient
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -164,6 +164,9 @@ object Skytils : CoroutineScope, EventSubscriber {
 
     @JvmField
     var usingSBA = false
+
+    @JvmField
+    var usingAaronMod = false
 
     @JvmField
     var jarFile: File? = null
@@ -359,7 +362,6 @@ object Skytils : CoroutineScope, EventSubscriber {
             ItemCycle,
             ItemFeatures,
             KeyShortcuts,
-            KuudraChestProfit,
             KuudraFeatures,
             LividFinder,
             LockOrb,
@@ -420,6 +422,7 @@ object Skytils : CoroutineScope, EventSubscriber {
         usingLabymod = isModLoaded("labymod")
         usingNEU = isModLoaded("notenoughupdates")
         usingSBA = isModLoaded("skyblockaddons")
+        usingAaronMod = isModLoaded("aaron-mod")
 
         MayorInfo.fetchMayorData()
 
@@ -496,7 +499,7 @@ object Skytils : CoroutineScope, EventSubscriber {
                     UDesktop.setClipboardString(
                         "Name: '${name}', Items: ${
                             chest.slots.filter { it.inventory == chest.inventory }
-                                .map { it.stack?.toNbt(UMinecraft.getMinecraft().player!!.registryManager) }
+                                .map { it.stack?.nbt }
                         }"
                     )
 

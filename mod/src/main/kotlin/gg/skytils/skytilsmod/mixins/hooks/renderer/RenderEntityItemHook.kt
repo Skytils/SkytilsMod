@@ -21,15 +21,14 @@ import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.utils.Utils
 import com.mojang.blaze3d.systems.RenderSystem
 import gg.essential.universal.UMatrixStack
+import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.ItemEntity
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 
 fun scaleItemDrop(
-    ci: CallbackInfo
+    matrixStack: MatrixStack
 ) {
     if (!Utils.inSkyblock) return
     val scale = Skytils.config.itemDropScale
-    val matrixStack = UMatrixStack()
     matrixStack.scale(scale, scale, scale)
-    matrixStack.applyToGlobalState()
 }

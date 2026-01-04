@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+import gg.essential.gradle.util.noRunConfigs
 import org.apache.tools.ant.filters.FixCrLfFilter
 
 plugins {
@@ -44,6 +45,8 @@ java.toolchain {
 loom.mixin {
     defaultRefmapName = "mixins.skytils-events.refmap.json"
 }
+
+loom.noRunConfigs()
 
 tasks.processResources {
     filesMatching("**/*.json") {

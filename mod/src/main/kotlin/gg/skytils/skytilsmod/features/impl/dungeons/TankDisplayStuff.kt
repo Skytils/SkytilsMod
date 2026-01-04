@@ -27,7 +27,6 @@ import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.DungeonClass
 import gg.skytils.skytilsmod.utils.RenderUtil
 import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.bindColor
 import com.mojang.blaze3d.systems.RenderSystem
 import org.lwjgl.opengl.GL11
 

@@ -30,6 +30,7 @@ import kotlinx.serialization.descriptors.*
 import kotlinx.serialization.encoding.*
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NbtIo
+import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.NbtSizeTracker
 import net.minecraft.registry.BuiltinRegistries
 import net.minecraft.util.math.BlockPos
@@ -182,7 +183,11 @@ fun Inventory.toMCItems() =
             val list = NbtIo.readCompressed(Base64.decode(data).inputStream(), NbtSizeTracker.ofUnlimitedBytes()).getList("i").getOrNull() ?: return@let emptyList()
             val registry = UPlayer.getPlayer()?.registryManager ?: BuiltinRegistries.createWrapperLookup() ?: return@let emptyList()
             (0 until list.size).mapNotNull { idx ->
-                list.getCompound(idx).takeUnless { it.isEmpty }?.getOrNull()?.let { ItemStack.fromNbt(registry, it).getOrNull() }
+                list.getCompound(idx).takeUnless { it.isEmpty }?.getOrNull()?.let {
+                    ItemStack.CODEC.parse(registry.getOps(NbtOps.INSTANCE), it).resultOrPartial { error ->
+                        println("Failed to load item: $error")
+                    }.getOrNull()
+                }
             }
         }
     }

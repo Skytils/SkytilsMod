@@ -38,11 +38,12 @@ import net.minecraft.block.Blocks
 import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket
 import net.minecraft.util.math.Box
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
 import java.awt.Color
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
 
 object TeleportMazeSolver : EventSubscriber {
 
@@ -89,11 +90,11 @@ object TeleportMazeSolver : EventSubscriber {
                         if (tpPad !in steppedPads) {
                             steppedPads.add(tpPad)
                             val deg2Rad = PI/180
-                            val magicYaw = (-this.change.yaw * deg2Rad - PI).toFloat()
-                            val yawX = MathHelper.sin(magicYaw)
-                            val yawZ = MathHelper.cos(magicYaw)
-                            val pitchVal = -MathHelper.cos(-this.change.pitch * deg2Rad.toFloat())
-                            val vec = Vec3d((yawX * pitchVal).toDouble(), 69.0, (yawZ * pitchVal).toDouble())
+                            val magicYaw = (-this.change.yaw * deg2Rad - PI)
+                            val yawX = sin(magicYaw)
+                            val yawZ = cos(magicYaw)
+                            val pitchVal = -cos(-this.change.pitch * deg2Rad)
+                            val vec = Vec3d(yawX * pitchVal, 69.0, yawZ * pitchVal)
                             valid.clear()
                             for (i in 4..23) {
                                 val bp = BlockPos.ofFloored(

@@ -24,12 +24,9 @@ import gg.essential.elementa.unstable.state.v2.stateOf
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.UMinecraft
-import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.utils.RenderUtil
 import net.minecraft.client.render.DiffuseLighting
-import net.minecraft.client.render.OverlayTexture
 import net.minecraft.item.Item
-import net.minecraft.item.ItemDisplayContext
 import net.minecraft.item.ItemStack
 
 class ItemComponent(val state: State<ItemStack>) : UIComponent() {
@@ -47,19 +44,7 @@ class ItemComponent(val state: State<ItemStack>) : UIComponent() {
         val vertexConsumer = UMinecraft.getMinecraft().bufferBuilders.entityVertexConsumers
         val item = state.getUntracked()
         RenderUtil.renderItem(item, 0, 0)
-        mc.itemRenderer.renderItem(
-            item,
-            ItemDisplayContext.GUI,
-            15728880,
-            OverlayTexture.DEFAULT_UV,
-            matrixStack.toMC(),
-            vertexConsumer,
-            null,
-            0
-        )
-        DiffuseLighting.disableGuiDepthLighting()
         vertexConsumer.draw()
-        DiffuseLighting.enableGuiDepthLighting()
         matrixStack.pop()
         UGraphics.disableLighting()
         super.draw(matrixStack)

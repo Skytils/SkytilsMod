@@ -18,19 +18,11 @@
 package gg.skytils.skytilsmod.mixins.hooks.renderer
 
 import gg.skytils.skytilsmod.Skytils
-import gg.skytils.skytilsmod.features.impl.handlers.MayorInfo.currentMayor
 import gg.skytils.skytilsmod.utils.Utils
-import gg.skytils.skytilsmod.utils.Utils.equalsOneOf
-import gg.skytils.skytilsmod.utils.baseMaxHealth
-import com.mojang.blaze3d.systems.RenderSystem
-import gg.essential.universal.UMatrixStack
-import net.minecraft.entity.passive.BatEntity
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+import net.minecraft.client.util.math.MatrixStack
 
-fun preRenderBat() {
+fun preRenderBat(matrices: MatrixStack) {
     if (Utils.inDungeons && Skytils.config.biggerBatModels) {
-        val matrices = UMatrixStack()
         matrices.scale(3f, 3f, 3f)
-        matrices.applyToGlobalState()
     }
 }

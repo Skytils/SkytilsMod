@@ -22,7 +22,6 @@ import gg.essential.elementa.ElementaVersion
 import gg.essential.elementa.WindowScreen
 import gg.essential.elementa.components.Window
 import gg.essential.elementa.dsl.pixels
-import gg.essential.elementa.unstable.state.v2.futureValues
 import gg.essential.elementa.unstable.state.v2.onChange
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
@@ -108,7 +107,7 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")), E
 
     @JvmStatic
     fun createTitle(title: String?, ticks: Int) {
-        SoundQueue.addToQueue("random.orb", 0.5f, isLoud = true)
+        SoundQueue.addToQueue("entity.experience_orb.pickup", 0.5f, isLoud = true)
         this.title = title
         titleDisplayTicks = ticks
     }
@@ -124,9 +123,9 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")), E
         //#endif
         profiler.push("SkytilsHUD")
         profiler.push("Toasts")
-        gui.draw(UMatrixStack.Compat.get())
+        gui.draw(UMatrixStack())
         profiler.swap("Hud")
-        hud.draw(UMatrixStack.Compat.get())
+        hud.draw(UMatrixStack())
         profiler.swap("Titles")
         renderTitles()
         profiler.pop()
@@ -170,16 +169,14 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")), E
             GlStateManager._enableBlend()
             GlStateManager._blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO)
             matrixStack.scale(scale, scale, scale) // TODO Check if changing this scale breaks anything...
-            matrixStack.runWithGlobalState {
-                UGraphics.drawString(
-                    matrixStack,
-                    title,
-                    (-mc.textRenderer.getWidth(title) / 2).toFloat(),
-                    -20.0f,
-                    0xFF0000,
-                    true
-                )
-            }
+            UGraphics.drawString(
+                matrixStack,
+                title,
+                (-stringWidth / 2).toFloat(),
+                -20.0f,
+                -0x10000,
+                true
+            )
             matrixStack.pop()
         }
         if (subtitle != null) {
@@ -193,13 +190,11 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")), E
             GlStateManager._enableBlend()
             GlStateManager._blendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO)
             matrixStack.scale(scale, scale, scale) // TODO Check if changing this scale breaks anything...
-            matrixStack.runWithGlobalState {
-                UGraphics.drawString(
-                    matrixStack,
-                    subtitle, -mc.textRenderer.getWidth(subtitle) / 2f, -23.0f,
-                    0xFF0000, true
-                )
-            }
+            UGraphics.drawString(
+                matrixStack,
+                subtitle, -stringWidth / 2f, -23.0f,
+                -0x10000, true
+            )
             matrixStack.pop()
         }
     }

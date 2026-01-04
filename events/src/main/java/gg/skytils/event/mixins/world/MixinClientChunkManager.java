@@ -22,33 +22,16 @@ import com.llamalad7.mixinextras.sugar.Local;
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.world.ChunkLoadEvent;
 import net.minecraft.client.world.ClientChunkManager;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.s2c.play.ChunkData;
-import net.minecraft.world.chunk.ChunkManager;
 import net.minecraft.world.chunk.WorldChunk;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.function.Consumer;
-
-//#if MC>12104
-import net.minecraft.world.Heightmap;
-import java.util.Map;
-//#endif
-
 @Mixin(ClientChunkManager.class)
-public abstract class MixinClientChunkManager extends ChunkManager {
+public abstract class MixinClientChunkManager {
     @Inject(method = "loadChunkFromPacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;resetChunkColor(Lnet/minecraft/util/math/ChunkPos;)V"))
-    private void onLoadChunkFromPacket(int x, int z, PacketByteBuf buf,
-                                       //#if MC<=12104
-                                       //$$ NbtCompound nbt,
-                                       //#else
-                                       Map<Heightmap.Type, long[]> heightmaps,
-                                       //#endif
-                                       Consumer<ChunkData.BlockEntityVisitor> consumer, CallbackInfoReturnable<WorldChunk> cir, @Local WorldChunk worldChunk) {
+    private void onLoadChunkFromPacket(CallbackInfoReturnable<WorldChunk> cir, @Local WorldChunk worldChunk) {
         EventsKt.postSync(new ChunkLoadEvent(worldChunk));
     }
 }

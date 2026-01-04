@@ -71,8 +71,10 @@ open class CustomColor {
     /** applyColor
      * Will set the color to OpenGL's active color
      */
+    // no-op as it's no longer used
+    // FIXME
     open fun applyColor() {
-        RenderSystem.setShaderColor(r, g, b, a)
+//        RenderSystem.setShaderColor(r, g, b, a)
     }
 
     open fun setA(a: Float): CustomColor {

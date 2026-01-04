@@ -333,7 +333,10 @@ enum class WitherKingDragons(
     }
     val particleLocation: BlockPos = blockPos.up(5)
 
-    //#if MC>=12104
+    //#if MC>=12111
+    //$$ val decalLayer = net.minecraft.client.render.RenderLayers.entityDecal(texture)
+    //$$ val cutoutLayer = net.minecraft.client.render.RenderLayers.entityCutoutNoCull(texture)
+    //#else
     val decalLayer = RenderLayer.getEntityDecal(texture)
     val cutoutLayer = RenderLayer.getEntityCutoutNoCull(texture)
     //#endif

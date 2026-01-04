@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import gg.essential.gradle.util.noServerRunConfigs
 import net.fabricmc.loom.task.RemapJarTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.security.MessageDigest
@@ -51,12 +52,24 @@ repositories {
         }
     }
     if (isLegacyFabric) maven("https://repo.legacyfabric.net/repository/legacyfabric/")
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = uri("https://api.modrinth.com/maven")
+            }
+        }
+        filter {
+            includeGroup("maven.modrinth")
+        }
+    }
 }
 
 loom {
     if (isLegacyFabric) {
         intermediaryUrl.set("https://repo.legacyfabric.net/repository/legacyfabric/net/legacyfabric/v2/intermediary/%1\$s/intermediary-%1\$s-v2.jar")
     }
+    noServerRunConfigs()
     silentMojangMappingsLicense()
     runConfigs {
         getByName("client") {
@@ -111,14 +124,17 @@ dependencies {
     if (platform.isForge) {
         include("gg.essential:loader-launchwrapper:1.2.3")
     } else {
-        include(modRuntimeOnly("gg.essential:loader-fabric:1.2.3")!!)
-        modImplementation("net.fabricmc.fabric-api:fabric-api") {
-            version {
-                require(when {
-                    platform.mcVersion == 12105 -> "0.128.0+1.21.5"
-                    else -> "0.119.2+1.21.4"
-                })
-            }
+        include(modRuntimeOnly("gg.essential:loader-fabric:1.2.5")!!)
+        val fapiVersion = when (platform.mcVersion) {
+            12105 -> "0.128.2+1.21.5"
+            12110 -> "0.138.4+1.21.10"
+            12111 -> "0.140.2+1.21.11"
+            else -> error("No fabric api version configured")
+        }
+        modImplementation("net.fabricmc.fabric-api:fabric-api:$fapiVersion") {
+            exclude(module = "fabric-content-registries-v0")
+            exclude(module = "fabric-rendering-fluids-v1")
+            exclude(module = "fabric-transfer-api-v1")
         }
     }
     modCompileOnly("gg.essential:essential-${if (platform.mcVersion >= 12006) "1.20.6-fabric" else if (!isLegacyFabric) platform.toString() else "${platform.mcVersionStr}-forge"}:17141+gd6f4cfd3a8") {
@@ -129,7 +145,10 @@ dependencies {
         exclude(module = "kotlinx-coroutines-core-jvm")
         exclude(module = "universalcraft-1.20.6-fabric")
     }
-    modCompileOnly("gg.essential:universalcraft-${if (!isLegacyFabric) platform.toString() else "${platform.mcVersionStr}-forge"}:415")
+    include(implementation("gg.essential:vigilance:312") {
+        isTransitive = false
+    })
+    modCompileOnly("gg.essential:universalcraft-${if (platform.mcVersion == 12110) "1.21.9-fabric" else platform}:446")
     relocated(implementation("gg.essential:elementa-unstable-layoutdsl:710") {
         excludeKotlin()
         exclude(module = "fabric-loader")
@@ -215,10 +234,11 @@ dependencies {
         }
         relocated(include(implementation("net.hypixel:mod-api-forge-tweaker:1.0.1.2")!!)!!)
     } else {
-        compileOnly("net.hypixel:mod-api:1.0.1")
+        modImplementation("net.hypixel:mod-api:1.0.1")
+        include(modImplementation("maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21")!!)
     }
 
-    val mixinExtrasVersion = "0.5.0-rc.2"
+    val mixinExtrasVersion = "0.5.2"
     if (platform.isFabric) {
         include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixinExtrasVersion}")!!)!!)
     } else {

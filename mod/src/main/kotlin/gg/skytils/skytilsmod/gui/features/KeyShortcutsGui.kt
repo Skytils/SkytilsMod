@@ -202,7 +202,7 @@ class KeyShortcutsGui : WindowScreen(ElementaVersion.V2, newGuiScale = 2), Reope
             button.text.setText(entry.getDisplayString())
             val pressed = clickedButton === entry
             val reused =
-                keyCode != 0 && (client?.options?.allKeys?.any { it.matchesKey(keyCode, keyCode) } == true || components.any { it.value.keyCode != 0 && it.value !== entry && it.value.keyCode == keyCode })
+                keyCode != 0 && (client?.options?.allKeys?.any { it.equals(entry) } == true || components.any { it.value.keyCode != 0 && it.value !== entry && it.value.keyCode == keyCode })
             if (pressed) {
                 button.text.setText("§f> §e${button.text.getText()}§f <")
             } else if (reused) {

@@ -284,7 +284,7 @@ object MiscFeatures : EventSubscriber {
             tickTimer(5) {
                 val entity = event.entity as ArmorStandEntity
                 val headSlot = entity.getEquippedStack(EquipmentSlot.HEAD)
-                val headUUID = headSlot?.get(DataComponentTypes.PROFILE)?.id?.getOrNull() ?: return@tickTimer
+                val headUUID = headSlot?.get(DataComponentTypes.PROFILE)?.gameProfile?.id ?: return@tickTimer
                 if (Skytils.config.trickOrTreatChestAlert && mc.player != null && headSlot.item === Items.PLAYER_HEAD && entity.squaredDistanceTo(
                         mc.player
                     ) < 10 * 10
@@ -460,7 +460,7 @@ object MiscFeatures : EventSubscriber {
         val item = event.stack
         if (!Utils.inSkyblock || item.count != 1) return
         val player = mc.player ?: return
-        val itemNbt = event.stack.get(DataComponentTypes.CUSTOM_DATA)?.nbt ?: return
+        val itemNbt = event.stack.get(DataComponentTypes.CUSTOM_DATA)?.copyNbt() ?: return
         if (itemNbt.contains("SkytilsNoItemOverlay")) return
         var stackTip = ""
 

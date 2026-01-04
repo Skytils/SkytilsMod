@@ -167,6 +167,7 @@ skytils.config.kuudra.price_checking.kuudra_chest_profit=Kuudra宝箱利润
 skytils.config.kuudra.price_checking.kuudra_chest_profit_includes_essence=Kuudra宝箱利润将包括精华
 skytils.config.kuudra.price_checking.kuudra_chest_profit_subtracts_key=Kuudra宝箱利润将扣除钥匙
 skytils.config.kuudra.price_checking.show_kuudra_lowest_bin_price=显示Kuudra最低一口价
+skytils.config.mining.quality_of_life.glass_pane_desync_fix=玻璃板不同步修复
 skytils.config.mining.quality_of_life.dark_mode_mist=深色模式的Mist区域
 skytils.config.mining.quality_of_life.highlight_completed_commissions=高亮已完成的委托
 skytils.config.mining.quality_of_life.highlight_disabled_hotm_perks=高亮已禁用的HOTM特权

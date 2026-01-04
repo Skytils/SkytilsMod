@@ -217,7 +217,7 @@ object UpdateChecker : EventSubscriber {
 
             val allowedVersions = allVersions.filter { it.versionType >= targetChannel }
 
-            val validUpdateVersions = allowedVersions.filter { "fabric" in it.loaders && MinecraftVersion.CURRENT.name in it.gameVersions }
+            val validUpdateVersions = allowedVersions.filter { "fabric" in it.loaders && MinecraftVersion.create().name in it.gameVersions }
 
             val latestRelease = validUpdateVersions.maxBy { Version.parse(it.versionNumber.substringAfter("v")) }
             val latestVersion = Version.parse(latestRelease.versionNumber)

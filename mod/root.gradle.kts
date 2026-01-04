@@ -20,13 +20,13 @@ plugins {
     id("gg.essential.multi-version.root")
 }
 
-version = "2.0.0-alpha.3"
+version = "2.0.0-alpha.4"
 
 preprocess {
-    val forge10809 = createNode("1.8.9-forge", 10809, "mcp")
-    val fabric10809 = createNode("1.8.9-fabric", 10809, "yarn")
     val fabric12105 = createNode("1.21.5-fabric", 12105, "yarn")
+    val fabric12110 = createNode("1.21.10-fabric", 12110, "yarn")
+    val fabric12111 = createNode("1.21.11-fabric", 12111, "yarn")
 
-    fabric12105.link(fabric10809, file("versions/1.21.5-1.8.9.txt"))
-    fabric10809.link(forge10809, file("versions/fabric-forge.txt"))
+    fabric12111.link(fabric12110)
+    fabric12110.link(fabric12105, file("versions/1.21.11-1.21.5.txt"))
 }

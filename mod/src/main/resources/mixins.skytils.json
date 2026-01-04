@@ -105,6 +105,7 @@
   "client": [
     "accessors.AccessorMultiplayerServerListWidget",
     "accessors.AccessorNetHandlerPlayClient",
+    "accessors.AccessorPopupBackground",
     "events.MixinGuiIngame",
     "events.MixinNetHandlerPlayClient",
     "events.MixinNetworkManager",
@@ -114,7 +115,8 @@
     "gui.ToggleHudParts_MixinGuiIngame",
     "renderer.MixinEntityRenderState",
     "renderer.MixinModelBiped",
-    "util.MixinMouseHelper"
+    "util.MixinMouseHelper",
+    "renderer.sodium.MixinLevelSlice"
   ],
   "mixinextras": {
     "minVersion": "0.5.0-rc.1"

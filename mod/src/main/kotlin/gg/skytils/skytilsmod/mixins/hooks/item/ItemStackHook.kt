@@ -52,9 +52,9 @@ fun showEnchantmentGlint(stack: Any, cir: CallbackInfoReturnable<Boolean>) {
                 }
             }
         }
-        val customData = get(DataComponentTypes.CUSTOM_DATA)
+        val customData = get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()
         if (customData?.contains("SkytilsForceGlint") == true) {
-            cir.returnValue = customData.nbt.getBoolean("SkytilsForceGlint").get()
+            cir.returnValue = customData.getBoolean("SkytilsForceGlint").get()
         }
     }
 }

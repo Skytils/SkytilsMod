@@ -65,6 +65,7 @@ import kotlinx.coroutines.launch
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPartyInfoPacket
 import net.hypixel.modapi.packet.impl.serverbound.ServerboundPartyInfoPacket
 import net.minecraft.client.network.AbstractClientPlayerEntity
+import net.minecraft.client.network.PlayerListEntry
 import net.minecraft.client.util.DefaultSkinHelper
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket
@@ -134,6 +135,14 @@ object DungeonListener : EventSubscriber {
             incompletePuzzles.clear()
             terminalStatePuzzles.clear()
         }
+    }
+
+    private fun PlayerListEntry?.skinTextureIdentifier() = this?.run {
+        //#if MC>=12110
+        //$$ skinTextures.comp_1626().comp_3627()
+        //#else
+        skinTextures.texture
+        //#endif
     }
 
     fun onPacket(event: MainThreadPacketReceiveEvent<*>) {
@@ -336,13 +345,13 @@ object DungeonListener : EventSubscriber {
                             DungeonClass.EMPTY,
                             0,
                             pos,
-                            old?.skinTextures?.texture ?: DefaultSkinHelper.getTexture()
+                            old.skinTextureIdentifier() ?: DefaultSkinHelper.getTexture()
                         ).also {
                             if (old == null) {
                                 printDevMessage({ "could not get network player info for $name $action" }, "dungeonlistener")
                                 tickTimer(1) {
                                     printDevMessage({ "setting skin for ${name}" }, "dungeonlistener")
-                                    it.skin = (mc.networkHandler!! as AccessorNetHandlerPlayClient).uuidToPlayerInfo[entry.profile?.id]?.skinTextures?.texture ?: DefaultSkinHelper.getTexture()
+                                    it.skin = (mc.networkHandler!! as AccessorNetHandlerPlayClient).uuidToPlayerInfo[entry.profile?.id].skinTextureIdentifier() ?: DefaultSkinHelper.getTexture()
                                 }
                             }
                             println("Added $it to list")
@@ -368,7 +377,7 @@ object DungeonListener : EventSubscriber {
                         it.name.string == teammate.playerName && it.uuid.version() == 4
                     }
 
-                    old?.skinTextures?.texture?.let { teammate.skin = it }
+                    old?.skinTextureIdentifier()?.let { teammate.skin = it }
 
                     if ("§r§cDEAD§r§f)§r" in text) {
                         markDead(teammate)

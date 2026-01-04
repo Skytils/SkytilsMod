@@ -1,0 +1,4 @@
+net.minecraft.GameVersion comp_4025() getName()
+net.minecraft.world.entity.Entity getEntityPos() net.minecraft.entity.Entity getPos()
+net.minecraft.entity.PlayerLikeEntity isModelPartVisible() net.minecraft.entity.player.PlayerEntity isPartVisible()
+net.minecraft.client.render.Camera getCameraPos() getPos()

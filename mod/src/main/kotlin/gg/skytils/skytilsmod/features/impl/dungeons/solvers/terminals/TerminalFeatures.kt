@@ -84,13 +84,10 @@ object TerminalFeatures : EventSubscriber {
 
     fun onTooltip(event: gg.skytils.event.impl.item.ItemTooltipEvent) {
         if (!isInPhase3()) return
-//        val chest = mc.player?.currentScreenHandler as? GenericContainerScreenHandler ?: return
-//
-//        val inv = chest.inventory
-//        val chestName = inv.customName.string
         val currentScreen = mc.currentScreen ?: return
         val chestName = currentScreen.title.string
         if (chestName == "Click the button on time!" || chestName == "Correct all the panes!") {
+            event.tooltip.clear()
         }
     }
 }

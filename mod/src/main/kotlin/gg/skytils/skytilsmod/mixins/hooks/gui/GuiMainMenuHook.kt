@@ -29,7 +29,11 @@ import net.minecraft.client.gui.screen.TitleScreen
 import java.util.*
 
 private fun splashTextSetter(gui: AccessorGuiMainMenu, str: String) {
+    //#if MC>=12111
+    //$$ gui.splashText = SplashTextRenderer(net.minecraft.text.Text.literal(str))
+    //#else
     gui.splashText = SplashTextRenderer(str)
+    //#endif
 }
 
 fun setSplashText(gui: TitleScreen) {

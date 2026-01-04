@@ -217,7 +217,6 @@ object DungeonChestProfit : EventSubscriber {
         if (chest.items.isNotEmpty()) {
             // TODO: probably can just directly call draw on component
 //            val leftAlign = element.component.getLeft() < UResolution.scaledWidth / 2f
-            RenderSystem.setShaderColor(1f, 1f, 1f, 1f)
             // disable lighting
             var drawnLines = 1
             val profit = chest.profit

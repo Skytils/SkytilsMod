@@ -35,7 +35,9 @@ import gg.skytils.skytilsmod.utils.graphics.colors.ColorFactory.web
 import gg.skytils.skytilsmod.utils.graphics.colors.CustomColor
 import gg.skytils.skytilsmod.utils.graphics.colors.CyclingTwoColorGradient
 import gg.skytils.skytilsmod.utils.graphics.colors.RainbowColor
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
 import net.minecraft.client.network.ClientPlayNetworkHandler
 import net.minecraft.client.option.GameOptions
@@ -224,7 +226,7 @@ fun Box.isPosInside(pos: BlockPos): Boolean {
     return pos.x > this.minX && pos.x < this.maxX && pos.y > this.minY && pos.y < this.maxY && pos.z > this.minZ && pos.z < this.maxZ
 }
 
-fun Vigilant.openGUI(): Job = Skytils.launch {
+fun Vigilant.openGUI(): Job = CoroutineScope(mc.asCoroutineDispatcher()).launch {
     Skytils.displayScreen = this@openGUI.gui()
 }
 

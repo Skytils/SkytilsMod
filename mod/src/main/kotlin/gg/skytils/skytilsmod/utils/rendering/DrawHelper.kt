@@ -18,15 +18,19 @@
 
 package gg.skytils.skytilsmod.utils.rendering
 
-import com.mojang.blaze3d.systems.RenderSystem
 import gg.essential.universal.UGraphics
 import gg.essential.universal.UMatrixStack
 import gg.essential.universal.render.URenderPipeline
 import gg.essential.universal.vertex.UBufferBuilder
+import gg.essential.universal.vertex.UVertexConsumer
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorGuiContainer
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorPopupBackground
 import net.minecraft.client.font.TextRenderer
+import net.minecraft.client.gui.screen.PopupScreen
 import net.minecraft.client.render.OverlayTexture
+import net.minecraft.client.render.item.ItemRenderState
+import net.minecraft.client.render.item.ItemRenderer
 import net.minecraft.client.texture.GlTexture
 import net.minecraft.item.ItemDisplayContext
 import net.minecraft.item.ItemStack
@@ -37,8 +41,17 @@ import net.minecraft.util.math.MathHelper
 import org.joml.Quaternionf
 import java.awt.Color
 
+//#if MC>=12111
+//$$ import gg.skytils.skytilsmod.utils.lineWidth
+//#endif
+
+//#if MC>=12110
+//$$ import net.minecraft.client.render.command.OrderedRenderCommandQueueImpl
+//#endif
+
 object DrawHelper {
     private val textureManager = mc.textureManager
+    private val itemRenderState = ItemRenderState()
 
     /**
      * Applies the camera offset to the given matrices.
@@ -71,7 +84,13 @@ object DrawHelper {
      * @param aboveItems If true, the Z-level will be set to render above items.
      */
     fun setupContainerScreenTransformations(matrices: UMatrixStack, aboveItems: Boolean = false) {
-        val screen = mc.currentScreen as? AccessorGuiContainer ?: error("Current screen does not implement AccessorGuiContainer")
+        var currentScreen = mc.currentScreen
+        while (currentScreen is PopupScreen) {
+            val accessor = currentScreen as? AccessorPopupBackground
+                ?: error("Current PopupScreen does not implement AccessorPopupBackground")
+            currentScreen = accessor.underlyingScreen
+        }
+        val screen = currentScreen as? AccessorGuiContainer ?: return
         matrices.translate(screen.guiLeft.toFloat(), screen.guiTop.toFloat(), 0f)
         if (aboveItems) {
             matrices.translate(0f, 0f, 100f + 150f + 1f)
@@ -86,44 +105,50 @@ object DrawHelper {
         buffer: UBufferBuilder,
         matrices: UMatrixStack,
         box: Box,
-        color: Color
+        color: Color,
+        lineWidth: Float = 1f
     ) {
+        //#if MC<=12110
+        fun UVertexConsumer.lineWidth(width: Float) = apply {
+            // no-op below 1.21.11 as it doesn't exist
+        }
+        //#endif
         box.apply {
-            buffer.pos(matrices, minX, minY, minZ).color(color).endVertex()
-            buffer.pos(matrices, maxX, minY, minZ).color(color).endVertex()
+            buffer.pos(matrices, minX, minY, minZ).color(color).lineWidth(lineWidth).endVertex()
+            buffer.pos(matrices, maxX, minY, minZ).color(color).lineWidth(lineWidth).endVertex()
 
-            buffer.pos(matrices, maxX, minY, minZ).color(color).endVertex()
-            buffer.pos(matrices, maxX, minY, maxZ).color(color).endVertex()
+            buffer.pos(matrices, maxX, minY, minZ).color(color).lineWidth(lineWidth).endVertex()
+            buffer.pos(matrices, maxX, minY, maxZ).color(color).lineWidth(lineWidth).endVertex()
 
-            buffer.pos(matrices, maxX, minY, maxZ).color(color).endVertex()
-            buffer.pos(matrices, minX, minY, maxZ).color(color).endVertex()
+            buffer.pos(matrices, maxX, minY, maxZ).color(color).lineWidth(lineWidth).endVertex()
+            buffer.pos(matrices, minX, minY, maxZ).color(color).lineWidth(lineWidth).endVertex()
 
-            buffer.pos(matrices, minX, minY, maxZ).color(color).endVertex()
-            buffer.pos(matrices, minX, minY, minZ).color(color).endVertex()
+            buffer.pos(matrices, minX, minY, maxZ).color(color).lineWidth(lineWidth).endVertex()
+            buffer.pos(matrices, minX, minY, minZ).color(color).lineWidth(lineWidth).endVertex()
 
-            buffer.pos(matrices, minX, maxY, minZ).color(color).endVertex()
-            buffer.pos(matrices, maxX, maxY, minZ).color(color).endVertex()
+            buffer.pos(matrices, minX, maxY, minZ).color(color).lineWidth(lineWidth).endVertex()
+            buffer.pos(matrices, maxX, maxY, minZ).color(color).lineWidth(lineWidth).endVertex()
 
-            buffer.pos(matrices, maxX, maxY, minZ).color(color).endVertex()
-            buffer.pos(matrices, maxX, maxY, maxZ).color(color).endVertex()
+            buffer.pos(matrices, maxX, maxY, minZ).color(color).lineWidth(lineWidth).endVertex()
+            buffer.pos(matrices, maxX, maxY, maxZ).color(color).lineWidth(lineWidth).endVertex()
 
-            buffer.pos(matrices, maxX, maxY, maxZ).color(color).endVertex()
-            buffer.pos(matrices, minX, maxY, maxZ).color(color).endVertex()
+            buffer.pos(matrices, maxX, maxY, maxZ).color(color).lineWidth(lineWidth).endVertex()
+            buffer.pos(matrices, minX, maxY, maxZ).color(color).lineWidth(lineWidth).endVertex()
 
-            buffer.pos(matrices, minX, maxY, maxZ).color(color).endVertex()
-            buffer.pos(matrices, minX, maxY, minZ).color(color).endVertex()
+            buffer.pos(matrices, minX, maxY, maxZ).color(color).lineWidth(lineWidth).endVertex()
+            buffer.pos(matrices, minX, maxY, minZ).color(color).lineWidth(lineWidth).endVertex()
 
-            buffer.pos(matrices, minX, minY, minZ).color(color).endVertex()
-            buffer.pos(matrices, minX, maxY, minZ).color(color).endVertex()
+            buffer.pos(matrices, minX, minY, minZ).color(color).lineWidth(lineWidth).endVertex()
+            buffer.pos(matrices, minX, maxY, minZ).color(color).lineWidth(lineWidth).endVertex()
 
-            buffer.pos(matrices, maxX, minY, minZ).color(color).endVertex()
-            buffer.pos(matrices, maxX, maxY, minZ).color(color).endVertex()
+            buffer.pos(matrices, maxX, minY, minZ).color(color).lineWidth(lineWidth).endVertex()
+            buffer.pos(matrices, maxX, maxY, minZ).color(color).lineWidth(lineWidth).endVertex()
 
-            buffer.pos(matrices, maxX, minY, maxZ).color(color).endVertex()
-            buffer.pos(matrices, maxX, maxY, maxZ).color(color).endVertex()
+            buffer.pos(matrices, maxX, minY, maxZ).color(color).lineWidth(lineWidth).endVertex()
+            buffer.pos(matrices, maxX, maxY, maxZ).color(color).lineWidth(lineWidth).endVertex()
 
-            buffer.pos(matrices, minX, minY, maxZ).color(color).endVertex()
-            buffer.pos(matrices, minX, maxY, maxZ).color(color).endVertex()   
+            buffer.pos(matrices, minX, minY, maxZ).color(color).lineWidth(lineWidth).endVertex()
+            buffer.pos(matrices, minX, maxY, maxZ).color(color).lineWidth(lineWidth).endVertex()
         }
     }
 
@@ -197,9 +222,10 @@ object DrawHelper {
         color: Color = Color.WHITE
     ) {
         val buffer = UBufferBuilder.create(UGraphics.DrawMode.QUADS, UGraphics.CommonVertexFormats.POSITION_TEXTURE_COLOR)
-        UGraphics.bindTexture(0, sprite)
         val texture = textureManager.getTexture(sprite)
+        //#if MC<=12105
         texture.setFilter(false, false)
+        //#endif
         val glTexture = texture.glTexture as GlTexture
         val x2 = x + width
         val y2 = y + height
@@ -223,7 +249,7 @@ object DrawHelper {
     fun drawNametag(matrices: UMatrixStack, text: String, x: Double, y: Double, z: Double, shadow: Boolean = true, scale: Float = 1f, background: Boolean = true, throughWalls: Boolean = false) {
         matrices.push()
         matrices.translate(x, y + 0.5, z)
-        matrices.multiply(mc.entityRenderDispatcher.rotation)
+        mc.entityRenderDispatcher.camera?.rotation?.let(matrices::multiply)
         matrices.scale(0.025f, -0.025f, 0.025f)
 
         matrices.scale(scale, scale, scale)
@@ -274,7 +300,52 @@ object DrawHelper {
 
         matrices.scale(16.0f, -16.0f, 16.0f)
 
-        mc.itemRenderer.renderItem(if (dynamicDisplay) mc.player else null, stack, ItemDisplayContext.GUI, matrices.toMC(), mc.bufferBuilders.entityVertexConsumers, mc.world, 15728880, OverlayTexture.DEFAULT_UV, 0)
+        mc.itemModelManager.clearAndUpdate(
+            itemRenderState,
+            stack,
+            ItemDisplayContext.GUI,
+            mc.world,
+            if (dynamicDisplay) mc.player else null,
+            0
+        )
+
+        //#if MC>=12110
+        //$$ val commandQueue = OrderedRenderCommandQueueImpl()
+        //$$ itemRenderState.render(
+        //$$     matrices.toMC(),
+        //$$     commandQueue,
+        //$$     15728880,
+        //$$     OverlayTexture.DEFAULT_UV,
+        //$$     0
+        //$$ )
+        //$$ commandQueue.batchingQueues.forEach { it.value.itemCommands.forEach { command ->
+        //$$     matrices.push()
+        //$$     matrices.peek().copy(
+        //$$         model = command.positionMatrix.positionMatrix,
+        //$$         normal = command.positionMatrix.normalMatrix
+        //$$     )
+        //$$     ItemRenderer.renderItem(
+        //$$         command.comp_4638,
+        //$$         matrices.toMC(),
+        //$$         mc.bufferBuilders.entityVertexConsumers,
+        //$$         command.comp_4500,
+        //$$         command.comp_4501,
+        //$$         command.comp_4639,
+        //$$         command.comp_4640,
+        //$$         command.renderLayer,
+        //$$         command.glintType
+        //$$     )
+        //$$
+        //$$     matrices.pop()
+        //$$ } }
+        //#else
+        itemRenderState.render(
+            matrices.toMC(),
+            mc.bufferBuilders.entityVertexConsumers,
+            15728880,
+            OverlayTexture.DEFAULT_UV
+        )
+        //#endif
 
         matrices.pop()
     }

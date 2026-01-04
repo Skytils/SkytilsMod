@@ -44,7 +44,13 @@ public abstract class MixinMouse {
     @Shadow public abstract double getScaledY(Window window);
 
     @Inject(method = "onMouseButton", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/Window;getHandle()J", shift = At.Shift.AFTER, ordinal = 0), cancellable = true)
+    //#if MC>=12110
+    //$$ private void onMouseButton(long l, net.minecraft.client.input.MouseInput mouseInput, int i, CallbackInfo ci, @Local Window windowObj) {
+    //$$     int action = i;
+    //$$     int button = mouseInput.button();
+    //#else
     private void onMouseButton(long window, int button, int action, int mods, CallbackInfo ci, @Local Window windowObj) {
+    //#endif
         if (action != GLFW.GLFW_PRESS) return;
 
         double scaledX = this.getScaledX(windowObj);

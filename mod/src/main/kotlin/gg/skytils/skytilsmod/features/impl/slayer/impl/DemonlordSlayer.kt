@@ -154,7 +154,7 @@ class DemonlordSlayer(entity: BlazeEntity) :
             lastTickInvis = true
             val prevBB = entity.boundingBox.expand(3.0, 1.5, 3.0)
             tickTimer(10) {
-                val demons = entity.world.getOtherEntities(
+                val demons = entity.entityWorld.getOtherEntities(
                     entity, prevBB
                 ) { it.type == EntityType.ZOMBIFIED_PIGLIN || (it.type == EntityType.WITHER_SKELETON) }
                 for (demon in demons) {
@@ -165,7 +165,7 @@ class DemonlordSlayer(entity: BlazeEntity) :
                         typhoeusTexture
                     }
                     if (helmet == helmetTexture) {
-                        demon.world.getOtherEntities(
+                        demon.entityWorld.getOtherEntities(
                             demon, demon.boundingBox.expand(0.2, 3.0, 0.2)
                         ) {
                             it is ArmorStandEntity && it.isInvisible && it.hasCustomName()

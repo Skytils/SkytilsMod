@@ -64,7 +64,7 @@ open class Slayer<T : LivingEntity>(
 
     fun detectSlayerEntities() =
         tickTask(5) {
-            val nearbyArmorStands = entity.world.getOtherEntities(
+            val nearbyArmorStands = entity.entityWorld.getOtherEntities(
                 entity, entity.boundingBox.expand(0.2, 3.0, 0.2)
             ) { nearbyEntity: Entity? ->
                 if (nearbyEntity is ArmorStandEntity) {

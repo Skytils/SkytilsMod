@@ -72,6 +72,8 @@ import gg.skytils.skytilsmod.core.structure.v2.HudElement
 import gg.skytils.skytilsmod.gui.layout.text
 import gg.skytils.skytilsmod.utils.multiplatform.textComponent
 import gg.skytils.skytilsmod.utils.rendering.DrawHelper
+import net.fabricmc.loader.api.FabricLoader
+import net.minecraft.block.Block
 import net.minecraft.entity.projectile.FishingBobberEntity
 import net.minecraft.block.Blocks
 import net.minecraft.client.font.TextRenderer
@@ -82,6 +84,7 @@ import net.minecraft.item.Items
 import net.minecraft.screen.GenericContainerScreenHandler
 import net.minecraft.nbt.NbtElement
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtOps
 import net.minecraft.nbt.NbtString
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket
 import net.minecraft.network.packet.s2c.play.EntityTrackerUpdateS2CPacket
@@ -94,6 +97,7 @@ import net.minecraft.world.BlockStateRaycastContext
 import java.awt.Color
 import java.time.Instant
 import java.util.Optional
+import java.util.WeakHashMap
 import kotlin.jvm.optionals.getOrDefault
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.pow
@@ -467,7 +471,7 @@ object ItemFeatures : EventSubscriber {
         }
 
         if (DevTools.getToggle("nbt") && UKeyboard.isKeyDown(UKeyboard.KEY_C) && UKeyboard.isCtrlKeyDown() && !UKeyboard.isShiftKeyDown() && !UKeyboard.isAltKeyDown()) {
-            UDesktop.setClipboardString(event.stack.toNbt(mc.player!!.registryManager).toString())
+            UDesktop.setClipboardString(ItemStack.CODEC.encodeStart(mc.player!!.registryManager.getOps(NbtOps.INSTANCE), event.stack).toString())
         }
     }
 
@@ -566,20 +570,43 @@ object ItemFeatures : EventSubscriber {
                 "WEIRD_TUBA",
                 "WEIRDER_TUBA",
                 "PUMPKIN_LAUNCHER",
-                "FIRE_FREEZE_STAFF"
+                "FIRE_FREEZE_STAFF",
+                "GEMSTONE_GAUNTLET"
             ))
         ) {
             val block = mc.world?.getBlockState(event.pos) ?: return
-            // TODO: verify this works as intended
-            if (!block.block.javaClass.run { getMethod("onUse").declaringClass == this } || Utils.inDungeons && (block.block === Blocks.COAL_BLOCK || block.block === Blocks.RED_TERRACOTTA)) {
+            if (!isInteractable(block.block)) {
                 event.cancelled = true
             }
         }
     }
 
+    // In Yarn mappings, this is AbstractBlock#onUse
+    private val onUseMethodName = FabricLoader.getInstance().mappingResolver.mapMethodName(
+        "intermediary",
+        "net.minecraft.class_4970",
+        "method_55766",
+        "(Lnet/minecraft/class_2680;Lnet/minecraft/class_1937;Lnet/minecraft/class_2338;Lnet/minecraft/class_1657;Lnet/minecraft/class_3965;)Lnet/minecraft/class_1269;"
+    )
+
+    private val interactableBlockCache = WeakHashMap<Class<out Block>, Boolean>()
+
+    private fun isInteractable(block: Block): Boolean {
+        if (Utils.inDungeons && (block === Blocks.COAL_BLOCK || block === Blocks.RED_TERRACOTTA)) {
+            return true
+        }
+
+        val clazz = block.javaClass
+
+        // If the block has its own onUse method that overrides the one in AbstractBlock, it is interactable
+        return interactableBlockCache.getOrPut(clazz) {
+            clazz.declaredMethods.any { it.name == onUseMethodName }
+        }
+    }
+
     fun onRenderItemOverlayPost(event: GuiContainerPostDrawSlotEvent) {
         val item = event.slot.stack ?: return
-        if (!Utils.inSkyblock || item.count != 1 || item.get(DataComponentTypes.CUSTOM_DATA)?.nbt?.contains("SkytilsNoItemOverlay") == true) return
+        if (!Utils.inSkyblock || item.count != 1 || item.get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()?.contains("SkytilsNoItemOverlay") == true) return
         val matrixStack = UMatrixStack()
         DrawHelper.setupContainerScreenTransformations(matrixStack, aboveItems = true)
         var stackTip = ""
@@ -587,7 +614,9 @@ object ItemFeatures : EventSubscriber {
         getExtraAttributes(item)?.let { extraAttributes ->
             val itemId = getSkyBlockItemID(extraAttributes)
             if (Skytils.config.showPotionTier && extraAttributes.contains("potion_level")) {
-                stackTip = extraAttributes.getInt("potion_level").toString()
+                extraAttributes.getInt("potion_level").getOrNull()?.toString()?.let {
+                    stackTip = it
+                }
             } else if (Skytils.config.showAttributeShardLevel && itemId == "ATTRIBUTE_SHARD") {
                 extraAttributes.getCompound("attributes").getOrNull()?.takeUnless {
                     it.isEmpty
@@ -596,7 +625,9 @@ object ItemFeatures : EventSubscriber {
                     If they ever add the ability to combine attributes on shards, this will need to be updated to:
                     stackTip = it.keySet.maxOf { s -> it.getInteger(s) }.toString()
                     */
-                    stackTip = it.getInt(it.keys.first()).toString()
+                    it.getInt(it.keys.first()).getOrNull()?.toString()?.let {
+                        stackTip = it
+                    }
                 }
             } else if ((Skytils.config.showEnchantedBookTier || Skytils.config.showEnchantedBookAbbreviation) && itemId == "ENCHANTED_BOOK") {
                 extraAttributes.getCompound("enchantments").getOrNull()?.takeIf {
@@ -635,8 +666,11 @@ object ItemFeatures : EventSubscriber {
                         UGraphics.drawString(matrixStack, prefix, 0f, 0f, Color.WHITE.rgb, false)
                         matrixStack.pop()
                     }
-                    if (Skytils.config.showEnchantedBookTier) stackTip =
-                        enchantments.getInt(name).toString()
+                    if (Skytils.config.showEnchantedBookTier) {
+                        enchantments.getInt(name).getOrNull()?.toString()?.let {
+                            stackTip = it
+                        }
+                    }
                 }
             } else if (Skytils.config.showHeadFloorNumber && item.item === Items.PLAYER_HEAD && headPattern.matches(
                     itemId ?: ""
@@ -696,7 +730,10 @@ object ItemFeatures : EventSubscriber {
             }
         }
         if (stackTip.isNotEmpty()) {
-            UGraphics.drawString(matrixStack, stackTip, 0f, 0f, Color.WHITE.rgb, false)
+            matrixStack.push()
+            matrixStack.translate(event.slot.x + 17f - UGraphics.getStringWidth(stackTip), event.slot.y + 9f, 0f)
+            UGraphics.drawString(matrixStack, stackTip, 0f, 0f, Color.WHITE.rgb, true)
+            matrixStack.pop()
         }
     }
 

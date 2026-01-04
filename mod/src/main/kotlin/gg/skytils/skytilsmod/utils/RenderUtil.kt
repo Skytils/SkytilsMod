@@ -18,7 +18,6 @@
 package gg.skytils.skytilsmod.utils
 
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.textures.GpuTexture
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.ChatColor
 import gg.essential.universal.UGraphics
@@ -28,15 +27,10 @@ import gg.essential.universal.UResolution
 import gg.essential.universal.vertex.UBufferBuilder
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.mixins.hooks.renderer.skipGlint
 import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorMinecraft
 import gg.skytils.skytilsmod.utils.rendering.DrawHelper
 import gg.skytils.skytilsmod.utils.rendering.DrawHelper.writeRectCoords
 import gg.skytils.skytilsmod.utils.rendering.SRenderPipelines
-import net.minecraft.block.Block
-import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.render.Tessellator
-import net.minecraft.client.render.VertexFormats
 import net.minecraft.client.render.block.entity.BeaconBlockEntityRenderer
 import net.minecraft.client.texture.GlTexture
 import net.minecraft.entity.Entity
@@ -45,9 +39,7 @@ import net.minecraft.screen.slot.Slot
 import net.minecraft.util.*
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
-import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
-import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.*
@@ -62,8 +54,21 @@ object RenderUtil {
     private val mutex = ReentrantLock()
 
     fun renderBeaconBeam(matrixStack: UMatrixStack, rgb: Int, partialTicks: Float) {
-        val height = 300
-        val bottomOffset = 0
+        //#if MC>=12110
+        //$$ val vertexConsumer = UMinecraft.getMinecraft().gameRenderer.entityRenderCommandQueue
+        //$$ BeaconBlockEntityRenderer.renderBeam(
+        //$$        matrixStack.toMC(),
+        //$$        vertexConsumer,
+        //$$        BeaconBlockEntityRenderer.BEAM_TEXTURE,
+        //$$        partialTicks,
+        //$$        1f,
+        //$$        mc.world!!.time.toInt(),
+        //$$        0,
+        //$$        rgb,
+        //$$        0.2f,
+        //$$        0.25f
+        //$$ )
+        //#else
         val vertexConsumer = UMinecraft.getMinecraft().bufferBuilders.entityVertexConsumers
         BeaconBlockEntityRenderer.renderBeam(
             matrixStack.toMC(),
@@ -72,13 +77,14 @@ object RenderUtil {
             partialTicks,
             1f,
             mc.world!!.time,
-            bottomOffset,
-            height,
+            0,
+            300,
             rgb,
             0.2f,
             0.25f
         )
         vertexConsumer.drawCurrentLayer()
+        //#endif
     }
 
     internal fun <T> Color.withParts(block: (Int, Int, Int, Int) -> T) =
@@ -100,8 +106,10 @@ object RenderUtil {
         val matrices = UMatrixStack.Compat.get()
         matrices.push()
         DrawHelper.setupCameraTransformations(matrices)
+        //#if MC<=12110
         RenderSystem.lineWidth(width)
-        DrawHelper.writeOutlineCube(buffer, matrices, aabb, color.multAlpha(1f))
+        //#endif
+        DrawHelper.writeOutlineCube(buffer, matrices, aabb, color.multAlpha(1f), width)
         buffer.build()?.drawAndClose(if (throughWalls) SRenderPipelines.noDepthBoxPipeline else SRenderPipelines.boxPipeline)
         matrices.pop()
     }
@@ -142,11 +150,21 @@ object RenderUtil {
     ) {
         matrixStack.push()
         DrawHelper.setupCameraTransformations(matrixStack)
+        //#if MC<=12110
         RenderSystem.lineWidth(width.toFloat())
+        //#endif
         val fixedColor = color.multAlpha(alphaMultiplier)
         val buffer = UBufferBuilder.create(UGraphics.DrawMode.LINE_STRIP, UGraphics.CommonVertexFormats.POSITION_COLOR)
-        buffer.pos(matrixStack, pos1.x, pos1.y, pos1.z).color(fixedColor).endVertex()
-        buffer.pos(matrixStack, pos2.x, pos2.y, pos2.z).color(fixedColor).endVertex()
+        buffer.pos(matrixStack, pos1.x, pos1.y, pos1.z).color(fixedColor)
+            //#if MC>=12111
+            //$$ .lineWidth(width)
+            //#endif
+            .endVertex()
+        buffer.pos(matrixStack, pos2.x, pos2.y, pos2.z).color(fixedColor)
+            //#if MC>=12111
+            //$$ .lineWidth(width)
+            //#endif
+            .endVertex()
         buffer.build()?.drawAndClose(SRenderPipelines.linesPipeline)
         matrixStack.pop()
     }
@@ -161,11 +179,17 @@ object RenderUtil {
     ) {
         matrixStack.push()
         DrawHelper.setupCameraTransformations(matrixStack)
+        //#if MC<=12110
         RenderSystem.lineWidth(width.toFloat())
+        //#endif
         val fixedColor = color.multAlpha(alphaMultiplier)
         val buffer = UBufferBuilder.create(UGraphics.DrawMode.LINE_STRIP, UGraphics.CommonVertexFormats.POSITION_COLOR)
         for (pos in points) {
-            buffer.pos(matrixStack, pos.x, pos.y, pos.z).color(fixedColor).endVertex()
+            buffer.pos(matrixStack, pos.x, pos.y, pos.z).color(fixedColor)
+                //#if MC>=12111
+                //$$ .lineWidth(width)
+                //#endif
+                .endVertex()
         }
         buffer.build()?.drawAndClose(SRenderPipelines.linesPipeline)
         matrixStack.pop()
@@ -288,7 +312,6 @@ object RenderUtil {
         val color = rarity.color.withAlpha(alpha)
         val tex = (mc.textureManager.getTexture(texture).glTexture as GlTexture)
 
-        color.bindColor()
         val buffer = UBufferBuilder.create(UGraphics.DrawMode.QUADS, UGraphics.CommonVertexFormats.POSITION_TEXTURE_COLOR)
         buffer.pos(matrixStack, 0.0, 0.0, 0.0).tex(0.0, 0.0).color(color).endVertex()
         buffer.pos(matrixStack, 16.0, 0.0, 0.0).tex(1.0, 0.0).color(color).endVertex()
@@ -422,11 +445,17 @@ object RenderUtil {
 
     fun drawCircle(matrixStack: UMatrixStack, x: Double, y: Double, z: Double, partialTicks: Float, radius: Double, edges: Int, r: Int, g: Int, b: Int, a: Int = 255) {
         val angleDelta = Math.PI * 2 / edges
+        //#if MC<=12105
         RenderSystem.lineWidth(5f)
+        //#endif
         val buffer = UBufferBuilder.create(UGraphics.DrawMode.LINE_STRIP, UGraphics.CommonVertexFormats.POSITION_COLOR)
         val (dx, dy, dz) = getViewerPos(partialTicks)
         repeat(edges) { idx ->
-            buffer.pos(matrixStack, x - dx + radius * cos(idx * angleDelta), y - dy, z - dz + radius * sin(idx * angleDelta)).color(r, g, b, a).endVertex()
+            buffer.pos(matrixStack, x - dx + radius * cos(idx * angleDelta), y - dy, z - dz + radius * sin(idx * angleDelta)).color(r, g, b, a)
+                //#if MC>=12111
+                //$$ .lineWidth(5f)
+                //#endif
+                .endVertex()
         }
         buffer.pos(matrixStack, x + radius - dx, y - dy, z - dz).color(r, g, b, a).endVertex()
         buffer.build()?.drawAndClose(SRenderPipelines.linesPipeline)
@@ -566,19 +595,18 @@ object RenderUtil {
         color: Color,
         partialTicks: Float
     ) {
-        val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
+        // TODO: convert this to VertexRendering#drawOutline
         val matrixStack = UMatrixStack()
+        DrawHelper.setupCameraTransformations(matrixStack)
         drawFilledBoundingBox(
             matrixStack,
             Box(pos)
-                .expandBlock()
-                .offset(-viewerX, -viewerY, -viewerZ),
+                .expandBlock(),
             color
         )
     }
 }
 
-fun Color.bindColor() = RenderSystem.setShaderColor(this.red / 255f, this.green / 255f, this.blue / 255f, this.alpha / 255f)
 fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
 
 fun Color.multAlpha(mult: Float) = Color(

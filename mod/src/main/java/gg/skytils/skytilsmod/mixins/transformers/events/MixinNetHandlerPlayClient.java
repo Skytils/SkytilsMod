@@ -25,12 +25,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-//#if MC==10809
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-//#else
 import net.minecraft.client.network.ClientCommonNetworkHandler;
-//#endif
 
 //#if MC==10809
 //$$ @Mixin(ClientPlayNetworkHandler.class)

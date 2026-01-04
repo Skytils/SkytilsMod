@@ -34,6 +34,10 @@ fun modifyBlockState(
     pos: BlockPos,
     original: BlockState
 ): BlockState {
+    return modifyBlockState(pos, original)
+}
+
+fun modifyBlockState(pos: BlockPos, original: BlockState): BlockState {
     if (!Utils.inSkyblock) return original
     var returnState = original
     if (SBInfo.mode == SkyblockIsland.DwarvenMines.mode) {

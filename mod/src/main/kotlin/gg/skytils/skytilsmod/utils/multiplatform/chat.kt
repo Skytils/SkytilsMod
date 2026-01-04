@@ -81,4 +81,10 @@ fun MutableMCTextComponent.setClickRun(command: String) = apply {
     setStyle(style.withClickEvent(ClickEvent.RunCommand(command)))
 }
 
-fun isValidChar(c: Char) = StringHelper.isValidChar(c)
+fun isValidChar(c: Char) =
+    StringHelper.isValidChar(
+        c
+        //#if MC>=1211
+        //$$ .code
+        //#endif
+    )

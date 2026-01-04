@@ -38,15 +38,6 @@ public interface AccessorGuiNewChat {
     @Accessor("scrolledLines")
     int getScrollPos();
 
-    @Invoker
-    double invokeToChatLineX(double x);
-
-    @Invoker
-    double invokeToChatLineY(double y);
-
-    @Invoker
-    int invokeGetMessageLineIndex(double x, double y);
-
     //#if MC==10809
     //$$ @Invoker("addMessage")
     //$$ void invokeSetChatLine(Text chatComponent, int chatLineId, int updateCounter, boolean displayOnly);
