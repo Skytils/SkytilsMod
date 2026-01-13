@@ -56,7 +56,7 @@ object DungeonChestProfit {
     private val element = DungeonChestProfitElement()
     private var rerollBypass = false
     private val essenceRegex = Regex("§d(?<type>\\w+) Essence §8x(?<count>\\d+)")
-    private val croesusChestRegex = Regex("^(Master Mode )?The Catacombs - Flo(or (IV|V?I{0,3}))?$")
+    private val croesusChestRegex = Regex("^(Master )?Catacombs - Flo(or (IV|V?I{0,3}))?$")
 
     @SubscribeEvent
     fun onGUIDrawnEvent(event: GuiContainerEvent.ForegroundDrawnEvent) {
@@ -97,7 +97,7 @@ object DungeonChestProfit {
         } else if (croesusChestRegex.matches(event.chestName)) {
             for (i in 10..16) {
                 val openChest = inv.getStackInSlot(i) ?: continue
-                val chestType = DungeonChest.getFromName(openChest.displayName.stripControlCodes()) ?: continue
+                val chestType = DungeonChest.getFromName(openChest.displayName.stripControlCodes() + " Chest") ?: continue
                 val lore = ItemUtil.getItemLore(openChest)
 
                 val contentIndex = lore.indexOf("§7Contents")
@@ -132,13 +132,13 @@ object DungeonChestProfit {
             if (!(name == "§cThe Catacombs" || name == "§cMaster Mode The Catacombs")) return
             val lore = ItemUtil.getItemLore(stack)
             event.slot highlight when {
-                lore.any { line -> line == "§aNo more Chests to open!" } -> {
+                lore.any { line -> line == "§aNo more chests to open!" } -> {
                     if (Skytils.config.croesusHideOpened) {
                         event.isCanceled = true
                         return
                     } else Color(255, 0, 0, 100)
                 }
-                lore.any { line -> line == "§8No Chests Opened!" } -> Color(0, 255, 0, 100)
+                lore.any { line -> line == "§8No chests opened yet!" } -> Color(0, 255, 0, 100)
                 lore.any { line -> line.startsWith("§8Opened Chest: ") } -> Color(255, 255, 0, 100)
                 else -> return
             }
@@ -167,7 +167,7 @@ object DungeonChestProfit {
     }
 
     private fun getIdFromName(name: String): String? {
-        return if (name.startsWith("§aEnchanted Book (")) {
+        return if (name.startsWith("§fEnchanted Book (")) {
             val enchant = name.substring(name.indexOf("(") + 1, name.indexOf(")"))
             return enchantNameToID(enchant)
         } else {
