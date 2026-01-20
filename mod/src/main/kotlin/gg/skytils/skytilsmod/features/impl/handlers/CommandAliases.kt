@@ -17,6 +17,8 @@
  */
 package gg.skytils.skytilsmod.features.impl.handlers
 
+import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.arguments.StringArgumentType
 import gg.essential.universal.UChat
 import gg.skytils.event.EventSubscriber
 import gg.skytils.event.impl.play.ChatMessageSentEvent
@@ -26,14 +28,24 @@ import gg.skytils.skytilsmod.Skytils.failPrefix
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.utils.runClientCommand
 import kotlinx.serialization.encodeToString
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import java.io.File
 import java.io.Reader
 import java.io.Writer
-import java.util.*
-import kotlin.collections.sortedMapOf
+import java.util.Comparator
+import java.util.HashMap
+import java.util.IllegalFormatException
+import java.util.SortedMap
 
 object CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json")), EventSubscriber {
     val aliases get() = _aliases
+
+    private var chatMessageRegister: (() -> Boolean)? = null
+
+    private var commandDispatcher: CommandDispatcher<FabricClientCommandSource>? = null
 
     private var _aliases: MutableMap<String, String> = hashMapOf()
 
@@ -41,7 +53,7 @@ object CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json
         .reversed()
         .thenComparing(Comparator.naturalOrder())
 
-    fun recreateMap(commandAliasSpaces: Boolean) {
+    fun recreateMap(commandAliasSpaces: Boolean = Skytils.config.commandAliasesSpaces) {
         _aliases =
             if (commandAliasSpaces) sortedMapOf<String, String>(
                 comparator
@@ -60,54 +72,38 @@ object CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json
     }
 
     init {
-        recreateMap(Skytils.config.commandAliasesSpaces)
+        recreateMap()
     }
 
     fun onSendChatMessage(event: ChatMessageSentEvent) {
-        if (event.message.startsWith("/")) {
-            if (!Skytils.config.commandAliasesSpaces) {
-                val args = event.message.substring(1).trim().split(" ").toMutableList()
-                val command = args.removeAt(0)
-                val replacement = aliases[command] ?: return
-                event.cancelled = true
-                try {
-                    val msg =
-                        if (Skytils.config.commandAliasMode == 0) "/${replacement} ${args.joinToString(" ")}" else "/${
-                            replacement.format(
-                                *args.toTypedArray()
-                            )
-                        }"
-                    if (event.addToHistory) {
-                        mc.inGameHud.chatHud.addToMessageHistory(msg)
-                    }
-                    if (runClientCommand(msg) != 0) return
-                    Skytils.sendMessageQueue.add(msg)
-                } catch (ignored: IllegalFormatException) {
-                    if (event.addToHistory) mc.inGameHud.chatHud.addToMessageHistory(event.message)
-                    UChat.chat("$failPrefix §cYou did not specify the correct amount of arguments for this alias!")
-                }
-            } else {
-                val candidate = event.message.substring(1).trim()
-                val replacement = aliases.entries.find { candidate == it.key || candidate.startsWith(it.key + ' ') } ?: return
-                val args = candidate.removePrefix(replacement.key).trim()
-                event.cancelled = true
-                try {
-                    val msg =
-                        if (Skytils.config.commandAliasMode == 0) "/${replacement.value} $args" else "/${
-                            replacement.value.format(
-                                *args.split(" ").toTypedArray()
-                            )
-                        }"
-                    if (event.addToHistory) {
-                        mc.inGameHud.chatHud.addToMessageHistory(msg)
-                    }
-                    if (runClientCommand(msg) != 0) return
-                    Skytils.sendMessageQueue.add(msg)
-                } catch (ignored: IllegalFormatException) {
-                    if (event.addToHistory) mc.inGameHud.chatHud.addToMessageHistory(event.message)
-                    UChat.chat("$failPrefix §cYou did not specify the correct amount of arguments for this alias!")
-                }
+        if (!event.message.startsWith("/")) return
+
+        val candidate = event.message.substring(1).trim()
+
+        val entry = aliases.entries
+            .find { (key, _) ->
+                ' ' in key && (candidate == key || candidate.startsWith("$key "))
+            } ?: return
+
+        val (key, template) = entry
+        val args = candidate.removePrefix(key).trim()
+
+        event.cancelled = true
+        try {
+            val msg =
+                if (Skytils.config.commandAliasMode == 0) "/$template $args" else "/${
+                    template.format(
+                        *args.split(" ").toTypedArray()
+                    )
+                }"
+            if (event.addToHistory) {
+                mc.inGameHud.chatHud.addToMessageHistory(msg)
             }
+            if (runClientCommand(msg) != 0) return
+            Skytils.sendMessageQueue.add(msg)
+        } catch (_: IllegalFormatException) {
+            if (event.addToHistory) mc.inGameHud.chatHud.addToMessageHistory(event.message)
+            UChat.chat("$failPrefix §cYou did not specify the correct amount of arguments for this alias!")
         }
     }
 
@@ -125,6 +121,78 @@ object CommandAliases : PersistentSave(File(Skytils.modDir, "commandaliases.json
     }
 
     override fun setup() {
-        register(::onSendChatMessage)
+        ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
+            commandDispatcher = dispatcher
+            refresh(dispatcher)
+        }
+    }
+
+    fun refresh(dispatcher: CommandDispatcher<FabricClientCommandSource>? = commandDispatcher, allowSpaces: Boolean = Skytils.config.commandAliasesSpaces, customRemovalKeys: Set<String>? = null) {
+        if (dispatcher == null) return
+
+        recreateMap(allowSpaces)
+
+        if (allowSpaces) {
+            if (chatMessageRegister == null) {
+                chatMessageRegister = register(::onSendChatMessage)
+            }
+        } else {
+            chatMessageRegister?.invoke()
+            chatMessageRegister = null
+        }
+
+        dispatcher.root.children
+            .removeIf { node -> aliases.containsKey(node.name) || (customRemovalKeys?.contains(node.name) == true) } // Due to how minecraft works, even after removal, the command will only be recognized as removed after switching servers.
+
+        aliases.forEach { (alias, template) ->
+            val hasSpace = ' ' in alias
+
+            if (!allowSpaces && hasSpace) return@forEach
+
+            val literalNode = literal(alias)
+                .then(
+                    argument("args", StringArgumentType.greedyString())
+                        .apply {
+                            if (!hasSpace) {
+                                this.executes { ctx ->
+                                    val raw = StringArgumentType.getString(ctx, "args")
+                                    runAlias(alias, template, raw)
+                                    1
+                                }
+                            }
+                        }
+                )
+
+            if (!hasSpace) {
+                literalNode.executes { ctx ->
+                    runAlias(alias, template, "")
+                    1
+                }
+            }
+
+            dispatcher.register(literalNode)
+        }
+    }
+
+    private fun runAlias(
+        alias: String,
+        template: String,
+        rawArgs: String
+    ) {
+        val args = if (rawArgs.isBlank()) emptyList() else rawArgs.split(" ")
+        val msg = try {
+            when (Skytils.config.commandAliasMode) {
+                0 -> "/" + listOf(template, *args.toTypedArray()).joinToString(" ")
+                else -> "/" + template.format(*args.toTypedArray())
+            }
+        } catch (_: IllegalFormatException) {
+            mc.inGameHud.chatHud.addToMessageHistory("/$alias $rawArgs")
+            UChat.chat("$failPrefix §cWrong number of arguments for alias '$alias'!")
+            return
+        }
+
+        mc.inGameHud.chatHud.addToMessageHistory(msg)
+        if (runClientCommand(msg) != 0) return
+        Skytils.sendMessageQueue.add(msg)
     }
 }

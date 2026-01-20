@@ -101,7 +101,7 @@ object Config : Vigilant(
 
     @Property(
         type = PropertyType.SWITCH, name = "Command Alias Subcommands",
-        description = "§b[BETA] Allows the use of spaces in command aliases to target subcommands.\nThis should only be turned on if used.",
+        description = "§b[BETA] Allows the use of spaces in command alias names.\nThis should only be turned on if used.\n§6You may need to switch servers to apply changes.",
         category = "General", subcategory = "Command Aliases",
         i18nName = "skytils.config.general.command_aliases.command_alias_subcommands",
         i18nCategory = "skytils.config.general",
@@ -4452,7 +4452,7 @@ object Config : Vigilant(
 
     init {
         registerListener("commandAliasesSpaces") { prop: Boolean ->
-            CommandAliases.recreateMap(prop)
+            CommandAliases.refresh(allowSpaces = prop)
         }
 
         addDependency("showEtherwarpTeleportPosColor", "showEtherwarpTeleportPos")
