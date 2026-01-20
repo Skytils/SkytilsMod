@@ -67,6 +67,7 @@
     "renderer.MixinTileEntityChestRenderer",
     "renderer.MixinTileEntitySkullRenderer",
     "renderer.MixinWorldRenderer_Glow",
+    "renderer.MixinPlayerEntityRenderer",
     "util.MixinChatStyle",
     "util.MixinUtil",
     "world.MixinClientWorld",
