@@ -12,6 +12,8 @@
   },
   "client": [
     "HideStatusEffects_MixinStatusEffectsDisplay",
-    "gui.EnterConfirmation_MixinAbstractSignEditScreen"
+    "events.MixinHandledScreen",
+    "gui.EnterConfirmation_MixinAbstractSignEditScreen",
+    "render.MixinItemEntityRenderer"
   ]
 }

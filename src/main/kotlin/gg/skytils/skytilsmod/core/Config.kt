@@ -50,6 +50,21 @@ object Config : Vigilant(
     )
     var pressEnterToConfirmSignQuestion = false
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Rarity Background",
+        description = "Shows the Rarity of items as their background.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var showRarityBackground = false
+
+    @Property(
+        type = PropertyType.DECIMAL_SLIDER, name = "Dropped Item Scale",
+        description = "Changes the scale of dropped items.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        minF = 0.10f, maxF = 2f, decimalPlaces = 2
+    )
+    var droppedItemScale = 1f
+
     fun init() {
         initialize()
         lastLaunchedVersion = Reference.VERSION
