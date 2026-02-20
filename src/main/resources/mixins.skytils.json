@@ -9,5 +9,8 @@
   ],
   "mixinextras": {
     "minVersion": "0.5.3"
-  }
+  },
+  "client": [
+    "HideStatusEffects_MixinStatusEffectsDisplay"
+  ]
 }

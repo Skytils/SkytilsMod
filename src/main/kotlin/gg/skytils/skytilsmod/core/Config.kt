@@ -36,6 +36,13 @@ object Config : Vigilant(
     )
     var lastLaunchedVersion = "0"
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Hide Potion Effects in Inventory",
+        description = "Prevents the game from rendering the potion effects in inventories while in Skyblock.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+    )
+    var hidePotionEffects = false
+
     fun init() {
         initialize()
         lastLaunchedVersion = Reference.VERSION
