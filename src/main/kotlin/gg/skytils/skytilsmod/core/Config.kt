@@ -51,13 +51,22 @@ object Config : Vigilant(
     var pressEnterToConfirmSignQuestion = false
 
     @Property(
-        type = PropertyType.SWITCH, name = "Show Rarity Background",
+        type = PropertyType.SWITCH, name = "Show Item Rarity",
         description = "Shows the Rarity of items as their background.",
         category = "Miscellaneous", subcategory = "Quality of Life"
     )
-    var showRarityBackground = false
+    var showItemRarity = false
+
+    @Property(
+        type = PropertyType.PERCENT_SLIDER, name = "Item Rarity Opacity",
+        description = "Changes how visible the rarity background is. Lower values are less visible.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var itemRarityOpacity = 1f
 
     fun init() {
+        addDependency("itemRarityOpacity", "showItemRarity")
+
         initialize()
         lastLaunchedVersion = Reference.VERSION
         markDirty()

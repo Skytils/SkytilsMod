@@ -1,5 +1,6 @@
 package gg.skytils.skytilsmod.features.impl.misc
 
+import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.ChatColor
 import gg.essential.universal.utils.toFormattedString
 import gg.skytils.event.EventSubscriber
@@ -33,20 +34,20 @@ object ShowItemRarity : EventSubscriber {
     }
 
     fun onDrawSlot(event: DrawSlotEvent) {
-        if (!SBInfo.skyblockState.getUntracked() || !Config.showRarityBackground) return
+        if (!SBInfo.skyblockState.getUntracked() || !Config.showItemRarity) return
 
         val stack = event.slot.stack
         val lines = stack.components.get(DataComponentTypes.LORE)?.lines ?: emptyList()
         lines.asReversed().firstNotNullOfOrNull { RARITY_REGEX.find(it.toFormattedString()) }?.let { match ->
             val (rarity) = match.destructured
-            val color = RARITY_COLOR_MAP.getOrDefault(rarity, ChatColor.GRAY)
+            val color = RARITY_COLOR_MAP.getOrDefault(rarity, ChatColor.GRAY).color ?: return
 
             event.context.fill(
                 event.slot.x,
                 event.slot.y,
                 event.slot.x + 16,
                 event.slot.y + 16,
-                color.color?.rgb ?: 0
+                color.withAlpha(Config.itemRarityOpacity).rgb
             )
         }
     }
