@@ -8,7 +8,6 @@ import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.core.HypixelApi
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.features.impl.handlers.KeyShortcuts
-import gg.skytils.skytilsmod.features.impl.misc.TakoTheTest
 import gg.skytils.skytilsmod.util.SBInfo
 import kotlinx.serialization.json.Json
 import net.fabricmc.loader.api.FabricLoader
@@ -43,7 +42,6 @@ object Skytils : EventSubscriber {
             SBInfo,
 
             KeyShortcuts,
-            TakoTheTest
         ).forEach(EventSubscriber::setup)
 
         HypixelApi.setup()
