@@ -43,6 +43,13 @@ object Config : Vigilant(
     )
     var hidePotionEffects = false
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Press Enter to confirm Sign Popups",
+        description = "Allows pressing enter to confirm a sign popup, such as the bazaar or auction house prices.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+    )
+    var pressEnterToConfirmSignQuestion = false
+
     fun init() {
         initialize()
         lastLaunchedVersion = Reference.VERSION
