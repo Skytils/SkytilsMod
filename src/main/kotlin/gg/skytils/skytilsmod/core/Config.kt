@@ -50,6 +50,13 @@ object Config : Vigilant(
     )
     var pressEnterToConfirmSignQuestion = false
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Rarity Background",
+        description = "Shows the Rarity of items as their background.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var showRarityBackground = false
+
     fun init() {
         initialize()
         lastLaunchedVersion = Reference.VERSION
