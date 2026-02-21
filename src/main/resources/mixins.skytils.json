@@ -5,7 +5,8 @@
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [
     "events.MainThreadPacket_MixinPacketApplyBatcherEntry",
-    "events.MixinClientConnection"
+    "events.MixinClientConnection",
+    "item.MixinItemStack"
   ],
   "mixinextras": {
     "minVersion": "0.5.3"

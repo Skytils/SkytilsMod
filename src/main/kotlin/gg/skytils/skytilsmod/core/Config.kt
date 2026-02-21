@@ -58,6 +58,14 @@ object Config : Vigilant(
     )
     var droppedItemScale = 1f
 
+    @Property(
+        type = PropertyType.SELECTOR, name = "Item Stars Display",
+        description = "Changes the way Item Stars are displayed on Items.",
+        category = "Miscellaneous", subcategory = "Items",
+        options = ["Normal", "Old", "Compact"]
+    )
+    var starDisplayType = 0
+
     fun init() {
         initialize()
         lastLaunchedVersion = Reference.VERSION
