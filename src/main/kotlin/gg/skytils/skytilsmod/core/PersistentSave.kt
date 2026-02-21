@@ -12,7 +12,7 @@ import kotlin.io.path.writer
 import kotlin.reflect.KClass
 
 abstract class PersistentSave(private val saveLocation: Path) {
-    private var dirty = false
+    protected var dirty = false
 
     private fun init() {
         saves.add(this)
@@ -70,7 +70,7 @@ abstract class PersistentSave(private val saveLocation: Path) {
         }
 
         private fun saveAll() =
-            saves.forEach(PersistentSave::writeSave)
+            saves.forEach { if (it.dirty) it.writeSave() }
 
         init {
             fixedRateTimer("Skytils-PersistentSave-Write", period = 30000L) {
