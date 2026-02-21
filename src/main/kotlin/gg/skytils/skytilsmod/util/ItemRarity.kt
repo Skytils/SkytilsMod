@@ -23,7 +23,7 @@ enum class ItemRarity(val chatColor: ChatColor, val color: Color) {
     companion object {
         val RARITY_REGEX by lazy {
             // TODO: Fix once §k (obfuscated) is shown in toFormattedString()
-            Regex("(?:§r§[\\da-f]§la§r )?§r§[\\da-f]§l(?:SHINY )?(?<rarity>${entries.joinToString("|") { it.rarityName }})")
+            Regex("^(?:§r§[\\da-f]§la§r )?§r§[\\da-f]§l(?:SHINY )?(?<rarity>${entries.joinToString("|") { it.rarityName }})")
         }
     }
 }
