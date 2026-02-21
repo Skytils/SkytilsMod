@@ -17,11 +17,11 @@ import java.awt.Color
 
 object ShowItemRarity : EventSubscriber {
     override fun setup() {
-        register(::onDrawSlot)
+        register(::onInventoryDrawSlot)
         register(::onHotbarDrawSlot)
     }
 
-    fun onDrawSlot(event: InventoryDrawSlotEvent) {
+    fun onInventoryDrawSlot(event: InventoryDrawSlotEvent) {
         if (!SBInfo.skyblockState.getUntracked() || !Config.showItemRarity) return
 
         if (Config.showPetRarity) {
@@ -38,7 +38,7 @@ object ShowItemRarity : EventSubscriber {
 
                 val color = ItemRarity.entries.find { it.rarityName == petInfo.tier }?.color ?: return
 
-                drawRarityBackground(event, color)
+                drawInventoryRarityBackground(event, color)
 
                 return
             }
@@ -51,7 +51,7 @@ object ShowItemRarity : EventSubscriber {
             val (rarity) = match.destructured
             val color = ItemRarity.entries.find { it.rarityName == rarity }?.color ?: return
 
-            drawRarityBackground(event, color)
+            drawInventoryRarityBackground(event, color)
         }
     }
 
@@ -68,7 +68,7 @@ object ShowItemRarity : EventSubscriber {
         }
     }
 
-    private fun drawRarityBackground(event: InventoryDrawSlotEvent, color: Color) {
+    private fun drawInventoryRarityBackground(event: InventoryDrawSlotEvent, color: Color) {
         // 0 = Square, 1 = Square Outline, 2 = Outline
         when (Config.itemRarityShape) {
             0 -> {
