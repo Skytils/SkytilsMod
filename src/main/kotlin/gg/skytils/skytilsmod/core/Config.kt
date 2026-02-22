@@ -58,6 +58,13 @@ object Config : Vigilant(
     )
     var droppedItemScale = 1f
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Prevent Cursor Reset",
+        description = "Prevents the cursor from resetting to the center of the screen when you open a GUI.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var preventCursorReset = false
+
     fun init() {
         initialize()
         lastLaunchedVersion = Reference.VERSION
