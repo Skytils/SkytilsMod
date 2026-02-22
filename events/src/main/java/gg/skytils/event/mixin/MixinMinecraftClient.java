@@ -27,7 +27,7 @@ public class MixinMinecraftClient {
         EventsKt.postSync(new TickEvent());
     }
 
-    @Inject(method = "setScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER), cancellable = true)
+    @Inject(method = "setScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/MinecraftClient;currentScreen:Lnet/minecraft/client/gui/screen/Screen;", opcode = Opcodes.PUTFIELD), cancellable = true)
     private void openScreen(CallbackInfo ci, @Local(argsOnly = true) LocalRef<Screen> screen) {
         ScreenOpenEvent event = new ScreenOpenEvent(screen.get());
         if (EventsKt.postCancellableSync(event)) {
