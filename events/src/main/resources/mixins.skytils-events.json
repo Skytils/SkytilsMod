@@ -10,6 +10,8 @@
     "minVersion": "0.5.3"
   },
   "client": [
+    "MixinHandledScreen",
+    "MixinInGameHud",
     "MixinKeyboard",
     "MixinMinecraftClient",
     "MixinMouse",

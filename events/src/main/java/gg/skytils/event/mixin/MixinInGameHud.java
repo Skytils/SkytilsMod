@@ -1,4 +1,4 @@
-package gg.skytils.skytilsmod.mixins.events;
+package gg.skytils.event.mixin;
 
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.HotbarDrawSlotEvent;

@@ -12,8 +12,6 @@
   },
   "client": [
     "HideStatusEffects_MixinStatusEffectsDisplay",
-    "events.MixinHandledScreen",
-    "events.MixinInGameHud",
     "gui.EnterConfirmation_MixinAbstractSignEditScreen"
   ]
 }
