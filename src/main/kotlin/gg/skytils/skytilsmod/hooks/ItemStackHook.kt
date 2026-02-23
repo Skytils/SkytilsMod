@@ -1,17 +1,13 @@
 package gg.skytils.skytilsmod.hooks
 
-import gg.essential.universal.utils.toUnformattedString
 import gg.skytils.skytilsmod.core.Config
-import gg.skytils.skytilsmod.util.SBInfo
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
-const val star = '✪'
+const val star = "✪"
 val masterStars = ('➊'..'➎').map { it.toString() }
 
-fun modifyDisplayName(displayName: Text): Text {
-    if (!SBInfo.skyblockState.getUntracked() || Config.starDisplayType == 0 || !displayName.toUnformattedString().contains(star)) return displayName
-
+fun modifyStarDisplay(displayName: Text): Text {
     val out = Text.empty().setStyle(displayName.style)
     val siblings = displayName.siblings
 
@@ -26,10 +22,14 @@ fun modifyDisplayName(displayName: Text): Text {
             // 1 = Old, 2 = Compact, 0 = Disabled
             when (Config.starDisplayType) {
                 1 -> {
-                    out.append(current)
-
                     if (masters > 0) {
-                        out.append(Text.literal(star.toString().repeat(masters)).formatted(Formatting.RED))
+                        val masterStarText = Text.literal(star.repeat(masters)).formatted(Formatting.RED)
+                        val normalStarText = Text.literal(star.repeat(stars - masters)).formatted(Formatting.GOLD)
+
+                        out.append(masterStarText)
+                        out.append(normalStarText)
+                    } else {
+                        out.append(current)
                     }
                 }
 
@@ -53,7 +53,7 @@ fun modifyDisplayName(displayName: Text): Text {
 }
 
 private fun Text.starCount(): Int {
-    return string.count { it == star }
+    return string.count { it.toString() == star }
 }
 
 private fun Text.masterStarCount(): Int {

@@ -1,6 +1,9 @@
 package gg.skytils.skytilsmod.mixins.item;
 
+import gg.essential.universal.utils.TextUtilsKt;
+import gg.skytils.skytilsmod.core.Config;
 import gg.skytils.skytilsmod.hooks.ItemStackHookKt;
+import gg.skytils.skytilsmod.util.SBInfo;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import org.jspecify.annotations.Nullable;
@@ -20,6 +23,10 @@ public abstract class MixinItemStack {
 
     @Inject(method = "getName", at = @At("HEAD"), cancellable = true)
     public void getName(CallbackInfoReturnable<Text> cir) {
-        cir.setReturnValue(ItemStackHookKt.modifyDisplayName(this.getCustomName() != null ? this.getCustomName() : this.getItemName()));
+        if (!SBInfo.INSTANCE.getSkyblockState().getUntracked() || Config.INSTANCE.getStarDisplayType() == 0) return;
+        Text displayName = this.getCustomName() != null ? this.getCustomName() : this.getItemName();
+        if (!TextUtilsKt.toUnformattedString(displayName).contains(ItemStackHookKt.star)) return;
+
+        cir.setReturnValue(ItemStackHookKt.modifyStarDisplay(displayName));
     }
 }
