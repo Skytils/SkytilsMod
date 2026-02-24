@@ -23,11 +23,15 @@ fun modifyStarDisplay(displayName: Text): Text {
             when (Config.starDisplayType) {
                 1 -> {
                     if (masters > 0) {
+                        val diff = stars - masters
                         val masterStarText = Text.literal(star.repeat(masters)).formatted(Formatting.RED)
-                        val normalStarText = Text.literal(star.repeat(stars - masters)).formatted(Formatting.GOLD)
+                        val normalStarText = Text.literal(star.repeat(diff)).formatted(Formatting.GOLD)
 
                         out.append(masterStarText)
-                        out.append(normalStarText)
+
+                        if (diff > 0) {
+                            out.append(normalStarText)
+                        }
                     } else {
                         out.append(current)
                     }
