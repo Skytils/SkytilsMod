@@ -13,6 +13,8 @@ import net.minecraft.util.Identifier
 import kotlin.math.roundToInt
 
 object CatlasDungeonMapOverlay {
+    private const val baseMapSize = 16f
+    private const val mapMargin = 8
     private val layerId = Identifier.of(Reference.MOD_ID, "catlas_dungeon_map")
 
     fun init() {
@@ -33,10 +35,9 @@ object CatlasDungeonMapOverlay {
             ?: return
 
         val scale = Config.catlasDungeonMapScale.coerceAtLeast(1f)
-        val mapSize = (16f * scale).roundToInt()
-        val margin = 8
-        val x = mc.window.scaledWidth - mapSize - margin
-        val y = margin
+        val mapSize = (baseMapSize * scale).roundToInt()
+        val x = mc.window.scaledWidth - mapSize - mapMargin
+        val y = mapMargin
 
         context.fill(x - 2, y - 2, x + mapSize + 2, y + mapSize + 2, 0x66000000)
 
