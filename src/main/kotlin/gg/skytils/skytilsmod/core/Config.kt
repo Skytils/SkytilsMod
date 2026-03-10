@@ -65,6 +65,21 @@ object Config : Vigilant(
     )
     var preventCursorReset = false
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Enable Catlas Dungeon Map",
+        description = "Renders the dungeon's filled map on your HUD while you are in dungeons.",
+        category = "Dungeons", subcategory = "Catlas",
+    )
+    var enableCatlasDungeonMap = false
+
+    @Property(
+        type = PropertyType.DECIMAL_SLIDER, name = "Catlas Dungeon Map Scale",
+        description = "Scales the Catlas dungeon map HUD overlay.",
+        category = "Dungeons", subcategory = "Catlas",
+        minF = 1f, maxF = 8f, decimalPlaces = 2
+    )
+    var catlasDungeonMapScale = 4f
+
     fun init() {
         initialize()
         lastLaunchedVersion = Reference.VERSION

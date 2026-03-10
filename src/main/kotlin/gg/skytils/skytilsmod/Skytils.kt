@@ -7,6 +7,7 @@ import gg.skytils.skytilsmod.commands.SkytilsCommands
 import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.core.HypixelApi
 import gg.skytils.skytilsmod.core.PersistentSave
+import gg.skytils.skytilsmod.features.impl.dungeons.CatlasDungeonMapOverlay
 import gg.skytils.skytilsmod.features.impl.handlers.KeyShortcuts
 import gg.skytils.skytilsmod.features.impl.handlers.MiscFeatures
 import gg.skytils.skytilsmod.util.SBInfo
@@ -47,6 +48,7 @@ object Skytils : EventSubscriber {
         ).forEach(EventSubscriber::setup)
 
         HypixelApi.setup()
+        CatlasDungeonMapOverlay.init()
         //noinspection UnusedExpression
         SkytilsCommands
         PersistentSave.loadData()

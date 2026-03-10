@@ -31,6 +31,7 @@ dependencies {
     include(modImplementation(libs.cloud.fabric.get())!!)
     include(implementation(libs.cloud.annotaitons.get())!!)
     modImplementation(libs.bundles.fabricapi)
+    modImplementation("net.fabricmc.fabric-api:fabric-rendering-v1")
     include(modImplementation(libs.partnermodintegration.get())!!)
 }
 
