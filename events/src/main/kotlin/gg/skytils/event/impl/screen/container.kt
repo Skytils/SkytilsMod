@@ -99,16 +99,7 @@ class GuiContainerSlotClickEvent(
 }
 
 private fun getChestName(containerGui: ContainerGui): String {
-    //#if MC<12000
-    //$$ return (containerGui.handler as? GenericContainerScreenHandler)?.inventory?.displayName?.method_0_5147()?.trim() ?: error("Container is not a chest")
-    //#else
     return containerGui.title.string
-    //#endif
 }
 
-typealias ContainerGui =
-        //#if MC<12000
-        //$$ HandledScreen
-        //#else
-        HandledScreen<*>
-        //#endif
+typealias ContainerGui = HandledScreen<*>

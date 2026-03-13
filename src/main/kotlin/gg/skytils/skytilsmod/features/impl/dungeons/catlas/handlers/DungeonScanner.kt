@@ -58,17 +58,9 @@ object DungeonScanner {
     val shouldScan: Boolean
         get() = !isScanning && !hasScanned && System.currentTimeMillis() - lastScanTime >= 250 && dungeonFloorNumber != null
 
-    //#if MC<11300
-    //$$ private val entranceDoorBlock = Blocks.MONSTER_EGG
-    //#else
     private val entranceDoorBlock = Blocks.INFESTED_CHISELED_STONE_BRICKS
-    //#endif
 
-    //#if MC<11300
-    //$$ private val bloodDoorBlock = Blocks.STAINED_HARDENED_CLAY
-    //#else
     private val bloodDoorBlock = Blocks.RED_TERRACOTTA
-    //#endif
 
     fun scan() {
         val world = mc.world ?: return

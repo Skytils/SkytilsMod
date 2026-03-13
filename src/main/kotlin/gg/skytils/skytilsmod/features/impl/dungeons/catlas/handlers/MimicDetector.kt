@@ -58,11 +58,7 @@ object MimicDetector : EventSubscriber {
     fun onEntityDeath(event: LivingEntityDeathEvent) {
         if (!Utils.inDungeons) return
         val entity = event.entity as? ZombieEntity ?: return
-        //#if MC<12105
         if (entity.isBaby && entity.armorItems.all { it == ItemStack.EMPTY }) {
-        //#else
-        //$$ if (entity.isBaby && EquipmentSlot.entries.all { it.type != EquipmentSlot.Type.HUMANOID_ARMOR || !entity.hasStackEquipped(it) }) {
-        //#endif
             if (!ScoreCalculation.mimicKilled.get()) {
                 ScoreCalculation.mimicKilled.set(true)
                 Skytils.sendMessageQueue.add("/pc \$SKYTILS-DUNGEON-SCORE-MIMIC$")

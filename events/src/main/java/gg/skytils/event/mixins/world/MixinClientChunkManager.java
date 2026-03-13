@@ -34,20 +34,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Consumer;
 
-//#if MC>12104
-//$$ import net.minecraft.world.Heightmap;
-//$$ import java.util.Map;
-//#endif
-
 @Mixin(ClientChunkManager.class)
 public abstract class MixinClientChunkManager extends ChunkManager {
     @Inject(method = "loadChunkFromPacket", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/world/ClientWorld;resetChunkColor(Lnet/minecraft/util/math/ChunkPos;)V"))
     private void onLoadChunkFromPacket(int x, int z, PacketByteBuf buf,
-                                       //#if MC<=12104
                                        NbtCompound nbt,
-                                       //#else
-                                       //$$ Map<Heightmap.Type, long[]> heightmaps,
-                                       //#endif
                                        Consumer<ChunkData.BlockEntityVisitor> consumer, CallbackInfoReturnable<WorldChunk> cir, @Local WorldChunk worldChunk) {
         EventsKt.postSync(new ChunkLoadEvent(worldChunk));
     }

@@ -45,9 +45,6 @@ object ItemUtil {
     @JvmStatic
     fun getExtraAttributes(item: ItemStack?): NbtCompound? {
         return item?.get(DataComponentTypes.CUSTOM_DATA)?.nbt?.getCompound("ExtraAttributes")
-        //#if MC>12104
-        //$$ ?.orElse(null)
-        //#endif
     }
 
     /**
@@ -60,11 +57,7 @@ object ItemUtil {
     @JvmStatic
     fun getSkyBlockItemID(extraAttributes: NbtCompound?): String? {
         return extraAttributes?.getString("id")
-            //#if MC<=12104
             ?.takeUnless { it.isEmpty() }
-            //#else
-            //$$ ?.orElse(null)
-            //#endif
     }
 
     /**

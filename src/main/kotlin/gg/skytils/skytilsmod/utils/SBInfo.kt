@@ -44,10 +44,8 @@ import net.minecraft.screen.GenericContainerScreenHandler
 
 import net.minecraft.network.packet.s2c.play.ScoreboardDisplayS2CPacket
 import net.minecraft.network.packet.s2c.common.CustomPayloadS2CPacket
-//#if MC>11400
 import net.minecraft.network.packet.BrandCustomPayload
 import net.minecraft.scoreboard.ScoreboardDisplaySlot
-//#endif
 
 object SBInfo : EventSubscriber {
 
@@ -133,19 +131,9 @@ object SBInfo : EventSubscriber {
 
     fun onPacket(event: MainThreadPacketReceiveEvent<*>) {
         if (!Utils.isOnHypixel && event.packet is CustomPayloadS2CPacket) {
-            //#if MC<11400
-            //$$ if (event.packet.method_11456().toString() == "MC|Brand") {
-            //$$     _hypixelState.set(event.packet.data.readString(Short.MAX_VALUE.toInt()).lowercase().contains("hypixel"))
-            //$$ }
-            //#else
             _hypixelState.set((event.packet.payload as? BrandCustomPayload)?.brand?.contains("hypixel") == true)
-            //#endif
         }
-        //#if MC<11400
-        //$$ if (!Utils.inSkyblock && Utils.isOnHypixel && event.packet is ScoreboardDisplayS2CPacket && event.packet.slot == 1) {
-        //#else
         if (!Utils.inSkyblock && Utils.isOnHypixel && event.packet is ScoreboardDisplayS2CPacket && event.packet.slot == ScoreboardDisplaySlot.SIDEBAR) {
-        //#endif
             _skyblockState.set(event.packet.name == "SBScoreboard")
             printDevMessage("score ${event.packet.name}", "utils")
             printDevMessage("sb ${Utils.inSkyblock}", "utils")

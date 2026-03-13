@@ -109,15 +109,8 @@ class OptionsGui(val parent: Screen? = null) :
         }
     }
 
-    //#if MC<11400
-    //$$ override fun init(mc: MinecraftClient, width: Int, height: Int) {
-    //$$     window.onWindowResize()
-    //$$     super.init(mc, width, height)
-    //$$ }
-    //#else
     override fun resize(mc: MinecraftClient, width: Int, height: Int) {
         window.onWindowResize()
         super.resize(mc, width, height)
     }
-    //#endif
 }

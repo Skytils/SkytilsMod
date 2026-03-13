@@ -228,12 +228,7 @@ object Skytils : CoroutineScope, EventSubscriber {
         DataFetcher.preload()
         LegacyIdProvider
         guiManager = GuiManager
-        //#if FORGE
-        //$$ jarFile = Loader.instance().modList.find { it.modId == MOD_ID }?.source
-        //$$ mc.framebuffer.enableStencil()
-        //#else
         jarFile = FabricLoader.getInstance().allMods.find { it.metadata.id == MOD_ID }?.origin?.paths?.firstOrNull()?.toFile()
-        //#endif
 
         CatlasConfig
 
