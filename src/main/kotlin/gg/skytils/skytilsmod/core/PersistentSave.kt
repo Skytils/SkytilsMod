@@ -1,41 +1,58 @@
+/*
+ * Skytils - Hypixel Skyblock Quality of Life Mod
+ * Copyright (C) 2020-2023 Skytils
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package gg.skytils.skytilsmod.core
 
+import gg.skytils.skytilsmod.Skytils
+import gg.skytils.skytilsmod.utils.ensureFile
+import kotlinx.serialization.json.Json
+import net.minecraft.client.MinecraftClient
+import java.io.File
 import java.io.Reader
 import java.io.Writer
-import java.nio.file.Path
 import kotlin.concurrent.fixedRateTimer
-import kotlin.io.path.createFile
-import kotlin.io.path.createParentDirectories
-import kotlin.io.path.exists
-import kotlin.io.path.reader
-import kotlin.io.path.writer
 import kotlin.reflect.KClass
 
-abstract class PersistentSave(private val saveLocation: Path) {
-    protected var dirty = false
+abstract class PersistentSave(protected val saveFile: File) {
 
-    private fun init() {
-        saves.add(this)
-    }
+    var dirty = false
 
-    init {
-        init()
-    }
+    protected val json: Json = Skytils.json
+    protected val mc: MinecraftClient = Skytils.mc
 
     abstract fun read(reader: Reader)
 
     abstract fun write(writer: Writer)
 
+    abstract fun setDefault(writer: Writer)
+
     private fun readSave() {
         try {
-            saveLocation.createParentDirectories()
-                .takeIf { !it.exists() }?.createFile()
-
-            saveLocation.reader().use { read(it) }
+            saveFile.ensureFile()
+            saveFile.bufferedReader().use {
+                read(it)
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             try {
-                saveLocation.writer().use { write(it) }
+                saveFile.bufferedWriter().use {
+                    setDefault(it)
+                }
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }
@@ -44,20 +61,30 @@ abstract class PersistentSave(private val saveLocation: Path) {
 
     private fun writeSave() {
         try {
-            saveLocation.createParentDirectories()
-                .takeIf { !it.exists() }?.createFile()
-
-            saveLocation.writer().use { write(it) }
-        } catch (e: Exception) {
-            e.printStackTrace()
+            saveFile.ensureFile()
+            saveFile.writer().use { writer ->
+                write(writer)
+            }
+            dirty = false
+        } catch (ex: Exception) {
+            ex.printStackTrace()
         }
     }
 
+    private fun init() {
+        SAVES.add(this)
+    }
+
+    init {
+        init()
+    }
+
     companion object {
-        val saves = mutableSetOf<PersistentSave>()
+        val SAVES = HashSet<PersistentSave>()
 
         fun markDirty(clazz: KClass<out PersistentSave>) {
-            val save = saves.find { it::class == clazz } ?: throw IllegalAccessException("PersistentSave not found")
+            val save =
+                SAVES.find { it::class == clazz } ?: throw IllegalAccessException("PersistentSave not found")
             save.dirty = true
         }
 
@@ -66,17 +93,20 @@ abstract class PersistentSave(private val saveLocation: Path) {
         }
 
         fun loadData() {
-            saves.forEach(PersistentSave::readSave)
+            SAVES.forEach { it.readSave() }
         }
-
-        private fun saveAll() =
-            saves.forEach { if (it.dirty) it.writeSave() }
 
         init {
             fixedRateTimer("Skytils-PersistentSave-Write", period = 30000L) {
-                saveAll()
+                for (save in SAVES) {
+                    if (save.dirty) save.writeSave()
+                }
             }
-            Runtime.getRuntime().addShutdownHook(Thread(::saveAll, "Skytils-PersistentSave-Shutdown"))
+            Runtime.getRuntime().addShutdownHook(Thread({
+                for (save in SAVES) {
+                    if (save.dirty) save.writeSave()
+                }
+            }, "Skytils-PersistentSave-Shutdown"))
         }
     }
 }

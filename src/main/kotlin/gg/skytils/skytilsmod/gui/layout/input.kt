@@ -1,32 +1,50 @@
+/*
+ * Skytils - Hypixel Skyblock Quality of Life Mod
+ * Copyright (C) 2020-2025 Skytils
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package gg.skytils.skytilsmod.gui.layout
 
-import gg.essential.elementa.UIComponent
-import gg.essential.elementa.unstable.layoutdsl.LayoutScope
-import gg.essential.elementa.unstable.layoutdsl.Modifier
-import gg.essential.elementa.unstable.layoutdsl.animateColor
-import gg.essential.elementa.unstable.layoutdsl.childBasedHeight
-import gg.essential.elementa.unstable.layoutdsl.childBasedWidth
-import gg.essential.elementa.unstable.layoutdsl.column
-import gg.essential.elementa.unstable.layoutdsl.hoverColor
-import gg.essential.elementa.unstable.layoutdsl.hoverScope
-import gg.essential.elementa.unstable.layoutdsl.inheritHoverScope
-import gg.essential.elementa.unstable.layoutdsl.row
-import gg.essential.elementa.unstable.state.v2.State
-import gg.essential.elementa.unstable.state.v2.stateOf
+import gg.essential.elementa.dsl.width
+import gg.essential.elementa.layoutdsl.*
+import gg.essential.elementa.state.v2.MutableState
+import gg.essential.elementa.state.v2.State
 import gg.essential.universal.USound
+import gg.essential.vigilance.utils.onLeftClick
+import gg.skytils.skytilsmod.gui.components.UIFilteringTextInput
 import java.awt.Color
 
-fun LayoutScope.button(text: State<String>, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    row(Modifier.hoverScope().animateColor(Color(0, 0, 0, 80)).hoverColor(Color(255, 255, 255, 80)).childBasedWidth(40f).childBasedHeight(10f).then(modifier)) {
+fun LayoutScope.button(text: State<String>, onClick: () -> Unit) {
+    row(Modifier.hoverScope().animateColor(Color(0, 0, 0, 80)).hoverColor(Color(255, 255, 255, 80)).childBasedWidth(40f).childBasedHeight(10f)) {
         column {
             text(text, Modifier.inheritHoverScope().animateColor(Color(0xe0e0e0)).hoverColor(Color(0xffffa0)))
         }
-    }.onMouseClick { event ->
-        if (event.mouseButton != 0) return@onMouseClick
+    }.onLeftClick {
         USound.playButtonPress()
         onClick()
     }
 }
 
-fun LayoutScope.button(text:String, modifier: Modifier = Modifier, onClick: () -> Unit) =
-    button(stateOf(text), modifier, onClick)
+fun LayoutScope.mcTextInput(text: MutableState<String>, placeholderText: String = "", modifier: Modifier = Modifier): UIFilteringTextInput {
+    val input = UIFilteringTextInput(placeholderText, shadow = true)
+    box(Modifier.childBasedSize(1f).color(Color(0xa0a0a0)).onLeftClick { input.grabWindowFocus() }) {
+        box(Modifier.childBasedWidth(4f).childBasedHeight(4f).color(Color(0x000000)).onLeftClick { input.grabWindowFocus() }) {
+            input(Modifier.width(placeholderText.width() + 32f).height(12f).then(modifier))
+        }
+    }
+    input.onUpdate(text::set)
+    return input
+}

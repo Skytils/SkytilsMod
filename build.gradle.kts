@@ -11,13 +11,27 @@ plugins {
 }
 
 repositories {
+    mavenCentral()
+    maven("https://repo.essential.gg/repository/maven-public/")
+    maven("https://repo.essential.gg/repository/maven-releases/")
     maven("https://repo.hypixel.net/repository/Hypixel")
+    maven("https://jitpack.io") {
+        mavenContent {
+            includeGroupAndSubgroups("com.github")
+        }
+    }
+    maven("https://maven.dediamondpro.dev/releases") {
+        mavenContent {
+            includeGroup("dev.dediamondpro")
+        }
+    }
 }
 
 val relocated: Configuration by configurations.creating
 
 dependencies {
     modImplementation(libs.flk)
+    include(modRuntimeOnly("gg.essential:loader-fabric:1.2.3")!!)
     // hack to return non null dependency
     include(implementation(libs.elementa.asProvider().get())!!)
     relocated(implementation(libs.elementa.layoutdsl.get())!!)
@@ -31,8 +45,18 @@ dependencies {
     include(modImplementation(libs.cloud.fabric.get())!!)
     include(implementation(libs.cloud.annotaitons.get())!!)
     modImplementation(libs.bundles.fabricapi)
-    modImplementation("net.fabricmc.fabric-api:fabric-rendering-v1")
     include(modImplementation(libs.partnermodintegration.get())!!)
+    include(implementation("org.brotli:dec:0.1.2")!!)
+    include(implementation("io.ktor:ktor-client-core-jvm:2.3.13")!!)
+    include(implementation("io.ktor:ktor-client-cio-jvm:2.3.13")!!)
+    include(implementation("io.ktor:ktor-client-content-negotiation-jvm:2.3.13")!!)
+    include(implementation("io.ktor:ktor-client-encoding-jvm:2.3.13")!!)
+    include(implementation("io.ktor:ktor-client-websockets-jvm:2.3.13")!!)
+    include(implementation("io.ktor:ktor-serialization-kotlinx-json-jvm:2.3.13")!!)
+    include(implementation("io.ktor:ktor-serialization-kotlinx-jvm:2.3.13")!!)
+    include(implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf-jvm:1.9.0")!!)
+    include(implementation("io.github.llamalad7:mixinextras-fabric:0.5.0-rc.1")!!)
+    annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.5.0-rc.1")
 }
 
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))

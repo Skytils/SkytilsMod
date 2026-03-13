@@ -1,0 +1,262 @@
+                    Essential Loader™
+          Use and Contribution License Agreement
+                     4th April 2024
+
+This Use and Contribution License Agreement allows you to modify,
+create, fork, and use new versions of our Essential Loader mod in
+accordance with the GPL-3 license. However, if you submit a pull
+request with changes or additions to the main Essential Loader
+repository, subject to the terms of this license, you transfer the
+copyright and ownership of those changes to Essential. This
+introduction is for summary purposes only and is not part of the
+agreement.
+
+                          *	*	*
+
+ModCore Inc., doing business as Essential (“Essential”), owns,
+publishes, and make available for download and use its Essential
+Loader™ modification to the Minecraft® game (collectively with all of
+its features and content and all updates thereto and versions thereof,
+the “Mod”), including its underlying source code (collectively with
+all updates thereto and versions thereof, the “Mod Code”), subject to
+the terms of this Use and Contribution License Agreement (this
+“Agreement”). Each individual, corporation, limited liability company,
+partnership, association, or other entity or party (each, a “Person”)
+that downloads and/or uses the Mod and/or the Mod Code (each, a
+“User”) shall be deemed to have accepted, executed, and be bound by
+the terms of this Agreement.
+
+Each individual User must be at least eighteen (18) years old to
+download and/or use the Mod and the Mod Code or, if between the ages
+of thirteen (13) and eighteen (18), have the permission of their
+parent or legal guardian and hereby represents and warrants they have
+obtained such permission.
+
+Now, therefore, for good and valuable consideration, the receipt and
+sufficiency of which are hereby accepted:
+
+1. GNU General Public License v3.0.
+
+The GNU General Public License v3.0, dated 29 June 2007, available at
+https://www.gnu.org/licenses/gpl-3.0.en.html (as amended from time to
+time, “GPL-3”), is hereby incorporated by reference into, and made
+part of, this Agreement and governs each User’s download and use of
+the Mod and the Mod Code; provided, however, to the extent of any
+conflict between any permissions, rights, obligations, terms, or
+conditions in this Agreement and GPL-3, this Agreement shall govern
+and control, including where expressly stated under Section 3 of this
+Agreement. All other rights in and to the Mod and the Mod Code are
+hereby expressly reserved. For purposes of GPL-3, the Mod Code, in the
+form published from time to time in its code repository presently
+located at https://github.com/EssentialGG/EssentialLoader (the “Mod
+Repository”), is the “Program” as defined therein.
+
+2. Creation of Modified Versions.
+
+Each User is permitted under GPL-3 to create and use “modified
+versions” of the Program (i.e., the Mod Code) as defined therein
+(collectively, “Modified Versions”) and subject to the terms and
+conditions thereof. Each User who creates a Modified Version may be
+referred to herein as a “Contributor.”
+
+3. Proposal and Acceptance of Modified Versions.
+
+Essential invites, but does not require, Contributors to submit their
+Modified Versions to Essential for potential inclusion in the Mod Code
+(each, a “Proposed Contribution”), subject to the following terms and
+conditions:
+
+(a) Submission Process. Contributors may submit their Proposed
+Contributions by opening a “pull request” on the Mod Repository. For
+more information on how to create a pull request, visit
+https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request.
+For the avoidance of doubt, Contributors are not obligated to submit
+any of their Modified Versions to Essential as Proposed Contributions,
+and may “fork” the Mod Code or their Modified Versions, thereby
+creating a derivative work subject to the terms of GPL-3.
+
+(b) Review and Acceptance. When a Contributor pushes a Proposed
+Contribution to the Repository, Essential will review the Proposed
+Contribution and may conduct whatever reviews and testing of the code
+as it deems necessary in its sole discretion, after which time
+Essential may (i) accept the Proposed Contribution (thereafter, an
+“Accepted Contribution”); (ii) decline the Proposed Contribution; or
+(iii) request that the Contributor make changes or refinements to the
+code for the Proposed Contribution and resubmit the Proposed
+Contribution for Essential’s review and acceptance, which the
+Contributor may accept or decline its sole discretion.
+
+(c) Merging Accepted Contributions Into Mod Code. Essential will have
+full discretion whether to merge any Accepted Contribution into the
+Mod Code and the Mod Repository. Essential is not obligated to
+include, use, or otherwise exploit any Accepted Contribution (or any
+portion thereof) in any manner, and each Contributor acknowledges and
+agrees that any decision by Essential respecting the use or inclusion
+of their Accepted Contribution shall be in Essential’s sole
+discretion.
+
+4. Ownership.
+
+Each Contributor shall retain all right, title, and interest in and to
+their respective Modified Versions and Proposed Contributions subject
+to the terms of GPL-3. In the event Essential accepts a Proposed
+Contribution thereby becoming an Accepted Contribution in accordance
+with the terms of Section 2 of this Agreement, to the fullest extent
+allowable and for the full term of protection otherwise accorded to
+its Contributor under applicable law, the Contributor shall be deemed
+to have hereby (i) irrevocably assigned, transferred, granted,
+conveyed, and relinquished to Essential all right, title, and
+interest, including, without limitation, all copyrights, neighboring
+rights, trademarks, patents, and any and all other ownership and
+exploitation rights, now or hereafter recognized in any and all
+territories and jurisdictions (collectively, “IP Rights”), in and to
+the Accepted Contribution in perpetuity throughout the universe,
+without any compensation therefor, to the fullest extent allowable and
+for the full term of protection otherwise accorded to the Contributor
+under applicable law (including any and all renewals, extensions, and
+revivals thereof), and (ii) unconditionally and irrevocably waived any
+“moral rights,” “droit moral,” or similar “moral rights of authors”
+throughout the universe in and in connection with the Accepted
+Contribution. Any and all of an Accepted Contribution that is
+incorporated by Essential into the Mod Code shall become fully part
+of, and inseparable from, the Mod Code and, to the extent
+copyrightable, the copyright claimed exclusively by Essential and its
+assignees in and to the Mod Code, whether or not registered with the
+U.S. Copyright Office or any other copyright registrar; a Contributor
+shall not register, or apply or attempt to register, their Accepted
+Contribution(s) with the U.S. Copyright Office or any other copyright
+registrar or otherwise claim status as a “joint copyright owner” with
+respect thereto. This Section 4 shall control to the extent that there
+are any conflicting terms and conditions contained in GPL-3 applicable
+to ownership of the Accepted Contribution and its Contributor’s use
+thereof, including, without limitation, Paragraph 2 of Section 2
+(Basic Permissions), Section 5 (Conveying Modified Source Versions),
+and Section 6 (Conveying Non-Source Forms) thereof, and all such
+activities shall constitute a breach of this Section 4.
+
+5. Representations and Warranties.
+
+By submitting a Proposed Contribution, its Contributor represents and
+warrants to Essential that (i) the rights in and to the Proposed
+Contribution that are granted by the Contributor hereunder will not
+conflict with or violate any commitment, agreement, or understanding
+such Contributor has with any third-party Person; (ii) the Proposed
+Contribution, when delivered to Essential, will be free and clear of
+any liens and claims by any third party; and (iii) the Proposed
+Contribution and Essential’s use thereof will not violate or infringe
+upon any IP Rights, right of privacy, or any statutory or common law
+rights of any Person, be libelous or otherwise subject Essential to
+liability, or be contrary to law.
+
+6. Indemnification.
+
+In accordance with Section 7(f) of GPL-3, each Contributor shall
+indemnify, defend, and hold harmless Essential and its present and
+future parent, subsidiary, and affiliate companies and each of their
+respective present and future officers, directors, shareholders,
+managers, members, employees, agents, representatives, successors, and
+permitted assigns (collectively, the “Indemnified Parties”) from and
+against any and all liabilities, losses, damages, costs, expenses
+(including, without limitation, attorneys’ fees and court costs),
+settlements, judgments, and recoveries resulting from any claim, suit,
+litigation, action, cause of action, or demand, whether based in whole
+or in part in contract, tort, negligence, statute, or otherwise (each,
+a “Claim”), brought or asserted by a third-party Person to the extent
+arising out of or attributable to any Accepted Contribution or
+material breach, or allegation which if true would constitute a
+material breach, of the Contributor’s obligations, representations, or
+warranties hereunder. Essential shall notify the Contributor in
+writing of any Claim subject to indemnification hereunder (provided
+any delay in such notice shall not relieve the Contributor of its
+indemnification obligations except to the extent such delay prejudices
+the defense of such Claim) and give the Contributor the opportunity to
+defend or settle such Claim solely with Essential’s prior written
+consent and using legal counsel acceptable to Essential, and cooperate
+with the Contributor in such defense and settlement, all at the
+Contributor’s sole cost and expense.
+
+7. Use of Essential’s Trademarks.
+
+All Contributors hereby acknowledge Essential’s exclusive trademark
+rights in and to Essential, ESSENTIAL MOD, and Essential Loader
+(together, the “Marks”) for use in connection with, among other
+things, downloadable and non-downloadable software, applications, and
+video and computer games and software as a service (SaaS) and
+platforms as a service (PaaS), based on Essential’s ongoing use of the
+Marks in commerce, and in accordance with Section 7(e) of GPL-3, agree
+not to use, sell, license, commercialize, or otherwise exploit any
+Modified Version under the Marks or any other trademark of Essential
+or any variation thereof or apply to register any of the foregoing
+with the U.S. Patent and Trademark Office or any other trademark
+registrar.
+
+8. Relationship of Contributor to Essential.
+
+Nothing in this Agreement or any course of dealing shall create any
+employment, service, agency, partnership, or joint venture
+relationship between Essential, on the one hand, and any Contributor
+or other User, on the other hand. Essential shall not compensate,
+monetarily or otherwise, any Contributor in exchange for them
+creating, submitting, or modifying a Proposed Contribution or for
+Essential accepting and/or incorporating into the Mod Code any
+Accepted Contribution.
+
+9. Notices to Users.
+
+All agreements, notices, disclosures, and other communications that
+Essential provides to a User electronically shall satisfy any legal
+requirement that such communications be in writing.
+
+10. Entire Agreement; Severability.
+
+This Agreement, together with the GPL-3 to the extent applicable
+hereunder, constitutes the entire agreement and understanding between
+Essential, on the one hand, and each Contributor and each other User,
+on the other hand, with respect to the subject matter hereof, and
+supersedes all prior and contemporaneous discussions, documents,
+agreements, and prior course of dealing between the parties with
+respect thereto. If any term, provision, or condition, or any part
+thereof, of this Agreement shall for any reason be found or held
+invalid or unenforceable by any court of competent jurisdiction, such
+invalidity or unenforceability shall not affect the remainder of such
+term, provision, or condition nor any other term, provision, or
+condition, and this Agreement shall survive and be construed as if
+such invalid or unenforceable term, provision, or condition had not
+been contained therein.
+
+11. Governing Law; Dispute Resolution.
+
+This Agreement shall be governed by and construed in accordance with
+the laws of the State of New York, without regard to any conflict or
+choice of laws rules to the contrary. Any dispute arising hereunder
+shall be adjudicated exclusively in the state or federal courts
+located in the County of New York in the State of New York, and each
+User waives any jurisdictional, venue, or inconvenient forum
+objections to such courts.
+
+12. No Waivers.
+
+No failure to exercise, or delay in exercising, any right, remedy,
+power, or privilege arising from this Agreement shall operate or be
+construed as a waiver thereof, nor shall any single or partial
+exercise of any right, remedy, power, or privilege hereunder preclude
+any other or further exercise thereof or the exercise of any other
+right, remedy, power, or privilege.
+
+13. Changes to this Agreement and the License Terms.
+
+Essential may change or amend this Agreement at any time at its sole
+discretion. If Essential makes a material change or amendment to this
+Agreement, it will notify each User by posting such changes or
+amendments on Essential’s website and other website(s) where Essential
+makes the Mod and/or Mod Code available for download (e.g., a GitHub
+repository), which changes or amendments will be effective
+automatically upon the posting thereof. If a user deems any of this
+Agreement or any future changes are unacceptable, that user should not
+use or continue to use the Mod or the Mod Code and delete all
+downloaded copies of the Mod Code in their possession or stored on any
+of their devices. A User’s continued use of the Mod and/or Mod Code
+following the posting of any notice of any change to this Agreement
+shall constitute their acceptance and agreement to such change.
+
+[End of Agreement]

@@ -1,19 +1,23 @@
 {
-  "compatibilityLevel": "JAVA_21",
-  "required": true,
-  "package": "gg.skytils.skytilsmod.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8",
+  "plugin": "gg.skytils.skytilsmod.mixins.SkytilsMixinPlugin",
+  "package": "gg.skytils.skytilsmod.mixins.transformers",
   "refmap": "mixins.skytils.refmap.json",
   "mixins": [
-    "events.MainThreadPacket_MixinPacketApplyBatcherEntry",
-    "events.MixinClientConnection"
+    "accessors.AccessorHypixelModAPI",
+    "accessors.AccessorHypixelPacketRegistry",
+    "accessors.AccessorMapState",
+    "accessors.AccessorSettingsGui",
+    "audio.MixinSoundManager"
   ],
-  "mixinextras": {
-    "minVersion": "0.5.3"
-  },
+  "verbose": true,
   "client": [
-    "HideStatusEffects_MixinStatusEffectsDisplay",
-    "PreventMouseReset_MixinMouse",
-    "gui.EnterConfirmation_MixinAbstractSignEditScreen",
-    "render.MixinItemEntityRenderer"
+    "accessors.AccessorNetHandlerPlayClient",
+    "events.MixinGuiIngame",
+    "events.MixinNetHandlerPlayClient",
+    "events.MixinNetworkManager",
+    "events.MixinPacketThreadUtil",
+    "gui.MixinGuiIngameMenu"
   ]
 }
