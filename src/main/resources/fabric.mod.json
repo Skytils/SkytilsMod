@@ -29,7 +29,6 @@
     "mixins.skytils-init.json"
   ],
   "depends": {
-    "essential-loader": ">=1.2.3",
     "fabric-language-kotlin": "${flk}",
     "cloud": "*",
     "fabric-api": "*",
