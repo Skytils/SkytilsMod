@@ -17,29 +17,10 @@
  */
 package gg.skytils.skytilsmod.utils
 
-import gg.essential.lib.caffeine.cache.Cache
-import gg.essential.universal.ChatColor
-import gg.essential.vigilance.Vigilant
-import gg.essential.vigilance.gui.settings.CheckboxComponent
-import gg.skytils.hypixel.types.skyblock.Pet
-import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.mc
-import gg.skytils.skytilsmod.utils.NumberUtil.roundToPrecision
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import net.minecraft.entity.Entity
-import net.minecraft.nbt.NbtList
 import net.minecraft.sound.SoundEvent
-import net.minecraft.text.Text
 import net.minecraft.util.*
-import net.minecraft.util.math.*
-import org.objectweb.asm.tree.MethodInsnNode
 import java.io.File
-import java.io.IOException
-import java.util.*
-import kotlin.io.path.Path
-import kotlin.io.path.notExists
-import kotlin.math.floor
 
 
 object Utils {
@@ -55,12 +36,6 @@ object Utils {
 
     @JvmField
     var shouldBypassVolume = false
-
-    fun getBlocksWithinRangeAtSameY(center: BlockPos, radius: Int, y: Int): Iterable<BlockPos> {
-        val corner1 = BlockPos(center.x - radius, y, center.z - radius)
-        val corner2 = BlockPos(center.x + radius, y, center.z + radius)
-        return BlockPos.iterate(corner1, corner2)
-    }
 
     /**
      * Taken from SkyblockAddons under MIT License
@@ -93,31 +68,6 @@ object Utils {
         } else run()
     }
 
-    fun timeFormat(seconds: Double): String {
-        return if (seconds >= 60) {
-            "${floor(seconds / 60).toInt()}m ${(seconds % 60).roundToPrecision(3)}s"
-        } else {
-            "${seconds.roundToPrecision(3)}s"
-        }
-    }
-
-    /**
-     * @link https://stackoverflow.com/a/47925649
-     */
-    @Throws(IOException::class)
-    fun getJavaRuntime(): String {
-        val os = System.getProperty("os.name")
-        val java = Path(System.getProperty("java.home"))
-            .resolve("bin")
-            .resolve(if (os != null && os.lowercase().startsWith("windows")) "java.exe" else "java")
-
-        if (java.notExists()) {
-            throw IOException("Unable to find suitable java runtime at $java")
-        }
-
-        return java.toAbsolutePath().toString()
-    }
-
     fun checkBossName(floor: String, bossName: String): Boolean {
         val correctBoss = when (floor) {
             "E" -> "The Watcher"
@@ -136,117 +86,9 @@ object Utils {
     }
 }
 
-inline val Box.minVec: Vec3d
-    get() = Vec3d(minX, minY, minZ)
-inline val Box.maxVec: Vec3d
-    get() = Vec3d(maxX, maxY, maxZ)
-
-fun Box.isPosInside(pos: BlockPos): Boolean {
-    return pos.x > this.minX && pos.x < this.maxX && pos.y > this.minY && pos.y < this.maxY && pos.z > this.minZ && pos.z < this.maxZ
-}
-
-fun Vigilant.openGUI(): Job = Skytils.launch {
-    Skytils.displayScreen = this@openGUI.gui()
-}
-
-fun Text.map(action: Text.() -> Unit) {
-    action(this)
-    siblings.forEach { it.map(action) }
-}
-
-fun Entity.getXZDistSq(other: Entity): Double {
-    val xDelta = this.x - other.x
-    val zDelta = this.z - other.z
-    return xDelta * xDelta + zDelta * zDelta
-}
-
-fun Entity.getXZDistSq(pos: BlockPos): Double {
-    val xDelta = this.x - pos.x
-    val zDelta = this.z - pos.z
-    return xDelta * xDelta + zDelta * zDelta
-}
-
-val Entity.hasMoved
-    get() = this.x != this.prevX || this.y != this.prevY || this.z != this.prevZ
-
-fun CheckboxComponent.toggle() {
-    this.mouseClick(this.getLeft().toDouble(), this.getTop().toDouble(), 0)
-}
-
-fun CheckboxComponent.setState(checked: Boolean) {
-    if (this.checked != checked) this.toggle()
-}
-
-fun BlockPos?.toVec3() = if (this == null) null else Vec3d(this)
-
-fun BlockPos.middleVec() = Vec3d(x + 0.5, y + 0.5, z + 0.5)
-
 fun <T : Any> T?.ifNull(run: () -> Unit): T? {
     if (this == null) run()
     return this
 }
 
-fun <T : Any> Map<T, T>.getOrSelf(key: T): T = this.getOrDefault(key, key)
-
-operator fun <K : Any, V : Any> Cache<K, V>.set(name: K, value: V) = put(name, value)
-
-fun Any?.toStringIfTrue(bool: Boolean?): String = if (bool == true) toString() else ""
-
-fun NbtList.asStringSet() = (0..size).mapTo(hashSetOf()) { getString(it) }
-
-
-fun Vec3i.toBoundingBox() = Box(x.toDouble(), y.toDouble(), z.toDouble(), x + 1.0, y + 1.0, z + 1.0)
-
 fun File.ensureFile() = (parentFile.exists() || parentFile.mkdirs()) && createNewFile()
-
-fun MethodInsnNode.matches(owner: String?, name: String?, desc: String?): Boolean {
-    return (owner == null || this.owner == owner) && (name == null || this.name == name) && (desc == null || this.desc == desc)
-}
-
-val gg.skytils.hypixel.types.player.Player.rank_prefix
-    get() = when(rank) {
-        "VIP" -> "§a[VIP]"
-        "VIP_PLUS" -> "§a[VIP§6+§a]"
-        "MVP" -> "§b[MVP]"
-        "MVP_PLUS" -> "§b[MVP${ChatColor.valueOf(plus_color)}+§b]"
-        "MVP_PLUS_PLUS" -> "${ChatColor.valueOf(mvp_plus_plus_color)}[MVP${ChatColor.valueOf(plus_color)}++${ChatColor.valueOf(mvp_plus_plus_color)}]"
-        "HELPER" -> "§9[HELPER]"
-        "MODERATOR" -> "§2[MOD]"
-        "GAME_MASTER" -> "§2[GM]"
-        "ADMIN" -> "§c[ADMIN]"
-        "YOUTUBER" -> "§c[§fYOUTUBE§c]"
-        else -> "§7"
-    }
-
-val gg.skytils.hypixel.types.player.Player.formattedName
-    get() = "${rank_prefix}${" ".toStringIfTrue(rank != "NONE")}$display_name"
-
-val Pet.isSpirit
-    get() = type == "SPIRIT" && (tier == "LEGENDARY" || (heldItem == "PET_ITEM_TIER_BOOST" && tier == "EPIC"))
-
-val <E> MutableMap<E, Boolean>.asSet: MutableSet<E>
-    get() = Collections.newSetFromMap(this)
-
-fun <E> List<E>.getLastOrNull(index: Int) = getOrNull(lastIndex - index)
-
-fun <T> Iterator<T>.nextOrNull(): T? = if (hasNext()) next() else null
-
-operator fun Vec3d.plus(other: Vec3d): Vec3d = add(other)
-operator fun Vec3d.minus(other: Vec3d): Vec3d = subtract(other)
-
-operator fun Vec3d.times(scaleValue: Double): Vec3d = Vec3d(x * scaleValue, y * scaleValue, z * scaleValue)
-
-fun Vec3d.squareDistanceTo(x: Double, y: Double, z: Double) =
-     (x - x) * (x - x) + (y - y) * (y - y) + (z - z) * (z - z)
-
-/**
- * @author Ilya
- * @link https://stackoverflow.com/a/56043547
- * Modified https://creativecommons.org/licenses/by-sa/4.0/
- */
-fun <T> List<T>.elementPairs() = sequence {
-    val arr = this@elementPairs
-    for (i in 0..<arr.size - 1)
-        for (j in i + 1..<arr.size)
-            yield(arr[i] to arr[j])
-}
