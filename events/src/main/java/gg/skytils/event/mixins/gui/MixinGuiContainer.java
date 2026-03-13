@@ -83,11 +83,11 @@ public abstract class MixinGuiContainer extends Screen {
 
     @Inject(method = "onMouseClick(Lnet/minecraft/screen/slot/Slot;IILnet/minecraft/screen/slot/SlotActionType;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerInteractionManager;clickSlot(IIILnet/minecraft/screen/slot/SlotActionType;Lnet/minecraft/entity/player/PlayerEntity;)V"), cancellable = true)
     private void onMouseClickEvent(Slot slot, int slotId, int button, SlotActionType actionType, CallbackInfo ci) {
-       this.onMouseClickEventImpl(slot, slotId, button, actionType.ordinal(), ci);
+       this.handleMouseClickEvent(slot, slotId, button, actionType.ordinal(), ci);
     }
 
     @Unique
-    private void onMouseClickEventImpl(Slot slot, int slotId, int clickedButton, int clickType, CallbackInfo ci) {
+    private void handleMouseClickEvent(Slot slot, int slotId, int clickedButton, int clickType, CallbackInfo ci) {
         if (EventsKt.postCancellableSync(new GuiContainerSlotClickEvent((HandledScreen) (Object) this, this.handler, slot, slotId, clickedButton, clickType))) {
             ci.cancel();
         }
