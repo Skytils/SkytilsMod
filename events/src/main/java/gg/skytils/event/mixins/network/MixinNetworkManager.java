@@ -53,11 +53,7 @@ public class MixinNetworkManager {
     @Unique
     private void skytils$postDisconnectEvent() {
         MinecraftClient.getInstance()
-        //#if MC>=12000
         .execute(
-        //#else
-        //$$ .submit(
-        //#endif
             () -> {
                 EventsKt.postSync(new ClientDisconnectEvent());
             }

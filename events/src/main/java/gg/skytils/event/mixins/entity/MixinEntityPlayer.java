@@ -29,10 +29,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-//#if MC>12000
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-//#endif
 
 @Mixin(PlayerEntity.class)
 public class MixinEntityPlayer {

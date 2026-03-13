@@ -18,15 +18,10 @@
 
 package gg.skytils.event.mixins.network;
 
-import com.llamalad7.mixinextras.sugar.Local;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import gg.skytils.event.EventsKt;
 import gg.skytils.event.impl.network.ClientConnectEvent;
-import gg.skytils.event.impl.play.ActionBarReceivedEvent;
-import gg.skytils.event.impl.play.ChatMessageReceivedEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -41,24 +36,4 @@ public class MixinNetHandlerPlayClient {
             EventsKt.postSync(new ClientConnectEvent());
         });
     }
-
-    //#if MC<12000
-    //$$ @Inject(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/ChatHud;addMessage(Lnet/minecraft/text/Text;)V"), cancellable = true)
-    //$$ public void onChat(CallbackInfo ci, @Local(argsOnly = true) LocalRef<GameMessageS2CPacket> packet) {
-    //$$     ChatMessageReceivedEvent event = new ChatMessageReceivedEvent(packet.get().getMessage());
-    //$$     if (EventsKt.postCancellableSync(event)) {
-    //$$         ci.cancel();
-    //$$     }
-    //$$     packet.set(new GameMessageS2CPacket(event.getMessage(), packet.get().getType()));
-    //$$ }
-    //$$
-    //$$ @Inject(method = "onGameMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/InGameHud;setOverlayMessage(Lnet/minecraft/text/Text;Z)V"), cancellable = true)
-    //$$ public void onActionbar(CallbackInfo ci, @Local(argsOnly = true) LocalRef<GameMessageS2CPacket> packet) {
-    //$$     ActionBarReceivedEvent event = new ActionBarReceivedEvent(packet.get().getMessage());
-    //$$     if (EventsKt.postCancellableSync(event)) {
-    //$$         ci.cancel();
-    //$$     }
-    //$$     packet.set(new GameMessageS2CPacket(event.getMessage(), packet.get().getType()));
-    //$$ }
-    //#endif
 }

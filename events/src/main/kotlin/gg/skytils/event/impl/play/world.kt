@@ -25,9 +25,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
-//#if MC>=12000
-import net.minecraft.util.Hand;
-//#endif
+import net.minecraft.util.Hand
 
 /**
  * [gg.skytils.event.mixins.MixinMinecraft.worldChange]
@@ -42,7 +40,5 @@ class BlockInteractEvent(val item: ItemStack?, val pos: BlockPos) : CancellableE
 
 class EntityInteractEvent(
     val entity: Entity,
-    //#if MC>=12000
     val hand: Hand
-    //#endif
 ) : CancellableEvent()

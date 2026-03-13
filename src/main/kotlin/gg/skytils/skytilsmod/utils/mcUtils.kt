@@ -53,17 +53,11 @@ inline fun BlockPos(vec: Vec3d): BlockPos = BlockPos(MathHelper.floor(vec.x), Ma
 inline fun Vec3d(pos: Vec3i): Vec3d = Vec3d(pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble())
 
 fun GenericContainerScreen.getSlot(id: Int) =
-    //#if MC<12000
-    //$$ handler.getSlot(id)
-    //#else
     screenHandler.getSlot(id)
-    //#endif
 
 val ItemStack.displayNameStr: String
     inline get() = this.name
-        //#if MC>=11600
         .string
-        //#endif
 
 val Text.formattedText: String
     get() = buildString {
