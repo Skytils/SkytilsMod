@@ -109,8 +109,8 @@ class OptionsGui(val parent: Screen? = null) :
         }
     }
 
-    override fun resize(mc: MinecraftClient, width: Int, height: Int) {
+    override fun resize(width: Int, height: Int) {
         window.onWindowResize()
-        super.resize(mc, width, height)
+        super.resize(width, height)
     }
 }

@@ -58,7 +58,7 @@ object MimicDetector : EventSubscriber {
     fun onEntityDeath(event: LivingEntityDeathEvent) {
         if (!Utils.inDungeons) return
         val entity = event.entity as? ZombieEntity ?: return
-        if (entity.isBaby && entity.armorItems.all { it == ItemStack.EMPTY }) {
+        if (entity.isBaby && listOf(EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET).all { entity.getEquippedStack(it) == ItemStack.EMPTY }) {
             if (!ScoreCalculation.mimicKilled.get()) {
                 ScoreCalculation.mimicKilled.set(true)
                 Skytils.sendMessageQueue.add("/pc \$SKYTILS-DUNGEON-SCORE-MIMIC$")
@@ -75,7 +75,7 @@ object MimicDetector : EventSubscriber {
             if (mc.world!!.entities.none {
                     it is ZombieEntity && it.isBaby && it.getEquippedStack(EquipmentSlot.HEAD)
                         .get(DataComponentTypes.PROFILE)
-                        ?.id?.getOrNull() == mimicSkullUUID
+                        ?.getGameProfile()?.id == mimicSkullUUID
                 }) {
                 ScoreCalculation.mimicKilled.set(true)
                 Skytils.sendMessageQueue.add("/pc \$SKYTILS-DUNGEON-SCORE-MIMIC$")

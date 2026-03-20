@@ -70,6 +70,10 @@ object KeyShortcuts: EventSubscriber, PersistentSave(Skytils.modDir.resolve("key
         writer.write(json.encodeToString(shortcuts))
     }
 
+    override fun setDefault(writer: Writer) {
+        writer.write("[]")
+    }
+
     @Serializable
     data class KeybindShortcut(val message: String, val keyCode: Int, val modifiers: Int = 0, val enabled: Boolean = true) {
         constructor(message: String, keyCode: Int, modifiers: List<Modifiers>, enabled: Boolean) : this(

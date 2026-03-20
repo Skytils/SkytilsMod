@@ -18,44 +18,69 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons.catlas.utils
 
+import com.mojang.blaze3d.pipeline.RenderPipeline
+import com.mojang.blaze3d.platform.DepthTestFunction
+import gg.skytils.skytilsmod.mixins.transformers.accessors.AccessorRenderLayer
+import net.minecraft.client.gl.Defines
+import net.minecraft.client.gl.RenderPipelines
+import net.minecraft.client.render.LayeringTransform
+import net.minecraft.client.render.OutputTarget
 import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.RenderPhase
-import net.minecraft.client.render.VertexFormat
-import net.minecraft.client.render.VertexFormats
-import java.util.OptionalDouble
+import net.minecraft.client.render.RenderSetup
+import net.minecraft.util.Identifier
 
 object CustomRenderLayers {
-    val espLines = RenderLayer.of(
-        "catlas:lines",
-        VertexFormats.LINES,
-        VertexFormat.DrawMode.LINES,
-        1536,
-        false,
-        true,
-        RenderLayer.MultiPhaseParameters.builder()
-            .program(RenderPhase.LINES_PROGRAM)
-            .lineWidth(RenderPhase.LineWidth(OptionalDouble.empty()))
-            .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-            .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-            .target(RenderPhase.ITEM_ENTITY_TARGET)
-            .writeMaskState(RenderPhase.ALL_MASK)
-            .cull(RenderPhase.DISABLE_CULLING)
-            .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
-            .build(false)
+
+    /**
+     * A RenderPipeline that inherits all properties from a base pipeline but with
+     * NO_DEPTH_TEST (depth always passes) and depth writes disabled.
+     * Used for ESP rendering that should be visible through walls.
+     */
+    private class EspPipeline(base: RenderPipeline, id: String) : RenderPipeline(
+        Identifier.of("skytils", id),
+        base.vertexShader,
+        base.fragmentShader,
+        base.shaderDefines,
+        base.samplers,
+        base.uniforms,
+        base.blendFunction,
+        DepthTestFunction.NO_DEPTH_TEST,
+        base.polygonMode,
+        base.isCull,
+        base.isWriteColor,
+        base.isWriteAlpha,
+        false, // writeDepth: false so ESP layers don't occlude other geometry
+        base.colorLogic,
+        base.vertexFormat,
+        base.vertexFormatMode,
+        base.depthBiasScaleFactor,
+        base.depthBiasConstant,
+        base.sortKey
     )
 
-    val espFilledBoxLayer = RenderLayer.of(
-        "catlas:debug_filled_box",
-        VertexFormats.POSITION_COLOR,
-        VertexFormat.DrawMode.TRIANGLE_STRIP,
-        1536,
-        false,
-        true,
-        RenderLayer.MultiPhaseParameters.builder()
-            .program(RenderPhase.POSITION_COLOR_PROGRAM)
-            .layering(RenderPhase.VIEW_OFFSET_Z_LAYERING)
-            .transparency(RenderPhase.TRANSLUCENT_TRANSPARENCY)
-            .depthTest(RenderPhase.ALWAYS_DEPTH_TEST)
-            .build(false)
-    )
+    /**
+     * Lines render layer for ESP — always-pass depth test so lines are visible through walls.
+     * Based on LINES_TRANSLUCENT with VIEW_OFFSET_Z_LAYERING + ITEM_ENTITY_TARGET (matches vanilla).
+     */
+    val espLines: RenderLayer by lazy {
+        val pipeline = EspPipeline(RenderPipelines.LINES_TRANSLUCENT, "esp_lines")
+        val setup = RenderSetup.builder(pipeline)
+            .layeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
+            .outputTarget(OutputTarget.ITEM_ENTITY_TARGET)
+            .build()
+        AccessorRenderLayer.of("skytils:esp_lines", setup)
+    }
+
+    /**
+     * Filled-box render layer for ESP — always-pass depth test so boxes are visible through walls.
+     * Based on DEBUG_FILLED_BOX with translucent + VIEW_OFFSET_Z_LAYERING (matches vanilla).
+     */
+    val espFilledBoxLayer: RenderLayer by lazy {
+        val pipeline = EspPipeline(RenderPipelines.DEBUG_FILLED_BOX, "esp_filled_box")
+        val setup = RenderSetup.builder(pipeline)
+            .translucent()
+            .layeringTransform(LayeringTransform.VIEW_OFFSET_Z_LAYERING)
+            .build()
+        AccessorRenderLayer.of("skytils:esp_filled_box", setup)
+    }
 }

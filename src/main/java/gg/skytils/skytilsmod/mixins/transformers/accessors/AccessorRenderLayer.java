@@ -16,21 +16,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package gg.skytils.skytilsmod.gui.layout
+package gg.skytils.skytilsmod.mixins.transformers.accessors;
 
-import gg.essential.elementa.components.UIText
-import gg.essential.elementa.unstable.layoutdsl.LayoutScope
-import gg.essential.elementa.unstable.layoutdsl.Modifier
-import gg.essential.elementa.unstable.state.v2.State
-import gg.essential.elementa.unstable.state.v2.effect
-import gg.essential.elementa.unstable.state.v2.stateOf
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderSetup;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Invoker;
 
-fun LayoutScope.text(text: State<String>, modifier: Modifier = Modifier): UIText {
-    val component = UIText()
-    effect(component) {
-        component.setText(text())
+@Mixin(RenderLayer.class)
+public interface AccessorRenderLayer {
+    @Invoker("of")
+    static RenderLayer of(String name, RenderSetup renderSetup) {
+        throw new AssertionError();
     }
-    return component(modifier)
 }
-
-fun LayoutScope.text(text: String, modifier: Modifier = Modifier): UIText = text(stateOf(text), modifier)

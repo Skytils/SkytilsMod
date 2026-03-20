@@ -136,7 +136,7 @@ object Catlas : EventSubscriber {
 
         val linesBuffer: VertexConsumer = event.entityVertexConsumers.getBuffer(CustomRenderLayers.espLines)
         event.matrices.push()
-        event.matrices.translate(event.camera.pos.negate())
+        event.matrices.translate(event.camera.cameraPos.negate())
         doors.forEach {
             VertexRendering.drawOutline(
                 event.matrices,
@@ -145,30 +145,56 @@ object Catlas : EventSubscriber {
                 it.x.toDouble(),
                 0.0,
                 it.z.toDouble(),
-                color.withAlpha(CatlasConfig.witherDoorOutline).rgb
+                color.withAlpha(CatlasConfig.witherDoorOutline).rgb,
+                1.0f
             )
         }
         event.entityVertexConsumers.draw(CustomRenderLayers.espLines)
 
-        val triangleStripBuffer: VertexConsumer = event.entityVertexConsumers.getBuffer(CustomRenderLayers.espFilledBoxLayer)
+        val fillBuffer: VertexConsumer = event.entityVertexConsumers.getBuffer(CustomRenderLayers.espFilledBoxLayer)
+        val fillAlpha = CatlasConfig.witherDoorFill
+        val r = color.red / 255f
+        val g = color.green / 255f
+        val b = color.blue / 255f
         doors.forEach {
-            VertexRendering.drawFilledBox(
-                event.matrices,
-                triangleStripBuffer,
-                doorShape.minX + it.x,
-                doorShape.minY,
-                doorShape.minZ + it.z,
-                doorShape.maxX + it.x,
-                doorShape.maxY,
-                doorShape.maxZ + it.z,
-                color.red / 255f,
-                color.green / 255f,
-                color.blue / 255f,
-                CatlasConfig.witherDoorFill
+            drawFilledBox(
+                event.matrices, fillBuffer,
+                (doorShape.minX + it.x).toFloat(), doorShape.minY.toFloat(), (doorShape.minZ + it.z).toFloat(),
+                (doorShape.maxX + it.x).toFloat(), doorShape.maxY.toFloat(), (doorShape.maxZ + it.z).toFloat(),
+                r, g, b, fillAlpha
             )
         }
         event.entityVertexConsumers.draw(CustomRenderLayers.espFilledBoxLayer)
         event.matrices.pop()
+    }
+
+    private fun drawFilledBox(
+        matrices: net.minecraft.client.util.math.MatrixStack,
+        buf: VertexConsumer,
+        x1: Float, y1: Float, z1: Float,
+        x2: Float, y2: Float, z2: Float,
+        r: Float, g: Float, b: Float, a: Float
+    ) {
+        val e = matrices.peek()
+        // 6 faces as quads (TRIANGLE_STRIP draws them as 2 triangles each)
+        // bottom (y1)
+        buf.vertex(e, x1, y1, z1).color(r, g, b, a); buf.vertex(e, x2, y1, z1).color(r, g, b, a)
+        buf.vertex(e, x2, y1, z2).color(r, g, b, a); buf.vertex(e, x1, y1, z2).color(r, g, b, a)
+        // top (y2)
+        buf.vertex(e, x1, y2, z1).color(r, g, b, a); buf.vertex(e, x2, y2, z1).color(r, g, b, a)
+        buf.vertex(e, x2, y2, z2).color(r, g, b, a); buf.vertex(e, x1, y2, z2).color(r, g, b, a)
+        // west (x1)
+        buf.vertex(e, x1, y1, z1).color(r, g, b, a); buf.vertex(e, x1, y2, z1).color(r, g, b, a)
+        buf.vertex(e, x1, y2, z2).color(r, g, b, a); buf.vertex(e, x1, y1, z2).color(r, g, b, a)
+        // east (x2)
+        buf.vertex(e, x2, y1, z1).color(r, g, b, a); buf.vertex(e, x2, y2, z1).color(r, g, b, a)
+        buf.vertex(e, x2, y2, z2).color(r, g, b, a); buf.vertex(e, x2, y1, z2).color(r, g, b, a)
+        // north (z1)
+        buf.vertex(e, x1, y1, z1).color(r, g, b, a); buf.vertex(e, x2, y1, z1).color(r, g, b, a)
+        buf.vertex(e, x2, y2, z1).color(r, g, b, a); buf.vertex(e, x1, y2, z1).color(r, g, b, a)
+        // south (z2)
+        buf.vertex(e, x1, y1, z2).color(r, g, b, a); buf.vertex(e, x2, y1, z2).color(r, g, b, a)
+        buf.vertex(e, x2, y2, z2).color(r, g, b, a); buf.vertex(e, x1, y2, z2).color(r, g, b, a)
     }
 
     fun onPuzzleReset(event: DungeonPuzzleResetEvent) {

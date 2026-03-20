@@ -18,9 +18,9 @@
 
 package gg.skytils.skytilsmod.features.impl.dungeons.catlas.core
 
+import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.listeners.DungeonListener
 import net.minecraft.entity.player.PlayerEntity
-import net.minecraft.entity.player.PlayerModelPart
 import net.minecraft.util.Identifier
 
 data class DungeonMapPlayer(val teammate: DungeonListener.DungeonTeammate) {
@@ -38,7 +38,7 @@ data class DungeonMapPlayer(val teammate: DungeonListener.DungeonTeammate) {
 
     /** Set player data that requires entity to be loaded */
     fun setData(player: PlayerEntity) {
-        renderHat = player.isPartVisible(PlayerModelPart.HAT)
+        renderHat = mc.networkHandler?.getPlayerListEntry(player.uuid)?.shouldShowHat() ?: true
         uuid = player.uuid.toString()
         playerLoaded = true
     }

@@ -260,13 +260,13 @@ object DungeonListener : EventSubscriber {
                             DungeonClass.EMPTY,
                             0,
                             pos,
-                            old?.skinTextures?.texture ?: DefaultSkinHelper.getTexture()
+                            old?.skinTextures?.body()?.texturePath() ?: DefaultSkinHelper.getTexture()
                         ).also {
                             if (old == null) {
                                 printDevMessage({ "could not get network player info for $name $actions" }, "dungeonlistener")
                                 tickTimer(1) {
                                     printDevMessage({ "setting skin for ${name}" }, "dungeonlistener")
-                                    it.skin = (mc.networkHandler!! as AccessorNetHandlerPlayClient).uuidToPlayerInfo[entry.profileId]?.skinTextures?.texture ?: DefaultSkinHelper.getTexture()
+                                    it.skin = (mc.networkHandler!! as AccessorNetHandlerPlayClient).uuidToPlayerInfo[entry.profileId]?.skinTextures?.body()?.texturePath() ?: DefaultSkinHelper.getTexture()
                                 }
                             }
                             println("Added $it to list")
@@ -292,7 +292,7 @@ object DungeonListener : EventSubscriber {
                         it.name.string == teammate.playerName && it.uuid.version() == 4
                     }
 
-                    old?.skinTextures?.texture?.let { teammate.skin = it }
+                    old?.skinTextures?.body()?.texturePath()?.let { teammate.skin = it }
 
                     if ("§r§cDEAD§r§f)§r" in text) {
                         markDead(teammate)

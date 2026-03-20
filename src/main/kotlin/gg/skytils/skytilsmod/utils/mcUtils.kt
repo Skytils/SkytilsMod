@@ -18,7 +18,7 @@
 
 package gg.skytils.skytilsmod.utils
 
-import gg.essential.elementa.state.v2.State
+import gg.essential.elementa.unstable.state.v2.State
 import gg.essential.universal.wrappers.UPlayer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource

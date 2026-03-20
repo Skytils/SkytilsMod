@@ -74,7 +74,7 @@ object LegacyIdProvider {
         runCatching {
             mc.resourceManager.getResourceOrThrow(
                 Identifier.of("catlas:state2legacy.json")
-            ).inputStream.use(json::decodeFromStream<JsonObject>)
+            ).inputStream.use { json.decodeFromStream<JsonObject>(it) }
         }.getOrNull()?.forEach { (k, v) ->
             if (k.startsWith("//")) return@forEach
             val id = when (v) {

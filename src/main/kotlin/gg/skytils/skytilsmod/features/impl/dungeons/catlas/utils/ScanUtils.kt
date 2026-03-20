@@ -38,7 +38,7 @@ object ScanUtils {
         runCatching {
             mc.resourceManager.getResourceOrThrow(
                 Identifier.of("catlas:rooms.json")
-            ).inputStream.use(json::decodeFromStream)
+            ).inputStream.use { json.decodeFromStream<Set<RoomData>>(it) }
         }.getOrElse {
             emptySet()
         }

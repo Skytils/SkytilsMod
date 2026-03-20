@@ -20,10 +20,10 @@ package gg.skytils.skytilsmod.core.structure.v2
 
 import gg.essential.elementa.components.UIBlock
 import gg.essential.elementa.components.UIContainer
-import gg.essential.elementa.layoutdsl.*
-import gg.essential.elementa.state.v2.MutableState
-import gg.essential.elementa.state.v2.memo
-import gg.essential.elementa.state.v2.mutableStateOf
+import gg.essential.elementa.unstable.layoutdsl.*
+import gg.essential.elementa.unstable.state.v2.MutableState
+import gg.essential.elementa.unstable.state.v2.memo
+import gg.essential.elementa.unstable.state.v2.mutableStateOf
 import gg.essential.elementa.utils.withAlpha
 import gg.essential.universal.UResolution
 import gg.skytils.skytilsmod.gui.layout.modifier.OffsetMouseAlignment

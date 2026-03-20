@@ -44,7 +44,7 @@ object ItemUtil {
      */
     @JvmStatic
     fun getExtraAttributes(item: ItemStack?): NbtCompound? {
-        return item?.get(DataComponentTypes.CUSTOM_DATA)?.nbt?.getCompound("ExtraAttributes")
+        return item?.get(DataComponentTypes.CUSTOM_DATA)?.copyNbt()?.getCompound("ExtraAttributes")?.orElse(null)
     }
 
     /**
@@ -56,7 +56,7 @@ object ItemUtil {
      */
     @JvmStatic
     fun getSkyBlockItemID(extraAttributes: NbtCompound?): String? {
-        return extraAttributes?.getString("id")
+        return extraAttributes?.getString("id")?.orElse(null)
             ?.takeUnless { it.isEmpty() }
     }
 

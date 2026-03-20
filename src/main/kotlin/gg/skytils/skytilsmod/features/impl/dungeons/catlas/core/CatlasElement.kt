@@ -32,12 +32,12 @@ import gg.skytils.skytilsmod.listeners.DungeonListener
 import gg.skytils.skytilsmod.utils.SBInfo
 import gg.skytils.skytilsmod.utils.SkyblockIsland
 import gg.skytils.skytilsmod.utils.Utils
+import net.minecraft.client.gl.RenderPipelines
 import net.minecraft.client.gui.DrawContext
-import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.RenderTickCounter
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.RotationAxis
 import net.minecraft.util.profiler.Profilers
+import kotlin.math.PI
 import java.awt.Color
 
 object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
@@ -55,23 +55,23 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
     private fun setupRotate(context: DrawContext) {
         context.enableScissor(0, 0, 128, 128)
-        context.matrices.translate(64.0, 64.0, 0.0)
-        context.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-mc.player!!.yaw + 180f))
+        context.matrices.translate(64f, 64f)
+        val angle = -mc.player!!.yaw + 180f
+        context.matrices.rotate((angle * PI / 180.0).toFloat())
 
         if (CatlasConfig.mapCenter) {
             context.matrices.translate(
-                -((mc.player!!.x - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first - 2),
-                -((mc.player!!.z - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second - 2),
-                0.0
+                -((mc.player!!.x - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first - 2).toFloat(),
+                -((mc.player!!.z - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second - 2).toFloat()
             )
         } else {
-            context.matrices.translate(-64.0, -64.0, 0.0)
+            context.matrices.translate(-64f, -64f)
         }
     }
 
     private fun renderRooms(context: DrawContext) {
-        context.matrices.push()
-        context.matrices.translate(MapUtils.startCorner.first.toFloat(), MapUtils.startCorner.second.toFloat(), 0f)
+        context.matrices.pushMatrix()
+        context.matrices.translate(MapUtils.startCorner.first.toFloat(), MapUtils.startCorner.second.toFloat())
 
         val connectorSize = (DungeonMapColorParser.quarterRoom.takeUnless { it == -1 } ?: 4)
         val checkmarkSize = when (CatlasConfig.mapCheckmark) {
@@ -123,7 +123,7 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                 }
             }
         }
-        context.matrices.pop()
+        context.matrices.popMatrix()
     }
 
     private fun getDoorState(door: Door, row: Int, column: Int): RoomState {
@@ -145,8 +145,8 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
     }
 
     private fun renderText(context: DrawContext) {
-        context.matrices.push()
-        context.matrices.translate(MapUtils.startCorner.first.toFloat(), MapUtils.startCorner.second.toFloat(), 0f)
+        context.matrices.pushMatrix()
+        context.matrices.translate(MapUtils.startCorner.first.toFloat(), MapUtils.startCorner.second.toFloat())
 
         val checkmarkSize = when (CatlasConfig.mapCheckmark) {
             1 -> 8.0 // default
@@ -185,15 +185,14 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
             }
 
             if (hasSecrets && (CatlasConfig.mapRoomSecrets == 2 || CatlasConfig.mapRoomSecrets == 3 && room.state != RoomState.GREEN)) {
-                context.matrices.push()
+                context.matrices.pushMatrix()
                 context.matrices.translate(
                     xOffsetCheck + halfRoom.toFloat(),
-                    yOffsetCheck + 2 + halfRoom.toFloat(),
-                    0f
+                    yOffsetCheck + 2 + halfRoom.toFloat()
                 )
-                context.matrices.scale(2f, 2f, 1f)
+                context.matrices.scale(2f, 2f)
                 RenderUtils.renderCenteredText(context, listOf(secretText), 0, 0, color)
-                context.matrices.pop()
+                context.matrices.popMatrix()
             } else if (CatlasConfig.mapCheckmark != 0) {
                 drawCheckmark(context, room, xOffsetCheck, yOffsetCheck, checkmarkSize)
             }
@@ -219,7 +218,7 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
                 color
             )
         }
-        context.matrices.pop()
+        context.matrices.popMatrix()
     }
 
     private fun getCheckmark(state: RoomState, type: Int): Identifier? {
@@ -246,13 +245,10 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
     private fun drawCheckmark(context: DrawContext, tile: Tile, xOffset: Float, yOffset: Float, checkmarkSize: Double) {
         getCheckmark(tile.state, CatlasConfig.mapCheckmark)?.let {
-            context.drawTexture(RenderLayer::getGuiTextured, it,
-                (xOffset + (MapUtils.mapRoomSize - checkmarkSize) / 2).toInt(),
-                (yOffset + (MapUtils.mapRoomSize - checkmarkSize) / 2).toInt(),
-                0f, 0f,
-                checkmarkSize.toInt(), checkmarkSize.toInt(),
-                checkmarkSize.toInt(), checkmarkSize.toInt()
-            )
+            val x = (xOffset + (MapUtils.mapRoomSize - checkmarkSize) / 2).toInt()
+            val y = (yOffset + (MapUtils.mapRoomSize - checkmarkSize) / 2).toInt()
+            val size = checkmarkSize.toInt()
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, it, x, y, 0f, 0f, size, size, size, size)
         }
     }
 
@@ -305,12 +301,12 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
         Profilers.get().pop()
 
         if (CatlasConfig.mapRotate) {
-            context.matrices.push()
+            context.matrices.pushMatrix()
             setupRotate(context)
         } else if (CatlasConfig.mapDynamicRotate) {
-            context.matrices.translate(64.0, 64.0, 0.0)
-            context.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(dynamicRotation))
-            context.matrices.translate(-64.0, -64.0, 0.0)
+            context.matrices.translate(64f, 64f)
+            context.matrices.rotate((-dynamicRotation * PI / 180.0).toFloat())
+            context.matrices.translate(-64f, -64f)
         }
 
         Profilers.get().push("rooms")
@@ -323,11 +319,11 @@ object CatlasElement : GuiElement(name = "Dungeon Map", x = 0, y = 0) {
 
         if (CatlasConfig.mapRotate) {
             context.disableScissor()
-            context.matrices.pop()
+            context.matrices.popMatrix()
         } else if (CatlasConfig.mapDynamicRotate) {
-            context.matrices.translate(64.0, 64.0, 0.0)
-            context.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-dynamicRotation))
-            context.matrices.translate(-64.0, -64.0, 0.0)
+            context.matrices.translate(64f, 64f)
+            context.matrices.rotate((dynamicRotation * PI / 180.0).toFloat())
+            context.matrices.translate(-64f, -64f)
         }
     }
 

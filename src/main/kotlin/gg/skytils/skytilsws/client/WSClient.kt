@@ -80,7 +80,7 @@ object WSClient {
             wsClient.webSocketSession(System.getProperty("skytils.websocketURL", "wss://ws.skytils.gg/ws")).apply {
                 session = this
                 try {
-                    sendSerialized<Packet>(C2SPacketConnect(SkytilsWS.version, Skytils.VERSION))
+                    sendSerialized<Packet>(C2SPacketConnect(SkytilsWS.version, Skytils.MOD_ID, Skytils.VERSION))
                     while (true) {
                         val packet = receiveDeserialized<Packet>()
                         PacketHandler.processPacket(this@apply, packet)

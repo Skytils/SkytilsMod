@@ -116,11 +116,11 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")), E
         for ((_, element) in elements) {
             Profilers.get().push(element.name)
             try {
-                event.context.matrices.push()
-                event.context.matrices.translate(element.scaleX, element.scaleY, 0f)
-                event.context.matrices.scale(element.scale, element.scale, 0f)
+                event.context.matrices.pushMatrix()
+                event.context.matrices.translate(element.scaleX, element.scaleY)
+                event.context.matrices.scale(element.scale, element.scale)
                 element.render(event.context, event.tickCounter)
-                event.context.matrices.pop()
+                event.context.matrices.popMatrix()
             } catch (ex: Exception) {
                 ex.printStackTrace()
                 UChat.chat("${Skytils.failPrefix} §cSkytils ${Skytils.VERSION} caught and logged an ${ex::class.simpleName ?: "error"} while rendering ${element.name}. Please report this on the Discord server at discord.gg/skytils.")
@@ -160,19 +160,18 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")), E
             if (stringWidth * scale > scaledWidth * 0.9f) {
                 scale = scaledWidth * 0.9f / stringWidth.toFloat()
             }
-            context.matrices.push()
+            context.matrices.pushMatrix()
             context.matrices.translate(
                 (context.scaledWindowWidth / 2).toFloat(),
-                (context.scaledWindowHeight / 2).toFloat(),
-                0.0f
+                (context.scaledWindowHeight / 2).toFloat()
             )
 /*            RenderSystem.enableBlend()
             RenderSystem.blendFuncSeparate(770, 771, 1, 0)*/
-            context.matrices.scale(scale, scale, scale) // TODO Check if changing this scale breaks anything...
-            context.matrices.push()
+            context.matrices.scale(scale, scale) // TODO Check if changing this scale breaks anything...
+            context.matrices.pushMatrix()
             context.drawTextWithBackground(textRenderer, Text.of(title), -stringWidth / 2, -10, stringWidth, 0xFF0000)
-            context.matrices.pop()
-            context.matrices.pop()
+            context.matrices.popMatrix()
+            context.matrices.popMatrix()
         }
 
         if (subtitle != null) {
@@ -181,19 +180,18 @@ object GuiManager : PersistentSave(File(Skytils.modDir, "guipositions.json")), E
             if (stringWidth * scale > scaledWidth * 0.9f) {
                 scale = scaledWidth * 0.9f / stringWidth.toFloat()
             }
-            context.matrices.push()
+            context.matrices.pushMatrix()
             context.matrices.translate(
                 (context.scaledWindowWidth / 2).toFloat(),
-                (context.scaledWindowHeight / 2).toFloat(),
-                0.0f
+                (context.scaledWindowHeight / 2).toFloat()
             )
 /*            RenderSystem.enableBlend()
             RenderSystem.blendFuncSeparate(770, 771, 1, 0)*/
-            context.matrices.push()
-            context.matrices.scale(scale, scale, scale) // TODO Check if changing this scale breaks anything...
+            context.matrices.pushMatrix()
+            context.matrices.scale(scale, scale) // TODO Check if changing this scale breaks anything...
             context.drawTextWithBackground(textRenderer, Text.of(subtitle), -stringWidth / 2, 5, stringWidth, 0xFF0000)
-            context.matrices.pop()
-            context.matrices.pop()
+            context.matrices.popMatrix()
+            context.matrices.popMatrix()
         }
     }
 

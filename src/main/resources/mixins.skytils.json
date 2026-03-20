@@ -14,6 +14,7 @@
   "verbose": true,
   "client": [
     "accessors.AccessorNetHandlerPlayClient",
+    "accessors.AccessorRenderLayer",
     "events.MixinGuiIngame",
     "events.MixinNetHandlerPlayClient",
     "events.MixinNetworkManager",

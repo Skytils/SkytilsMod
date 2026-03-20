@@ -27,10 +27,9 @@ import gg.skytils.event.register
 import gg.skytils.skytilsmod._event.MainThreadPacketReceiveEvent
 import gg.skytils.skytilsmod.utils.DevTools
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap
-import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.render.VertexConsumer
 import net.minecraft.client.render.VertexRendering
-import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.network.packet.s2c.play.UnloadChunkS2CPacket
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Box
@@ -68,8 +67,10 @@ object HeightProvider : EventSubscriber {
     fun onWorldDraw(event: WorldDrawEvent) {
         if (DevTools.getToggle("heightmap")) {
             event.matrices.push()
-            event.matrices.translate(event.camera.pos.negate())
-            val vertexConsumer: VertexConsumer = event.entityVertexConsumers.getBuffer(RenderLayer.getLines())
+            event.matrices.translate(event.camera.cameraPos.negate())
+            // HeightProvider is a debug visualisation — use standard depth-tested lines (no wall-clip)
+            val linesLayer = RenderLayers.LINES_TRANSLUCENT
+            val vertexConsumer: VertexConsumer = event.entityVertexConsumers.getBuffer(linesLayer)
             for ((k, v) in heightMap) {
                 val pos = BlockPos.fromLong(k).withY(v)
                 if (!pos.isWithinDistance(event.camera.blockPos, 160.0)) continue
@@ -80,10 +81,11 @@ object HeightProvider : EventSubscriber {
                     pos.x.toDouble(),
                     pos.y.toDouble(),
                     pos.z.toDouble(),
-                    Color.RED.rgb
+                    Color.RED.rgb,
+                    1.0f
                 )
             }
-            event.entityVertexConsumers.draw(RenderLayer.getLines())
+            event.entityVertexConsumers.draw(linesLayer)
             event.matrices.pop()
         }
     }

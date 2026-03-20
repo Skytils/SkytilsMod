@@ -24,10 +24,11 @@ cloud-fabric = { module = "org.incendo:cloud-fabric", version.ref = "cloud-fabri
 cloud-annotaitons = { module = "org.incendo:cloud-annotations", version.ref = "cloud" }
 fabricapi-bom = { module = "net.fabricmc.fabric-api:fabric-api-bom", version.ref = "fabricapi" }
 fabricapi-commandapi = { module = "net.fabricmc.fabric-api:fabric-command-api-v2" }
+fabricapi-lifecycle = { module = "net.fabricmc.fabric-api:fabric-lifecycle-events-v1" }
 partnermodintegration = { module = "gg.essential:partner-mod-integration-1.21.11-fabric", version.ref = "pmi" }
 
 [bundles]
-fabricapi = [ "fabricapi-bom", "fabricapi-commandapi" ]
+fabricapi = [ "fabricapi-bom", "fabricapi-commandapi", "fabricapi-lifecycle" ]
 cloud = [ "cloud-fabric", "cloud-annotaitons" ]
 
 [plugins]

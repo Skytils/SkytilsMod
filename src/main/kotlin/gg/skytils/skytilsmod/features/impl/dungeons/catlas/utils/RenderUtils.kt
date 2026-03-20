@@ -27,16 +27,18 @@ import gg.skytils.skytilsmod.utils.DungeonClass
 import gg.skytils.skytilsmod.utils.ItemUtil
 import gg.skytils.skytilsmod.utils.Utils
 import gg.skytils.skytilsmod.utils.ifNull
+import net.minecraft.client.gl.RenderPipelines
 import net.minecraft.client.gui.DrawContext
 import net.minecraft.client.gui.PlayerSkinDrawer
-import net.minecraft.client.render.RenderLayer
 import net.minecraft.util.Identifier
-import net.minecraft.util.math.RotationAxis
 import java.awt.Color
+import kotlin.math.PI
 import kotlin.math.roundToInt
 
 object RenderUtils {
     private val mapIcons = Identifier.of("catlas:textures/marker.png")
+
+    private fun Float.toRadians(): Float = (this * PI / 180.0).toFloat()
 
     fun renderRectBorder(context: DrawContext, x: Double, y: Double, w: Double, h: Double, thickness: Double, color: Color) {
         if (color.alpha == 0) return
@@ -48,14 +50,14 @@ object RenderUtils {
 
     fun renderCenteredText(context: DrawContext, text: List<String>, x: Int, y: Int, color: Int) {
         if (text.isEmpty()) return
-        context.matrices.push()
-        context.matrices.translate(x.toFloat(), y.toFloat(), 0f)
-        context.matrices.scale(CatlasConfig.textScale, CatlasConfig.textScale, 1f)
+        context.matrices.pushMatrix()
+        context.matrices.translate(x.toFloat(), y.toFloat())
+        context.matrices.scale(CatlasConfig.textScale, CatlasConfig.textScale)
 
         if (CatlasConfig.mapRotate) {
-            context.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(mc.player!!.yaw + 180f))
+            context.matrices.rotate((mc.player!!.yaw + 180f).toRadians())
         } else if (CatlasConfig.mapDynamicRotate) {
-            context.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-CatlasElement.dynamicRotation))
+            context.matrices.rotate((-CatlasElement.dynamicRotation).toRadians())
         }
 
         val fontHeight = mc.textRenderer.fontHeight + 1
@@ -66,50 +68,46 @@ object RenderUtils {
         }
 
         if (CatlasConfig.mapDynamicRotate) {
-            context.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(CatlasElement.dynamicRotation))
+            context.matrices.rotate(CatlasElement.dynamicRotation.toRadians())
         }
 
-        context.matrices.pop()
+        context.matrices.popMatrix()
     }
 
     fun drawPlayerHead(context: DrawContext, name: String, player: DungeonMapPlayer) {
-        context.matrices.push()
+        context.matrices.pushMatrix()
         try {
             // Translates to the player's location which is updated every tick.
             if (player.isOurMarker || name == mc.player!!.name.string) {
                 context.matrices.translate(
-                    (mc.player!!.x - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first,
-                    (mc.player!!.z - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second,
-                    0.0
+                    ((mc.player!!.x - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first).toFloat(),
+                    ((mc.player!!.z - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second).toFloat()
                 )
             } else {
                 player.teammate.player?.also { entityPlayer ->
                     // If the player is loaded in our view, use that location instead (more precise)
                     context.matrices.translate(
-                        (entityPlayer.x - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first,
-                        (entityPlayer.z - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second,
-                        0.0
+                        ((entityPlayer.x - DungeonScanner.startX + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.first).toFloat(),
+                        ((entityPlayer.z - DungeonScanner.startZ + 15) * MapUtils.coordMultiplier + MapUtils.startCorner.second).toFloat()
                     )
                 }.ifNull {
-                    context.matrices.translate(player.mapX.toFloat(), player.mapZ.toFloat(), 0f)
+                    context.matrices.translate(player.mapX.toFloat(), player.mapZ.toFloat())
                 }
             }
 
             // Apply head rotation and scaling
-            context.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(player.yaw + 180f))
-            context.matrices.scale(CatlasConfig.playerHeadScale, CatlasConfig.playerHeadScale, 1f)
+            context.matrices.rotate((player.yaw + 180f).toRadians())
+            context.matrices.scale(CatlasConfig.playerHeadScale, CatlasConfig.playerHeadScale)
 
             if (CatlasConfig.mapVanillaMarker && (player.isOurMarker || name == mc.player!!.name.string)) {
-                //context.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(180f))
                 context.drawTexture(
-                    RenderLayer::getGuiTextured,
+                    RenderPipelines.GUI_TEXTURED,
                     mapIcons,
                     -6, -6,
                     0f, 0f,
                     12, 12,
                     12, 12
                 )
-                //context.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-180f))
             } else {
                 // Render box behind the player head
                 val borderColor = when (player.teammate.dungeonClass) {
@@ -122,11 +120,11 @@ object RenderUtils {
                 }
 
                 context.fill(-6, -6, -6 + 12, -6 + 12, borderColor.rgb)
-                context.matrices.translate(0f, 0f, 0.1f)
+                context.matrices.translate(0f, 0f)
 
-                context.matrices.push()
+                context.matrices.pushMatrix()
                 val scale = 1f - CatlasConfig.playerBorderPercentage
-                context.matrices.scale(scale, scale, scale)
+                context.matrices.scale(scale, scale)
 
                 PlayerSkinDrawer.draw(
                     context,
@@ -138,7 +136,7 @@ object RenderUtils {
                     false,
                     -1
                 )
-                context.matrices.pop()
+                context.matrices.popMatrix()
             }
 
             // Handle player names
@@ -147,19 +145,19 @@ object RenderUtils {
                     "SPIRIT_LEAP", "INFINITE_SPIRIT_LEAP", "HAUNT_ABILITY"
                 )
             ) {
-                context.matrices.push()
+                context.matrices.pushMatrix()
                 if (!CatlasConfig.mapRotate) {
-                    context.matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(-player.yaw + 180f))
+                    context.matrices.rotate((-player.yaw + 180f).toRadians())
                 }
-                context.matrices.translate(0f, 10f, 0f)
-                context.matrices.scale(CatlasConfig.playerNameScale, CatlasConfig.playerNameScale, 1f)
+                context.matrices.translate(0f, 10f)
+                context.matrices.scale(CatlasConfig.playerNameScale, CatlasConfig.playerNameScale)
                 context.drawCenteredTextWithShadow(mc.textRenderer, name, 0, 0, 0xFFFFFF)
-                context.matrices.pop()
+                context.matrices.popMatrix()
             }
 
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        context.matrices.pop()
+        context.matrices.popMatrix()
     }
 }

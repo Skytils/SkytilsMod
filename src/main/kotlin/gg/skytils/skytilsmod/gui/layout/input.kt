@@ -19,9 +19,9 @@
 package gg.skytils.skytilsmod.gui.layout
 
 import gg.essential.elementa.dsl.width
-import gg.essential.elementa.layoutdsl.*
-import gg.essential.elementa.state.v2.MutableState
-import gg.essential.elementa.state.v2.State
+import gg.essential.elementa.unstable.layoutdsl.*
+import gg.essential.elementa.unstable.state.v2.MutableState
+import gg.essential.elementa.unstable.state.v2.State
 import gg.essential.universal.USound
 import gg.essential.vigilance.utils.onLeftClick
 import gg.skytils.skytilsmod.gui.components.UIFilteringTextInput

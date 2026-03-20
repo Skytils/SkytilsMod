@@ -11,7 +11,7 @@ import gg.skytils.skytilsmod.Skytils
 import java.net.URI
 
 object Config : Vigilant(
-    Skytils.modDir.resolve("config.toml").toFile(),
+    Skytils.modDir.resolve("config.toml"),
     "Skytils (${Reference.VERSION})",
     sortingBehavior = ConfigSorting
 ) {

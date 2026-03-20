@@ -24,9 +24,11 @@ import gg.essential.elementa.constraints.PositionConstraint
 import gg.essential.elementa.constraints.RelativeConstraint
 import gg.essential.elementa.dsl.plus
 import gg.essential.elementa.dsl.pixels
-import gg.essential.elementa.layoutdsl.*
+import gg.essential.elementa.unstable.layoutdsl.*
 
 class OffsetMouseAlignment(val x: Float = 0f, val y: Float = 0f) : Alignment {
+    override fun align(childSize: Float, parentSize: Float): Float = 0f
+
     override fun applyHorizontal(component: UIComponent): () -> Unit {
         return BasicXModifier { MousePositionConstraint() + x.pixels }.applyToComponent(component)
     }
@@ -37,6 +39,8 @@ class OffsetMouseAlignment(val x: Float = 0f, val y: Float = 0f) : Alignment {
 }
 
 private class BasicAlignment(private val constraintFactory: () -> PositionConstraint) : Alignment {
+    override fun align(childSize: Float, parentSize: Float): Float = 0f
+
     override fun applyHorizontal(component: UIComponent): () -> Unit {
         return BasicXModifier(constraintFactory).applyToComponent(component)
     }

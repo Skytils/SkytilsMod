@@ -20,8 +20,8 @@ package gg.skytils.skytilsmod.gui.layout.modifier
 
 import gg.essential.elementa.UIComponent
 import gg.essential.elementa.events.UIClickEvent
-import gg.essential.elementa.layoutdsl.Modifier
-import gg.essential.elementa.layoutdsl.then
+import gg.essential.elementa.unstable.layoutdsl.Modifier
+import gg.essential.elementa.unstable.layoutdsl.then
 
 inline fun Modifier.onLeftClickEvent(crossinline callback: UIComponent.(UIClickEvent) -> Unit) = this then  {
     val listener: UIComponent.(event: UIClickEvent) -> Unit = { event ->
