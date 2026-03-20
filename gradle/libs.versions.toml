@@ -12,6 +12,10 @@ cloud-fabric = "2.0.0-beta.15"
 cloud = "2.0.0"
 fabricapi = "0.141.3+1.21.11"
 pmi = "1.0.6"
+brotli = "0.1.2"
+ktor = "2.3.13"
+kotlinx-serialization-protobuf = "1.9.0"
+mixinextras = "0.5.0-rc.1"
 
 [libraries]
 flk = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "flk" }
@@ -24,10 +28,21 @@ cloud-fabric = { module = "org.incendo:cloud-fabric", version.ref = "cloud-fabri
 cloud-annotaitons = { module = "org.incendo:cloud-annotations", version.ref = "cloud" }
 fabricapi-bom = { module = "net.fabricmc.fabric-api:fabric-api-bom", version.ref = "fabricapi" }
 fabricapi-commandapi = { module = "net.fabricmc.fabric-api:fabric-command-api-v2" }
+fabricapi-lifecycle = { module = "net.fabricmc.fabric-api:fabric-lifecycle-events-v1" }
 partnermodintegration = { module = "gg.essential:partner-mod-integration-1.21.11-fabric", version.ref = "pmi" }
+brotli = { module = "org.brotli:dec", version.ref = "brotli" }
+ktor-client-core = { module = "io.ktor:ktor-client-core-jvm", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio-jvm", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation-jvm", version.ref = "ktor" }
+ktor-client-encoding = { module = "io.ktor:ktor-client-encoding-jvm", version.ref = "ktor" }
+ktor-client-websockets = { module = "io.ktor:ktor-client-websockets-jvm", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json-jvm", version.ref = "ktor" }
+ktor-serialization-kotlinx-jvm = { module = "io.ktor:ktor-serialization-kotlinx-jvm", version.ref = "ktor" }
+kotlinx-serialization-protobuf = { module = "org.jetbrains.kotlinx:kotlinx-serialization-protobuf-jvm", version.ref = "kotlinx-serialization-protobuf" }
+mixinextras = { module = "io.github.llamalad7:mixinextras-fabric", version.ref = "mixinextras" }
 
 [bundles]
-fabricapi = [ "fabricapi-bom", "fabricapi-commandapi" ]
+fabricapi = [ "fabricapi-bom", "fabricapi-commandapi", "fabricapi-lifecycle" ]
 cloud = [ "cloud-fabric", "cloud-annotaitons" ]
 
 [plugins]

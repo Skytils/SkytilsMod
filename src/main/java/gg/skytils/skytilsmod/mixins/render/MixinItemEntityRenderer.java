@@ -1,7 +1,7 @@
 package gg.skytils.skytilsmod.mixins.render;
 
 import gg.skytils.skytilsmod.core.Config;
-import gg.skytils.skytilsmod.util.SBInfo;
+import gg.skytils.skytilsmod.utils.SBInfo;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.ItemEntityRenderer;
 import net.minecraft.client.render.entity.state.ItemEntityRenderState;

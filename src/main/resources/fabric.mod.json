@@ -21,22 +21,18 @@
         "adapter": "kotlin",
         "value": "gg.skytils.skytilsmod.SkytilsMod"
       }
-    ],
-    "preLaunch": [
-      {
-        "adapter": "kotlin",
-        "value": "gg.skytils.skytilsmod.SkytilsMod::preLaunch"
-      }
     ]
   },
   "mixins": [
     "mixins.skytils.json",
-    "mixins.skytils-events.json"
+    "mixins.skytils-events.json",
+    "mixins.skytils-init.json"
   ],
   "depends": {
     "fabric-language-kotlin": "${flk}",
     "cloud": "*",
     "fabric-api": "*",
+    "hypixel-mod-api": ">=1.0.1",
     "minecraft": "*"
   }
 }

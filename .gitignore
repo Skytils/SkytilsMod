@@ -120,3 +120,25 @@ run/
 .vscode/
 
 .kotlin/
+
+# ── GSD baseline (auto-generated) ──
+.gsd
+.bg-shell/
+*.swp
+*.swo
+*.code-workspace
+.env
+.env.*
+!.env.example
+node_modules/
+.next/
+dist/
+__pycache__/
+*.pyc
+.venv/
+venv/
+target/
+vendor/
+coverage/
+.cache/
+tmp/

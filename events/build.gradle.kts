@@ -6,6 +6,8 @@ plugins {
 
 dependencies {
     modCompileOnly(libs.flk)
+    implementation("io.github.llamalad7:mixinextras-fabric:0.5.0-rc.1")
+    annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.5.0-rc.1")
 }
 
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))

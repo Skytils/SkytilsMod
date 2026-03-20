@@ -1,7 +1,7 @@
 package gg.skytils.skytilsmod.mixins.gui;
 
 import gg.skytils.skytilsmod.core.Config;
-import gg.skytils.skytilsmod.util.SBInfo;
+import gg.skytils.skytilsmod.utils.SBInfo;
 import kotlin.text.StringsKt;
 import net.minecraft.client.gui.screen.ingame.AbstractSignEditScreen;
 import net.minecraft.client.input.KeyInput;

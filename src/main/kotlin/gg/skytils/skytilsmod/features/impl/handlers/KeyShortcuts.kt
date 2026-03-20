@@ -2,14 +2,14 @@ package gg.skytils.skytilsmod.features.impl.handlers
 
 import gg.essential.universal.UKeyboard
 import gg.skytils.event.EventSubscriber
-import gg.skytils.event.impl.KeyboardInputEvent
-import gg.skytils.event.impl.MouseInputEvent
+import gg.skytils.event.impl.play.KeyboardInputEvent
+import gg.skytils.event.impl.play.MouseInputEvent
 import gg.skytils.event.register
 import gg.skytils.skytilsmod.Skytils
 import gg.skytils.skytilsmod.Skytils.json
 import gg.skytils.skytilsmod.Skytils.mc
 import gg.skytils.skytilsmod.core.PersistentSave
-import gg.skytils.skytilsmod.util.SBInfo
+import gg.skytils.skytilsmod.utils.SBInfo
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
@@ -68,6 +68,10 @@ object KeyShortcuts: EventSubscriber, PersistentSave(Skytils.modDir.resolve("key
 
     override fun write(writer: Writer) {
         writer.write(json.encodeToString(shortcuts))
+    }
+
+    override fun setDefault(writer: Writer) {
+        writer.write("[]")
     }
 
     @Serializable

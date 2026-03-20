@@ -1,18 +1,29 @@
 {
-  "compatibilityLevel": "JAVA_21",
-  "required": true,
-  "package": "gg.skytils.event.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "minVersion": "0.8",
+  "package": "gg.skytils.event.mixins",
   "refmap": "mixins.skytils-events.refmap.json",
-  "mixins": [
-    "network.MixinClientConnection"
-  ],
-  "mixinextras": {
-    "minVersion": "0.5.3"
-  },
   "client": [
     "MixinKeyboard",
-    "MixinMinecraftClient",
+    "MixinMinecraft",
     "MixinMouse",
-    "network.MixinClientPlayNetworkHandler"
+    "entity.MixinBossStatus",
+    "entity.MixinEntityPlayer",
+    "gui.MixinChatScreen",
+    "gui.MixinGuiContainer",
+    "gui.MixinGuiScreen",
+    "network.MixinMessageHandler",
+    "network.MixinNetHandlerPlayClient",
+    "network.MixinNetworkManager",
+    "render.MixinItemRenderer",
+    "render.MixinRenderManager",
+    "render.MixinWorldRenderer",
+    "world.MixinClientChunkManager",
+    "world.MixinWorld"
+  ],
+  "verbose": true,
+  "mixins": [
+    "entity.MixinEntityLivingBase",
+    "world.MixinChunk"
   ]
 }

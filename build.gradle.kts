@@ -11,7 +11,20 @@ plugins {
 }
 
 repositories {
+    mavenCentral()
+    maven("https://repo.essential.gg/repository/maven-public/")
+    maven("https://repo.essential.gg/repository/maven-releases/")
     maven("https://repo.hypixel.net/repository/Hypixel")
+    maven("https://jitpack.io") {
+        mavenContent {
+            includeGroupAndSubgroups("com.github")
+        }
+    }
+    maven("https://maven.dediamondpro.dev/releases") {
+        mavenContent {
+            includeGroup("dev.dediamondpro")
+        }
+    }
 }
 
 val relocated: Configuration by configurations.creating
@@ -32,6 +45,17 @@ dependencies {
     include(implementation(libs.cloud.annotaitons.get())!!)
     modImplementation(libs.bundles.fabricapi)
     include(modImplementation(libs.partnermodintegration.get())!!)
+    include(implementation(libs.brotli.get())!!)
+    include(implementation(libs.ktor.client.core.get())!!)
+    include(implementation(libs.ktor.client.cio.get())!!)
+    include(implementation(libs.ktor.client.content.negotiation.get())!!)
+    include(implementation(libs.ktor.client.encoding.get())!!)
+    include(implementation(libs.ktor.client.websockets.get())!!)
+    include(implementation(libs.ktor.serialization.kotlinx.json.get())!!)
+    include(implementation(libs.ktor.serialization.kotlinx.jvm.get())!!)
+    include(implementation(libs.kotlinx.serialization.protobuf.get())!!)
+    implementation(libs.mixinextras)
+    annotationProcessor(libs.mixinextras)
 }
 
 java.toolchain.languageVersion.set(JavaLanguageVersion.of(21))
