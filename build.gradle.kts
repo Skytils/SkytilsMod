@@ -59,7 +59,6 @@ tasks {
 
     shadowJar {
         archiveBaseName.set(loom.minecraftVersion.map { "Skytils-$it" })
-        archiveClassifier.set("dev")
         configurations = listOf(relocated)
 
         relocate("gg.essential.elementa.unstable", "gg.skytils.elementa.unstable")

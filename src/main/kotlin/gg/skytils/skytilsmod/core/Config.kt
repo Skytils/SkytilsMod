@@ -49,6 +49,21 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life",
     )
     var pressEnterToConfirmSignQuestion = false
+  
+    @Property(
+        type = PropertyType.DECIMAL_SLIDER, name = "Dropped Item Scale",
+        description = "Changes the scale of dropped items.",
+        category = "Miscellaneous", subcategory = "Quality of Life",
+        minF = 0.10f, maxF = 2f, decimalPlaces = 2
+    )
+    var droppedItemScale = 1f
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Prevent Cursor Reset",
+        description = "Prevents the cursor from resetting to the center of the screen when you open a GUI.",
+        category = "Miscellaneous", subcategory = "Quality of Life"
+    )
+    var preventCursorReset = false
 
     @Property(
         type = PropertyType.SWITCH, name = "Show Item Rarity",

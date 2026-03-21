@@ -9,6 +9,7 @@ import gg.skytils.skytilsmod.core.HypixelApi
 import gg.skytils.skytilsmod.core.PersistentSave
 import gg.skytils.skytilsmod.features.impl.handlers.KeyShortcuts
 import gg.skytils.skytilsmod.features.impl.misc.ShowItemRarity
+import gg.skytils.skytilsmod.features.impl.handlers.MiscFeatures
 import gg.skytils.skytilsmod.util.SBInfo
 import kotlinx.serialization.json.Json
 import net.fabricmc.loader.api.FabricLoader
@@ -43,7 +44,8 @@ object Skytils : EventSubscriber {
             SBInfo,
 
             KeyShortcuts,
-            ShowItemRarity
+            MiscFeatures,
+            ShowItemRarity,
         ).forEach(EventSubscriber::setup)
 
         HypixelApi.setup()
