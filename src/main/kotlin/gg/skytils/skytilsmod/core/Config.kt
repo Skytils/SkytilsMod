@@ -49,7 +49,7 @@ object Config : Vigilant(
         category = "Miscellaneous", subcategory = "Quality of Life",
     )
     var pressEnterToConfirmSignQuestion = false
-
+  
     @Property(
         type = PropertyType.DECIMAL_SLIDER, name = "Dropped Item Scale",
         description = "Changes the scale of dropped items.",
@@ -65,7 +65,40 @@ object Config : Vigilant(
     )
     var preventCursorReset = false
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Item Rarity",
+        description = "Shows the Rarity of items as their background.",
+        category = "Miscellaneous", subcategory = "Item Rarity"
+    )
+    var showItemRarity = false
+
+    @Property(
+        type = PropertyType.SWITCH, name = "Show Pet Rarity",
+        description = "Shows the Rarity of pets as their background.",
+        category = "Miscellaneous", subcategory = "Item Rarity"
+    )
+    var showPetRarity = false
+
+    @Property(
+        type = PropertyType.SELECTOR, name = "Item Rarity Shape",
+        description = "Select the shape of the rarity background.",
+        category = "Miscellaneous", subcategory = "Item Rarity",
+        options = ["Square", "Square Outline", "Outline"],
+    )
+    var itemRarityShape = 0
+
+    @Property(
+        type = PropertyType.PERCENT_SLIDER, name = "Item Rarity Opacity",
+        description = "Changes how visible the rarity background is. Lower values are less visible.",
+        category = "Miscellaneous", subcategory = "Item Rarity"
+    )
+    var itemRarityOpacity = 1f
+
     fun init() {
+        addDependency("showPetRarity", "showItemRarity")
+        addDependency("itemRarityShape", "showItemRarity")
+        addDependency("itemRarityOpacity", "showItemRarity")
+
         initialize()
         lastLaunchedVersion = Reference.VERSION
         markDirty()
