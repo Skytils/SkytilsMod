@@ -89,11 +89,21 @@ class CommandAliasesScreen : WindowScreen(ElementaVersion.V10) {
     override fun onScreenClose() {
         super.onScreenClose()
 
+        val newAliases = aliases.getUntracked().mapNotNull { (alias, command) ->
+            (alias.trim('/') to command.trim('/')).takeIf { alias.isNotEmpty() && command.isNotEmpty() }
+        }.toMap()
+
+        val dispatcher = CommandAliases.currentDispatcher
+        if (dispatcher != null) {
+            val removed = CommandAliases.aliases.keys - newAliases.keys
+            val added = newAliases.keys - CommandAliases.aliases.keys
+            CommandAliases.removeAliasesFromDispatcher(removed, dispatcher)
+            CommandAliases.injectAliasesIntoDispatcher(added, dispatcher)
+        }
+
         CommandAliases.aliases.run {
             clear()
-            putAll(aliases.getUntracked().mapNotNull { (alias, command) ->
-                (alias.trim('/') to command.trim('/')).takeIf { alias.isNotEmpty() && command.isNotEmpty() }
-            })
+            putAll(newAliases)
         }
 
         PersistentSave.markDirty<CommandAliases>()

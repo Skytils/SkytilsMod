@@ -11,6 +11,7 @@
     "minVersion": "0.5.3"
   },
   "client": [
+    "accessor.CommandNodeAccessor",
     "HideStatusEffects_MixinStatusEffectsDisplay",
     "PreventMouseReset_MixinMouse",
     "gui.EnterConfirmation_MixinAbstractSignEditScreen",
