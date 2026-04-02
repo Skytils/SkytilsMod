@@ -7,6 +7,7 @@ import gg.skytils.skytilsmod.commands.SkytilsCommands
 import gg.skytils.skytilsmod.core.Config
 import gg.skytils.skytilsmod.core.HypixelApi
 import gg.skytils.skytilsmod.core.PersistentSave
+import gg.skytils.skytilsmod.features.impl.handlers.CommandAliases
 import gg.skytils.skytilsmod.features.impl.handlers.KeyShortcuts
 import gg.skytils.skytilsmod.features.impl.misc.ShowItemRarity
 import gg.skytils.skytilsmod.features.impl.handlers.MiscFeatures
@@ -51,6 +52,7 @@ object Skytils : EventSubscriber {
         HypixelApi.setup()
         //noinspection UnusedExpression
         SkytilsCommands
+        CommandAliases
         PersistentSave.loadData()
     }
 

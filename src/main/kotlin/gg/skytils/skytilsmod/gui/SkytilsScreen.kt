@@ -46,6 +46,9 @@ class SkytilsScreen : WindowScreen(ElementaVersion.V10) {
                     button("Edit Key Shortcuts", Modifier.fillWidth()) {
                         displayScreen(KeyShortcutsScreen())
                     }
+                    button("Command Aliases", Modifier.fillWidth()) {
+                        displayScreen(CommandAliasesScreen())
+                    }
                 }
             }
         }
