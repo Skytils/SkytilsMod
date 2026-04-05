@@ -65,6 +65,13 @@ object Config : Vigilant(
     )
     var preventCursorReset = false
 
+    @Property(
+        type = PropertyType.SWITCH, name = "Ice Fill Solver",
+        description = "Solves the Ice Fill Puzzle in Dungeons.",
+        category = "Dungeons", subcategory = "Solver"
+    )
+    var iceFillSolver = false
+
     fun init() {
         initialize()
         lastLaunchedVersion = Reference.VERSION
