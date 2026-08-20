@@ -248,7 +248,7 @@ object CHWaypoints {
             if (!corleone.loc.exists()) {
                 corleone.loc.set()
                 corleone.sendThroughWS()
-            } else corleone.loc.set()
+            }
         }
     }
 
@@ -262,7 +262,7 @@ object CHWaypoints {
                 if (!it.loc.exists()) {
                     it.loc.set()
                     it.sendThroughWS()
-                } else it.loc.set()
+                }
             }
         } else if (waypointDelayTicks > 0)
             waypointDelayTicks--
